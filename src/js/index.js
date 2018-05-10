@@ -1,42 +1,20 @@
-import _ from 'lodash';
-// import Render from '../pulic/index.art';
+// import Webcomponents from 'webcomponents-lite';
+// import core from './core.js';
+// import htmlImport from './html-import.js';
+// import config from './config.js';
+import loader from './loader.js';
 
-// const data = {
-// 	title: 'My Page2222'
-// };
-// const html = Render(data);
-// console.log(html);
+import css from '../css/style.scss';
 
-// if (typeof document === 'object') {
-// 	document.body.innerHTML = html;
-// }
+import { addScript } from './core.js';
+import config from './config.js';
+import htmlImport from './html-import.js';
 
-// if ('serviceWorker' in navigator) {
-// 	window.addEventListener('load', () => {
-// 		navigator.serviceWorker.register('/sw.js').then(registration => {
-// 			console.log('SW registered: ', registration);
-// 		}).catch(registrationError => {
-// 			console.log('SW registration failed: ', registrationError);
-// 		});
-// 	});
-// }
-
-import {
-	MDCTopAppBar
-} from '@material/top-app-bar/index';
+// import {MDCTopAppBar} from '@material/top-app-bar/index';
 
 // Instantiation
-const topAppBarElement = document.querySelector('.mdc-top-app-bar');
-const topAppBar = new MDCTopAppBar(topAppBarElement);
+// const topAppBarElement = document.querySelector('.mdc-top-app-bar');
+// const topAppBar = new MDCTopAppBar(topAppBarElement);
 
-function component() {
-	var element = document.createElement('div');
 
-	// lodash 是由当前 script 脚本 import 导入进来的
-	element.innerHTML = _.join(['Hello', 'webpack'], ' ');
-	element.classList.add('hello');
-
-	return element;
-}
-
-document.body.appendChild(component());
+loader.init();

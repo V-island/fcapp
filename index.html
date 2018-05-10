@@ -5,17 +5,23 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 	<meta name="theme-color" content="#000000">
 	<link rel="manifest" href="/manifest.json">
-	<title><%= htmlWebpackPlugin.options.title %></title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<title>Fun Chat</title>
+    <link rel="import" href="../public/top-nav.html">
 </head>
 <body>
-	<header class="mdc-top-app-bar mdc-top-app-bar--fixed">
-	  <div class="mdc-top-app-bar__row">
-	    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-	      <a href="#" class="material-icons mdc-top-app-bar__navigation-icon">menu</a>
-	      <span class="mdc-top-app-bar__title">Title</span>
-	    </section>
-	  </div>
-	</header>
+
+    <div class="loading">
+        <div class="inner">
+            <img src="./src/img/Ripple.svg" alt="加载中……">
+            正在加载中，请稍等片刻
+        </div>
+    </div>
+	<div class="wrapper">
+        <div class="content-box">
+
+        </div>
+        <!-- .content-box -->
+    </div>
+    <!-- .wrapper -->
 </body>
 </html>

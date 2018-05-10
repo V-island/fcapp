@@ -1,4 +1,0 @@
-<% include('./header.art', {
-      title: title
-}) %>
-<p>This is just an awesome page.</p>

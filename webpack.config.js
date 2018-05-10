@@ -5,11 +5,9 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 // const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
-const extractSass = new ExtractTextPlugin({
-    filename: "[name].[contenthash].css",
-    disable: process.env.NODE_ENV === "development"
-});
 
 module.exports = {
 	entry: {
@@ -22,17 +20,29 @@ module.exports = {
 	},
 	module: {
 		rules: [{
-            test: /\.scss$/,
-            use: extractSass.extract({
-                use: [{
-                    loader: "css-loader"
-                }, {
-                    loader: "sass-loader"
-                }],
-                // 在开发环境使用 style-loader
-                fallback: "style-loader"
-            })
-        }]
+			test: /\.scss$/,
+			use: ExtractTextPlugin.extract({
+				fallback: 'style-loader',
+				//如果需要，可以在 sass-loader 之前将 resolve-url-loader 链接进来
+				use: ['css-loader', 'sass-loader']
+			})
+		}, {
+			test: /\.(png|svg|jpg|gif)$/,
+			use: [{
+				loader: 'file-loader',
+				options: {
+					name: './img/[hash].[ext]'
+				}
+			}]
+		}, {
+			test: /\.html$/,
+			use: [{
+				loader: 'html-loader',
+				// options: {
+				// 	minimize: true
+				// }
+			}]
+		}]
 	},
 	plugins: [
 		new CleanWebpackPlugin(['dist']),
@@ -42,10 +52,23 @@ module.exports = {
 		// 	clientsClaim: true,
 		// 	skipWaiting: true
 		// }),
-		// new ExtractTextPlugin({
-		//     filename: "[name].[contenthash].css",
-		//     disable: process.env.NODE_ENV === "development"
-		// }),
+		new HtmlWebpackPlugin({
+			title: 'Output Management',
+			filename: 'index.html',
+			template: './index.html'
+		}),
+		new CopyWebpackPlugin([{
+			from: path.resolve(__dirname, 'src/public'),
+			to: './public'
+		}]),
+		new webpack.ProvidePlugin({
+			$: 'jquery',
+			_: 'lodash'
+		}),
+		new ExtractTextPlugin({
+			filename: './css/[name].css',
+			allChunks: true
+		}),
 		new ManifestPlugin({
 			fileName: 'manifest.json',
 			basePath: './',
