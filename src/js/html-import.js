@@ -1,4 +1,4 @@
-export default {
+ let htmlImport = {
 	tpl: {},
 	jswebcomponent: 'bower_components/webcomponentsjs/webcomponents-lite.js',
 	jswebcomponentPf: 'bower_components/webcomponents-platform/webcomponents-platform.js',
@@ -258,3 +258,5 @@ export default {
 
 	}
 }
+
+export default htmlImport;

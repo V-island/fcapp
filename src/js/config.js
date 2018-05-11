@@ -1,4 +1,4 @@
-export default {
+let config = {
 	apihost: 'http://192.168.8.240:8090',
 	//apihost:'http://192.168.8.15:9000',
 	wshost: 'ws://192.168.8.240:8090',
@@ -10,16 +10,7 @@ export default {
 	importJs: [
 		// '../libs/webcomponentsjs/webcomponents-lite.js'
 	],
-	rules: [{
-		'path': '#/home',
-		'name': 'home',
-		'component': 'Home'
-	}, {
-		'path': '#/user',
-		'name': 'user',
-		'component': 'User'
-	}],
-	importFile: [{
+	publicFile: [{
 		name: 'top',
 		path: '../public/top-nav.html',
 		dom: 'body',
@@ -27,9 +18,16 @@ export default {
 		init: 1
 	}],
 	pagesFile: [{
-		name: 'apply_service',
-		path: '../pages/apply_service.html',
+		name: 'login',
+		path: '../pages/login.html',
+		dom: 'body',
+		mode: 'replace'
+	},{
+		name: 'home',
+		path: '../pages/home.html',
 		dom: '.wrapper',
 		mode: 'replace'
 	}]
 }
+
+export default config;

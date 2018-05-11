@@ -1,6 +1,7 @@
-import { addScript } from './core.js';
-import config from './config.js';
-import htmlImport from './html-import.js';
+import { addScript } from './core';
+import config from './config';
+import htmlImport from './html-import';
+import Router from './router';
 
 export default {
 	beforeJs: function(jslist) {
@@ -13,17 +14,18 @@ export default {
 	},
 	init: function() {
 		// this.beforeJs(config.importJs);
-		console.log(location.hash);
 		// htmlImport.getFile(config.importFile);
 		// htmlImport.getFile(config.pagesFile);
 
 		// if (location.href.indexOf('/uc/') > -1) {
 		// 	htmlImport.getFile(config.ucFile);
 		// }
-		let url = location.hash;
-		console.log(url);
-		console.log(config.rules);
-		let data = _.takeRightWhile(config.rules, ['path', "#/home"]);
-		console.log(data);
+		// let url = location.hash;
+		// console.log(url);
+		// console.log(config.router);
+		// let data = _.findLastKey(config.router, {
+		// 	'path': url
+		// });
+		
 	}
 }

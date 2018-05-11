@@ -11,7 +11,7 @@ const webpack = require('webpack');
 
 module.exports = {
 	entry: {
-		main: './src/js/index.js'
+		main: './src/js/app.js'
 	},
 	devtool: 'inline-source-map',
 	output: {
