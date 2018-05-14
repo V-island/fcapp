@@ -25,22 +25,23 @@ const router = new Router({
 	routes: [{
 		path: '/login',
 		name: 'login',
-		template: false,
+		template: '../pages/login.html',
 		component: Login,
 		children: [{
 			path: '/user',
 			name: 'user',
-			template: false,
+			template: '../pages/user.html',
 			component: Login
 		}]
 	}, {
 		path: '/home',
 		name: 'home',
+		template: '../pages/home.html',
 		component: Home,
 		children: [{
 			path: '/body',
 			name: 'body',
-			template: false,
+			template: '../pages/body.html',
 			component: Login
 		}]
 	}]

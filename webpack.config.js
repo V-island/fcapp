@@ -58,8 +58,8 @@ module.exports = {
 			template: './index.html'
 		}),
 		new CopyWebpackPlugin([{
-			from: path.resolve(__dirname, 'src/public'),
-			to: './public'
+			from: path.resolve(__dirname, 'src/pages'),
+			to: './pages'
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',

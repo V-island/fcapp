@@ -1,3 +1,5 @@
+import htmlImport from './html-import';
+
 class Router {
 
 	constructor(options) {
@@ -5,7 +7,7 @@ class Router {
 
 		this.options = options;
 		this.nav = '.uc-nav';
-		this.matcher = this.createMatcher(options.routes || []);
+		this.matcher = this.createRouteMap(options.routes || []);
 		this.init();
 	}
 	/**
@@ -21,21 +23,16 @@ class Router {
 		this.changePage();
 	}
 
-	/**
-	 * [createMatcher description]
-	 * @param  {[type]} routes [description]
-	 * @return {[type]}        [description]
-	 */
-	createMatcher(routes) {
-		console.log(routes);
-		let url = this.getHashpage();
-		console.log(url);
-		let data = _.findLastKey(routes, {
-			'path': url
-		});
-		console.log(data);
-		let ref = this.createRouteMap(routes);
-		return routes;
+	createTemplate(Href) {
+		let rules = this.matcher;
+		let i = _.findKey(rules, ['path', Href]);
+
+		if (rules[i]) {
+			console.log('router匹配成功');
+			htmlImport.attachTo(rules[i]);
+		}else {
+			console.log('404未找到该页面');
+		}
 	}
 
 	/**
@@ -44,13 +41,12 @@ class Router {
 	 * @return {[type]}        [description]
 	 */
 	createRouteMap(routes, oldPathList) {
-		var pathList = oldPathList || [];
+		let pathList = oldPathList || [];
 		var _this = this;
 
 		routes.forEach(function(route) {
 			_this.addRouteRecord(route, pathList, _this);
 		});
-		console.log(pathList);
 		return pathList;
 	}
 
@@ -72,7 +68,6 @@ class Router {
 
 		if (route.children) {
 			route.children.forEach(function(child) {
-				console.log(route.path);
 				var childMatchAs = route.path ?
 					(route.path + child.path) :
 					undefined;
@@ -89,12 +84,19 @@ class Router {
 	 */
 	setLocation(nav, _name) {
 		//重置默认导航
-		if (location.hash == '' || location.hash == '#') {
+		if (location.hash == '' || location.hash == '#' || location.hash === undefined) {
+			console.log('验证登录状态');
+			console.log('成功调转首页HOME');
+			location.hash = '#/home';
+		}else {
 			if (_name === undefined || _name == '') {
-				console.log('验证登录状态');
-				location.href = location.host;
+				console.log('再次验证登录状态');
+				let _page = this.getHashpage();
+				console.log('验证成功正加载：' + _page + '页面');
+				this.createTemplate(_page);
 			} else {
-				// location.hash = _name;
+				console.log('正加载：' + _name + '页面');
+				this.createTemplate(_name);
 			}
 		}
 	}

@@ -1,75 +1,79 @@
- let htmlImport = {
-	tpl: {},
-	jswebcomponent: 'bower_components/webcomponentsjs/webcomponents-lite.js',
-	jswebcomponentPf: 'bower_components/webcomponents-platform/webcomponents-platform.js',
-	file: [{
-		name: 'test',
-		path: 'test.html',
-		dom: 'body',
-		init: 1
-	}],
-	msg: {
-		support: '支持导入!',
-		nosupport: '不支持导入|-_-)',
-		errorsupport: '导入错误：',
-		savedone: '本地保存完成',
-		alreadysave: '本地已存在',
-		cantfindobj: 'obj对象没找到！',
-		importready: '所有导入已经加载完成！',
-		allready: '导入加载已经完成，元素已经注册！',
-		masthasname: '必须指定名称',
-		maststring: '必须是字符串',
-		updatesuccess: '更新成功！'
-	},
-	supportsImports: function() {
-		return 'import' in document.createElement('link');
-	},
-	getFile: function(file) {
+import Webcomponents from 'webcomponents-lite';
 
-		var _self = this;
+const MSG = {
+	support: '支持导入!',
+	nosupport: '不支持导入|-_-)',
+	errorsupport: '导入错误：',
+	savedone: '本地保存完成',
+	alreadysave: '本地已存在',
+	cantfindobj: 'obj对象没找到！',
+	importready: '所有导入已经加载完成！',
+	allready: '导入加载已经完成，元素已经注册！',
+	masthasname: '必须指定名称',
+	maststring: '必须是字符串',
+	updatesuccess: '更新成功！'
+}
 
-		file = typeof(file) == 'undefined' ? _self.file : file;
-		if (file.length > 0) {
-			_self.getData(file);
+const RULE = {
+	path: '/test',
+	name: 'test',
+	template: '../pages/test.html',
+	component: false,
+	dom: 'body'
+}
+
+class htmlImport {
+
+	constructor(rule) {
+		this.rule = typeof(rule) == 'undefined' ? RULE : rule;
+		this.name = rule.name;
+		this.template = rule.template;
+		this.component = rule.component;
+		this.dom = typeof(rule.dom) == 'undefined' ? 'body' : rule.dom;
+		this.mode = typeof(rule.mode) == 'undefined' ? 'add' : rule.mode;
+		this.tpl = {};
+
+		if (!this.supportsImports()) {
+			console.log(MSG.nosupport);
+			document.head.appendChild(Webcomponents);
 		}
-	},
-	start: function(file) {
-		var _self = this;
+		console.log(MSG.support);
+		this.tplImport();
+	}
+	/**
+	 * @param {!Element} root
+	 * @return {!MDCTopAppBar}
+	 */
+	static attachTo(rule) {
+		return new htmlImport(rule);
+	}
 
-		if (_self.supportsImports()) {
-			console.log(_self.msg.support);
-			//_self.getFile(file);
-		} else {
-			console.log(_self.msg.nosupport);
-			//core.addScript(_self.jswebcomponent,_self.getFile(file));
-		}
-		// _self.getFile(file);
-
-		core.addScript(_self.jswebcomponent, _self.getFile(file));
-		//core.addScript(_self.jswebcomponentPf,_self.getFile(file));
-
-	},
-	tplImport: function(param) {
-		console.log(param);
-		var _self = this;
-		var link = document.createElement('link');
+	/**
+	 * 模板导入
+	 * @return {[type]}       [description]
+	 */
+	tplImport() {
+		let _self = this;
+		let link = document.createElement('link');
 		link.rel = 'import';
-		link.id = param.name;
-		link.href = param.path;
+		link.id = _self.name;
+		link.href = _self.template;
+
 		link.onload = function(e) {
-			// console.log('Loaded import: ' + e.target.href);
-			var _target = e.target.import;
+			console.log('Loaded import: ' + e.target.href);
+			let _target = e.target.import;
 			// console.log(_target.children);
-			var bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
+			let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
 
 			if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML == '') {
 				bodyHTML = _target.head.innerHTML;
 			} else if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML != '') {
 				bodyHTML = _target.head.innerHTML + bodyHTML;
 			}
+
 			//MAC safari bug
 			if (bodyHTML == '') {
-				for (var i = 0; i < _target.children.length; i++) {
+				for (let i = 0; i < _target.children.length; i++) {
 					bodyHTML = bodyHTML + _target.children[i].outerHTML;
 				}
 			}
@@ -80,23 +84,23 @@
 
 			bodyHTML = _self.replaceNote(bodyHTML);
 
-			_self.tpl[param.name] = bodyHTML;
+			_self.tpl[_self.name] = bodyHTML;
 
-			//var oldHTML = localStorage.getItem(param.name);
+			// var oldHTML = localStorage.getItem(_self.name);
 			// console.log(oldHTML);
 
-			//if (oldHTML != bodyHTML) {
-			//localStorage.removeItem(param.name);
-			//localStorage.setItem(param.name, bodyHTML);
-			//console.log(param.name + ' ' + _self.msg.savedone);
+			// if (oldHTML != bodyHTML) {
+			// 	localStorage.removeItem(_self.name);
+			// 	localStorage.setItem(_self.name, bodyHTML);
+			// 	console.log(_self.name + ' ' + _self.msg.savedone);
 
-			//} else {
-			//console.log(param.name + ' ' + _self.msg.alreadysave);
-			//}
+			// } else {
+			// 	console.log(_self.name + ' ' + _self.msg.alreadysave);
+			// }
 
-			// console.info(param.dom);
-			if (typeof(param.dom) != 'undefined' && param.init) {
-				_self.setdom(param);
+			// console.info(_self.dom);
+			if (typeof(_self.dom) != 'undefined') {
+				_self.setdom();
 			}
 			// console.log(localStorage);
 			//加载完成后清除头部引用
@@ -112,93 +116,27 @@
 		};
 		document.head.appendChild(link);
 
-	},
-	getData: function(data) {
-		var _self = this;
-		// console.log(data);
-		for (var i in data) {
-			var param = {};
-			param.name = data[i].name;
-			param.path = data[i].path;
-			param.dom = data[i].dom;
-			param.mode = data[i].mode;
-			param.init = data[i].init;
-			_self.tplImport(param);
+	}
 
-			if (data[i].child !== undefined) {
-				_self.getData(data[i].child);
-			}
-		}
-	},
-	getItem: function(data, name) {
-		var _self = this;
-		var _val = false;
-		name = name === undefined ? '' : name;
-		for (var i in data) {
-			var _name = data[i].name;
-			if (_name == name) {
-				_val = data[i];
-				return _val;
-			}
-		}
-		// console.log(_val);
-	},
-	setItem: function(data, name) {
-		//console.log('htmlImport','setItem');
-		var _self = this;
-		var _val = _self.getItem(data, name);
-
-		if (_val) {
-
-			_self.setdom(_val);
-
-			if (_val.child !== undefined) {
-				for (var n in _val.child) {
-					_self.setdom(_val.child[n]);
-				}
-			}
-		}
-	},
-	updateItem: function(name, str) {
-		if (name === undefined || name == '') {
-			console.warn(name, this.msg.masthasname);
-			return;
-		}
-		if (typeof str != 'string') {
-			console.warn(str, this.msg.maststring);
-			return;
-		}
-		this.tpl[name] = str;
-		localStorage.setItem(name, str);
-		console.info(name, this.msg.updatesuccess);
-	},
-	// 去注释以及style script 换行符 标签空格
-	replaceNote: function(str) {
-		return str.replace(/(\n)/g, '')
-			.replace(/(\t)/g, '')
-			.replace(/(\r)/g, '')
-			.replace(/<!--[\s\S]*?--\>/g, '')
-			.replace(/<style[^>]*>[\s\S]*?<\/[^>]*style>/gi, '')
-			//.replace(/<script[^>]*>[\s\S]*?<\/[^>]*script>/gi,'')
-			.replace(/>\s*/g, '>')
-			.replace(/\s*</g, '<');
-	},
-	setdom: function(param) {
-		var _wrapper = param.dom == '' || param.dom == 'body' ? 'body' : 'body ' + param.dom;
-
+	/**
+	 * 写入DOM
+	 * @return {[type]}       [description]
+	 */
+	setdom() {
+		// var _wrapper = param.dom == '' || param.dom == 'body' ? 'body' : 'body ' + param.dom;
+		let _wrapper = this.dom;
 		// var _dom = localStorage.getItem(param.name);
-		if (!(param.name in this.tpl)) {
-			console.log(param.name + '不在htmlImport.tpl中');
+		if (!(this.name in this.tpl)) {
+			console.log(this.name + '不在htmlImport.tpl中');
 			return;
 		}
-		var _dom = this.tpl[param.name];
+		let _dom = this.tpl[this.name];
 		console.log(_dom);
-		var _target = document.querySelector(_wrapper);
-		var _mode = typeof(param.mode) == 'undefined' ? 'add' : param.mode;
+		let _target = document.querySelector(_wrapper);
 		// console.log(_dom);
 		if (_target) {
 
-			switch (_mode) {
+			switch (this.mode) {
 				case 'replace':
 					_target.innerHTML = _dom;
 					break;
@@ -212,50 +150,65 @@
 					_target.innerHTML += _dom;
 			}
 
-			console.info(param.name + ' 读取成功，写入到 ' + _wrapper);
+			console.info(this.name + ' 读取成功，写入到 ' + _wrapper);
 			// console.log(_target.innerHTML);
 		} else {
-			console.warn(_wrapper + ' 没找到！' + param.name + ' 写入不成功');
+			console.warn(_wrapper + ' 没找到！' + this.name + ' 写入不成功');
 			return false;
 		}
 
-	},
-	ready: function(obj, fn) {
-		var _self = this;
+	}
 
-		if (typeof(obj) == 'undefined') {
-			console.warn(_self.msg.cantfindobj);
-			return;
-		}
+	/**
+	 * 验证浏览器是否支持html import导入
+	 * @return {boolean}
+	 */
+	supportsImports() {
+		return 'import' in document.createElement('link');
+	}
 
-		//console.log(window.WebComponents);
-		//读取成功后
-		window.addEventListener('HTMLImportsLoaded', function(e) {
-			console.info(_self.msg.importready);
-			obj[fn]();
+	/**
+	 * 去注释以及style script 换行符 标签空格
+	 * @param  {[type]} str [description]
+	 * @return {[type]}     [description]
+	 */
+	replaceNote(str) {
+		return str.replace(/(\n)/g, '')
+			.replace(/(\t)/g, '')
+			.replace(/(\r)/g, '')
+			.replace(/<!--[\s\S]*?--\>/g, '')
+			.replace(/<style[^>]*>[\s\S]*?<\/[^>]*style>/gi, '')
+			//.replace(/<script[^>]*>[\s\S]*?<\/[^>]*script>/gi,'')
+			.replace(/>\s*/g, '>')
+			.replace(/\s*</g, '<');
+	}
 
-		});
+	/**
+	 * 导入script
+	 * @param {[type]}   url     [description]
+	 * @param {Function} fn      [description]
+	 * @param {[type]}   charset [description]
+	 */
+	addScript(url, fn, charset) {
+		let _self = this;
+		let doc = document;
+		let script = doc.createElement('script');
 
-
-		// window.addEventListener('WebComponentsReady', function(e) {
-		//     console.info(_self.msg.allready);
-		//     obj[fn]();
-
-		// });
-
-
-
-	},
-	addStyle: function() {
-		var importDoc = document.currentScript.ownerDocument;
-		var style = importDoc.querySelectorAll('link[rel=stylesheet]');
-		for (var i = 0; i < style.length; i++) {
-			document.head.appendChild(style[i]);
-		}
-	},
-	init: function() {
-		this.start();
-
+		script.language = 'javascript';
+		script.charset = charset ? charset : 'utf-8';
+		script.type = 'text/javascript';
+		script.src = url;
+		script.onload = script.onreadystatechange = function() {
+			if (!script.readyState || 'loaded' === script.readyState || 'complete' === script.readyState) {
+				fn && fn();
+				script.onload = script.onreadystatechange = null;
+				script.parentNode.removeChild(script);
+			}
+		};
+		script.onerror = function(e) {
+			console.error('Load Error' + url);
+		};
+		doc.head.appendChild(script);
 	}
 }
 
