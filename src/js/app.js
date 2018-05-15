@@ -6,13 +6,11 @@
 
 import css from '../css/style.scss';
 import Router from './router';
-import Login from './pages/login';
-import Home from './pages/home';
 
-// import { addScript } from './core';
-// import config from './config';
-// import htmlImport from './html-import';
+import config from './config';
 
+const PUBLICFILE = config.publicFile;
+const PAGESFILE = config.pagesFile;
 // import {MDCTopAppBar} from '@material/top-app-bar/index';
 
 // Instantiation
@@ -25,24 +23,38 @@ const router = new Router({
 	routes: [{
 		path: '/login',
 		name: 'login',
-		template: '../pages/login.html',
-		component: Login,
-		children: [{
-			path: '/user',
-			name: 'user',
-			template: '../pages/user.html',
-			component: Login
-		}]
+		template: [
+			PAGESFILE.login
+		]
+	}, {
+		path: '/sign',
+		name: 'sign'
 	}, {
 		path: '/home',
 		name: 'home',
-		template: '../pages/home.html',
-		component: Home,
+		template: [
+			PUBLICFILE.top_nav,
+			PUBLICFILE.foot_nav,
+			PAGESFILE.home
+		],
 		children: [{
-			path: '/body',
-			name: 'body',
-			template: '../pages/body.html',
-			component: Login
+			path: '/new',
+			name: 'new'
+		}, {
+			path: '/hot',
+			name: 'hot'
+		}, {
+			path: '/video',
+			name: 'video'
 		}]
+	}, {
+		path: '/friends',
+		name: 'friends'
+	}, {
+		path: '/message',
+		name: 'message'
+	}, {
+		path: '/user',
+		name: 'user'
 	}]
 })

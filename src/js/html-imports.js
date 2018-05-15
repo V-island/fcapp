@@ -184,7 +184,7 @@
 			.replace(/\s*</g, '<');
 	},
 	setdom: function(param) {
-		var _wrapper = param.dom == '' || param.dom == 'body' ? 'body' : 'body ' + param.dom;
+		var _wrapper = typeof(param.dom) == 'undefined' || param.dom == 'body' ? 'body' : 'body ' + param.dom;
 
 		// var _dom = localStorage.getItem(param.name);
 		if (!(param.name in this.tpl)) {
@@ -194,7 +194,7 @@
 		var _dom = this.tpl[param.name];
 		console.log(_dom);
 		var _target = document.querySelector(_wrapper);
-		var _mode = typeof(param.mode) == 'undefined' ? 'add' : param.mode;
+		var _mode = typeof(param.mode) == 'undefined' ? 'replace' : param.mode;
 		// console.log(_dom);
 		if (_target) {
 

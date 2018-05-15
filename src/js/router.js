@@ -29,7 +29,7 @@ class Router {
 
 		if (rules[i]) {
 			console.log('router匹配成功');
-			htmlImport.attachTo(rules[i]);
+			htmlImport.attachTo(rules[i].template);
 		}else {
 			console.log('404未找到该页面');
 		}
@@ -63,7 +63,6 @@ class Router {
 			path: matchAs === undefined ? route.path : matchAs,
 			name: route.name,
 			template: route.template || true,
-			component: route.component
 		};
 
 		if (route.children) {

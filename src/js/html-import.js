@@ -14,23 +14,17 @@ const MSG = {
 	updatesuccess: '更新成功！'
 }
 
-const RULE = {
+const RULE = [{
 	path: '/test',
 	name: 'test',
 	template: '../pages/test.html',
 	component: false,
 	dom: 'body'
-}
+}]
 
 class htmlImport {
 
 	constructor(rule) {
-		this.rule = typeof(rule) == 'undefined' ? RULE : rule;
-		this.name = rule.name;
-		this.template = rule.template;
-		this.component = rule.component;
-		this.dom = typeof(rule.dom) == 'undefined' ? 'body' : rule.dom;
-		this.mode = typeof(rule.mode) == 'undefined' ? 'add' : rule.mode;
 		this.tpl = {};
 
 		if (!this.supportsImports()) {
@@ -38,7 +32,7 @@ class htmlImport {
 			document.head.appendChild(Webcomponents);
 		}
 		console.log(MSG.support);
-		this.tplImport();
+		this.getFile(rule);
 	}
 	/**
 	 * @param {!Element} root
@@ -48,16 +42,30 @@ class htmlImport {
 		return new htmlImport(rule);
 	}
 
+	getFile(rule) {
+
+		let _self = this;
+		let _file = typeof(rule) == 'undefined' ? RULE : rule;
+		console.log(_file);
+
+		if (_file.length > 0) {
+			_file.forEach(function(param) {
+				console.log(param);
+				_self.tplImport(param);
+			});
+		}
+	}
+
 	/**
 	 * 模板导入
 	 * @return {[type]}       [description]
 	 */
-	tplImport() {
+	tplImport(param) {
 		let _self = this;
 		let link = document.createElement('link');
 		link.rel = 'import';
-		link.id = _self.name;
-		link.href = _self.template;
+		link.id = param.name;
+		link.href = param.path;
 
 		link.onload = function(e) {
 			console.log('Loaded import: ' + e.target.href);
@@ -84,24 +92,22 @@ class htmlImport {
 
 			bodyHTML = _self.replaceNote(bodyHTML);
 
-			_self.tpl[_self.name] = bodyHTML;
+			_self.tpl[param.name] = bodyHTML;
 
-			// var oldHTML = localStorage.getItem(_self.name);
+			// var oldHTML = localStorage.getItem(param.name);
 			// console.log(oldHTML);
 
 			// if (oldHTML != bodyHTML) {
-			// 	localStorage.removeItem(_self.name);
-			// 	localStorage.setItem(_self.name, bodyHTML);
-			// 	console.log(_self.name + ' ' + _self.msg.savedone);
+			// 	localStorage.removeItem(param.name);
+			// 	localStorage.setItem(param.name, bodyHTML);
+			// 	console.log(param.name + ' ' + MSG.savedone);
 
 			// } else {
-			// 	console.log(_self.name + ' ' + _self.msg.alreadysave);
+			// 	console.log(param.name + ' ' + MSG.alreadysave);
 			// }
 
-			// console.info(_self.dom);
-			if (typeof(_self.dom) != 'undefined') {
-				_self.setdom();
-			}
+			console.log(_self.tpl);
+			_self.setdom(param);
 			// console.log(localStorage);
 			//加载完成后清除头部引用
 			if (!link.readyState || 'link' === link.readyState || 'complete' === link.readyState) {
@@ -111,7 +117,7 @@ class htmlImport {
 
 		};
 		link.onerror = function(e) {
-			console.error(_self.msg.errorsupport + e.target.href);
+			console.error(MSG.errorsupport + e.target.href);
 			return;
 		};
 		document.head.appendChild(link);
@@ -122,21 +128,21 @@ class htmlImport {
 	 * 写入DOM
 	 * @return {[type]}       [description]
 	 */
-	setdom() {
-		// var _wrapper = param.dom == '' || param.dom == 'body' ? 'body' : 'body ' + param.dom;
-		let _wrapper = this.dom;
+	setdom(param) {
+		let _wrapper = typeof(param.dom) == 'undefined' || param.dom == 'body' ? 'body' : param.dom;
 		// var _dom = localStorage.getItem(param.name);
-		if (!(this.name in this.tpl)) {
-			console.log(this.name + '不在htmlImport.tpl中');
+		if (!(param.name in this.tpl)) {
+			console.log(param.name + '不在htmlImport.tpl中');
 			return;
 		}
-		let _dom = this.tpl[this.name];
+		let _dom = this.tpl[param.name];
 		console.log(_dom);
 		let _target = document.querySelector(_wrapper);
-		// console.log(_dom);
+		let _mode = typeof(param.mode) == 'undefined' ? 'add' : param.mode;
+
 		if (_target) {
 
-			switch (this.mode) {
+			switch (_mode) {
 				case 'replace':
 					_target.innerHTML = _dom;
 					break;
@@ -150,10 +156,11 @@ class htmlImport {
 					_target.innerHTML += _dom;
 			}
 
-			console.info(this.name + ' 读取成功，写入到 ' + _wrapper);
+			console.info(param.name + ' 读取成功，写入到 ' + _wrapper);
+			param.component.init();
 			// console.log(_target.innerHTML);
 		} else {
-			console.warn(_wrapper + ' 没找到！' + this.name + ' 写入不成功');
+			console.warn(_wrapper + ' 没找到！' + param.name + ' 写入不成功');
 			return false;
 		}
 

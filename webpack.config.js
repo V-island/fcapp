@@ -15,7 +15,7 @@ module.exports = {
 	},
 	devtool: 'inline-source-map',
 	output: {
-		filename: './js/[name].js',
+		filename: './js/[name].[hash].js',
 		path: path.resolve(__dirname, 'dist')
 	},
 	module: {
@@ -55,11 +55,20 @@ module.exports = {
 		new HtmlWebpackPlugin({
 			title: 'Output Management',
 			filename: 'index.html',
-			template: './index.html'
+			template: './index.html',
+			favicon: './src/img/favicon.ico',
+			meta: {
+				viewport: 'width=device-width,initial-scale=1,shrink-to-fit=no',
+				keywords: 'chat,fun chat',
+				'theme-color': '#000'
+			}
 		}),
 		new CopyWebpackPlugin([{
 			from: path.resolve(__dirname, 'src/pages'),
 			to: './pages'
+		}, {
+			from: path.resolve(__dirname, 'src/public'),
+			to: './public'
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
