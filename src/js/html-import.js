@@ -14,13 +14,13 @@ const MSG = {
 	updatesuccess: '更新成功！'
 }
 
-const RULE = [{
+const RULE = {
 	path: '/test',
 	name: 'test',
 	template: '../pages/test.html',
 	component: false,
 	dom: 'body'
-}]
+}
 
 class htmlImport {
 
@@ -48,12 +48,13 @@ class htmlImport {
 		let _file = typeof(rule) == 'undefined' ? RULE : rule;
 		console.log(_file);
 
-		if (_file.length > 0) {
-			_file.forEach(function(param) {
-				console.log(param);
-				_self.tplImport(param);
-			});
-		}
+		// if (_file.length > 0) {
+		// 	_file.forEach(function(param) {
+		// 		console.log(param);
+		// 		_self.tplImport(param);
+		// 	});
+		// }
+		_self.tplImport(_file);
 	}
 
 	/**

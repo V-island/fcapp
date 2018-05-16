@@ -4,12 +4,12 @@
 // import config from './config.js';
 // import loader from './loader';
 
-import css from '../css/style.scss';
+import FCSTYLE from '../sass/fc.scss';
 import Router from './router';
 
 import config from './config';
 
-const PUBLICFILE = config.publicFile;
+// const PUBLICFILE = config.publicFile;
 const PAGESFILE = config.pagesFile;
 // import {MDCTopAppBar} from '@material/top-app-bar/index';
 
@@ -23,20 +23,14 @@ const router = new Router({
 	routes: [{
 		path: '/login',
 		name: 'login',
-		template: [
-			PAGESFILE.login
-		]
+		template: PAGESFILE.login
 	}, {
 		path: '/sign',
 		name: 'sign'
 	}, {
 		path: '/home',
 		name: 'home',
-		template: [
-			PUBLICFILE.top_nav,
-			PUBLICFILE.foot_nav,
-			PAGESFILE.home
-		],
+		template: PAGESFILE.home,
 		children: [{
 			path: '/new',
 			name: 'new'
