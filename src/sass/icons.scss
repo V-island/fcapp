@@ -1,27 +1,70 @@
 // @font-face {
-//   font-family: "iconfont-sm";
-//   src: url('//at.alicdn.com/t/font_1433401008_2229297.woff') format('woff'), /* chrome、firefox */
-//   url('//at.alicdn.com/t/font_1433401008_2229297.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
-//   url('//at.alicdn.com/t/font_1433401008_2229297.svg#iconfont') format('svg'); /* iOS 4.1- */
+    //       font-family: "iconfont-sm";
+    //       src: url('//at.alicdn.com/t/font_1433401008_2229297.woff') format('woff'), /* chrome、firefox */
+    //       url('//at.alicdn.com/t/font_1433401008_2229297.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+    //       url('//at.alicdn.com/t/font_1433401008_2229297.svg#iconfont') format('svg'); /* iOS 4.1- */
+    //
 // }
 
 .icon {
-  font-family:"iconfont-sm" !important;
-  font-style:normal;
-  display: inline-block;
-  vertical-align: middle;
-  background-size: 100% auto;
-  background-position: center;
-
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-stroke-width: 0.2px;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: "iconfont-sm" !important;
+    font-style: normal;
+    display: inline-block;
+    vertical-align: middle;
+    background-size: 100% auto;
+    background-position: center;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-search{
-  background-image: url('../img/icons/icon-search.png');
-  background: image-set(url('../img/icons/icon-search.png') 1x,url('../img/icons/icon-search@2x.png') 2x) center;
+// .icon-search {
+//     @include icon-image(icon-search);
+// }
+
+// .icon-filter {
+//     @include icon-image(icon-filter);
+// }
+
+// .icon-home {
+//     @include icon-image(icon-home);
+// }
+
+// .icon-friends {
+//     @include icon-image(icon-friends);
+// }
+
+// .icon-live {
+//     @include icon-image(icon-live);
+// }
+
+// .icon-message {
+//     @include icon-image(icon-message);
+// }
+
+// .icon-me {
+//     @include icon-image(icon-me);
+// }
+
+$names: search, filter, home, friends, live, message, me;
+
+@mixin iconImage($name){
+    background-image: url("../img/icons/icon-#{$name}.png");
+    background: image-set(url("../img/icons/icon-#{$name}.png") 1x, url("../img/icons/icon-#{$name}@2x.png") 2x) center;
 }
+
+@each $name in $names {
+    .icon-#{$name} {
+        @include iconImage($name);
+        @if $name != live and $name != search and $name != filter {
+            .active >&{
+                @include iconImage(#{$name}-active);
+            }
+        }
+    }
+}
+
+
 
 /*
 .icon-app:before { content: "\e605"; }

@@ -3,39 +3,68 @@
         <!-- 标题栏 -->
         <header class="bar bar-flex">
             <div class="icon-btn" data-ripple>
-            	<i class="icon icon-search"></i>
+                <i class="icon icon-search"></i>
             </div>
-            <div class="title-content">123456</div>
+            <div class="title-content">
+                <nav class="buttons-tab">
+                    <a href="javascript:void();" class="tab-link">New</a>
+                    <a href="javascript:void();" class="tab-link active">Hot</a>
+                    <a href="javascript:void();" class="tab-link">Video</a>
+                </nav>
+            </div>
             <div class="icon-btn" data-ripple>
-            	<i class="icon icon-search"></i>
+                <i class="icon icon-filter"></i>
             </div>
         </header>
         <!-- 工具栏 -->
         <nav class="bar bar-tab">
-            <a class="tab-item active" href="#/home">
-				<span class="icon icon-home"></span>
-				<span class="tab-label">Home</span>
-			</a>
-            <a class="tab-item" href="#/friend">
-				<span class="icon icon-star"></span>
-				<span class="tab-label">Friends</span>
-			</a>
-            <a class="tab-item" href="#/live">
-				<span class="icon icon-settings"></span>
-				<span class="tab-label">Live</span>
-			</a>
-            <a class="tab-item" href="#/message">
-				<span class="icon icon-star"></span>
-				<span class="tab-label">Message</span>
-			</a>
-            <a class="tab-item" href="#/me">
-				<span class="icon icon-settings"></span>
-				<span class="tab-label">Me</span>
-			</a>
+            <a class="tab-item active" href="#/home" data-ripple>
+                <span class="icon icon-home"></span>
+                <span class="tab-label">Home</span>
+            </a>
+            <a class="tab-item" href="#/friends" data-ripple>
+                <span class="icon icon-friends"></span>
+                <span class="tab-label">Friends</span>
+            </a>
+            <a class="tab-item icons" href="javascript:void();" data-ripple>
+                <span class="icon icon-live"></span>
+            </a>
+            <a class="tab-item" href="#/message" data-ripple>
+                <span class="icon icon-message"></span>
+                <span class="tab-label">Message</span>
+            </a>
+            <a class="tab-item" href="#/me" data-ripple>
+                <span class="icon icon-me"></span>
+                <span class="tab-label">Me</span>
+            </a>
         </nav>
         <!-- 这里是页面内容区 -->
-        <div class="content native-scroll">
-            <div class="content-block">这里是content</div>
+        <div class="content">
+            <div class="tabs-container">
+                <div class="tabs-wrapper">
+                    <div class="tab-item">
+                        <div class="content-block">
+                            <p>This is tab 1 content</p>
+                        </div>
+                    </div>
+                    <div class="tab-item active">
+                        <div class="content-block">
+                            <div class="banner" style="width: 100%">
+                                <div class="fotorama" data-arrows="false" data-click="false" data-swipe="false" data-width="100%" data-ratio="3/2">
+                                    <a href="#"><img src="http://s.fotorama.io/1.jpg"></a>
+                                    <a href="#"><img src="http://s.fotorama.io/1.jpg"></a>
+                                    <a href="#"><img src="http://s.fotorama.io/1.jpg"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-item">
+                        <div class="content-block">
+                            <p>This is tab 3 content</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- popup, panel 等放在这里 -->

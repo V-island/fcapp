@@ -27,16 +27,21 @@
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1",
     "webpack": "^4.8.1",
     "webpack-cli": "^2.1.3",
     "webpack-manifest-plugin": "^2.0.2",
     "workbox-webpack-plugin": "^3.2.0"
   },
   "dependencies": {
-    "@material/top-app-bar": "^0.35.1",
+    "@material/tabs": "^0.35.0",
     "art-template": "^4.12.2",
+    "expose-loader": "^0.7.5",
+    "fotorama": "^4.6.4",
     "jquery": "^3.3.1",
+    "jquery-ripple": "^0.2.4",
     "lodash": "^4.17.10",
+    "swiper": "^4.2.6",
     "webcomponents-lite": "^0.6.0"
   }
 }

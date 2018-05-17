@@ -29,11 +29,11 @@ $color-danger-active: opacify($color-danger, 0.1);
 $color-warning-active: opacify($color-warning, 0.1);
 $color-success-active: opacify($color-success, 0.1);
 
-$color-split: #e7e7e7;  //分割线的颜色
-$color-bg: #2D2D32;
+$color-split: #383840;  //分割线的颜色
+$color-bg: #383840;
 $color-text: #3d4145; //文案色
 $color-text-secondary: #5f646e; //次级文案
-$color-text-gray: #999; //灰色文案
+$color-text-gray: #888; //灰色文案
 $color-text-gray-light: #ccc; //更灰色文案
 
 //链接色
@@ -43,9 +43,10 @@ $color-link-active: $color-primary-active; //链接色有可能不同于主色
 // Bars
 // --------------------------------------------------
 
-$bar-bg-color: $color-bg;
-$bar-gradient-color-left: opacify($bar-bg-color, 0.2);
-$bar-gradient-color-right: transparentize($bar-bg-color, 0.3);
+$bar-bg-color: #2D2D32;
+$bar-gradient-color-left: #313443;
+$bar-gradient-color-right: #535969;
+$bar-item-color: $color-text-gray;
 $bar-base-height:  2.2rem;
 $bar-tab-height:   2.5rem;
 $bar-side-spacing: 0.5rem;

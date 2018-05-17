@@ -1,4 +1,6 @@
 import Webcomponents from 'webcomponents-lite';
+// import ripple from 'jquery-ripple';
+require('jquery-ripple');
 
 const MSG = {
 	support: '支持导入!',
@@ -158,7 +160,9 @@ class htmlImport {
 			}
 
 			console.info(param.name + ' 读取成功，写入到 ' + _wrapper);
+
 			param.component.init();
+			$('[data-ripple]').ripple();
 			// console.log(_target.innerHTML);
 		} else {
 			console.warn(_wrapper + ' 没找到！' + param.name + ' 写入不成功');

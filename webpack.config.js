@@ -29,9 +29,9 @@ module.exports = {
 		}, {
 			test: /\.(png|svg|jpg|gif)$/,
 			use: [{
-				loader: 'file-loader',
+				loader: 'url-loader',
 				options: {
-					name: './img/[hash].[ext]'
+					limit: 8192
 				}
 			}]
 		}, {
@@ -41,6 +41,15 @@ module.exports = {
 				// options: {
 				// 	minimize: true
 				// }
+			}]
+		}, {
+			test: require.resolve('jquery'),
+			use: [{
+				loader: 'expose-loader',
+				options: 'jQuery'
+			}, {
+				loader: 'expose-loader',
+				options: '$'
 			}]
 		}]
 	},
@@ -86,8 +95,8 @@ module.exports = {
 				short_name: "Fun Chat",
 				display: "standalone",
 				start_url: "/",
-				theme_color: "#313131",
-				background_color: "#313131",
+				theme_color: "#383840",
+				background_color: "#383840",
 				icons: [{
 					"src": "e.png",
 					"sizes": "256x256",

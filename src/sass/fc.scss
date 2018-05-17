@@ -1,4 +1,6 @@
-@import "@material/top-app-bar/mdc-top-app-bar";
+@import "@material/tabs/mdc-tabs";
+@import "jquery-ripple/jquery.ripple.scss";
+@import 'fotorama/fotorama';
 
 // Variables
 @import "variables";
@@ -19,3 +21,4 @@
 @import "bars";
 @import "panels";
 @import "icons";
+@import "tabs";
