@@ -22,6 +22,33 @@
 
 }
 
+@mixin justify-content($jc){
+    @if $jc == flex-start {
+        -webkit-box-pack: start;
+        -ms-flex-pack: start;
+        -webkit-justify-content: flex-start;
+        justify-content: flex-start;
+    }
+    @else if $jc == flex-end {
+        -webkit-box-pack: end;
+        -ms-flex-pack: end;
+        -webkit-justify-content: flex-end;
+        justify-content: flex-end;
+    }
+    @else if $jc == space-between {
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        -webkit-justify-content: space-between;
+        justify-content: space-between;
+    }
+    @else {
+        -webkit-box-pack: $jc;
+        -ms-flex-pack: $jc;
+        -webkit-justify-content: $jc;
+        justify-content: $jc;
+    }
+}
+
 @mixin hairline($position, $color) {
     @if $position==top {
         &:before {

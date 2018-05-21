@@ -1,0 +1,39 @@
+// tag
+// ----------------------------------
+//
+.tag {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	align-items: center;
+
+	label.tag-label {
+		background: $tag-bg-color;
+		border-radius: $tag-border-radius;
+		border: $tag-border-default;
+		font-size: 0.6rem;
+		color: $tag-txt-color;
+		min-width: 2.5rem;
+		padding: 0 0.6rem;
+		margin: 0.25rem;
+		text-align: center;
+		line-height: 1.3rem;
+
+		>span {
+			margin-right: 0.25rem;
+			color: $color-primary;
+		}
+
+		&.active {
+			background: $tag-bg-color-active;
+			border-color: $tag-bg-color-active;
+
+			>span {
+				color: $tag-txt-color;
+			}
+
+		}
+
+	}
+
+}

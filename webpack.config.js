@@ -31,7 +31,17 @@ module.exports = {
 			use: [{
 				loader: 'url-loader',
 				options: {
+					outputPath: 'src/img/',
 					limit: 8192
+				}
+			}]
+		}, {
+			test: /\.(woff|woff2|eot|ttf|otf)$/,
+			use: [{
+				loader: 'file-loader',
+				options: {
+					name: '[path][name].[ext]',
+					outputPath: '/'
 				}
 			}]
 		}, {
@@ -77,7 +87,7 @@ module.exports = {
 			to: './pages'
 		}, {
 			from: path.resolve(__dirname, 'src/public'),
-			to: './public'
+			to: './src/public'
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
