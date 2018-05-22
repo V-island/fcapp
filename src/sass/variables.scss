@@ -16,14 +16,14 @@ $imgBaseUrl: "../img";
 
 
 // 主色
-$color-primary: #FFDD33;
-$color-danger: #F64033;
-$color-warning: #f60;
-$color-success: #4cd964;
-$color-primary-active: #0a8ddf;
-$color-danger-active: opacify($color-danger, 0.1);
-$color-warning-active: opacify($color-warning, 0.1);
-$color-success-active: opacify($color-success, 0.1);
+$color-primary: rgba(255,221,51,1);//#FFDD33
+$color-danger: rgba(246,64,51,1);//#F64033
+$color-warning: rgba(255,102,0,1);//#f60
+$color-success: rgba(31,201,105,1);//#1FC969
+$color-primary-active: transparentize($color-primary, 0.2);
+$color-danger-active: transparentize($color-danger, 0.2);
+$color-warning-active: transparentize($color-warning, 0.2);
+$color-success-active: transparentize($color-success, 0.2);
 $color-split: #383840;
 //分割线的颜色
 $color-bg: #383840;
@@ -46,7 +46,6 @@ $color-link-active: $color-primary-active;
 
 // Bars
 // --------------------------------------------------
-
 $bar-bg-color: #2D2D32;
 $bar-gradient-color-left: #313443;
 $bar-gradient-color-right: #535969;
@@ -54,11 +53,12 @@ $bar-item-color: $color-text-gray;
 $bar-base-height: 2.2rem;
 $bar-tab-height: 2.5rem;
 $bar-side-spacing: 0.5rem;
+
 // Cards
 // --------------------------------------------------
-
 $card-bg: #535969;
 $card-border-color: #fff;
+
 // Tags
 //---------------------------------------------------
 $tag-border-width: 1px;
@@ -68,6 +68,7 @@ $tag-border-radius: 0.7rem;
 $tag-txt-color: #fff;
 $tag-bg-color: transparent;
 $tag-bg-color-active: #4E87FA;
+
 //Modal
 //---------------------------------------------------
 $modal-bg-color: #3D4150;
@@ -80,24 +81,27 @@ $modal-border-radius: 0.1rem;
 // $actions-modal-duration: 300ms;
 // $actions-modal-button-bg: rgba(243, 243, 243, 0.95);
 // $actions-modal-active-button-bg: #dcdcdc;
-$popup-bg-color: #000;
+$popup-bg-color: #333;
 $popup-gradient-color-top: #313443;
 $popup-gradient-color-bottom: #535969;
 $popup-duration: 400ms;
+
 // Buttons
 // --------------------------------------------------
+$btn-font-size: 0.75rem;
+$btn-height: 2.1rem;
+$btn-big-height: 2.4rem;
+$btn-border-radius: 0.1rem;
+$btn-primary-txt-color: #333;
 
-$button-font-size: 0.6rem;
 // Transitions
 // --------------------------------------------------
-
 $timing-fuction: cubic-bezier(.1, .5, .1, 1);
 // Inspired by $c2prods
 
 
 // Borders
 // --------------------------------------------------
-
 $border-default-width: 1px;
 $border-default-color: $color-split;
 $border-default: $border-default-width solid $border-default-color;

@@ -1,9 +1,4 @@
 // import Webcomponents from 'webcomponents-lite';
-// import core from './core.js';
-// import htmlImport from './html-import.js';
-// import config from './config.js';
-// import loader from './loader';
-
 import FCSTYLE from '../sass/fc.scss';
 import Router from './router';
 

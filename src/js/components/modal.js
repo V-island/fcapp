@@ -31,7 +31,7 @@ let Modal = {
 		let buttonsHTML = '';
 		if (params.buttons && params.buttons.length > 0) {
 			for (let i = 0; i < params.buttons.length; i++) {
-				buttonsHTML += '<span class="modal-button' + (params.buttons[i].bold ? ' modal-button-bold' : '') + '">' + params.buttons[i].text + '</span>';
+				buttonsHTML += '<span class="modal-button' + (params.buttons[i].bold ? ' modal-button-bold' : '') + '" data-ripple>' + params.buttons[i].text + '</span>';
 			}
 		}
 		let extraClass = params.extraClass || '';

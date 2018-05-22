@@ -154,13 +154,15 @@
     height: 100%;
     z-index: 10400;
     color: $color-text;
-    background-color: #fff;
-    background-image: linear-gradient(to bottom, $popup-gradient-color-top, $popup-gradient-color-bottom);
+    background-color: $popup-bg-color;
     box-sizing: border-box;
     display: none;
     @include scrollable;
     transition-property: transform;
     transform: translate3d(0,100%,0);
+    &.popup-call{
+        background-image: linear-gradient(to bottom, $popup-gradient-color-top, $popup-gradient-color-bottom);
+    }
     &.modal-in, &.modal-out {
         transition-duration: $popup-duration;
     }

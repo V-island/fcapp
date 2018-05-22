@@ -37,7 +37,7 @@ $ionicons-version: "4.1.0" !default;
     -moz-osx-font-smoothing: grayscale;
 }
 
-$names: search, filter, home, friends, live, message, me, female, male;
+$names: search, filter, home, favorite, live, message, me, female, male;
 
 @mixin iconImage($name) {
     background-image: url("../img/icons/icon-#{$name}.png");
@@ -48,7 +48,7 @@ $names: search, filter, home, friends, live, message, me, female, male;
     .icon-#{$name}{
         @include iconImage($name);
 
-        @if $name == home and $name == friends and $name == message and $name == me {
+        @if $name == home and $name == favorite and $name == message and $name == me {
             .active >& {
                 @include iconImage(#{$name}-active);
             }
@@ -57,6 +57,13 @@ $names: search, filter, home, friends, live, message, me, female, male;
 
     }
 
+}
+
+.icon-star{
+    @include iconImage(star-outline);
+    &.active {
+        @include iconImage(star);
+    }
 }
 
 // Ionicons Icon Font CSS

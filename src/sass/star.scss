@@ -1,0 +1,14 @@
+.stars{
+	@include flex-spindle(space-around);
+	>i.icon {
+		width: 1rem;
+		height: 1rem;
+		margin: 0 0.5rem;
+	}
+	.stars-label{
+		font-size: 0.7rem;
+		color: $color-text;
+	    line-height: 1rem;
+	    margin: 0 0.35rem;
+	}
+}
