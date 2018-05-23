@@ -37,7 +37,7 @@ $ionicons-version: "4.1.0" !default;
     -moz-osx-font-smoothing: grayscale;
 }
 
-$names: search, filter, home, favorite, live, message, me, female, male;
+$names: search, filter, home, favorite, live, message, me, female, male, attention, close, gift, news, share, fecebook, tumblr, Twitter;
 
 @mixin iconImage($name) {
     background-image: url("../img/icons/icon-#{$name}.png");
@@ -65,6 +65,25 @@ $names: search, filter, home, favorite, live, message, me, female, male;
         @include iconImage(star);
     }
 }
+
+/**
+$gifts: search;
+
+@mixin giftImage($gift) {
+    background-image: url("../img/gifts/gift-# {$gift}.png");
+    background: image-set(url("../img/gifts/gift-# {$gift}.png") 1x, url("../img/gifts/gift-# {$gift}@2x.png") 2x) center;
+}
+
+@each $gift in $gifts {
+    .gift-# {$gift}{
+        vertical-align: middle;
+        background-size: 100% auto;
+        background-position: center;
+        @include giftImage($gift);
+    }
+
+}
+**/
 
 // Ionicons Icon Font CSS
 // --------------------------

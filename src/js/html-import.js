@@ -139,7 +139,7 @@ class htmlImport {
 			return;
 		}
 		let _dom = this.tpl[param.name];
-		console.log(_dom);
+		// console.log(_dom);
 		let _target = document.querySelector(_wrapper);
 		let _mode = typeof(param.mode) == 'undefined' ? 'add' : param.mode;
 

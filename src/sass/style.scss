@@ -1,9 +1,8 @@
 //Style
 //--------------------------------
 
-/**
- * User name and avatar
- */
+// User name and avatar
+//--------------------------------
 .user-info {
 	@include flex-spindle(center);
 	@include flex-vertical(column);
@@ -23,11 +22,36 @@
 
 	}
 
+	&.across {
+		justify-content: space-between;
+	    flex-direction: initial;
+	    align-items: center;
+
+		>.user-img {
+			width: 1.4rem;
+			height: 1.4rem;
+		    float: left;
+		    margin-right: 0.35rem;
+		}
+		.across-body{
+			width: 3.3rem;
+		}
+		.user-name{
+			font-size: 0.6rem;
+			color: $color-text;
+			@include wrap-space;
+		}
+		.user-txt{
+			font-size: 0.45rem;
+			color: $color-text;
+			@include wrap-space;
+		}
+	}
+
 }
 
-/**
- * popup-box
- */
+// popup-box
+//--------------------------------
 .popup-box {
 	text-align: center;
 	@include flex-spindle(center);
@@ -99,47 +123,19 @@
 			text-align: center;
 
 			>h3{
-				font-weight: 700;
+				font-weight: 600;
 				font-size: 1.05rem;
 				color: $color-text;
 				margin: 0.35rem 0;
+				small{
+					font-size: 0.5rem;
+				}
 			}
 
 			>p{
-				font-size: 0.35rem;
+				font-size: 0.5rem;
 				color: $color-text-gray;
 			}
-		}
-	}
-
-	.score-gift{
-		padding: 1rem 0;
-		>p {
-			font-size: 0.35rem;
-			color: $color-text-gray;
-		    margin-bottom: 0.35rem;
-		    min-width: 14rem;
-		    display: inline-block;
-		    &:after {
-		    	content: "";
-	    	    height: 1px;
-	    	    width: 2.1rem;
-	    	    display: block;
-	    	    background: #888;
-	    	    position: absolute;
-	    	    left: 0;
-	    	    top: 0.35rem;
-		    }
-		    &:before {
-		    	content: "";
-	    	    height: 1px;
-	    	    width: 2.1rem;
-	    	    display: block;
-	    	    background: #888;
-	    	    position: absolute;
-	    	    right: 0;
-	    	    top: 0.35rem;
-		    }
 		}
 	}
 
@@ -176,6 +172,40 @@
 			width: 12rem;
 			margin: 0 auto 2rem;
 		}
+		.score-box{
+			padding: 1rem 0;
+
+			>p {
+				font-size: 0.5rem;
+				color: $color-text-gray;
+			    margin-bottom: 0.35rem;
+			    min-width: 13rem;
+			    display: inline-block;
+			    position: relative;
+
+			    $starts: after, before;
+			    @each $start in $starts {
+				    &:#{$start}{
+				    	content: "";
+			    	    height: 1px;
+			    	    width: 2.1rem;
+			    	    display: block;
+			    	    background: $color-text-gray;
+			    	    position: absolute;
+			    	    top: 0.35rem;
+
+				        @if $start == after {
+				            left: 0;
+				        }
+				        @else {
+				        	right: 0;
+				        }
+
+				    }
+
+				}
+			}
+		}
 		.user-img{
 			width: 3.85rem !important;
 			height: 3.85rem !important;
@@ -188,4 +218,125 @@
 		}
 	}
 
+}
+
+// gift label
+//--------------------------------
+.score-gift{
+	.item{
+		@include flex-center;
+	    margin: 0.35rem 1.3rem;
+
+		>span{
+			display: inline-block;
+		}
+	}
+	.item-img{
+		width: 4.55rem;
+		height: 4.2rem;
+		padding: 1.05rem;
+	}
+	.item-amount{
+		color: $color-primary;
+		font-size: 0.6rem;
+	    font-weight: 500;
+	}
+}
+
+// live-wrapper
+//--------------------------------
+.live-wrapper{
+	overflow: hidden;
+}
+
+.live-video{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	video.video{
+		width: 100%;
+		height: 100%;
+		background: $color-text-secondary;
+	}
+
+	&.liver-video-us{
+		top: auto;
+		left: auto;
+		right: 0.75rem;
+		bottom: 1.05rem;
+		width: 4.9rem;
+		height: 7rem;
+
+		video.video{
+			background: $color-primary;
+		}
+	}
+}
+.live-attention{
+	background: $live-mask-bg-color;
+	padding: 0.35rem;
+	width: 7.5rem;
+	height: 2.1rem;
+	border-radius: 1rem;
+	@include  spindle-center(space-between);
+	position: absolute;
+	top: 0.75rem;
+	left: 0.75rem;
+
+	>i.icon{
+		width: 1.45rem;
+		height: 1.45rem;
+	}
+}
+.live-close{
+	position: absolute;
+	top: 0.75rem;
+	right: 0.75rem;
+
+	>i.icon{
+		width: 1.05rem;
+		height: 1.05rem;
+	}
+}
+.live-buttons{
+	@include  spindle-center(space-between);
+	position: absolute;
+	bottom: 0.75rem;
+	left: 0.75rem;
+	width: 10rem;
+
+	>.icon{
+		width: 2.1rem;
+		height: 2.1rem;
+	}
+}
+.live-comments{
+	position: absolute;
+	left: 0.75rem;
+	bottom: 4.5rem;
+	width: 10rem;
+	max-height: 12rem;
+	overflow: hidden;
+	@include  flex-vertical(column);
+
+	>label{
+		background: $live-mask-bg-color;
+		padding: 0.35rem 0.5rem;
+		color: $color-text;
+		font-size: 0.5rem;
+		line-height: 1.5;
+		margin: 0.35rem 0;
+		border-radius: 0.75rem;
+
+		span{
+			color: $color-primary;
+
+			.anchor &{
+				color: $live-anchor-txt-color;
+			}
+		}
+	}
 }

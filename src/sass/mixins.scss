@@ -1,3 +1,14 @@
+@mixin Newline {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+@mixin wrap-space {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @mixin scrollable {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -187,9 +198,17 @@
 }
 
 /**
+ * 主轴布局/垂直布局
+ */
+@mixin spindle-center($col) {
+    @include flex-spindle($col);
+    align-items: center;
+}
+
+/**
  * 水平/垂直布局
  */
-@mixin flex-center(){
+@mixin flex-center {
     display: flex;
     justify-content: center;
     align-items: center;

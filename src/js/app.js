@@ -25,20 +25,14 @@ const router = new Router({
 	}, {
 		path: '/home',
 		name: 'home',
-		template: PAGESFILE.home,
-		children: [{
-			path: '/new',
-			name: 'new'
-		}, {
-			path: '/hot',
-			name: 'hot'
-		}, {
-			path: '/video',
-			name: 'video'
-		}]
+		template: PAGESFILE.home
 	}, {
-		path: '/friends',
-		name: 'friends'
+		path: '/live',
+		name: 'live',
+		template: PAGESFILE.live
+	}, {
+		path: '/favorite',
+		name: 'favorite'
 	}, {
 		path: '/message',
 		name: 'message'

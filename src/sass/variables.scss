@@ -99,10 +99,14 @@ $btn-primary-txt-color: #333;
 $timing-fuction: cubic-bezier(.1, .5, .1, 1);
 // Inspired by $c2prods
 
-
 // Borders
 // --------------------------------------------------
 $border-default-width: 1px;
 $border-default-color: $color-split;
 $border-default: $border-default-width solid $border-default-color;
 $border-radius: 0.3rem;
+
+//live
+//---------------------------------------------------
+$live-mask-bg-color: rgba(51, 51, 51, 0.2);//#333
+$live-anchor-txt-color: #FF3376;

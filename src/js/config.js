@@ -1,6 +1,7 @@
 
 import Login from './pages/login';
 import Home from './pages/home';
+import Live from './pages/live';
 
 let config = {
 	// apihost: 'http://192.168.8.240:8090',
@@ -19,6 +20,13 @@ let config = {
 			name: 'home',
 			path: '../pages/home.html',
 			component: Home,
+			dom: 'body'
+		},
+		live: {
+			name: 'live',
+			path: '../pages/live.html',
+			component: Live,
+			mode: 'replace',
 			dom: 'body'
 		}
 	}

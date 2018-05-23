@@ -119,7 +119,8 @@ let home = {
 	event: function() {
 		$('.card-content','.card-list').on('click', function() {
 			modal.alert('She is looking forward to your true love', 'Not enough coins', function() {
-				modal.popup();
+				// modal.popup();
+				location.hash = '#/live';
 			});
 		});
 	},

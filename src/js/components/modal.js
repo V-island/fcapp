@@ -173,6 +173,8 @@ let Modal = {
 	 * @return {[type]}               [description]
 	 */
 	popup: function (modal, removeOnClose) {
+		let _this = this;
+
         if (typeof removeOnClose === 'undefined') removeOnClose = true;
         if (typeof modal === 'string' && modal.indexOf('<') >= 0) {
             let _modal = document.createElement('div');
@@ -188,11 +190,67 @@ let Modal = {
         if (modal.length === 0) return false;
         modal.show();
         modal.find(".content").scroller("refresh");
-        if (modal.find('.' + defaults.viewClass).length > 0) {
-            $.sizeNavbars(modal.find('.' + defaults.viewClass)[0]);
+        if (modal.find('.' + _this.defaults.viewClass).length > 0) {
+            $.sizeNavbars(modal.find('.' + _this.defaults.viewClass)[0]);
         }
-        $.openModal(modal);
+        _this.openModal(modal);
 
+        return modal[0];
+    },
+
+    /**
+     * 操作表
+     * @param  {[type]} params [description]
+     * @return {[type]}        [description]
+     */
+    actions: function (params) {
+        var modal, groupSelector, buttonSelector;
+        params = params || [];
+
+        if (params.length > 0 && !$.isArray(params[0])) {
+            params = [params];
+        }
+        var modalHTML;
+        var buttonsHTML = '';
+        for (var i = 0; i < params.length; i++) {
+            for (var j = 0; j < params[i].length; j++) {
+                if (j === 0) buttonsHTML += '<div class="actions-modal-group">';
+                var button = params[i][j];
+                var buttonClass = button.label ? 'actions-modal-label' : 'actions-modal-button';
+                if (button.bold) buttonClass += ' actions-modal-button-bold';
+                if (button.color) buttonClass += ' color-' + button.color;
+                if (button.bg) buttonClass += ' bg-' + button.bg;
+                if (button.disabled) buttonClass += ' disabled';
+                buttonsHTML += '<span class="' + buttonClass + '">' + button.text + '</span>';
+                if (j === params[i].length - 1) buttonsHTML += '</div>';
+            }
+        }
+        modalHTML = '<div class="actions-modal">' + buttonsHTML + '</div>';
+        _modalTemplateTempDiv.innerHTML = modalHTML;
+        modal = $(_modalTemplateTempDiv).children();
+        $(defaults.modalContainer).append(modal[0]);
+        groupSelector = '.actions-modal-group';
+        buttonSelector = '.actions-modal-button';
+
+        var groups = modal.find(groupSelector);
+        groups.each(function (index, el) {
+            var groupIndex = index;
+            $(el).children().each(function (index, el) {
+                var buttonIndex = index;
+                var buttonParams = params[groupIndex][buttonIndex];
+                var clickTarget;
+                if ($(el).is(buttonSelector)) clickTarget = $(el);
+                // if (toPopover && $(el).find(buttonSelector).length > 0) clickTarget = $(el).find(buttonSelector);
+
+                if (clickTarget) {
+                    clickTarget.on('click', function (e) {
+                        if (buttonParams.close !== false) $.closeModal(modal);
+                        if (buttonParams.onClick) buttonParams.onClick(modal, e);
+                    });
+                }
+            });
+        });
+        $.openModal(modal);
         return modal[0];
     },
 
