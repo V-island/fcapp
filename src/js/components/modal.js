@@ -100,6 +100,7 @@ let Modal = {
 	 * @return {[object]}                params
 	 */
 	confirm: function (text, title, callbackOk, callbackCancel) {
+		let _this = this;
 	    if (typeof title === 'function') {
 	        callbackCancel = arguments[2];
 	        callbackOk = arguments[1];
@@ -109,8 +110,8 @@ let Modal = {
 	        text: text || '',
 	        title: typeof title === 'undefined' ? defaults.modalTitle : title,
 	        buttons: [
-	            {text: defaults.modalButtonCancel, onClick: callbackCancel},
-	            {text: defaults.modalButtonOk, bold: true, onClick: callbackOk}
+	            {text: _this.defaults.modalButtonCancel, onClick: callbackCancel},
+	            {text: _this.defaults.modalButtonOk, bold: true, onClick: callbackOk}
 	        ]
 	    });
 	},
@@ -167,7 +168,7 @@ let Modal = {
 	},
 
 	/**
-	 * 弹出
+	 * 弹出整页
 	 * @param  {[string]} modal         [description]
 	 * @param  {[type]} removeOnClose [description]
 	 * @return {[type]}               [description]
@@ -182,17 +183,17 @@ let Modal = {
             if (_modal.childNodes.length > 0) {
                 modal = _modal.childNodes[0];
                 if (removeOnClose) modal.classList.add('remove-on-close');
-                $(defaults.modalContainer).append(modal);
+                $(_this.defaults.modalContainer).append(modal);
             }
             else return false; //nothing found
         }
         modal = $(modal);
         if (modal.length === 0) return false;
         modal.show();
-        modal.find(".content").scroller("refresh");
-        if (modal.find('.' + _this.defaults.viewClass).length > 0) {
-            $.sizeNavbars(modal.find('.' + _this.defaults.viewClass)[0]);
-        }
+        // modal.find(".content").scroller("refresh");
+        // if (modal.find('.' + _this.defaults.viewClass).length > 0) {
+        //     $.sizeNavbars(modal.find('.' + _this.defaults.viewClass)[0]);
+        // }
         _this.openModal(modal);
 
         return modal[0];
@@ -203,54 +204,17 @@ let Modal = {
      * @param  {[type]} params [description]
      * @return {[type]}        [description]
      */
-    actions: function (params) {
-        var modal, groupSelector, buttonSelector;
-        params = params || [];
+    actions: function (modal, params) {
+        let _this = this;
+        let titleHTML = params.title ? '<div class="modal-title">' + params.title + '</div>' : '';
+		let closeHTML = params.closeBtn ? '<a href="javascript: void(0)" class="modal-close"><i class="ion ion-md-close"></i></a>' : '';
+		let cancelHTML = params.cancelBtn ? '<a href="javascript: void(0)" class="button button-link actions-button-cancel" data-ripple>Cancel</a>' : '';
+		let modalHTML = '<div class="actions-modal"><div class="modal-header">' + (titleHTML + closeHTML) + '</div>' + (modal + cancelHTML) + '</div>';
 
-        if (params.length > 0 && !$.isArray(params[0])) {
-            params = [params];
-        }
-        var modalHTML;
-        var buttonsHTML = '';
-        for (var i = 0; i < params.length; i++) {
-            for (var j = 0; j < params[i].length; j++) {
-                if (j === 0) buttonsHTML += '<div class="actions-modal-group">';
-                var button = params[i][j];
-                var buttonClass = button.label ? 'actions-modal-label' : 'actions-modal-button';
-                if (button.bold) buttonClass += ' actions-modal-button-bold';
-                if (button.color) buttonClass += ' color-' + button.color;
-                if (button.bg) buttonClass += ' bg-' + button.bg;
-                if (button.disabled) buttonClass += ' disabled';
-                buttonsHTML += '<span class="' + buttonClass + '">' + button.text + '</span>';
-                if (j === params[i].length - 1) buttonsHTML += '</div>';
-            }
-        }
-        modalHTML = '<div class="actions-modal">' + buttonsHTML + '</div>';
-        _modalTemplateTempDiv.innerHTML = modalHTML;
-        modal = $(_modalTemplateTempDiv).children();
-        $(defaults.modalContainer).append(modal[0]);
-        groupSelector = '.actions-modal-group';
-        buttonSelector = '.actions-modal-button';
+		let _modalTemplateTempDiv = document.createElement('div');
+		_modalTemplateTempDiv.innerHTML = modalHTML;
 
-        var groups = modal.find(groupSelector);
-        groups.each(function (index, el) {
-            var groupIndex = index;
-            $(el).children().each(function (index, el) {
-                var buttonIndex = index;
-                var buttonParams = params[groupIndex][buttonIndex];
-                var clickTarget;
-                if ($(el).is(buttonSelector)) clickTarget = $(el);
-                // if (toPopover && $(el).find(buttonSelector).length > 0) clickTarget = $(el).find(buttonSelector);
-
-                if (clickTarget) {
-                    clickTarget.on('click', function (e) {
-                        if (buttonParams.close !== false) $.closeModal(modal);
-                        if (buttonParams.onClick) buttonParams.onClick(modal, e);
-                    });
-                }
-            });
-        });
-        $.openModal(modal);
+        _this.openModal(modal);
         return modal[0];
     },
 

@@ -37,22 +37,37 @@ $ionicons-version: "4.1.0" !default;
     -moz-osx-font-smoothing: grayscale;
 }
 
-$names: search, filter, home, favorite, live, message, me, female, male, attention, close, gift, news, share, fecebook, tumblr, Twitter;
+$names: search, filter, home, favorite, live, message, me, female, male, attention, close, gift, news, share, fecebook, tumblr, Twitter, cards, paypal, confirm, phiz;
 
 @mixin iconImage($name) {
-    background-image: url("../img/icons/icon-#{$name}.png");
-    background: image-set(url("../img/icons/icon-#{$name}.png") 1x, url("../img/icons/icon-#{$name}@2x.png") 2x) center;
+    background-image: url("#{$imgBaseUrl}/icons/icon-#{$name}.png");
+    background: image-set(url("#{$imgBaseUrl}/icons/icon-#{$name}.png") 1x, url("#{$imgBaseUrl}/icons/icon-#{$name}@2x.png") 2x) center;
+}
+
+@mixin iconActive($name) {
+    .active >& {
+        @include iconImage(#{$name}-active);
+    }
 }
 
 @each $name in $names {
     .icon-#{$name}{
         @include iconImage($name);
 
-        @if $name == home and $name == favorite and $name == message and $name == me {
-            .active >& {
-                @include iconImage(#{$name}-active);
-            }
-
+        @if $name == home {
+            @include iconActive($name);
+        }
+        @else if $name == favorite {
+            @include iconActive($name);
+        }
+        @else if $name == message {
+            @include iconActive($name);
+        }
+        @else if $name == me {
+            @include iconActive($name);
+        }
+        @else if $name == confirm {
+            @include iconActive($name);
         }
 
     }
@@ -66,24 +81,20 @@ $names: search, filter, home, favorite, live, message, me, female, male, attenti
     }
 }
 
-/**
-$gifts: search;
+$gifts: guardian-heart;
 
 @mixin giftImage($gift) {
-    background-image: url("../img/gifts/gift-# {$gift}.png");
-    background: image-set(url("../img/gifts/gift-# {$gift}.png") 1x, url("../img/gifts/gift-# {$gift}@2x.png") 2x) center;
+    background-image: url("#{$imgBaseUrl}/gifts/gift-#{$gift}.png");
+    background: image-set(url("#{$imgBaseUrl}/gifts/gift-#{$gift}.png") 1x, url("#{$imgBaseUrl}/gifts/gift-#{$gift}@2x.png") 2x) center;
 }
 
 @each $gift in $gifts {
-    .gift-# {$gift}{
-        vertical-align: middle;
-        background-size: 100% auto;
-        background-position: center;
+    .gift-#{$gift}{
         @include giftImage($gift);
     }
 
 }
-**/
+
 
 // Ionicons Icon Font CSS
 // --------------------------

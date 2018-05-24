@@ -33,7 +33,70 @@
 			}
 
 		}
+	}
+	label.gift-label{
+		width: 4.55rem;
+		height: 4.2rem;
+		border: 1px solid transparent;
+		text-align: center;
+		padding: 0.35rem;
 
+		>p {
+			font-size: 0.5rem;
+			color: $color-text-gray-light;
+		}
+
+		>i.icon{
+			width: 2rem;
+			height: 2rem;
+		}
+
+		.name{
+			color: $color-text-gray;
+		}
+
+		&.active {
+			border-color: $color-primary;;
+		}
+	}
+	label.recharge-label{
+		background: none;
+		border-radius: 3rem;
+		border: $tag-recharge-border-default;
+		font-size: 0.5rem;
+		color: $color-text-gray-light;
+		width: 5.25rem;
+		padding: 0.2rem;
+		margin: 0.35rem;
+		text-align: center;
+
+		>p{
+			line-height: 1;
+		}
+
+		.cost{
+			font-size: 0.7rem;
+		    line-height: 1.5;
+			color: $color-text-gray;
+		}
+		&.active{
+			background: $color-primary;
+			border-color: $color-primary;
+		}
+	}
+	label.share-label{
+		margin: 0 1.4rem;
+		@include flex-spindle-center(space-around, column);
+
+		i.icon{
+			@include size(3.15rem);
+		}
+
+		span{
+			color: $color-text-gray-light;
+			font-size: 0.6rem;
+			margin-top: 0.35rem;
+		}
 	}
 	.tag-anchor{
 		width: 3.15rem;

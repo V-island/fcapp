@@ -25,6 +25,8 @@ $color-danger-active: transparentize($color-danger, 0.2);
 $color-warning-active: transparentize($color-warning, 0.2);
 $color-success-active: transparentize($color-success, 0.2);
 $color-split: #383840;
+$color-gift-txt: #FC496A;
+$color-money: $color-gift-txt;
 //分割线的颜色
 $color-bg: #383840;
 $color-text: #fff;
@@ -33,9 +35,9 @@ $color-text-active: #ff00ff;
 $color-text-secondary: #999;
 //次级文案
 
-$color-text-gray: #888;
+$color-text-gray: #333;
 //灰色文案
-$color-text-gray-light: #ccc;
+$color-text-gray-light: #888;
 //更灰色文案
 
 //链接色
@@ -49,7 +51,7 @@ $color-link-active: $color-primary-active;
 $bar-bg-color: #2D2D32;
 $bar-gradient-color-left: #313443;
 $bar-gradient-color-right: #535969;
-$bar-item-color: $color-text-gray;
+$bar-item-color: $color-text-gray-light;
 $bar-base-height: 2.2rem;
 $bar-tab-height: 2.5rem;
 $bar-side-spacing: 0.5rem;
@@ -68,6 +70,7 @@ $tag-border-radius: 0.7rem;
 $tag-txt-color: #fff;
 $tag-bg-color: transparent;
 $tag-bg-color-active: #4E87FA;
+$tag-recharge-border-default: $tag-border-width solid $color-text-gray-light;
 
 //Modal
 //---------------------------------------------------
@@ -78,10 +81,12 @@ $modal-buton-bg: $modal-bg-color;
 $modal-buton-active-bg: #d4d4d4;
 $modal-duration: 400ms;
 $modal-border-radius: 0.1rem;
-// $actions-modal-duration: 300ms;
-// $actions-modal-button-bg: rgba(243, 243, 243, 0.95);
-// $actions-modal-active-button-bg: #dcdcdc;
-$popup-bg-color: #333;
+$actions-modal-bg-color: $color-text;
+$actions-modal-title-color: $color-text-gray;
+$actions-modal-duration: 300ms;
+$actions-modal-border-radius: 0.2rem 0.2rem 0 0;
+$actions-modal-color-split: #F1F1F1;
+$popup-bg-color: $color-text-gray;
 $popup-gradient-color-top: #313443;
 $popup-gradient-color-bottom: #535969;
 $popup-duration: 400ms;
@@ -92,7 +97,8 @@ $btn-font-size: 0.75rem;
 $btn-height: 2.1rem;
 $btn-big-height: 2.4rem;
 $btn-border-radius: 0.1rem;
-$btn-primary-txt-color: #333;
+$btn-primary-txt-color: $color-text-gray;
+$btn-fill-border-radius: 0.75rem;
 
 // Transitions
 // --------------------------------------------------
@@ -105,6 +111,12 @@ $border-default-width: 1px;
 $border-default-color: $color-split;
 $border-default: $border-default-width solid $border-default-color;
 $border-radius: 0.3rem;
+
+// Lists
+//---------------------------------------------------
+$list-block-border-color: $color-split;
+$list-block-bg: #fff;
+$list-side-padding: 0.8rem;
 
 //live
 //---------------------------------------------------

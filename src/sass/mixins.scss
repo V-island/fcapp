@@ -206,10 +206,24 @@
 }
 
 /**
+ * 主轴布局/垂直布局
+ */
+@mixin flex-spindle-center($col, $flex) {
+    @include flex-spindle($col);
+    flex-direction: $flex;
+    align-items: center;
+}
+
+/**
  * 水平/垂直布局
  */
 @mixin flex-center {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+@mixin size($num) {
+    width: $num;
+    height: $num;
 }

@@ -11,8 +11,7 @@
 		border-radius: 50%;
 		vertical-align: middle;
 		border: 1px solid $color-text;
-		width: 1rem;
-		height: 1rem;
+		@include size(1rem);
 
 		+.user-name {
 			font-size: 0.75rem;
@@ -28,8 +27,7 @@
 	    align-items: center;
 
 		>.user-img {
-			width: 1.4rem;
-			height: 1.4rem;
+			@include size(1.4rem);
 		    float: left;
 		    margin-right: 0.35rem;
 		}
@@ -80,8 +78,7 @@
 			font-size: 0.75rem;
 
 			>i.icon {
-				width: 0.7rem;
-				height: 0.7rem;
+				@include size(0.7rem);
 				margin-left: 0.35rem;
 				vertical-align: text-top;
 			}
@@ -93,8 +90,7 @@
 	.calling-svg {
 		text-align: center;
 		border: 0.2rem solid $color-text;
-		width: 8.4rem;
-		height: 8.4rem;
+		@include size(8.4rem);
 		border-radius: 50%;
 		line-height: 12rem;
 		font-size: 0.6rem;
@@ -104,8 +100,7 @@
 		&:after {
 			content: "";
 			border: 0.2rem solid rgba(255, 255, 255, 0.15);
-			width: 8.4rem;
-			height: 8.4rem;
+			@include size(8.4rem);
 			display: flex;
 			position: absolute;
 			top: -0.4rem;
@@ -134,7 +129,7 @@
 
 			>p{
 				font-size: 0.5rem;
-				color: $color-text-gray;
+				color: $color-text-gray-light;
 			}
 		}
 	}
@@ -177,7 +172,7 @@
 
 			>p {
 				font-size: 0.5rem;
-				color: $color-text-gray;
+				color: $color-text-gray-light;
 			    margin-bottom: 0.35rem;
 			    min-width: 13rem;
 			    display: inline-block;
@@ -190,7 +185,7 @@
 			    	    height: 1px;
 			    	    width: 2.1rem;
 			    	    display: block;
-			    	    background: $color-text-gray;
+			    	    background: $color-text-gray-light;
 			    	    position: absolute;
 			    	    top: 0.35rem;
 
@@ -243,6 +238,114 @@
 	}
 }
 
+.gift-group{
+	position: relative;
+	padding: 0.35rem 0.5rem;
+	@include hairline(top, $actions-modal-color-split);
+	@include flex-spindle(space-between);
+
+	.button{
+		margin: 0;
+		line-height: 1.4rem;
+		height: 1.4rem;
+		font-size: 0.6rem;
+		padding: 0 0.7rem;
+	}
+
+	.recharge-box{
+		color: $color-gift-txt;
+		font-size: 0.5rem;
+		@include spindle-center(start);
+
+		>.button{
+			border-radius: $btn-fill-border-radius;
+			margin-right: 0.35rem;
+		}
+
+		span{
+			color: $color-text-gray-light;
+		}
+	}
+}
+
+// Recharge box
+//--------------------------------
+.recharge-group{
+	>p.recharge-label{
+		margin: 0.35rem 0.7rem;
+		@include spindle-center(space-between);
+
+		span{
+			color: $color-text-gray-light;
+			font-size: 0.7rem;
+
+			&.money{
+				color: $color-gift-txt;
+			}
+		}
+	}
+
+	>p.amount-label{
+		margin: 0.35rem 3.15rem;
+		color: $color-text-gray;
+		font-size: 0.7rem;
+
+		span{
+			color: $color-gift-txt;
+		}
+	}
+
+	>.tag{
+	    position: relative;
+		@include hairline(bottom, $actions-modal-color-split);
+		padding: 0.35rem 0;
+	}
+
+	>.button{
+		width: 10rem;
+	    margin: 0.7rem auto 0.25rem;
+	}
+
+	>.buttons{
+		width: 80%;
+	    margin: 1rem auto 0;
+
+		.button{
+			width: 5.5rem;
+		}
+	}
+}
+
+.share-group{
+	margin: 0.4rem 0 0.8rem;
+}
+
+.news-group{
+	@include spindle-center(start);
+
+	.news-input {
+	    flex-grow: 1;
+	    border-color: $color-text;
+	}
+
+	.news-phiz{
+		margin-left: 0.35rem;
+		flex-grow: 0;
+
+		>i.icon{
+			@include size(1.05rem);
+		}
+	}
+
+	>.button{
+		height: 1.4rem;
+		line-height: 1.4rem;
+		font-size: 0.6rem;
+		margin: 0 0.35rem;
+		flex-grow: 0;
+	}
+}
+
 // live-wrapper
 //--------------------------------
 .live-wrapper{
@@ -287,8 +390,7 @@
 	left: 0.75rem;
 
 	>i.icon{
-		width: 1.45rem;
-		height: 1.45rem;
+		@include size(1.45rem);
 	}
 }
 .live-close{
@@ -297,8 +399,7 @@
 	right: 0.75rem;
 
 	>i.icon{
-		width: 1.05rem;
-		height: 1.05rem;
+		@include size(1.05rem);
 	}
 }
 .live-buttons{
@@ -309,8 +410,7 @@
 	width: 10rem;
 
 	>.icon{
-		width: 2.1rem;
-		height: 2.1rem;
+		@include size(2.1rem);
 	}
 }
 .live-comments{

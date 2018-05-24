@@ -204,6 +204,46 @@ html.with-statusbar-overlay {
     }
 }
 
+// Actions
+.actions-modal {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 11000;
+    width: 100%;
+    transform: translate3d(0,100%,0);
+    background: $actions-modal-bg-color;
+    border-radius: $actions-modal-border-radius;
+    min-height: 2rem;
+    &.modal-in {
+        transition-duration: $actions-modal-duration;
+        transform: translate3d(0,0,0);
+    }
+    &.modal-out {
+        z-index: 11000-1;
+        transition-duration: $actions-modal-duration;
+        transform: translate3d(0,100%,0);
+    }
+    .modal-header{
+        padding: 0.35rem;
+        margin-bottom: 0.5rem;
+    }
+    .modal-title{
+        font-size: 0.75rem;
+        color: $actions-modal-title-color;
+    }
+    .modal-close{
+        right: 0.6rem;
+    }
+}
+.actions-modal-group {
+    padding: 0.4rem;
+}
+.actions-button-cancel{
+    color: $color-text-gray !important;
+    position: relative;
+    @include hairline(top, $actions-modal-color-split);
+}
 //toast
 .toast {
   background: rgba(0, 0, 0, .8);

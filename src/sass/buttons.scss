@@ -46,22 +46,6 @@
         line-height: ($btn-big-height - 0.1rem);
     }
 
-    &.button-fill {
-        color: #fff;
-        background: $color-primary;
-        border: none;
-        line-height: $btn-height;
-
-        &.active, &:active {
-            background: $color-primary-active;
-        }
-
-        &.button-big {
-            line-height: $btn-big-height;
-        }
-
-    }
-
     &.button-link {
         padding-top: 0.3rem;
         padding-bottom: 0.3rem;
@@ -101,22 +85,57 @@
 
 }
 
+@mixin button-themes($color) {
+    border-color: $color;
+    color: $color;
+
+    &:active {
+        background-color: $color;
+        color: $color-text;
+    }
+
+}
+
+$themes: primary, danger, warning, success, recharge;
+
 .button {
-    &.button-primary {
-        @include button-variant($color-primary, $color-primary-active);
-        color: $btn-primary-txt-color;
-    }
+    @each $theme in $themes {
+        &.button-#{$theme} {
+            @if $theme == primary {
+                @include button-variant($color-primary, $color-primary-active);
+                color: $btn-primary-txt-color;
+            }
+            @else if $theme == danger {
+                @include button-variant($color-danger, $color-danger-active);
+            }
+            @else if $theme == warning {
+                @include button-variant($color-warning, $color-warning-active);
+            }
+            @else if $theme == success {
+                @include button-variant($color-success, $color-success-active);
+            }
+        }
 
-    &.button-danger {
-        @include button-variant($color-danger, $color-danger-active);
-    }
+        &.fill-#{$theme} {
+            background: none;
 
-    &.button-warning {
-        @include button-variant($color-warning, $color-warning-active);
-    }
+            @if $theme == primary {
+                @include button-themes($color-primary);
+            }
+            @else if $theme == danger {
+                @include button-themes($color-danger);
+            }
+            @else if $theme == warning {
+                @include button-themes($color-warning);
+            }
+            @else if $theme == success {
+                @include button-themes($color-success);
+            }
+            @else if $theme == recharge {
+                @include button-themes($color-gift-txt);
+            }
+        }
 
-    &.button-success {
-        @include button-variant($color-success, $color-success-active);
     }
 
 }

@@ -1,11 +1,15 @@
 import modal from '../components/modal';
 
 let live = {
-	event: function () {
+	event: function() {
 		let btn = $('.live-buttons');
 
-		$('.icon-new', btn).on('click', function() {
+		$('.icon-news', btn).on('click', function() {
 			console.log('评论');
+			// modal.actions( , {
+			// 	title: 'Gift',
+			// 	closeBtn: true
+			// });
 		});
 
 		$('.icon-share', btn).on('click', function() {
