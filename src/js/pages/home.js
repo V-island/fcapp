@@ -1,5 +1,4 @@
 import Swiper from 'swiper';
-import modal from '../components/modal';
 
 function homeSwiper() {
 	//暂时设计每个slide大小需要一致
@@ -114,11 +113,10 @@ function homeSwiper() {
 	})
 }
 
-
 let home = {
 	event: function() {
 		$('.card-content','.card-list').on('click', function() {
-			modal.alert('She is looking forward to your true love', 'Not enough coins', function() {
+			Modal.alert('She is looking forward to your true love', 'Not enough coins', function() {
 				// modal.popup();
 				location.hash = '#/live';
 			});

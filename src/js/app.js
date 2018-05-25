@@ -1,11 +1,18 @@
 // import Webcomponents from 'webcomponents-lite';
 import FCSTYLE from '../sass/fc.scss';
+import htmlImport from './html-import';
 import Router from './router';
+
+// components
+import modal from './components/modal';
 
 import config from './config';
 
-// const PUBLICFILE = config.publicFile;
-const PAGESFILE = config.pagesFile;
+window.HTMLImport = htmlImport;
+window.Modal = modal;
+
+window.PUBLICFILE = config.publicFile;
+window.PAGESFILE = config.pagesFile;
 // import {MDCTopAppBar} from '@material/top-app-bar/index';
 
 // Instantiation
@@ -40,4 +47,7 @@ const router = new Router({
 		path: '/user',
 		name: 'user'
 	}]
-})
+});
+
+require('jquery-ripple');
+$('[data-ripple]').ripple();

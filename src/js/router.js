@@ -1,5 +1,3 @@
-import htmlImport from './html-import';
-
 class Router {
 
 	constructor(options) {
@@ -29,7 +27,7 @@ class Router {
 
 		if (rules[i]) {
 			console.log('router匹配成功');
-			htmlImport.attachTo(rules[i].template);
+			HTMLImport.attachTo(rules[i].template);
 		}else {
 			console.log('404未找到该页面');
 		}
@@ -62,6 +60,7 @@ class Router {
 		let routes = {
 			path: matchAs === undefined ? route.path : matchAs,
 			name: route.name,
+			component: route.component,
 			template: route.template || true,
 		};
 

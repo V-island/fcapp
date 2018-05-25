@@ -1,6 +1,5 @@
 import Webcomponents from 'webcomponents-lite';
 // import ripple from 'jquery-ripple';
-require('jquery-ripple');
 
 const MSG = {
 	support: '支持导入!',
@@ -110,8 +109,15 @@ class htmlImport {
 			// }
 
 			console.log(_self.tpl);
-			_self.setdom(param);
 			// console.log(localStorage);
+			if (typeof(param.dom) != 'undefined' && param.init) {
+				console.log('进入加载dom ' + param.name);
+				_self.setdom(param);
+			}
+
+			if (typeof(param.component) != 'undefined') {
+				param.component.init();
+			}
 			//加载完成后清除头部引用
 			if (!link.readyState || 'link' === link.readyState || 'complete' === link.readyState) {
 				link.onload = link.onreadystatechange = null;
@@ -161,8 +167,7 @@ class htmlImport {
 
 			console.info(param.name + ' 读取成功，写入到 ' + _wrapper);
 
-			param.component.init();
-			$('[data-ripple]').ripple();
+			// param.component.init();
 			// console.log(_target.innerHTML);
 		} else {
 			console.warn(_wrapper + ' 没找到！' + param.name + ' 写入不成功');

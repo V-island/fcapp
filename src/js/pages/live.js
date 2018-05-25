@@ -1,12 +1,11 @@
-import modal from '../components/modal';
-
 let live = {
+	templateDOM: {},
 	event: function() {
 		let btn = $('.live-buttons');
 
 		$('.icon-news', btn).on('click', function() {
 			console.log('评论');
-			// modal.actions( , {
+			// Modal.actions( , {
 			// 	title: 'Gift',
 			// 	closeBtn: true
 			// });
@@ -22,6 +21,9 @@ let live = {
 	},
 	init: function() {
 		console.log('这里是livejs');
+		let templateDOM = HTMLImport.attachTo(PUBLICFILE.actions_lives);
+		let html = templateDOM.querySelector('#live-news');
+		console.log(html);
 		this.event();
 	}
 }

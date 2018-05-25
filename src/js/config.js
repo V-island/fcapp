@@ -1,4 +1,4 @@
-
+// gages
 import Login from './pages/login';
 import Home from './pages/home';
 import Live from './pages/live';
@@ -9,25 +9,34 @@ let config = {
 	// apiip: 'http://120.76.84.82:8080/api/',
 	// apitest: 'http://www.easy-mock.com/mock/59c4c72ee0dc663341b4ca37/v1/',
 	// pagesRoot: '../pages/',
+	publicFile: {
+		actions_lives: {
+			name: 'actions_lives',
+			path: '../src/public/actions_lives.html'
+		}
+	},
 	pagesFile: {
 		login: {
 			name: 'login',
 			path: '../pages/login.html',
 			component: Login,
-			dom: 'body'
+			dom: 'body',
+			init: 1
 		},
 		home: {
 			name: 'home',
 			path: '../pages/home.html',
 			component: Home,
-			dom: 'body'
+			dom: 'body',
+			init: 1
 		},
 		live: {
 			name: 'live',
 			path: '../pages/live.html',
 			component: Live,
 			mode: 'replace',
-			dom: 'body'
+			dom: 'body',
+			init: 1
 		}
 	}
 }

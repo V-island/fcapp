@@ -37,7 +37,7 @@ $ionicons-version: "4.1.0" !default;
     -moz-osx-font-smoothing: grayscale;
 }
 
-$names: search, filter, home, favorite, live, message, me, female, male, attention, close, gift, news, share, fecebook, tumblr, Twitter, cards, paypal, confirm, phiz;
+$names: search, filter, home, favorite, live, message, me, female, male, attention, close, gift, news, share, fecebook, tumblr, Twitter, cards, paypal, confirm, phiz, thumbs-upion;
 
 @mixin iconImage($name) {
     background-image: url("#{$imgBaseUrl}/icons/icon-#{$name}.png");
@@ -67,6 +67,9 @@ $names: search, filter, home, favorite, live, message, me, female, male, attenti
             @include iconActive($name);
         }
         @else if $name == confirm {
+            @include iconActive($name);
+        }
+        @else if $name == thumbs-upion {
             @include iconActive($name);
         }
 
