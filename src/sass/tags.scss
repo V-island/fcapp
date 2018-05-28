@@ -35,11 +35,10 @@
 		}
 	}
 	label.gift-label{
-		width: 4.55rem;
-		height: 4.2rem;
+		@include size(4.2rem);
 		border: 1px solid transparent;
 		text-align: center;
-		padding: 0.35rem;
+		padding: 0.35rem 0;
 
 		>p {
 			font-size: 0.5rem;
@@ -85,7 +84,7 @@
 		}
 	}
 	label.share-label{
-		margin: 0 1.4rem;
+		margin: 0 1.2rem;
 		@include flex-spindle-center(space-around, column);
 
 		i.icon{

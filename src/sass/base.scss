@@ -82,6 +82,11 @@ a {
     top: $bar-base-height;
 }
 
+.bar-user~.content {
+    top: $bar-user-height;
+    margin-top: 0.7rem;
+}
+
 .bar-header-secondary~.content {
     top: ($bar-base-height*2);
 }
@@ -123,4 +128,17 @@ a {
 
 .clearfix {
     @include clearfix;
+}
+
+//color
+.color-price{
+    color: #35A5DF !important;
+}
+
+.color-account{
+    color: #6C93E0 !important;
+}
+
+.color-score{
+    color: #B6A9FF !important;
 }

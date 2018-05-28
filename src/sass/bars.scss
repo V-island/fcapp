@@ -172,6 +172,82 @@
 
 }
 
+// User bar
+// --------------------------------------------------
+.bar-user {
+    height: $bar-user-height;
+    position: relative;
+    padding: 0 0.7rem;
+    @include spindle-center(space-between);
+
+    .user-image{
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        opacity: 0.3;
+        z-index: -1;
+    }
+
+    .user-info.across{
+        justify-content: start !important;
+        flex-grow: 1;
+    }
+
+    img.user-img{
+        width: 3.85rem !important;
+        height: 3.85rem !important;
+    }
+
+    .across-body{
+        flex-grow: 1;
+    }
+
+    .across-title{
+        @include spindle-center(start);
+
+        i.icon{
+            width: 1.4rem;
+            height: 0.7rem;
+            font-size: 0.5rem;
+            line-height: 1.5;
+            text-align: right;
+            padding: 0.1rem 0.2rem;
+            flex: 0 0 1.4rem;
+            margin-right: 0.35rem;
+        }
+    }
+
+    .user-name{
+        font-size: 1.25rem !important;
+        margin-right: 0.35rem;
+    }
+
+    .user-detail{
+        font-size: 0.6rem;
+        color: $color-primary;
+
+        i.icon{
+            width: 0.35rem;
+            height: 0.7rem;
+            margin-left: 0.35rem;
+        }
+    }
+
+    .user-txt{
+        font-size: 0.6rem !important;
+
+        i.icon{
+            @include size(0.7rem);
+            margin-right: 0.35rem;
+        }
+    }
+}
+
 // Bars with buttons
 // --------------------------------------------------
 .bar .button {

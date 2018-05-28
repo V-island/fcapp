@@ -6,7 +6,10 @@ let Modal = {
 		modalButtonOk: 'BUY NOW',
 		modalButtonCancel: '取消',
 		modalPreloaderTitle: '加载中',
-		modalContainer: document.body ? document.body : 'body'
+		modalContainer: document.body ? document.body : 'body',
+		modalCloseByOutside: true,
+		actionsCloseByOutside: true,
+		popupCloseByOutside: true
 	},
 	modalStack: [],
 
@@ -100,7 +103,7 @@ let Modal = {
 	 * @return {[object]}                params
 	 */
 	confirm: function (text, title, callbackOk, callbackCancel) {
-		let _this = this;
+		let _self = this;
 	    if (typeof title === 'function') {
 	        callbackCancel = arguments[2];
 	        callbackOk = arguments[1];
@@ -110,8 +113,8 @@ let Modal = {
 	        text: text || '',
 	        title: typeof title === 'undefined' ? defaults.modalTitle : title,
 	        buttons: [
-	            {text: _this.defaults.modalButtonCancel, onClick: callbackCancel},
-	            {text: _this.defaults.modalButtonOk, bold: true, onClick: callbackOk}
+	            {text: _self.defaults.modalButtonCancel, onClick: callbackCancel},
+	            {text: _self.defaults.modalButtonOk, bold: true, onClick: callbackOk}
 	        ]
 	    });
 	},
@@ -159,10 +162,10 @@ let Modal = {
 	 */
 	toast: function(msg, duration, extraclass) {
 	    let $toast = $('<div class="modal toast ' + (extraclass || '') + '">' + msg + '</div>').appendTo(document.body);
-	    let _this = this;
-	    _this.openModal($toast, function(){
+	    let _self = this;
+	    _self.openModal($toast, function(){
 	        setTimeout(function() {
-	            _this.closeModal($toast);
+	            _self.closeModal($toast);
 	        }, duration || 2000);
 	    });
 	},
@@ -174,7 +177,7 @@ let Modal = {
 	 * @return {[type]}               [description]
 	 */
 	popup: function (modal, removeOnClose) {
-		let _this = this;
+		let _self = this;
 
         if (typeof removeOnClose === 'undefined') removeOnClose = true;
         if (typeof modal === 'string' && modal.indexOf('<') >= 0) {
@@ -183,7 +186,7 @@ let Modal = {
             if (_modal.childNodes.length > 0) {
                 modal = _modal.childNodes[0];
                 if (removeOnClose) modal.classList.add('remove-on-close');
-                $(_this.defaults.modalContainer).append(modal);
+                $(_self.defaults.modalContainer).append(modal);
             }
             else return false; //nothing found
         }
@@ -191,10 +194,10 @@ let Modal = {
         if (modal.length === 0) return false;
         modal.show();
         // modal.find(".content").scroller("refresh");
-        // if (modal.find('.' + _this.defaults.viewClass).length > 0) {
-        //     $.sizeNavbars(modal.find('.' + _this.defaults.viewClass)[0]);
+        // if (modal.find('.' + _self.defaults.viewClass).length > 0) {
+        //     $.sizeNavbars(modal.find('.' + _self.defaults.viewClass)[0]);
         // }
-        _this.openModal(modal);
+        _self.openModal(modal);
 
         return modal[0];
     },
@@ -205,16 +208,34 @@ let Modal = {
      * @return {[type]}        [description]
      */
     actions: function (modal, params) {
-        let _this = this;
-        let titleHTML = params.title ? '<div class="modal-title">' + params.title + '</div>' : '';
+    	console.log(params);
+        let _self = this;
+		let titleHTML = params.title ? '<div class="modal-title">' + params.title + '</div>' : '';
 		let closeHTML = params.closeBtn ? '<a href="javascript: void(0)" class="modal-close"><i class="ion ion-md-close"></i></a>' : '';
+		let headerHTML = titleHTML || closeHTML ? '<div class="modal-header">' + (titleHTML + closeHTML) + '</div>' : '';
 		let cancelHTML = params.cancelBtn ? '<a href="javascript: void(0)" class="button button-link actions-button-cancel" data-ripple>Cancel</a>' : '';
-		let modalHTML = '<div class="actions-modal"><div class="modal-header">' + (titleHTML + closeHTML) + '</div>' + (modal + cancelHTML) + '</div>';
+		let modalHTML = '<div class="actions-modal">' + (headerHTML + modal + cancelHTML) + '</div>';
 
 		let _modalTemplateTempDiv = document.createElement('div');
+
 		_modalTemplateTempDiv.innerHTML = modalHTML;
 
-        _this.openModal(modal);
+		let _modal = $(_modalTemplateTempDiv).children();
+
+		$(_self.defaults.modalContainer).append(_modal[0]);
+
+		_modal.find('.modal-close').on('click', function (e) {
+	        _self.closeModal(_modal);
+	    });
+		// Add events on buttons
+		// _modal.find('.modal-close').each(function (index, el) {
+		//     $(el).on('click', function (e) {
+		//         if (params.buttons[index].close !== false) $.closeModal(modal);
+		//         // if (params.buttons[index].onClick) params.buttons[index].onClick(modal, e);
+		//         // if (params.onClick) params.onClick(modal, index);
+		//     });
+		// });
+        _self.openModal(_modal);
         return modal[0];
     },
 
@@ -226,12 +247,12 @@ let Modal = {
 	 */
 	openModal: function (modal, cb) {
 	    modal = $(modal);
-	    let _this = this;
+	    let _self = this;
 	    let isModal = modal.hasClass('modal'),
 	        isNotToast = !modal.hasClass('toast');
-	    if ($('.modal.modal-in:not(.modal-out)').length && _this.defaults.modalStack && isModal && isNotToast) {
-	        _this.modalStack.push(function () {
-	            _this.openModal(modal, cb);
+	    if ($('.modal.modal-in:not(.modal-out)').length && _self.defaults.modalStack && isModal && isNotToast) {
+	        _self.modalStack.push(function () {
+	            _self.openModal(modal, cb);
 	        });
 	        return;
 	    }
@@ -254,10 +275,10 @@ let Modal = {
 	    let overlay;
 	    if (!isLoginScreen && !isPickerModal && !isToast) {
 	        if ($('.modal-overlay').length === 0 && !isPopup) {
-	            $(_this.defaults.modalContainer).append('<div class="modal-overlay"></div>');
+	            $(_self.defaults.modalContainer).append('<div class="modal-overlay"></div>');
 	        }
 	        if ($('.popup-overlay').length === 0 && isPopup) {
-	            $(_this.defaults.modalContainer).append('<div class="popup-overlay"></div>');
+	            $(_self.defaults.modalContainer).append('<div class="popup-overlay"></div>');
 	        }
 	        overlay = isPopup ? $('.popup-overlay') : $('.modal-overlay');
 	    }
@@ -270,7 +291,7 @@ let Modal = {
 
 	    // Picker modal body class
 	    if (isPickerModal) {
-	        $(_this.defaults.modalContainer).addClass('with-picker-modal');
+	        $(_self.defaults.modalContainer).addClass('with-picker-modal');
 	    }
 
 	    // Classes for transition in
@@ -284,7 +305,10 @@ let Modal = {
 	      cb.call(this);
 	    }
 
-	    $(document).on('click', ' .modal-overlay, .popup-overlay, .close-popup, .open-popup, .close-picker', _this.handleClicks);
+	    require('jquery-ripple');
+	    $('[data-ripple]').ripple();
+
+	    $(document).on('click', ' .modal-overlay, .popup-overlay, .close-popup, .open-popup, .close-picker', _self.handleClicks);
 	    return true;
 	},
 
@@ -295,7 +319,7 @@ let Modal = {
 	 */
 	closeModal: function (modal) {
 	    modal = $(modal || '.modal-in');
-	    let _this = this;
+	    let _self = this;
 	    if (typeof modal !== 'undefined' && modal.length === 0) {
 	        return;
 	    }
@@ -319,8 +343,8 @@ let Modal = {
 
 	    // Picker modal body class
 	    if (isPickerModal) {
-	        $(_this.defaults.modalContainer).removeClass('with-picker-modal');
-	        $(_this.defaults.modalContainer).addClass('picker-modal-closing');
+	        $(_self.defaults.modalContainer).removeClass('with-picker-modal');
+	        $(_self.defaults.modalContainer).addClass('picker-modal-closing');
 	    }
 
 	    modal.removeClass('modal-in').addClass('modal-out').transitionEnd(function (e) {
@@ -340,8 +364,8 @@ let Modal = {
                 modal.remove();
             }
         });
-	    if (isModal &&  _this.defaults.modalStack ) {
-	        _this.modalStackClearQueue();
+	    if (isModal &&  _self.defaults.modalStack ) {
+	        _self.modalStackClearQueue();
 	    }
 
 	    return true;
@@ -351,7 +375,6 @@ let Modal = {
 	    /*jshint validthis:true */
 	    let clicked = $(this);
 	    let url = clicked.attr('href');
-	   	let _this = this;
 
 	    //Collect Clicked data- attributes
 	    let clickedData = clicked.dataset();
@@ -363,27 +386,27 @@ let Modal = {
 	            popup = clickedData.popup;
 	        }
 	        else popup = '.popup';
-	        _this.popup(popup);
+	        Modal.popup(popup);
 	    }
 	    if (clicked.hasClass('close-popup')) {
 	        if (clickedData.popup) {
 	            popup = clickedData.popup;
 	        }
 	        else popup = '.popup.modal-in';
-	        _this.closeModal(popup);
+	        Modal.closeModal(popup);
 	    }
 
 	    // Close Modal
 	    if (clicked.hasClass('modal-overlay')) {
-	        if ($('.modal.modal-in').length > 0 && _this.defaults.modalCloseByOutside)
-	            _this.closeModal('.modal.modal-in');
-	        if ($('.actions-modal.modal-in').length > 0 && _this.defaults.actionsCloseByOutside)
-	            _this.closeModal('.actions-modal.modal-in');
+	        if ($('.modal.modal-in').length > 0 && Modal.defaults.modalCloseByOutside)
+	            Modal.closeModal('.modal.modal-in');
+	        if ($('.actions-modal.modal-in').length > 0 && Modal.defaults.actionsCloseByOutside)
+	            Modal.closeModal('.actions-modal.modal-in');
 
 	    }
 	    if (clicked.hasClass('popup-overlay')) {
-	        if ($('.popup.modal-in').length > 0 && _this.defaults.popupCloseByOutside)
-	            _this.closeModal('.popup.modal-in');
+	        if ($('.popup.modal-in').length > 0 && Modal.defaults.popupCloseByOutside)
+	            Modal.closeModal('.popup.modal-in');
 	    }
 	}
 }

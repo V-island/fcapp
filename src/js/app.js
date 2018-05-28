@@ -45,7 +45,8 @@ const router = new Router({
 		name: 'message'
 	}, {
 		path: '/user',
-		name: 'user'
+		name: 'user',
+		template: PAGESFILE.user
 	}]
 });
 

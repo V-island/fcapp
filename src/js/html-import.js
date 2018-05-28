@@ -76,7 +76,9 @@ class htmlImport {
 			let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
 
 			if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML == '') {
-				bodyHTML = _target.head.innerHTML;
+				for (let i = 0; i < _target.head.children.length; i++) {
+					_self.setTpl(_target.head.children[i].id, _target.head.children[i].innerHTML);
+				}
 			} else if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML != '') {
 				bodyHTML = _target.head.innerHTML + bodyHTML;
 			}
@@ -88,28 +90,8 @@ class htmlImport {
 				}
 			}
 
+			_self.setTpl(param.name, bodyHTML);
 
-
-			// console.log(bodyHTML);
-
-			bodyHTML = _self.replaceNote(bodyHTML);
-
-			_self.tpl[param.name] = bodyHTML;
-
-			// var oldHTML = localStorage.getItem(param.name);
-			// console.log(oldHTML);
-
-			// if (oldHTML != bodyHTML) {
-			// 	localStorage.removeItem(param.name);
-			// 	localStorage.setItem(param.name, bodyHTML);
-			// 	console.log(param.name + ' ' + MSG.savedone);
-
-			// } else {
-			// 	console.log(param.name + ' ' + MSG.alreadysave);
-			// }
-
-			console.log(_self.tpl);
-			// console.log(localStorage);
 			if (typeof(param.dom) != 'undefined' && param.init) {
 				console.log('进入加载dom ' + param.name);
 				_self.setdom(param);
@@ -131,6 +113,33 @@ class htmlImport {
 		};
 		document.head.appendChild(link);
 
+	}
+
+	/**
+	 * 写入模板
+	 * @param {[type]} name [description]
+	 * @param {[type]} html [description]
+	 */
+	setTpl(name, html) {
+		let _self = this;
+		let bodyHTML = _self.replaceNote(html);
+		_self.tpl[name] = bodyHTML;
+
+		// var oldHTML = localStorage.getItem(param.name);
+		// console.log(oldHTML);
+
+		// if (oldHTML != bodyHTML) {
+		// 	localStorage.removeItem(param.name);
+		// 	localStorage.setItem(param.name, bodyHTML);
+		// 	console.log(param.name + ' ' + MSG.savedone);
+
+		// } else {
+		// 	console.log(param.name + ' ' + MSG.alreadysave);
+		// }
+
+		// console.log(_self.tpl);
+		// console.log(localStorage);
+		return;
 	}
 
 	/**

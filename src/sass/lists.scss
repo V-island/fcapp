@@ -26,7 +26,7 @@
     }
 
     .list-item-graphic{
-        @include size(1.4rem);
+        @include size(1.42rem);
         margin-right: 0.35rem;
     }
 
@@ -36,6 +36,11 @@
         @include size(1.1rem);
     }
 
+    .list-item-meta-txt{
+        margin-right: 0.35rem;
+        color: $color-text-gray-light;
+    }
+
     .list-item-text, .list-item-secondary {
         @include wrap-space;
         display: block;
@@ -43,6 +48,27 @@
 
     &.list-two-line .list-item {
         height: 3.6rem;
+    }
+
+    &.list-user{
+        background: $list-user-bg-color;
+        margin-bottom: 0.35rem;
+
+        >.line{
+            margin: 0 0.8rem 0 2.55rem;
+            height: 1px;
+            background: $list-user-border-color;
+        }
+
+        .list-item-text{
+            color: $color-text;
+            flex-grow: 1;
+        }
+
+        .list-item-meta{
+            width: 0.35rem;
+            height: 0.7rem;
+        }
     }
 
 }
