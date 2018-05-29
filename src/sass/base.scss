@@ -80,6 +80,10 @@ a {
 
 .bar-flex~.content {
     top: $bar-base-height;
+
+    &.block{
+        margin: 0.75rem 0;
+    }
 }
 
 .bar-user~.content {
@@ -136,9 +140,9 @@ a {
 }
 
 .color-account{
-    color: #6C93E0 !important;
+    color: #C068FA !important;
 }
 
 .color-score{
-    color: #B6A9FF !important;
+    color: #FCC635 !important;
 }

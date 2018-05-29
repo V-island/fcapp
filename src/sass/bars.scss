@@ -53,11 +53,10 @@
 //
 // We position the absolutely to make sure the title is always centered
 .title {
-    position: absolute;
     display: block;
     width: 100%;
     padding: 0;
-    margin: 0 (-$bar-side-spacing);
+    margin: 0;
     font-size: $font-size-default;
     font-weight: $font-weight;
     line-height: $bar-base-height;
@@ -84,7 +83,7 @@
     .icon-btn {
         flex: 0 auto;
         text-align: center;
-        width: 1.8rem;
+        width: 2rem;
         height: 1.8rem;
         border-radius: 0.9rem;
     }
@@ -360,6 +359,10 @@
     .icon-filter{
         width: .8rem;
         height: .85rem;
+    }
+    .icon-arrow-back{
+        width: 0.5rem;
+        height: 0.9rem;
     }
 
 }

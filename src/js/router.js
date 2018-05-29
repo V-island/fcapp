@@ -23,6 +23,8 @@ class Router {
 
 	createTemplate(Href) {
 		let rules = this.matcher;
+		console.log(rules);
+		console.log(Href);
 		let i = _.findKey(rules, ['path', Href]);
 
 		if (rules[i]) {
@@ -60,7 +62,6 @@ class Router {
 		let routes = {
 			path: matchAs === undefined ? route.path : matchAs,
 			name: route.name,
-			component: route.component,
 			template: route.template || true,
 		};
 
@@ -112,7 +113,6 @@ class Router {
 			let _page = _self.getHashpage();
 			_self.changehref(e.oldURL, e.newURL);
 			_self.setLocation(nav, _page);
-			// _self.backCtrl();
 			// if('Modal' in window){
 			// 	Modal.close();
 			// }
@@ -206,18 +206,21 @@ class Router {
 	 * @return {[type]} [description]
 	 */
 	backCtrl() {
-		var _self = this;
-		var _target = $(document.body).find('.top-bar .back');
-		var _name = location.hash.split('#')[1];
+		console.log('进入退出函数');
+		let _self = this;
+		let _target = $(document.body).find('.bar-flex .back');
+		// let _target = document.querySelector('.bar-flex .back');
+		// var _name = location.hash.split('#')[1];
+		console.log(_target);
+		_target.off().on('click', function() {
+			history.go(-1);
+		});
+		// if (_name.indexOf('uc_user_info') > -1) {
+		// 	_target.addClass('show');
 
-		if (_name.indexOf('uc_user_info') > -1) {
-			_target.addClass('show');
-			_target.off().on('click', function() {
-				history.go(-1);
-			});
-		} else {
-			_target.removeClass('show');
-		}
+		// } else {
+		// 	_target.removeClass('show');
+		// }
 	}
 }
 

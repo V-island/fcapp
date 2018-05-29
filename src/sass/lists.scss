@@ -4,7 +4,8 @@
     font-weight: 400;
     line-height: 1.75rem;
     margin: 0;
-    padding: 0.4rem 0;
+    // padding: 0.4rem 0;
+    padding: 0;
     list-style-type: none;
     text-decoration: inherit;
     letter-spacing: .00937rem;
@@ -68,6 +69,33 @@
         .list-item-meta{
             width: 0.35rem;
             height: 0.7rem;
+        }
+    }
+
+    &.user-info{
+        padding: 0;
+
+        .list-item{
+            // padding: 0;
+            // margin: 0 0.8rem;
+            border-bottom: 1px solid $list-user-border-color;
+
+            &:last-of-type{
+                border-width: 0;
+            }
+
+            &.user-avatar{
+                height: 3.2rem;
+            }
+        }
+
+        .list-item-graphic{
+            margin-right: 0;
+            @include size(2.1rem);
+
+            > .user-img{
+                @include size(2.1rem);
+            }
         }
     }
 

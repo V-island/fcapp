@@ -2,7 +2,9 @@
 import Login from './pages/login';
 import Home from './pages/home';
 import Live from './pages/live';
+
 import User from './pages/user';
+import UserDetail from './pages/user_detail';
 
 let config = {
 	// apihost: 'http://192.168.8.240:8090',
@@ -43,6 +45,14 @@ let config = {
 			name: 'user',
 			path: '../pages/user.html',
 			component: User,
+			mode: 'replace',
+			dom: 'body',
+			init: 1
+		},
+		user_detail: {
+			name: 'user_detail',
+			path: '../pages/user_detail.html',
+			component: UserDetail,
 			mode: 'replace',
 			dom: 'body',
 			init: 1

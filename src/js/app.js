@@ -1,5 +1,5 @@
 // import Webcomponents from 'webcomponents-lite';
-import FCSTYLE from '../sass/fc.scss';
+import '../sass/fc.scss';
 import htmlImport from './html-import';
 import Router from './router';
 
@@ -46,9 +46,11 @@ const router = new Router({
 	}, {
 		path: '/user',
 		name: 'user',
-		template: PAGESFILE.user
+		template: PAGESFILE.user,
+		children: [{
+			path: '/detail',
+			name: 'detail',
+			template: PAGESFILE.user_detail
+		}]
 	}]
 });
-
-require('jquery-ripple');
-$('[data-ripple]').ripple();

@@ -1,2718 +1,969 @@
 /**
- * vue-router v3.0.1
- * (c) 2017 Evan You
- * @license MIT
+ * 路由
+ *
+ * 路由功能将接管页面的链接点击行为，最后达到动画切换的效果，具体如下：
+ *  1. 链接对应的是另一个页面，那么则尝试 ajax 加载，然后把新页面里的符合约定的结构提取出来，然后做动画切换；如果没法 ajax 或结构不符合，那么则回退为普通的页面跳转
+ *  2. 链接是当前页面的锚点，并且该锚点对应的元素存在且符合路由约定，那么则把该元素做动画切入
+ *  3. 浏览器前进后退（history.forward/history.back）时，也使用动画效果
+ *  4. 如果链接有 back 这个 class，那么则忽略一切，直接调用 history.back() 来后退
+ *
+ * 路由功能默认开启，如果需要关闭路由功能，那么在 zepto 之后，msui 脚本之前设置 $.config.router = false 即可（intro.js 中会 extend 到 $.smConfig 中）。
+ *
+ * 可以设置 $.config.routerFilter 函数来设置当前点击链接是否使用路由功能，实参是 a 链接的 zepto 对象；返回 false 表示不使用 router 功能。
+ *
+ * ajax 载入新的文档时，并不会执行里面的 js。到目前为止，在开启路由功能时，建议的做法是：
+ *  把所有页面的 js 都放到同一个脚本里，js 里面的事件绑定使用委托而不是直接的绑定在元素上（因为动态加载的页面元素还不存在），然后所有页面都引用相同的 js 脚本。非事件类可以通过监控 pageInit 事件，根据里面的 pageId 来做对应区别处理。
+ *
+ * 如果有需要
+ *
+ * 对外暴露的方法
+ *  - load （原 loadPage 效果一致,但后者已标记为待移除）
+ *  - forward
+ *  - back
+ *
+ * 事件
+ * pageLoad* 系列在发生 ajax 加载时才会触发；当是块切换或已缓存的情况下，不会发送这些事件
+ *  - pageLoadCancel: 如果前一个还没加载完,那么取消并发送该事件
+ *  - pageLoadStart: 开始加载
+ *  - pageLodComplete: ajax complete 完成
+ *  - pageLoadError: ajax 发生 error
+ *  - pageAnimationStart: 执行动画切换前，实参是 event，sectionId 和 $section
+ *  - pageAnimationEnd: 执行动画完毕，实参是 event，sectionId 和 $section
+ *  - beforePageRemove: 新 document 载入且动画切换完毕，旧的 document remove 之前在 window 上触发，实参是 event 和 $pageContainer
+ *  - pageRemoved: 新的 document 载入且动画切换完毕，旧的 document remove 之后在 window 上触发
+ *  - beforePageSwitch: page 切换前，在 pageAnimationStart 前，beforePageSwitch 之后会做一些额外的处理才触发 pageAnimationStart
+ *  - pageInitInternal: （经 init.js 处理后，对外是 pageInit）紧跟着动画完成的事件，实参是 event，sectionId 和 $section
+ *
+ * 术语
+ *  - 文档（document），不带 hash 的 url 关联着的应答 html 结构
+ *  - 块（section），一个文档内有指定块标识的元素
+ *
+ * 路由实现约定
+ *  - 每个文档的需要展示的内容必需位于指定的标识（routerConfig.sectionGroupClass）的元素里面，默认是: div.page-group （注意,如果改变这个需要同时改变 less 中的命名）
+ *  - 每个块必需带有指定的块标识（routerConfig.pageClass），默认是 .page
+ *
+ *  即，使用路由功能的每一个文档应当是下面这样的结构（省略 <body> 等）:
+ *      <div class="page-group">
+ *          <div class="page">xxx</div>
+ *          <div class="page">yyy</div>
+ *      </div>
+ *
+ * 另，每一个块都应当有一个唯一的 ID，这样才能通过 #the-id 的形式来切换定位。
+ * 当一个块没有 id 时，如果是第一个的默认的需要展示的块，那么会给其添加一个随机的 id；否则，没有 id 的块将不会被切换展示。
+ *
+ * 通过 history.state/history.pushState 以及用 sessionStorage 来记录当前 state 以及最大的 state id 来辅助前进后退的切换效果，所以在不支持 sessionStorage 的情况下，将不开启路由功能。
+ *
+ * 为了解决 ajax 载入页面导致重复 ID 以及重复 popup 等功能，上面约定了使用路由功能的所有可展示内容都必需位于指定元素内。从而可以在进行文档间切换时可以进行两个文档的整体移动，切换完毕后再把前一个文档的内容从页面之间移除。
+ *
+ * 默认地过滤了部分协议的链接，包括 tel:, javascript:, mailto:，这些链接将不会使用路由功能。如果有更多的自定义控制需求，可以在 $.config.routerFilter 实现
+ *
+ * 注: 以 _ 开头的函数标明用于此处内部使用，可根据需要随时重构变更，不对外确保兼容性。
+ *
  */
-(function(global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (global.VueRouter = factory());
-}(this, (function() {
-  'use strict';
++function($) {
+    'use strict';
 
-  /*  */
-
-  function assert(condition, message) {
-    if (!condition) {
-      throw new Error(("[vue-router] " + message))
-    }
-  }
-
-  function warn(condition, message) {
-    if ("development" !== 'production' && !condition) {
-      typeof console !== 'undefined' && console.warn(("[vue-router] " + message));
-    }
-  }
-
-  function isError(err) {
-    return Object.prototype.toString.call(err).indexOf('Error') > -1
-  }
-
-  var View = {
-    name: 'router-view',
-    functional: true,
-    props: {
-      name: {
-        type: String,
-        default: 'default'
-      }
-    },
-    render: function render(_, ref) {
-      var props = ref.props;
-      var children = ref.children;
-      var parent = ref.parent;
-      var data = ref.data;
-
-      data.routerView = true;
-
-      // directly use parent context's createElement() function
-      // so that components rendered by router-view can resolve named slots
-      var h = parent.$createElement;
-      var name = props.name;
-      var route = parent.$route;
-      var cache = parent._routerViewCache || (parent._routerViewCache = {});
-
-      // determine current view depth, also check to see if the tree
-      // has been toggled inactive but kept-alive.
-      var depth = 0;
-      var inactive = false;
-      while (parent && parent._routerRoot !== parent) {
-        if (parent.$vnode && parent.$vnode.data.routerView) {
-          depth++;
-        }
-        if (parent._inactive) {
-          inactive = true;
-        }
-        parent = parent.$parent;
-      }
-      data.routerViewDepth = depth;
-
-      // render previous view if the tree is inactive and kept-alive
-      if (inactive) {
-        return h(cache[name], data, children)
-      }
-
-      var matched = route.matched[depth];
-      // render empty node if no matched route
-      if (!matched) {
-        cache[name] = null;
-        return h()
-      }
-
-      var component = cache[name] = matched.components[name];
-
-      // attach instance registration hook
-      // this will be called in the instance's injected lifecycle hooks
-      data.registerRouteInstance = function(vm, val) {
-        // val could be undefined for unregistration
-        var current = matched.instances[name];
-        if (
-          (val && current !== vm) ||
-          (!val && current === vm)
-        ) {
-          matched.instances[name] = val;
-        }
-      }
-
-      // also register instance in prepatch hook
-      // in case the same component instance is reused across different routes
-      ;
-      (data.hook || (data.hook = {})).prepatch = function(_, vnode) {
-        matched.instances[name] = vnode.componentInstance;
-      };
-
-      // resolve props
-      var propsToPass = data.props = resolveProps(route, matched.props && matched.props[name]);
-      if (propsToPass) {
-        // clone to prevent mutation
-        propsToPass = data.props = extend({}, propsToPass);
-        // pass non-declared props as attrs
-        var attrs = data.attrs = data.attrs || {};
-        for (var key in propsToPass) {
-          if (!component.props || !(key in component.props)) {
-            attrs[key] = propsToPass[key];
-            delete propsToPass[key];
-          }
-        }
-      }
-
-      return h(component, data, children)
-    }
-  };
-
-  function resolveProps(route, config) {
-    switch (typeof config) {
-      case 'undefined':
-        return
-      case 'object':
-        return config
-      case 'function':
-        return config(route)
-      case 'boolean':
-        return config ? route.params : undefined
-      default:
-        {
-          warn(
-            false,
-            "props in \"" + (route.path) + "\" is a " + (typeof config) + ", " +
-            "expecting an object, function or boolean."
-          );
-        }
-    }
-  }
-
-  function extend(to, from) {
-    for (var key in from) {
-      to[key] = from[key];
-    }
-    return to
-  }
-
-  /*  */
-
-  var encodeReserveRE = /[!'()*]/g;
-  var encodeReserveReplacer = function(c) {
-    return '%' + c.charCodeAt(0).toString(16);
-  };
-  var commaRE = /%2C/g;
-
-  // fixed encodeURIComponent which is more conformant to RFC3986:
-  // - escapes [!'()*]
-  // - preserve commas
-  var encode = function(str) {
-    return encodeURIComponent(str)
-      .replace(encodeReserveRE, encodeReserveReplacer)
-      .replace(commaRE, ',');
-  };
-
-  var decode = decodeURIComponent;
-
-  function resolveQuery(
-    query,
-    extraQuery,
-    _parseQuery
-  ) {
-    if (extraQuery === void 0) extraQuery = {};
-
-    var parse = _parseQuery || parseQuery;
-    var parsedQuery;
-    try {
-      parsedQuery = parse(query || '');
-    } catch (e) {
-      "development" !== 'production' && warn(false, e.message);
-      parsedQuery = {};
-    }
-    for (var key in extraQuery) {
-      parsedQuery[key] = extraQuery[key];
-    }
-    return parsedQuery
-  }
-
-  function parseQuery(query) {
-    var res = {};
-
-    query = query.trim().replace(/^(\?|#|&)/, '');
-
-    if (!query) {
-      return res
-    }
-
-    query.split('&').forEach(function(param) {
-      var parts = param.replace(/\+/g, ' ').split('=');
-      var key = decode(parts.shift());
-      var val = parts.length > 0 ?
-        decode(parts.join('=')) :
-        null;
-
-      if (res[key] === undefined) {
-        res[key] = val;
-      } else if (Array.isArray(res[key])) {
-        res[key].push(val);
-      } else {
-        res[key] = [res[key], val];
-      }
-    });
-
-    return res
-  }
-
-  function stringifyQuery(obj) {
-    var res = obj ? Object.keys(obj).map(function(key) {
-      var val = obj[key];
-
-      if (val === undefined) {
-        return ''
-      }
-
-      if (val === null) {
-        return encode(key)
-      }
-
-      if (Array.isArray(val)) {
-        var result = [];
-        val.forEach(function(val2) {
-          if (val2 === undefined) {
-            return
-          }
-          if (val2 === null) {
-            result.push(encode(key));
-          } else {
-            result.push(encode(key) + '=' + encode(val2));
-          }
-        });
-        return result.join('&')
-      }
-
-      return encode(key) + '=' + encode(val)
-    }).filter(function(x) {
-      return x.length > 0;
-    }).join('&') : null;
-    return res ? ("?" + res) : ''
-  }
-
-  /*  */
-
-
-  var trailingSlashRE = /\/?$/;
-
-  function createRoute(
-    record,
-    location,
-    redirectedFrom,
-    router
-  ) {
-    var stringifyQuery$$1 = router && router.options.stringifyQuery;
-
-    var query = location.query || {};
-    try {
-      query = clone(query);
-    } catch (e) {}
-
-    var route = {
-      name: location.name || (record && record.name),
-      meta: (record && record.meta) || {},
-      path: location.path || '/',
-      hash: location.hash || '',
-      query: query,
-      params: location.params || {},
-      fullPath: getFullPath(location, stringifyQuery$$1),
-      matched: record ? formatMatch(record) : []
-    };
-    if (redirectedFrom) {
-      route.redirectedFrom = getFullPath(redirectedFrom, stringifyQuery$$1);
-    }
-    return Object.freeze(route)
-  }
-
-  function clone(value) {
-    if (Array.isArray(value)) {
-      return value.map(clone)
-    } else if (value && typeof value === 'object') {
-      var res = {};
-      for (var key in value) {
-        res[key] = clone(value[key]);
-      }
-      return res
-    } else {
-      return value
-    }
-  }
-
-  // the starting route that represents the initial state
-  var START = createRoute(null, {
-    path: '/'
-  });
-
-  function formatMatch(record) {
-    var res = [];
-    while (record) {
-      res.unshift(record);
-      record = record.parent;
-    }
-    return res
-  }
-
-  function getFullPath(
-    ref,
-    _stringifyQuery
-  ) {
-    var path = ref.path;
-    var query = ref.query;
-    if (query === void 0) query = {};
-    var hash = ref.hash;
-    if (hash === void 0) hash = '';
-
-    var stringify = _stringifyQuery || stringifyQuery;
-    return (path || '/') + stringify(query) + hash
-  }
-
-  function isSameRoute(a, b) {
-    if (b === START) {
-      return a === b
-    } else if (!b) {
-      return false
-    } else if (a.path && b.path) {
-      return (
-        a.path.replace(trailingSlashRE, '') === b.path.replace(trailingSlashRE, '') &&
-        a.hash === b.hash &&
-        isObjectEqual(a.query, b.query)
-      )
-    } else if (a.name && b.name) {
-      return (
-        a.name === b.name &&
-        a.hash === b.hash &&
-        isObjectEqual(a.query, b.query) &&
-        isObjectEqual(a.params, b.params)
-      )
-    } else {
-      return false
-    }
-  }
-
-  function isObjectEqual(a, b) {
-    if (a === void 0) a = {};
-    if (b === void 0) b = {};
-
-    // handle null value #1566
-    if (!a || !b) {
-      return a === b
-    }
-    var aKeys = Object.keys(a);
-    var bKeys = Object.keys(b);
-    if (aKeys.length !== bKeys.length) {
-      return false
-    }
-    return aKeys.every(function(key) {
-      var aVal = a[key];
-      var bVal = b[key];
-      // check nested equality
-      if (typeof aVal === 'object' && typeof bVal === 'object') {
-        return isObjectEqual(aVal, bVal)
-      }
-      return String(aVal) === String(bVal)
-    })
-  }
-
-  function isIncludedRoute(current, target) {
-    return (
-      current.path.replace(trailingSlashRE, '/').indexOf(
-        target.path.replace(trailingSlashRE, '/')
-      ) === 0 &&
-      (!target.hash || current.hash === target.hash) &&
-      queryIncludes(current.query, target.query)
-    )
-  }
-
-  function queryIncludes(current, target) {
-    for (var key in target) {
-      if (!(key in current)) {
-        return false
-      }
-    }
-    return true
-  }
-
-  /*  */
-
-  // work around weird flow bug
-  var toTypes = [String, Object];
-  var eventTypes = [String, Array];
-
-  var Link = {
-    name: 'router-link',
-    props: {
-      to: {
-        type: toTypes,
-        required: true
-      },
-      tag: {
-        type: String,
-        default: 'a'
-      },
-      exact: Boolean,
-      append: Boolean,
-      replace: Boolean,
-      activeClass: String,
-      exactActiveClass: String,
-      event: {
-        type: eventTypes,
-        default: 'click'
-      }
-    },
-    render: function render(h) {
-      var this$1 = this;
-
-      var router = this.$router;
-      var current = this.$route;
-      var ref = router.resolve(this.to, current, this.append);
-      var location = ref.location;
-      var route = ref.route;
-      var href = ref.href;
-
-      var classes = {};
-      var globalActiveClass = router.options.linkActiveClass;
-      var globalExactActiveClass = router.options.linkExactActiveClass;
-      // Support global empty active class
-      var activeClassFallback = globalActiveClass == null ?
-        'router-link-active' :
-        globalActiveClass;
-      var exactActiveClassFallback = globalExactActiveClass == null ?
-        'router-link-exact-active' :
-        globalExactActiveClass;
-      var activeClass = this.activeClass == null ?
-        activeClassFallback :
-        this.activeClass;
-      var exactActiveClass = this.exactActiveClass == null ?
-        exactActiveClassFallback :
-        this.exactActiveClass;
-      var compareTarget = location.path ?
-        createRoute(null, location, null, router) :
-        route;
-
-      classes[exactActiveClass] = isSameRoute(current, compareTarget);
-      classes[activeClass] = this.exact ?
-        classes[exactActiveClass] :
-        isIncludedRoute(current, compareTarget);
-
-      var handler = function(e) {
-        if (guardEvent(e)) {
-          if (this$1.replace) {
-            router.replace(location);
-          } else {
-            router.push(location);
-          }
-        }
-      };
-
-      var on = {
-        click: guardEvent
-      };
-      if (Array.isArray(this.event)) {
-        this.event.forEach(function(e) {
-          on[e] = handler;
-        });
-      } else {
-        on[this.event] = handler;
-      }
-
-      var data = {
-        class: classes
-      };
-
-      if (this.tag === 'a') {
-        data.on = on;
-        data.attrs = {
-          href: href
+    if (!window.CustomEvent) {
+        window.CustomEvent = function(type, config) {
+            config = config || { bubbles: false, cancelable: false, detail: undefined};
+            var e = document.createEvent('CustomEvent');
+            e.initCustomEvent(type, config.bubbles, config.cancelable, config.detail);
+            return e;
         };
-      } else {
-        // find the first <a> child and apply listener and href
-        var a = findAnchor(this.$slots.default);
-        if (a) {
-          // in case the <a> is a static node
-          a.isStatic = false;
-          var extend = _Vue.util.extend;
-          var aData = a.data = extend({}, a.data);
-          aData.on = on;
-          var aAttrs = a.data.attrs = extend({}, a.data.attrs);
-          aAttrs.href = href;
-        } else {
-          // doesn't have <a> child, apply listener to self
-          data.on = on;
-        }
-      }
 
-      return h(this.tag, data, this.$slots.default)
+        window.CustomEvent.prototype = window.Event.prototype;
     }
-  };
 
-  function guardEvent(e) {
-    // don't redirect with control keys
-    if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) {
-      return
-    }
-    // don't redirect when preventDefault called
-    if (e.defaultPrevented) {
-      return
-    }
-    // don't redirect on right click
-    if (e.button !== undefined && e.button !== 0) {
-      return
-    }
-    // don't redirect if `target="_blank"`
-    if (e.currentTarget && e.currentTarget.getAttribute) {
-      var target = e.currentTarget.getAttribute('target');
-      if (/\b_blank\b/i.test(target)) {
-        return
-      }
-    }
-    // this may be a Weex event which doesn't have this method
-    if (e.preventDefault) {
-      e.preventDefault();
-    }
-    return true
-  }
-
-  function findAnchor(children) {
-    if (children) {
-      var child;
-      for (var i = 0; i < children.length; i++) {
-        child = children[i];
-        if (child.tag === 'a') {
-          return child
-        }
-        if (child.children && (child = findAnchor(child.children))) {
-          return child
-        }
-      }
-    }
-  }
-
-  var _Vue;
-
-  function install(Vue) {
-    if (install.installed && _Vue === Vue) {
-      return
-    }
-    install.installed = true;
-
-    _Vue = Vue;
-
-    var isDef = function(v) {
-      return v !== undefined;
+    var EVENTS = {
+        pageLoadStart: 'pageLoadStart', // ajax 开始加载新页面前
+        pageLoadCancel: 'pageLoadCancel', // 取消前一个 ajax 加载动作后
+        pageLoadError: 'pageLoadError', // ajax 加载页面失败后
+        pageLoadComplete: 'pageLoadComplete', // ajax 加载页面完成后（不论成功与否）
+        pageAnimationStart: 'pageAnimationStart', // 动画切换 page 前
+        pageAnimationEnd: 'pageAnimationEnd', // 动画切换 page 结束后
+        beforePageRemove: 'beforePageRemove', // 移除旧 document 前（适用于非内联 page 切换）
+        pageRemoved: 'pageRemoved', // 移除旧 document 后（适用于非内联 page 切换）
+        beforePageSwitch: 'beforePageSwitch', // page 切换前，在 pageAnimationStart 前，beforePageSwitch 之后会做一些额外的处理才触发 pageAnimationStart
+        pageInit: 'pageInitInternal' // 目前是定义为一个 page 加载完毕后（实际和 pageAnimationEnd 等同）
     };
 
-    var registerInstance = function(vm, callVal) {
-      var i = vm.$options._parentVnode;
-      if (isDef(i) && isDef(i = i.data) && isDef(i = i.registerRouteInstance)) {
-        i(vm, callVal);
-      }
-    };
+    var Util = {
+        /**
+         * 获取 url 的 fragment（即 hash 中去掉 # 的剩余部分）
+         *
+         * 如果没有则返回空字符串
+         * 如: http://example.com/path/?query=d#123 => 123
+         *
+         * @param {String} url url
+         * @returns {String}
+         */
+        getUrlFragment: function(url) {
+            var hashIndex = url.indexOf('#');
+            return hashIndex === -1 ? '' : url.slice(hashIndex + 1);
+        },
+        /**
+         * 获取一个链接相对于当前页面的绝对地址形式
+         *
+         * 假设当前页面是 http://a.com/b/c
+         * 那么有以下情况:
+         * d => http://a.com/b/d
+         * /e => http://a.com/e
+         * #1 => http://a.com/b/c#1
+         * http://b.com/f => http://b.com/f
+         *
+         * @param {String} url url
+         * @returns {String}
+         */
+        getAbsoluteUrl: function(url) {
+            var link = document.createElement('a');
+            link.setAttribute('href', url);
+            var absoluteUrl = link.href;
+            link = null;
+            return absoluteUrl;
+        },
+        /**
+         * 获取一个 url 的基本部分，即不包括 hash
+         *
+         * @param {String} url url
+         * @returns {String}
+         */
+        getBaseUrl: function(url) {
+            var hashIndex = url.indexOf('#');
+            return hashIndex === -1 ? url.slice(0) : url.slice(0, hashIndex);
+        },
+        /**
+         * 把一个字符串的 url 转为一个可获取其 base 和 fragment 等的对象
+         *
+         * @param {String} url url
+         * @returns {UrlObject}
+         */
+        toUrlObject: function(url) {
+            var fullUrl = this.getAbsoluteUrl(url),
+                baseUrl = this.getBaseUrl(fullUrl),
+                fragment = this.getUrlFragment(url);
 
-    Vue.mixin({
-      beforeCreate: function beforeCreate() {
-        if (isDef(this.$options.router)) {
-          this._routerRoot = this;
-          this._router = this.$options.router;
-          this._router.init(this);
-          Vue.util.defineReactive(this, '_route', this._router.history.current);
-        } else {
-          this._routerRoot = (this.$parent && this.$parent._routerRoot) || this;
-        }
-        registerInstance(this, this);
-      },
-      destroyed: function destroyed() {
-        registerInstance(this);
-      }
-    });
-
-    Object.defineProperty(Vue.prototype, '$router', {
-      get: function get() {
-        return this._routerRoot._router
-      }
-    });
-
-    Object.defineProperty(Vue.prototype, '$route', {
-      get: function get() {
-        return this._routerRoot._route
-      }
-    });
-
-    Vue.component('router-view', View);
-    Vue.component('router-link', Link);
-
-    var strats = Vue.config.optionMergeStrategies;
-    // use the same hook merging strategy for route hooks
-    strats.beforeRouteEnter = strats.beforeRouteLeave = strats.beforeRouteUpdate = strats.created;
-  }
-
-  /*  */
-
-  var inBrowser = typeof window !== 'undefined';
-
-  /*  */
-
-  function resolvePath(
-    relative,
-    base,
-    append
-  ) {
-    var firstChar = relative.charAt(0);
-    if (firstChar === '/') {
-      return relative
-    }
-
-    if (firstChar === '?' || firstChar === '#') {
-      return base + relative
-    }
-
-    var stack = base.split('/');
-
-    // remove trailing segment if:
-    // - not appending
-    // - appending to trailing slash (last segment is empty)
-    if (!append || !stack[stack.length - 1]) {
-      stack.pop();
-    }
-
-    // resolve relative path
-    var segments = relative.replace(/^\//, '').split('/');
-    for (var i = 0; i < segments.length; i++) {
-      var segment = segments[i];
-      if (segment === '..') {
-        stack.pop();
-      } else if (segment !== '.') {
-        stack.push(segment);
-      }
-    }
-
-    // ensure leading slash
-    if (stack[0] !== '') {
-      stack.unshift('');
-    }
-
-    return stack.join('/')
-  }
-
-  function parsePath(path) {
-    var hash = '';
-    var query = '';
-
-    var hashIndex = path.indexOf('#');
-    if (hashIndex >= 0) {
-      hash = path.slice(hashIndex);
-      path = path.slice(0, hashIndex);
-    }
-
-    var queryIndex = path.indexOf('?');
-    if (queryIndex >= 0) {
-      query = path.slice(queryIndex + 1);
-      path = path.slice(0, queryIndex);
-    }
-
-    return {
-      path: path,
-      query: query,
-      hash: hash
-    }
-  }
-
-  function cleanPath(path) {
-    return path.replace(/\/\//g, '/')
-  }
-
-  var isarray = Array.isArray || function(arr) {
-    return Object.prototype.toString.call(arr) == '[object Array]';
-  };
-
-  /**
-   * Expose `pathToRegexp`.
-   */
-  var pathToRegexp_1 = pathToRegexp;
-  var parse_1 = parse;
-  var compile_1 = compile;
-  var tokensToFunction_1 = tokensToFunction;
-  var tokensToRegExp_1 = tokensToRegExp;
-
-  /**
-   * The main path matching regexp utility.
-   *
-   * @type {RegExp}
-   */
-  var PATH_REGEXP = new RegExp([
-    // Match escaped characters that would otherwise appear in future matches.
-    // This allows the user to escape special characters that won't transform.
-    '(\\\\.)',
-    // Match Express-style parameters and un-named parameters with a prefix
-    // and optional suffixes. Matches appear as:
-    //
-    // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
-    // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
-    // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
-    '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
-  ].join('|'), 'g');
-
-  /**
-   * Parse a string for the raw tokens.
-   *
-   * @param  {string}  str
-   * @param  {Object=} options
-   * @return {!Array}
-   */
-  function parse(str, options) {
-    var tokens = [];
-    var key = 0;
-    var index = 0;
-    var path = '';
-    var defaultDelimiter = options && options.delimiter || '/';
-    var res;
-
-    while ((res = PATH_REGEXP.exec(str)) != null) {
-      var m = res[0];
-      var escaped = res[1];
-      var offset = res.index;
-      path += str.slice(index, offset);
-      index = offset + m.length;
-
-      // Ignore already escaped sequences.
-      if (escaped) {
-        path += escaped[1];
-        continue
-      }
-
-      var next = str[index];
-      var prefix = res[2];
-      var name = res[3];
-      var capture = res[4];
-      var group = res[5];
-      var modifier = res[6];
-      var asterisk = res[7];
-
-      // Push the current path onto the tokens.
-      if (path) {
-        tokens.push(path);
-        path = '';
-      }
-
-      var partial = prefix != null && next != null && next !== prefix;
-      var repeat = modifier === '+' || modifier === '*';
-      var optional = modifier === '?' || modifier === '*';
-      var delimiter = res[2] || defaultDelimiter;
-      var pattern = capture || group;
-
-      tokens.push({
-        name: name || key++,
-        prefix: prefix || '',
-        delimiter: delimiter,
-        optional: optional,
-        repeat: repeat,
-        partial: partial,
-        asterisk: !!asterisk,
-        pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
-      });
-    }
-
-    // Match any characters still remaining.
-    if (index < str.length) {
-      path += str.substr(index);
-    }
-
-    // If the path exists, push it onto the end.
-    if (path) {
-      tokens.push(path);
-    }
-
-    return tokens
-  }
-
-  /**
-   * Compile a string to a template function for the path.
-   *
-   * @param  {string}             str
-   * @param  {Object=}            options
-   * @return {!function(Object=, Object=)}
-   */
-  function compile(str, options) {
-    return tokensToFunction(parse(str, options))
-  }
-
-  /**
-   * Prettier encoding of URI path segments.
-   *
-   * @param  {string}
-   * @return {string}
-   */
-  function encodeURIComponentPretty(str) {
-    return encodeURI(str).replace(/[\/?#]/g, function(c) {
-      return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-    })
-  }
-
-  /**
-   * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
-   *
-   * @param  {string}
-   * @return {string}
-   */
-  function encodeAsterisk(str) {
-    return encodeURI(str).replace(/[?#]/g, function(c) {
-      return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-    })
-  }
-
-  /**
-   * Expose a method for transforming tokens into the path function.
-   */
-  function tokensToFunction(tokens) {
-    // Compile all the tokens into regexps.
-    var matches = new Array(tokens.length);
-
-    // Compile all the patterns before compilation.
-    for (var i = 0; i < tokens.length; i++) {
-      if (typeof tokens[i] === 'object') {
-        matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$');
-      }
-    }
-
-    return function(obj, opts) {
-      var path = '';
-      var data = obj || {};
-      var options = opts || {};
-      var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent;
-
-      for (var i = 0; i < tokens.length; i++) {
-        var token = tokens[i];
-
-        if (typeof token === 'string') {
-          path += token;
-
-          continue
-        }
-
-        var value = data[token.name];
-        var segment;
-
-        if (value == null) {
-          if (token.optional) {
-            // Prepend partial segment prefixes.
-            if (token.partial) {
-              path += token.prefix;
+            return {
+                base: baseUrl,
+                full: fullUrl,
+                original: url,
+                fragment: fragment
+            };
+        },
+        /**
+         * 判断浏览器是否支持 sessionStorage，支持返回 true，否则返回 false
+         * @returns {Boolean}
+         */
+        supportStorage: function() {
+            var mod = 'sm.router.storage.ability';
+            try {
+                sessionStorage.setItem(mod, mod);
+                sessionStorage.removeItem(mod);
+                return true;
+            } catch(e) {
+                return false;
             }
-
-            continue
-          } else {
-            throw new TypeError('Expected "' + token.name + '" to be defined')
-          }
-        }
-
-        if (isarray(value)) {
-          if (!token.repeat) {
-            throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
-          }
-
-          if (value.length === 0) {
-            if (token.optional) {
-              continue
-            } else {
-              throw new TypeError('Expected "' + token.name + '" to not be empty')
-            }
-          }
-
-          for (var j = 0; j < value.length; j++) {
-            segment = encode(value[j]);
-
-            if (!matches[i].test(segment)) {
-              throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
-            }
-
-            path += (j === 0 ? token.prefix : token.delimiter) + segment;
-          }
-
-          continue
-        }
-
-        segment = token.asterisk ? encodeAsterisk(value) : encode(value);
-
-        if (!matches[i].test(segment)) {
-          throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
-        }
-
-        path += token.prefix + segment;
-      }
-
-      return path
-    }
-  }
-
-  /**
-   * Escape a regular expression string.
-   *
-   * @param  {string} str
-   * @return {string}
-   */
-  function escapeString(str) {
-    return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
-  }
-
-  /**
-   * Escape the capturing group by escaping special characters and meaning.
-   *
-   * @param  {string} group
-   * @return {string}
-   */
-  function escapeGroup(group) {
-    return group.replace(/([=!:$\/()])/g, '\\$1')
-  }
-
-  /**
-   * Attach the keys as a property of the regexp.
-   *
-   * @param  {!RegExp} re
-   * @param  {Array}   keys
-   * @return {!RegExp}
-   */
-  function attachKeys(re, keys) {
-    re.keys = keys;
-    return re
-  }
-
-  /**
-   * Get the flags for a regexp from the options.
-   *
-   * @param  {Object} options
-   * @return {string}
-   */
-  function flags(options) {
-    return options.sensitive ? '' : 'i'
-  }
-
-  /**
-   * Pull out keys from a regexp.
-   *
-   * @param  {!RegExp} path
-   * @param  {!Array}  keys
-   * @return {!RegExp}
-   */
-  function regexpToRegexp(path, keys) {
-    // Use a negative lookahead to match only capturing groups.
-    var groups = path.source.match(/\((?!\?)/g);
-
-    if (groups) {
-      for (var i = 0; i < groups.length; i++) {
-        keys.push({
-          name: i,
-          prefix: null,
-          delimiter: null,
-          optional: false,
-          repeat: false,
-          partial: false,
-          asterisk: false,
-          pattern: null
-        });
-      }
-    }
-
-    return attachKeys(path, keys)
-  }
-
-  /**
-   * Transform an array into a regexp.
-   *
-   * @param  {!Array}  path
-   * @param  {Array}   keys
-   * @param  {!Object} options
-   * @return {!RegExp}
-   */
-  function arrayToRegexp(path, keys, options) {
-    var parts = [];
-
-    for (var i = 0; i < path.length; i++) {
-      parts.push(pathToRegexp(path[i], keys, options).source);
-    }
-
-    var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
-
-    return attachKeys(regexp, keys)
-  }
-
-  /**
-   * Create a path regexp from string input.
-   *
-   * @param  {string}  path
-   * @param  {!Array}  keys
-   * @param  {!Object} options
-   * @return {!RegExp}
-   */
-  function stringToRegexp(path, keys, options) {
-    return tokensToRegExp(parse(path, options), keys, options)
-  }
-
-  /**
-   * Expose a function for taking tokens and returning a RegExp.
-   *
-   * @param  {!Array}          tokens
-   * @param  {(Array|Object)=} keys
-   * @param  {Object=}         options
-   * @return {!RegExp}
-   */
-  function tokensToRegExp(tokens, keys, options) {
-    if (!isarray(keys)) {
-      options = /** @type {!Object} */ (keys || options);
-      keys = [];
-    }
-
-    options = options || {};
-
-    var strict = options.strict;
-    var end = options.end !== false;
-    var route = '';
-
-    // Iterate over the tokens and create our regexp string.
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i];
-
-      if (typeof token === 'string') {
-        route += escapeString(token);
-      } else {
-        var prefix = escapeString(token.prefix);
-        var capture = '(?:' + token.pattern + ')';
-
-        keys.push(token);
-
-        if (token.repeat) {
-          capture += '(?:' + prefix + capture + ')*';
-        }
-
-        if (token.optional) {
-          if (!token.partial) {
-            capture = '(?:' + prefix + '(' + capture + '))?';
-          } else {
-            capture = prefix + '(' + capture + ')?';
-          }
-        } else {
-          capture = prefix + '(' + capture + ')';
-        }
-
-        route += capture;
-      }
-    }
-
-    var delimiter = escapeString(options.delimiter || '/');
-    var endsWithDelimiter = route.slice(-delimiter.length) === delimiter;
-
-    // In non-strict mode we allow a slash at the end of match. If the path to
-    // match already ends with a slash, we remove it for consistency. The slash
-    // is valid at the end of a path match, not in the middle. This is important
-    // in non-ending mode, where "/test/" shouldn't match "/test//route".
-    if (!strict) {
-      route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?';
-    }
-
-    if (end) {
-      route += '$';
-    } else {
-      // In non-ending mode, we need the capturing groups to match as much as
-      // possible by using a positive lookahead to the end or next path segment.
-      route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)';
-    }
-
-    return attachKeys(new RegExp('^' + route, flags(options)), keys)
-  }
-
-  /**
-   * Normalize the given path string, returning a regular expression.
-   *
-   * An empty array can be passed in for the keys, which will hold the
-   * placeholder key descriptions. For example, using `/user/:id`, `keys` will
-   * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
-   *
-   * @param  {(string|RegExp|Array)} path
-   * @param  {(Array|Object)=}       keys
-   * @param  {Object=}               options
-   * @return {!RegExp}
-   */
-  function pathToRegexp(path, keys, options) {
-    if (!isarray(keys)) {
-      options = /** @type {!Object} */ (keys || options);
-      keys = [];
-    }
-
-    options = options || {};
-
-    if (path instanceof RegExp) {
-      return regexpToRegexp(path, /** @type {!Array} */ (keys))
-    }
-
-    if (isarray(path)) {
-      return arrayToRegexp( /** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
-    }
-
-    return stringToRegexp( /** @type {string} */ (path), /** @type {!Array} */ (keys), options)
-  }
-
-  pathToRegexp_1.parse = parse_1;
-  pathToRegexp_1.compile = compile_1;
-  pathToRegexp_1.tokensToFunction = tokensToFunction_1;
-  pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
-
-  /*  */
-
-  // $flow-disable-line
-  var regexpCompileCache = Object.create(null);
-
-  function fillParams(
-    path,
-    params,
-    routeMsg
-  ) {
-    try {
-      var filler =
-        regexpCompileCache[path] ||
-        (regexpCompileCache[path] = pathToRegexp_1.compile(path));
-      return filler(params || {}, {
-        pretty: true
-      })
-    } catch (e) {
-      {
-        warn(false, ("missing param for " + routeMsg + ": " + (e.message)));
-      }
-      return ''
-    }
-  }
-
-  /*  */
-
-  function createRouteMap(
-    routes,
-    oldPathList,
-    oldPathMap,
-    oldNameMap
-  ) {
-    // the path list is used to control path matching priority
-    var pathList = oldPathList || [];
-    // $flow-disable-line
-    var pathMap = oldPathMap || Object.create(null);
-    // $flow-disable-line
-    var nameMap = oldNameMap || Object.create(null);
-
-    routes.forEach(function(route) {
-      addRouteRecord(pathList, pathMap, nameMap, route);
-    });
-
-    // ensure wildcard routes are always at the end
-    for (var i = 0, l = pathList.length; i < l; i++) {
-      if (pathList[i] === '*') {
-        pathList.push(pathList.splice(i, 1)[0]);
-        l--;
-        i--;
-      }
-    }
-
-    return {
-      pathList: pathList,
-      pathMap: pathMap,
-      nameMap: nameMap
-    }
-  }
-
-  function addRouteRecord(
-    pathList,
-    pathMap,
-    nameMap,
-    route,
-    parent,
-    matchAs
-  ) {
-    var path = route.path;
-    var name = route.name; {
-      assert(path != null, "\"path\" is required in a route configuration.");
-      assert(
-        typeof route.component !== 'string',
-        "route config \"component\" for path: " + (String(path || name)) + " cannot be a " +
-        "string id. Use an actual component instead."
-      );
-    }
-
-    var pathToRegexpOptions = route.pathToRegexpOptions || {};
-    var normalizedPath = normalizePath(
-      path,
-      parent,
-      pathToRegexpOptions.strict
-    );
-
-    if (typeof route.caseSensitive === 'boolean') {
-      pathToRegexpOptions.sensitive = route.caseSensitive;
-    }
-
-    var record = {
-      path: normalizedPath,
-      regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
-      components: route.components || {
-        default: route.component
-      },
-      instances: {},
-      name: name,
-      parent: parent,
-      matchAs: matchAs,
-      redirect: route.redirect,
-      beforeEnter: route.beforeEnter,
-      meta: route.meta || {},
-      props: route.props == null ?
-        {} :
-        route.components ?
-        route.props :
-        {
-          default: route.props
         }
     };
 
-    if (route.children) {
-      // Warn if route is named, does not redirect and has a default child route.
-      // If users navigate to this route by name, the default child will
-      // not be rendered (GH Issue #629)
-      {
-        if (route.name && !route.redirect && route.children.some(function(child) {
-            return /^\/?$/.test(child.path);
-          })) {
-          warn(
-            false,
-            "Named Route '" + (route.name) + "' has a default child route. " +
-            "When navigating to this named route (:to=\"{name: '" + (route.name) + "'\"), " +
-            "the default child route will not be rendered. Remove the name from " +
-            "this route and use the name of the default child route for named " +
-            "links instead."
-          );
-        }
-      }
-      route.children.forEach(function(child) {
-        var childMatchAs = matchAs ?
-          cleanPath((matchAs + "/" + (child.path))) :
-          undefined;
-        addRouteRecord(pathList, pathMap, nameMap, child, record, childMatchAs);
-      });
-    }
+    var routerConfig = {
+        sectionGroupClass: 'page-group',
+        // 表示是当前 page 的 class
+        curPageClass: 'page-current',
+        // 用来辅助切换时表示 page 是 visible 的,
+        // 之所以不用 curPageClass，是因为 page-current 已被赋予了「当前 page」这一含义而不仅仅是 display: block
+        // 并且，别的地方已经使用了，所以不方便做变更，故新增一个
+        visiblePageClass: 'page-visible',
+        // 表示是 page 的 class，注意，仅是标志 class，而不是所有的 class
+        pageClass: 'page'
+    };
 
-    if (route.alias !== undefined) {
-      var aliases = Array.isArray(route.alias) ?
-        route.alias :
-        [route.alias];
+    var DIRECTION = {
+        leftToRight: 'from-left-to-right',
+        rightToLeft: 'from-right-to-left'
+    };
 
-      aliases.forEach(function(alias) {
-        var aliasRoute = {
-          path: alias,
-          children: route.children
+    var theHistory = window.history;
+
+    var Router = function() {
+        this.sessionNames = {
+            currentState: 'sm.router.currentState',
+            maxStateId: 'sm.router.maxStateId'
         };
-        addRouteRecord(
-          pathList,
-          pathMap,
-          nameMap,
-          aliasRoute,
-          parent,
-          record.path || '/' // matchAs
-        );
-      });
-    }
 
-    if (!pathMap[record.path]) {
-      pathList.push(record.path);
-      pathMap[record.path] = record;
-    }
+        this._init();
+        this.xhr = null;
+        window.addEventListener('popstate', this._onPopState.bind(this));
+    };
 
-    if (name) {
-      if (!nameMap[name]) {
-        nameMap[name] = record;
-      } else if ("development" !== 'production' && !matchAs) {
-        warn(
-          false,
-          "Duplicate named routes definition: " +
-          "{ name: \"" + name + "\", path: \"" + (record.path) + "\" }"
-        );
-      }
-    }
-  }
+    /**
+     * 初始化
+     *
+     * - 把当前文档内容缓存起来
+     * - 查找默认展示的块内容，查找顺序如下
+     *      1. id 是 url 中的 fragment 的元素
+     *      2. 有当前块 class 标识的第一个元素
+     *      3. 第一个块
+     * - 初始页面 state 处理
+     *
+     * @private
+     */
+    Router.prototype._init = function() {
 
-  function compileRouteRegex(path, pathToRegexpOptions) {
-    var regex = pathToRegexp_1(path, [], pathToRegexpOptions); {
-      var keys = Object.create(null);
-      regex.keys.forEach(function(key) {
-        warn(!keys[key.name], ("Duplicate param keys in route with path: \"" + path + "\""));
-        keys[key.name] = true;
-      });
-    }
-    return regex
-  }
+        this.$view = $('body');
 
-  function normalizePath(path, parent, strict) {
-    if (!strict) {
-      path = path.replace(/\/$/, '');
-    }
-    if (path[0] === '/') {
-      return path
-    }
-    if (parent == null) {
-      return path
-    }
-    return cleanPath(((parent.path) + "/" + path))
-  }
+        // 用来保存 document 的 map
+        this.cache = {};
+        var $doc = $(document);
+        var currentUrl = location.href;
+        this._saveDocumentIntoCache($doc, currentUrl);
 
-  /*  */
+        var curPageId;
 
+        var currentUrlObj = Util.toUrlObject(currentUrl);
+        var $allSection = $doc.find('.' + routerConfig.pageClass);
+        var $visibleSection = $doc.find('.' + routerConfig.curPageClass);
+        var $curVisibleSection = $visibleSection.eq(0);
+        var $hashSection;
 
-  function normalizeLocation(
-    raw,
-    current,
-    append,
-    router
-  ) {
-    var next = typeof raw === 'string' ? {
-      path: raw
-    } : raw;
-    // named target
-    if (next.name || next._normalized) {
-      return next
-    }
-
-    // relative params
-    if (!next.path && next.params && current) {
-      next = assign({}, next);
-      next._normalized = true;
-      var params = assign(assign({}, current.params), next.params);
-      if (current.name) {
-        next.name = current.name;
-        next.params = params;
-      } else if (current.matched.length) {
-        var rawPath = current.matched[current.matched.length - 1].path;
-        next.path = fillParams(rawPath, params, ("path " + (current.path)));
-      } else {
-        warn(false, "relative params navigation requires a current route.");
-      }
-      return next
-    }
-
-    var parsedPath = parsePath(next.path || '');
-    var basePath = (current && current.path) || '/';
-    var path = parsedPath.path ?
-      resolvePath(parsedPath.path, basePath, append || next.append) :
-      basePath;
-
-    var query = resolveQuery(
-      parsedPath.query,
-      next.query,
-      router && router.options.parseQuery
-    );
-
-    var hash = next.hash || parsedPath.hash;
-    if (hash && hash.charAt(0) !== '#') {
-      hash = "#" + hash;
-    }
-
-    return {
-      _normalized: true,
-      path: path,
-      query: query,
-      hash: hash
-    }
-  }
-
-  function assign(a, b) {
-    for (var key in b) {
-      a[key] = b[key];
-    }
-    return a
-  }
-
-  /*  */
-
-
-  function createMatcher(
-    routes,
-    router
-  ) {
-    var ref = createRouteMap(routes);
-    var pathList = ref.pathList;
-    var pathMap = ref.pathMap;
-    var nameMap = ref.nameMap;
-
-    function addRoutes(routes) {
-      createRouteMap(routes, pathList, pathMap, nameMap);
-    }
-
-    function match(
-      raw,
-      currentRoute,
-      redirectedFrom
-    ) {
-      var location = normalizeLocation(raw, currentRoute, false, router);
-      var name = location.name;
-
-      if (name) {
-        var record = nameMap[name]; {
-          warn(record, ("Route with name '" + name + "' does not exist"));
+        if (currentUrlObj.fragment) {
+            $hashSection = $doc.find('#' + currentUrlObj.fragment);
         }
-        if (!record) {
-          return _createRoute(null, location)
+        if ($hashSection && $hashSection.length) {
+            $visibleSection = $hashSection.eq(0);
+        } else if (!$visibleSection.length) {
+            $visibleSection = $allSection.eq(0);
         }
-        var paramNames = record.regex.keys
-          .filter(function(key) {
-            return !key.optional;
-          })
-          .map(function(key) {
-            return key.name;
-          });
-
-        if (typeof location.params !== 'object') {
-          location.params = {};
+        if (!$visibleSection.attr('id')) {
+            $visibleSection.attr('id', this._generateRandomId());
         }
 
-        if (currentRoute && typeof currentRoute.params === 'object') {
-          for (var key in currentRoute.params) {
-            if (!(key in location.params) && paramNames.indexOf(key) > -1) {
-              location.params[key] = currentRoute.params[key];
-            }
-          }
-        }
-
-        if (record) {
-          location.path = fillParams(record.path, location.params, ("named route \"" + name + "\""));
-          return _createRoute(record, location, redirectedFrom)
-        }
-      } else if (location.path) {
-        location.params = {};
-        for (var i = 0; i < pathList.length; i++) {
-          var path = pathList[i];
-          var record$1 = pathMap[path];
-          if (matchRoute(record$1.regex, location.path, location.params)) {
-            return _createRoute(record$1, location, redirectedFrom)
-          }
-        }
-      }
-      // no match
-      return _createRoute(null, location)
-    }
-
-    function redirect(
-      record,
-      location
-    ) {
-      var originalRedirect = record.redirect;
-      var redirect = typeof originalRedirect === 'function' ?
-        originalRedirect(createRoute(record, location, null, router)) :
-        originalRedirect;
-
-      if (typeof redirect === 'string') {
-        redirect = {
-          path: redirect
-        };
-      }
-
-      if (!redirect || typeof redirect !== 'object') {
-        {
-          warn(
-            false, ("invalid redirect option: " + (JSON.stringify(redirect)))
-          );
-        }
-        return _createRoute(null, location)
-      }
-
-      var re = redirect;
-      var name = re.name;
-      var path = re.path;
-      var query = location.query;
-      var hash = location.hash;
-      var params = location.params;
-      query = re.hasOwnProperty('query') ? re.query : query;
-      hash = re.hasOwnProperty('hash') ? re.hash : hash;
-      params = re.hasOwnProperty('params') ? re.params : params;
-
-      if (name) {
-        // resolved named direct
-        var targetRecord = nameMap[name]; {
-          assert(targetRecord, ("redirect failed: named route \"" + name + "\" not found."));
-        }
-        return match({
-          _normalized: true,
-          name: name,
-          query: query,
-          hash: hash,
-          params: params
-        }, undefined, location)
-      } else if (path) {
-        // 1. resolve relative redirect
-        var rawPath = resolveRecordPath(path, record);
-        // 2. resolve params
-        var resolvedPath = fillParams(rawPath, params, ("redirect route with path \"" + rawPath + "\""));
-        // 3. rematch with existing query and hash
-        return match({
-          _normalized: true,
-          path: resolvedPath,
-          query: query,
-          hash: hash
-        }, undefined, location)
-      } else {
-        {
-          warn(false, ("invalid redirect option: " + (JSON.stringify(redirect))));
-        }
-        return _createRoute(null, location)
-      }
-    }
-
-    function alias(
-      record,
-      location,
-      matchAs
-    ) {
-      var aliasedPath = fillParams(matchAs, location.params, ("aliased route with path \"" + matchAs + "\""));
-      var aliasedMatch = match({
-        _normalized: true,
-        path: aliasedPath
-      });
-      if (aliasedMatch) {
-        var matched = aliasedMatch.matched;
-        var aliasedRecord = matched[matched.length - 1];
-        location.params = aliasedMatch.params;
-        return _createRoute(aliasedRecord, location)
-      }
-      return _createRoute(null, location)
-    }
-
-    function _createRoute(
-      record,
-      location,
-      redirectedFrom
-    ) {
-      if (record && record.redirect) {
-        return redirect(record, redirectedFrom || location)
-      }
-      if (record && record.matchAs) {
-        return alias(record, location, record.matchAs)
-      }
-      return createRoute(record, location, redirectedFrom, router)
-    }
-
-    return {
-      match: match,
-      addRoutes: addRoutes
-    }
-  }
-
-  function matchRoute(
-    regex,
-    path,
-    params
-  ) {
-    var m = path.match(regex);
-
-    if (!m) {
-      return false
-    } else if (!params) {
-      return true
-    }
-
-    for (var i = 1, len = m.length; i < len; ++i) {
-      var key = regex.keys[i - 1];
-      var val = typeof m[i] === 'string' ? decodeURIComponent(m[i]) : m[i];
-      if (key) {
-        params[key.name] = val;
-      }
-    }
-
-    return true
-  }
-
-  function resolveRecordPath(path, record) {
-    return resolvePath(path, record.parent ? record.parent.path : '/', true)
-  }
-
-  /*  */
-
-
-  var positionStore = Object.create(null);
-
-  function setupScroll() {
-    // Fix for #1585 for Firefox
-    window.history.replaceState({
-      key: getStateKey()
-    }, '');
-    window.addEventListener('popstate', function(e) {
-      saveScrollPosition();
-      if (e.state && e.state.key) {
-        setStateKey(e.state.key);
-      }
-    });
-  }
-
-  function handleScroll(
-    router,
-    to,
-    from,
-    isPop
-  ) {
-    if (!router.app) {
-      return
-    }
-
-    var behavior = router.options.scrollBehavior;
-    if (!behavior) {
-      return
-    }
-
-    {
-      assert(typeof behavior === 'function', "scrollBehavior must be a function");
-    }
-
-    // wait until re-render finishes before scrolling
-    router.app.$nextTick(function() {
-      var position = getScrollPosition();
-      var shouldScroll = behavior(to, from, isPop ? position : null);
-
-      if (!shouldScroll) {
-        return
-      }
-
-      if (typeof shouldScroll.then === 'function') {
-        shouldScroll.then(function(shouldScroll) {
-          scrollToPosition((shouldScroll), position);
-        }).catch(function(err) {
-          {
-            assert(false, err.toString());
-          }
-        });
-      } else {
-        scrollToPosition(shouldScroll, position);
-      }
-    });
-  }
-
-  function saveScrollPosition() {
-    var key = getStateKey();
-    if (key) {
-      positionStore[key] = {
-        x: window.pageXOffset,
-        y: window.pageYOffset
-      };
-    }
-  }
-
-  function getScrollPosition() {
-    var key = getStateKey();
-    if (key) {
-      return positionStore[key]
-    }
-  }
-
-  function getElementPosition(el, offset) {
-    var docEl = document.documentElement;
-    var docRect = docEl.getBoundingClientRect();
-    var elRect = el.getBoundingClientRect();
-    return {
-      x: elRect.left - docRect.left - offset.x,
-      y: elRect.top - docRect.top - offset.y
-    }
-  }
-
-  function isValidPosition(obj) {
-    return isNumber(obj.x) || isNumber(obj.y)
-  }
-
-  function normalizePosition(obj) {
-    return {
-      x: isNumber(obj.x) ? obj.x : window.pageXOffset,
-      y: isNumber(obj.y) ? obj.y : window.pageYOffset
-    }
-  }
-
-  function normalizeOffset(obj) {
-    return {
-      x: isNumber(obj.x) ? obj.x : 0,
-      y: isNumber(obj.y) ? obj.y : 0
-    }
-  }
-
-  function isNumber(v) {
-    return typeof v === 'number'
-  }
-
-  function scrollToPosition(shouldScroll, position) {
-    var isObject = typeof shouldScroll === 'object';
-    if (isObject && typeof shouldScroll.selector === 'string') {
-      var el = document.querySelector(shouldScroll.selector);
-      if (el) {
-        var offset = shouldScroll.offset && typeof shouldScroll.offset === 'object' ? shouldScroll.offset : {};
-        offset = normalizeOffset(offset);
-        position = getElementPosition(el, offset);
-      } else if (isValidPosition(shouldScroll)) {
-        position = normalizePosition(shouldScroll);
-      }
-    } else if (isObject && isValidPosition(shouldScroll)) {
-      position = normalizePosition(shouldScroll);
-    }
-
-    if (position) {
-      window.scrollTo(position.x, position.y);
-    }
-  }
-
-  /*  */
-
-  var supportsPushState = inBrowser && (function() {
-    var ua = window.navigator.userAgent;
-
-    if (
-      (ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
-      ua.indexOf('Mobile Safari') !== -1 &&
-      ua.indexOf('Chrome') === -1 &&
-      ua.indexOf('Windows Phone') === -1
-    ) {
-      return false
-    }
-
-    return window.history && 'pushState' in window.history
-  })();
-
-  // use User Timing api (if present) for more accurate key precision
-  var Time = inBrowser && window.performance && window.performance.now ?
-    window.performance :
-    Date;
-
-  var _key = genKey();
-
-  function genKey() {
-    return Time.now().toFixed(3)
-  }
-
-  function getStateKey() {
-    return _key
-  }
-
-  function setStateKey(key) {
-    _key = key;
-  }
-
-  function pushState(url, replace) {
-    saveScrollPosition();
-    // try...catch the pushState call to get around Safari
-    // DOM Exception 18 where it limits to 100 pushState calls
-    var history = window.history;
-    try {
-      if (replace) {
-        history.replaceState({
-          key: _key
-        }, '', url);
-      } else {
-        _key = genKey();
-        history.pushState({
-          key: _key
-        }, '', url);
-      }
-    } catch (e) {
-      window.location[replace ? 'replace' : 'assign'](url);
-    }
-  }
-
-  function replaceState(url) {
-    pushState(url, true);
-  }
-
-  /*  */
-
-  function runQueue(queue, fn, cb) {
-    var step = function(index) {
-      if (index >= queue.length) {
-        cb();
-      } else {
-        if (queue[index]) {
-          fn(queue[index], function() {
-            step(index + 1);
-          });
+        if ($curVisibleSection.length &&
+            ($curVisibleSection.attr('id') !== $visibleSection.attr('id'))) {
+            // 在 router 到 inner page 的情况下，刷新（或者直接访问该链接）
+            // 直接切换 class 会有「闪」的现象,或许可以采用 animateSection 来减缓一下
+            $curVisibleSection.removeClass(routerConfig.curPageClass);
+            $visibleSection.addClass(routerConfig.curPageClass);
         } else {
-          step(index + 1);
+            $visibleSection.addClass(routerConfig.curPageClass);
         }
-      }
+        curPageId = $visibleSection.attr('id');
+
+
+        // 新进入一个使用 history.state 相关技术的页面时，如果第一个 state 不 push/replace,
+        // 那么在后退回该页面时，将不触发 popState 事件
+        if (theHistory.state === null) {
+            var curState = {
+                id: this._getNextStateId(),
+                url: Util.toUrlObject(currentUrl),
+                pageId: curPageId
+            };
+
+            theHistory.replaceState(curState, '', currentUrl);
+            this._saveAsCurrentState(curState);
+            this._incMaxStateId();
+        }
     };
-    step(0);
-  }
 
-  /*  */
-
-  function resolveAsyncComponents(matched) {
-    return function(to, from, next) {
-      var hasAsync = false;
-      var pending = 0;
-      var error = null;
-
-      flatMapComponents(matched, function(def, _, match, key) {
-        // if it's a function and doesn't have cid attached,
-        // assume it's an async component resolve function.
-        // we are not using Vue's default async resolving mechanism because
-        // we want to halt the navigation until the incoming component has been
-        // resolved.
-        if (typeof def === 'function' && def.cid === undefined) {
-          hasAsync = true;
-          pending++;
-
-          var resolve = once(function(resolvedDef) {
-            if (isESModule(resolvedDef)) {
-              resolvedDef = resolvedDef.default;
-            }
-            // save resolved on async factory in case it's used elsewhere
-            def.resolved = typeof resolvedDef === 'function' ?
-              resolvedDef :
-              _Vue.extend(resolvedDef);
-            match.components[key] = resolvedDef;
-            pending--;
-            if (pending <= 0) {
-              next();
-            }
-          });
-
-          var reject = once(function(reason) {
-            var msg = "Failed to resolve async component " + key + ": " + reason;
-            "development" !== 'production' && warn(false, msg);
-            if (!error) {
-              error = isError(reason) ?
-                reason :
-                new Error(msg);
-              next(error);
-            }
-          });
-
-          var res;
-          try {
-            res = def(resolve, reject);
-          } catch (e) {
-            reject(e);
-          }
-          if (res) {
-            if (typeof res.then === 'function') {
-              res.then(resolve, reject);
-            } else {
-              // new syntax in Vue 2.3
-              var comp = res.component;
-              if (comp && typeof comp.then === 'function') {
-                comp.then(resolve, reject);
-              }
-            }
-          }
+    /**
+     * 切换到 url 指定的块或文档
+     *
+     * 如果 url 指向的是当前页面，那么认为是切换块；
+     * 否则是切换文档
+     *
+     * @param {String} url url
+     * @param {Boolean=} ignoreCache 是否强制请求不使用缓存，对 document 生效，默认是 false
+     */
+    Router.prototype.load = function(url, ignoreCache) {
+        if (ignoreCache === undefined) {
+            ignoreCache = false;
         }
-      });
 
-      if (!hasAsync) {
-        next();
-      }
-    }
-  }
-
-  function flatMapComponents(
-    matched,
-    fn
-  ) {
-    return flatten(matched.map(function(m) {
-      return Object.keys(m.components).map(function(key) {
-        return fn(
-          m.components[key],
-          m.instances[key],
-          m, key
-        );
-      })
-    }))
-  }
-
-  function flatten(arr) {
-    return Array.prototype.concat.apply([], arr)
-  }
-
-  var hasSymbol =
-    typeof Symbol === 'function' &&
-    typeof Symbol.toStringTag === 'symbol';
-
-  function isESModule(obj) {
-    return obj.__esModule || (hasSymbol && obj[Symbol.toStringTag] === 'Module')
-  }
-
-  // in Webpack 2, require.ensure now also returns a Promise
-  // so the resolve/reject functions may get called an extra time
-  // if the user uses an arrow function shorthand that happens to
-  // return that Promise.
-  function once(fn) {
-    var called = false;
-    return function() {
-      var args = [],
-        len = arguments.length;
-      while (len--) args[len] = arguments[len];
-
-      if (called) {
-        return
-      }
-      called = true;
-      return fn.apply(this, args)
-    }
-  }
-
-  /*  */
-
-  var History = function History(router, base) {
-    this.router = router;
-    this.base = normalizeBase(base);
-    // start with a route object that stands for "nowhere"
-    this.current = START;
-    this.pending = null;
-    this.ready = false;
-    this.readyCbs = [];
-    this.readyErrorCbs = [];
-    this.errorCbs = [];
-  };
-
-  History.prototype.listen = function listen(cb) {
-    this.cb = cb;
-  };
-
-  History.prototype.onReady = function onReady(cb, errorCb) {
-    if (this.ready) {
-      cb();
-    } else {
-      this.readyCbs.push(cb);
-      if (errorCb) {
-        this.readyErrorCbs.push(errorCb);
-      }
-    }
-  };
-
-  History.prototype.onError = function onError(errorCb) {
-    this.errorCbs.push(errorCb);
-  };
-
-  History.prototype.transitionTo = function transitionTo(location, onComplete, onAbort) {
-    var this$1 = this;
-
-    var route = this.router.match(location, this.current);
-    this.confirmTransition(route, function() {
-      this$1.updateRoute(route);
-      onComplete && onComplete(route);
-      this$1.ensureURL();
-
-      // fire ready cbs once
-      if (!this$1.ready) {
-        this$1.ready = true;
-        this$1.readyCbs.forEach(function(cb) {
-          cb(route);
-        });
-      }
-    }, function(err) {
-      if (onAbort) {
-        onAbort(err);
-      }
-      if (err && !this$1.ready) {
-        this$1.ready = true;
-        this$1.readyErrorCbs.forEach(function(cb) {
-          cb(err);
-        });
-      }
-    });
-  };
-
-  History.prototype.confirmTransition = function confirmTransition(route, onComplete, onAbort) {
-    var this$1 = this;
-
-    var current = this.current;
-    var abort = function(err) {
-      if (isError(err)) {
-        if (this$1.errorCbs.length) {
-          this$1.errorCbs.forEach(function(cb) {
-            cb(err);
-          });
+        if (this._isTheSameDocument(location.href, url)) {
+            this._switchToSection(Util.getUrlFragment(url));
         } else {
-          warn(false, 'uncaught error during route navigation:');
-          console.error(err);
+            this._saveDocumentIntoCache($(document), location.href);
+            this._switchToDocument(url, ignoreCache);
         }
-      }
-      onAbort && onAbort(err);
-    };
-    if (
-      isSameRoute(route, current) &&
-      // in the case the route map has been dynamically appended to
-      route.matched.length === current.matched.length
-    ) {
-      this.ensureURL();
-      return abort()
-    }
-
-    var ref = resolveQueue(this.current.matched, route.matched);
-    var updated = ref.updated;
-    var deactivated = ref.deactivated;
-    var activated = ref.activated;
-
-    var queue = [].concat(
-      // in-component leave guards
-      extractLeaveGuards(deactivated),
-      // global before hooks
-      this.router.beforeHooks,
-      // in-component update hooks
-      extractUpdateHooks(updated),
-      // in-config enter guards
-      activated.map(function(m) {
-        return m.beforeEnter;
-      }),
-      // async components
-      resolveAsyncComponents(activated)
-    );
-
-    this.pending = route;
-    var iterator = function(hook, next) {
-      if (this$1.pending !== route) {
-        return abort()
-      }
-      try {
-        hook(route, current, function(to) {
-          if (to === false || isError(to)) {
-            // next(false) -> abort navigation, ensure current URL
-            this$1.ensureURL(true);
-            abort(to);
-          } else if (
-            typeof to === 'string' ||
-            (typeof to === 'object' && (
-              typeof to.path === 'string' ||
-              typeof to.name === 'string'
-            ))
-          ) {
-            // next('/') or next({ path: '/' }) -> redirect
-            abort();
-            if (typeof to === 'object' && to.replace) {
-              this$1.replace(to);
-            } else {
-              this$1.push(to);
-            }
-          } else {
-            // confirm transition and pass on the value
-            next(to);
-          }
-        });
-      } catch (e) {
-        abort(e);
-      }
     };
 
-    runQueue(queue, iterator, function() {
-      var postEnterCbs = [];
-      var isValid = function() {
-        return this$1.current === route;
-      };
-      // wait until async components are resolved before
-      // extracting in-component enter guards
-      var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
-      var queue = enterGuards.concat(this$1.router.resolveHooks);
-      runQueue(queue, iterator, function() {
-        if (this$1.pending !== route) {
-          return abort()
+    /**
+     * 调用 history.forward()
+     */
+    Router.prototype.forward = function() {
+        theHistory.forward();
+    };
+
+    /**
+     * 调用 history.back()
+     */
+    Router.prototype.back = function() {
+        theHistory.back();
+    };
+
+    //noinspection JSUnusedGlobalSymbols
+    /**
+     * @deprecated
+     */
+    Router.prototype.loadPage = Router.prototype.load;
+
+    /**
+     * 切换显示当前文档另一个块
+     *
+     * 把新块从右边切入展示，同时会把新的块的记录用 history.pushState 来保存起来
+     *
+     * 如果已经是当前显示的块，那么不做任何处理；
+     * 如果没对应的块，那么忽略。
+     *
+     * @param {String} sectionId 待切换显示的块的 id
+     * @private
+     */
+    Router.prototype._switchToSection = function(sectionId) {
+        if (!sectionId) {
+            return;
         }
-        this$1.pending = null;
-        onComplete(route);
-        if (this$1.router.app) {
-          this$1.router.app.$nextTick(function() {
-            postEnterCbs.forEach(function(cb) {
-              cb();
+
+        var $curPage = this._getCurrentSection(),
+            $newPage = $('#' + sectionId);
+
+        // 如果已经是当前页，不做任何处理
+        if ($curPage === $newPage) {
+            return;
+        }
+
+        this._animateSection($curPage, $newPage, DIRECTION.rightToLeft);
+        this._pushNewState('#' + sectionId, sectionId);
+    };
+
+    /**
+     * 载入显示一个新的文档
+     *
+     * - 如果有缓存，那么直接利用缓存来切换
+     * - 否则，先把页面加载过来缓存，然后再切换
+     *      - 如果解析失败，那么用 location.href 的方式来跳转
+     *
+     * 注意：不能在这里以及其之后用 location.href 来 **读取** 切换前的页面的 url，
+     *     因为如果是 popState 时的调用，那么此时 location 已经是 pop 出来的 state 的了
+     *
+     * @param {String} url 新的文档的 url
+     * @param {Boolean=} ignoreCache 是否不使用缓存强制加载页面
+     * @param {Boolean=} isPushState 是否需要 pushState
+     * @param {String=} direction 新文档切入的方向
+     * @private
+     */
+    Router.prototype._switchToDocument = function(url, ignoreCache, isPushState, direction) {
+        var baseUrl = Util.toUrlObject(url).base;
+
+        if (ignoreCache) {
+            delete this.cache[baseUrl];
+        }
+
+        var cacheDocument = this.cache[baseUrl];
+        var context = this;
+
+        if (cacheDocument) {
+            this._doSwitchDocument(url, isPushState, direction);
+        } else {
+            this._loadDocument(url, {
+                success: function($doc) {
+                    try {
+                        context._parseDocument(url, $doc);
+                        context._doSwitchDocument(url, isPushState, direction);
+                    } catch (e) {
+                        location.href = url;
+                    }
+                },
+                error: function() {
+                    location.href = url;
+                }
             });
-          });
         }
-      });
-    });
-  };
+    };
 
-  History.prototype.updateRoute = function updateRoute(route) {
-    var prev = this.current;
-    this.current = route;
-    this.cb && this.cb(route);
-    this.router.afterHooks.forEach(function(hook) {
-      hook && hook(route, prev);
-    });
-  };
-
-  function normalizeBase(base) {
-    if (!base) {
-      if (inBrowser) {
-        // respect <base> tag
-        var baseEl = document.querySelector('base');
-        base = (baseEl && baseEl.getAttribute('href')) || '/';
-        // strip full URL origin
-        base = base.replace(/^https?:\/\/[^\/]+/, '');
-      } else {
-        base = '/';
-      }
-    }
-    // make sure there's the starting slash
-    if (base.charAt(0) !== '/') {
-      base = '/' + base;
-    }
-    // remove trailing slash
-    return base.replace(/\/$/, '')
-  }
-
-  function resolveQueue(
-    current,
-    next
-  ) {
-    var i;
-    var max = Math.max(current.length, next.length);
-    for (i = 0; i < max; i++) {
-      if (current[i] !== next[i]) {
-        break
-      }
-    }
-    return {
-      updated: next.slice(0, i),
-      activated: next.slice(i),
-      deactivated: current.slice(i)
-    }
-  }
-
-  function extractGuards(
-    records,
-    name,
-    bind,
-    reverse
-  ) {
-    var guards = flatMapComponents(records, function(def, instance, match, key) {
-      var guard = extractGuard(def, name);
-      if (guard) {
-        return Array.isArray(guard) ?
-          guard.map(function(guard) {
-            return bind(guard, instance, match, key);
-          }) :
-          bind(guard, instance, match, key)
-      }
-    });
-    return flatten(reverse ? guards.reverse() : guards)
-  }
-
-  function extractGuard(
-    def,
-    key
-  ) {
-    if (typeof def !== 'function') {
-      // extend now so that global mixins are applied.
-      def = _Vue.extend(def);
-    }
-    return def.options[key]
-  }
-
-  function extractLeaveGuards(deactivated) {
-    return extractGuards(deactivated, 'beforeRouteLeave', bindGuard, true)
-  }
-
-  function extractUpdateHooks(updated) {
-    return extractGuards(updated, 'beforeRouteUpdate', bindGuard)
-  }
-
-  function bindGuard(guard, instance) {
-    if (instance) {
-      return function boundRouteGuard() {
-        return guard.apply(instance, arguments)
-      }
-    }
-  }
-
-  function extractEnterGuards(
-    activated,
-    cbs,
-    isValid
-  ) {
-    return extractGuards(activated, 'beforeRouteEnter', function(guard, _, match, key) {
-      return bindEnterGuard(guard, match, key, cbs, isValid)
-    })
-  }
-
-  function bindEnterGuard(
-    guard,
-    match,
-    key,
-    cbs,
-    isValid
-  ) {
-    return function routeEnterGuard(to, from, next) {
-      return guard(to, from, function(cb) {
-        next(cb);
-        if (typeof cb === 'function') {
-          cbs.push(function() {
-            // #750
-            // if a router-view is wrapped with an out-in transition,
-            // the instance may not have been registered at this time.
-            // we will need to poll for registration until current route
-            // is no longer valid.
-            poll(cb, match.instances, key, isValid);
-          });
-        }
-      })
-    }
-  }
-
-  function poll(
-    cb, // somehow flow cannot infer this is a function
-    instances,
-    key,
-    isValid
-  ) {
-    if (instances[key]) {
-      cb(instances[key]);
-    } else if (isValid()) {
-      setTimeout(function() {
-        poll(cb, instances, key, isValid);
-      }, 16);
-    }
-  }
-
-  /*  */
-
-
-  var HTML5History = (function(History$$1) {
-    function HTML5History(router, base) {
-      var this$1 = this;
-
-      History$$1.call(this, router, base);
-
-      var expectScroll = router.options.scrollBehavior;
-
-      if (expectScroll) {
-        setupScroll();
-      }
-
-      var initLocation = getLocation(this.base);
-      window.addEventListener('popstate', function(e) {
-        var current = this$1.current;
-
-        // Avoiding first `popstate` event dispatched in some browsers but first
-        // history route not updated since async guard at the same time.
-        var location = getLocation(this$1.base);
-        if (this$1.current === START && location === initLocation) {
-          return
+    /**
+     * 利用缓存来做具体的切换文档操作
+     *
+     * - 确定待切入的文档的默认展示 section
+     * - 把新文档 append 到 view 中
+     * - 动画切换文档
+     * - 如果需要 pushState，那么把最新的状态 push 进去并把当前状态更新为该状态
+     *
+     * @param {String} url 待切换的文档的 url
+     * @param {Boolean} isPushState 加载页面后是否需要 pushState，默认是 true
+     * @param {String} direction 动画切换方向，默认是 DIRECTION.rightToLeft
+     * @private
+     */
+    Router.prototype._doSwitchDocument = function(url, isPushState, direction) {
+        if (typeof isPushState === 'undefined') {
+            isPushState = true;
         }
 
-        this$1.transitionTo(location, function(route) {
-          if (expectScroll) {
-            handleScroll(router, route, current, true);
-          }
+        var urlObj = Util.toUrlObject(url);
+        var $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
+        var $newDoc = $($('<div></div>').append(this.cache[urlObj.base].$content).html());
+
+        // 确定一个 document 展示 section 的顺序
+        // 1. 与 hash 关联的 element
+        // 2. 默认的标识为 current 的 element
+        // 3. 第一个 section
+        var $allSection = $newDoc.find('.' + routerConfig.pageClass);
+        var $visibleSection = $newDoc.find('.' + routerConfig.curPageClass);
+        var $hashSection;
+
+        if (urlObj.fragment) {
+            $hashSection = $newDoc.find('#' + urlObj.fragment);
+        }
+        if ($hashSection && $hashSection.length) {
+            $visibleSection = $hashSection.eq(0);
+        } else if (!$visibleSection.length) {
+            $visibleSection = $allSection.eq(0);
+        }
+        if (!$visibleSection.attr('id')) {
+            $visibleSection.attr('id', this._generateRandomId());
+        }
+
+        var $currentSection = this._getCurrentSection();
+        $currentSection.trigger(EVENTS.beforePageSwitch, [$currentSection.attr('id'), $currentSection]);
+
+        $allSection.removeClass(routerConfig.curPageClass);
+        $visibleSection.addClass(routerConfig.curPageClass);
+
+        // prepend 而不 append 的目的是避免 append 进去新的 document 在后面，
+        // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
+        this.$view.prepend($newDoc);
+
+        this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
+
+        if (isPushState) {
+            this._pushNewState(url, $visibleSection.attr('id'));
+        }
+    };
+
+    /**
+     * 判断两个 url 指向的页面是否是同一个
+     *
+     * 判断方式: 如果两个 url 的 base 形式（不带 hash 的绝对形式）相同，那么认为是同一个页面
+     *
+     * @param {String} url
+     * @param {String} anotherUrl
+     * @returns {Boolean}
+     * @private
+     */
+    Router.prototype._isTheSameDocument = function(url, anotherUrl) {
+        return Util.toUrlObject(url).base === Util.toUrlObject(anotherUrl).base;
+    };
+
+    /**
+     * ajax 加载 url 指定的页面内容
+     *
+     * 加载过程中会发出以下事件
+     *  pageLoadCancel: 如果前一个还没加载完,那么取消并发送该事件
+     *  pageLoadStart: 开始加载
+     *  pageLodComplete: ajax complete 完成
+     *  pageLoadError: ajax 发生 error
+     *
+     *
+     * @param {String} url url
+     * @param {Object=} callback 回调函数配置，可选，可以配置 success\error 和 complete
+     *      所有回调函数的 this 都是 null，各自实参如下：
+     *      success: $doc, status, xhr
+     *      error: xhr, status, err
+     *      complete: xhr, status
+     *
+     * @private
+     */
+    Router.prototype._loadDocument = function(url, callback) {
+        if (this.xhr && this.xhr.readyState < 4) {
+            this.xhr.onreadystatechange = function() {
+            };
+            this.xhr.abort();
+            this.dispatch(EVENTS.pageLoadCancel);
+        }
+
+        this.dispatch(EVENTS.pageLoadStart);
+
+        callback = callback || {};
+        var self = this;
+
+        this.xhr = $.ajax({
+            url: url,
+            success: $.proxy(function(data, status, xhr) {
+                // 给包一层 <html/>，从而可以拿到完整的结构
+                var $doc = $('<html></html>');
+                $doc.append(data);
+                callback.success && callback.success.call(null, $doc, status, xhr);
+            }, this),
+            error: function(xhr, status, err) {
+                callback.error && callback.error.call(null, xhr, status, err);
+                self.dispatch(EVENTS.pageLoadError);
+            },
+            complete: function(xhr, status) {
+                callback.complete && callback.complete.call(null, xhr, status);
+                self.dispatch(EVENTS.pageLoadComplete);
+            }
         });
-      });
-    }
-
-    if (History$$1) HTML5History.__proto__ = History$$1;
-    HTML5History.prototype = Object.create(History$$1 && History$$1.prototype);
-    HTML5History.prototype.constructor = HTML5History;
-
-    HTML5History.prototype.go = function go(n) {
-      window.history.go(n);
     };
 
-    HTML5History.prototype.push = function push(location, onComplete, onAbort) {
-      var this$1 = this;
+    /**
+     * 对于 ajax 加载进来的页面，把其缓存起来
+     *
+     * @param {String} url url
+     * @param $doc ajax 载入的页面的 jq 对象，可以看做是该页面的 $(document)
+     * @private
+     */
+    Router.prototype._parseDocument = function(url, $doc) {
+        var $innerView = $doc.find('.' + routerConfig.sectionGroupClass);
 
-      var ref = this;
-      var fromRoute = ref.current;
-      this.transitionTo(location, function(route) {
-        pushState(cleanPath(this$1.base + route.fullPath));
-        handleScroll(this$1.router, route, fromRoute, false);
-        onComplete && onComplete(route);
-      }, onAbort);
-    };
-
-    HTML5History.prototype.replace = function replace(location, onComplete, onAbort) {
-      var this$1 = this;
-
-      var ref = this;
-      var fromRoute = ref.current;
-      this.transitionTo(location, function(route) {
-        replaceState(cleanPath(this$1.base + route.fullPath));
-        handleScroll(this$1.router, route, fromRoute, false);
-        onComplete && onComplete(route);
-      }, onAbort);
-    };
-
-    HTML5History.prototype.ensureURL = function ensureURL(push) {
-      if (getLocation(this.base) !== this.current.fullPath) {
-        var current = cleanPath(this.base + this.current.fullPath);
-        push ? pushState(current) : replaceState(current);
-      }
-    };
-
-    HTML5History.prototype.getCurrentLocation = function getCurrentLocation() {
-      return getLocation(this.base)
-    };
-
-    return HTML5History;
-  }(History));
-
-  function getLocation(base) {
-    var path = window.location.pathname;
-    if (base && path.indexOf(base) === 0) {
-      path = path.slice(base.length);
-    }
-    return (path || '/') + window.location.search + window.location.hash
-  }
-
-  /*  */
-
-
-  var HashHistory = (function(History$$1) {
-    function HashHistory(router, base, fallback) {
-      History$$1.call(this, router, base);
-      // check history fallback deeplinking
-      if (fallback && checkFallback(this.base)) {
-        return
-      }
-      ensureSlash();
-    }
-
-    if (History$$1) HashHistory.__proto__ = History$$1;
-    HashHistory.prototype = Object.create(History$$1 && History$$1.prototype);
-    HashHistory.prototype.constructor = HashHistory;
-
-    // this is delayed until the app mounts
-    // to avoid the hashchange listener being fired too early
-    HashHistory.prototype.setupListeners = function setupListeners() {
-      var this$1 = this;
-
-      var router = this.router;
-      var expectScroll = router.options.scrollBehavior;
-      var supportsScroll = supportsPushState && expectScroll;
-
-      if (supportsScroll) {
-        setupScroll();
-      }
-
-      window.addEventListener(supportsPushState ? 'popstate' : 'hashchange', function() {
-        var current = this$1.current;
-        if (!ensureSlash()) {
-          return
+        if (!$innerView.length) {
+            throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
         }
-        this$1.transitionTo(getHash(), function(route) {
-          if (supportsScroll) {
-            handleScroll(this$1.router, route, current, true);
-          }
-          if (!supportsPushState) {
-            replaceHash(route.fullPath);
-          }
+
+        this._saveDocumentIntoCache($doc, url);
+    };
+
+    /**
+     * 把一个页面的相关信息保存到 this.cache 中
+     *
+     * 以页面的 baseUrl 为 key,而 value 则是一个 DocumentCache
+     *
+     * @param {*} doc doc
+     * @param {String} url url
+     * @private
+     */
+    Router.prototype._saveDocumentIntoCache = function(doc, url) {
+        var urlAsKey = Util.toUrlObject(url).base;
+        var $doc = $(doc);
+
+        this.cache[urlAsKey] = {
+            $doc: $doc,
+            $content: $doc.find('.' + routerConfig.sectionGroupClass)
+        };
+    };
+
+    /**
+     * 从 sessionStorage 中获取保存下来的「当前状态」
+     *
+     * 如果解析失败，那么认为当前状态是 null
+     *
+     * @returns {State|null}
+     * @private
+     */
+    Router.prototype._getLastState = function() {
+        var currentState = sessionStorage.getItem(this.sessionNames.currentState);
+        try {
+            currentState = JSON.parse(currentState);
+        } catch(e) {
+            currentState = null;
+        }
+
+        return currentState;
+    };
+
+    /**
+     * 把一个状态设为当前状态，保存仅 sessionStorage 中
+     *
+     * @param {State} state
+     * @private
+     */
+    Router.prototype._saveAsCurrentState = function(state) {
+        sessionStorage.setItem(this.sessionNames.currentState, JSON.stringify(state));
+    };
+
+    /**
+     * 获取下一个 state 的 id
+     *
+     * 读取 sessionStorage 里的最后的状态的 id，然后 + 1；如果原没设置，那么返回 1
+     *
+     * @returns {number}
+     * @private
+     */
+    Router.prototype._getNextStateId = function() {
+        var maxStateId = sessionStorage.getItem(this.sessionNames.maxStateId);
+        return maxStateId ? parseInt(maxStateId, 10) + 1 : 1;
+    };
+
+    /**
+     * 把 sessionStorage 里的最后状态的 id 自加 1
+     *
+     * @private
+     */
+    Router.prototype._incMaxStateId = function() {
+        sessionStorage.setItem(this.sessionNames.maxStateId, this._getNextStateId());
+    };
+
+    /**
+     * 从一个文档切换为显示另一个文档
+     *
+     * @param $from 目前显示的文档
+     * @param $to 待切换显示的新文档
+     * @param $visibleSection 新文档中展示的 section 元素
+     * @param direction 新文档切入方向
+     * @private
+     */
+    Router.prototype._animateDocument = function($from, $to, $visibleSection, direction) {
+        var sectionId = $visibleSection.attr('id');
+
+
+        var $visibleSectionInFrom = $from.find('.' + routerConfig.curPageClass);
+        $visibleSectionInFrom.addClass(routerConfig.visiblePageClass).removeClass(routerConfig.curPageClass);
+
+        $visibleSection.trigger(EVENTS.pageAnimationStart, [sectionId, $visibleSection]);
+
+        this._animateElement($from, $to, direction);
+
+        $from.animationEnd(function() {
+            $visibleSectionInFrom.removeClass(routerConfig.visiblePageClass);
+            // 移除 document 前后，发送 beforePageRemove 和 pageRemoved 事件
+            $(window).trigger(EVENTS.beforePageRemove, [$from]);
+            $from.remove();
+            $(window).trigger(EVENTS.pageRemoved);
         });
-      });
+
+        $to.animationEnd(function() {
+            $visibleSection.trigger(EVENTS.pageAnimationEnd, [sectionId, $visibleSection]);
+            // 外层（init.js）中会绑定 pageInitInternal 事件，然后对页面进行初始化
+            $visibleSection.trigger(EVENTS.pageInit, [sectionId, $visibleSection]);
+        });
     };
 
-    HashHistory.prototype.push = function push(location, onComplete, onAbort) {
-      var this$1 = this;
+    /**
+     * 把当前文档的展示 section 从一个 section 切换到另一个 section
+     *
+     * @param $from
+     * @param $to
+     * @param direction
+     * @private
+     */
+    Router.prototype._animateSection = function($from, $to, direction) {
+        var toId = $to.attr('id');
+        $from.trigger(EVENTS.beforePageSwitch, [$from.attr('id'), $from]);
 
-      var ref = this;
-      var fromRoute = ref.current;
-      this.transitionTo(location, function(route) {
-        pushHash(route.fullPath);
-        handleScroll(this$1.router, route, fromRoute, false);
-        onComplete && onComplete(route);
-      }, onAbort);
+        $from.removeClass(routerConfig.curPageClass);
+        $to.addClass(routerConfig.curPageClass);
+        $to.trigger(EVENTS.pageAnimationStart, [toId, $to]);
+        this._animateElement($from, $to, direction);
+        $to.animationEnd(function() {
+            $to.trigger(EVENTS.pageAnimationEnd, [toId, $to]);
+            // 外层（init.js）中会绑定 pageInitInternal 事件，然后对页面进行初始化
+            $to.trigger(EVENTS.pageInit, [toId, $to]);
+        });
     };
 
-    HashHistory.prototype.replace = function replace(location, onComplete, onAbort) {
-      var this$1 = this;
-
-      var ref = this;
-      var fromRoute = ref.current;
-      this.transitionTo(location, function(route) {
-        replaceHash(route.fullPath);
-        handleScroll(this$1.router, route, fromRoute, false);
-        onComplete && onComplete(route);
-      }, onAbort);
-    };
-
-    HashHistory.prototype.go = function go(n) {
-      window.history.go(n);
-    };
-
-    HashHistory.prototype.ensureURL = function ensureURL(push) {
-      var current = this.current.fullPath;
-      if (getHash() !== current) {
-        push ? pushHash(current) : replaceHash(current);
-      }
-    };
-
-    HashHistory.prototype.getCurrentLocation = function getCurrentLocation() {
-      return getHash()
-    };
-
-    return HashHistory;
-  }(History));
-
-  function checkFallback(base) {
-    var location = getLocation(base);
-    if (!/^\/#/.test(location)) {
-      window.location.replace(
-        cleanPath(base + '/#' + location)
-      );
-      return true
-    }
-  }
-
-  function ensureSlash() {
-    var path = getHash();
-    if (path.charAt(0) === '/') {
-      return true
-    }
-    replaceHash('/' + path);
-    return false
-  }
-
-  function getHash() {
-    // We can't use window.location.hash here because it's not
-    // consistent across browsers - Firefox will pre-decode it!
-    var href = window.location.href;
-    var index = href.indexOf('#');
-    return index === -1 ? '' : href.slice(index + 1)
-  }
-
-  function getUrl(path) {
-    var href = window.location.href;
-    var i = href.indexOf('#');
-    var base = i >= 0 ? href.slice(0, i) : href;
-    return (base + "#" + path)
-  }
-
-  function pushHash(path) {
-    if (supportsPushState) {
-      pushState(getUrl(path));
-    } else {
-      window.location.hash = path;
-    }
-  }
-
-  function replaceHash(path) {
-    if (supportsPushState) {
-      replaceState(getUrl(path));
-    } else {
-      window.location.replace(getUrl(path));
-    }
-  }
-
-  /*  */
-
-
-  var AbstractHistory = (function(History$$1) {
-    function AbstractHistory(router, base) {
-      History$$1.call(this, router, base);
-      this.stack = [];
-      this.index = -1;
-    }
-
-    if (History$$1) AbstractHistory.__proto__ = History$$1;
-    AbstractHistory.prototype = Object.create(History$$1 && History$$1.prototype);
-    AbstractHistory.prototype.constructor = AbstractHistory;
-
-    AbstractHistory.prototype.push = function push(location, onComplete, onAbort) {
-      var this$1 = this;
-
-      this.transitionTo(location, function(route) {
-        this$1.stack = this$1.stack.slice(0, this$1.index + 1).concat(route);
-        this$1.index++;
-        onComplete && onComplete(route);
-      }, onAbort);
-    };
-
-    AbstractHistory.prototype.replace = function replace(location, onComplete, onAbort) {
-      var this$1 = this;
-
-      this.transitionTo(location, function(route) {
-        this$1.stack = this$1.stack.slice(0, this$1.index).concat(route);
-        onComplete && onComplete(route);
-      }, onAbort);
-    };
-
-    AbstractHistory.prototype.go = function go(n) {
-      var this$1 = this;
-
-      var targetIndex = this.index + n;
-      if (targetIndex < 0 || targetIndex >= this.stack.length) {
-        return
-      }
-      var route = this.stack[targetIndex];
-      this.confirmTransition(route, function() {
-        this$1.index = targetIndex;
-        this$1.updateRoute(route);
-      });
-    };
-
-    AbstractHistory.prototype.getCurrentLocation = function getCurrentLocation() {
-      var current = this.stack[this.stack.length - 1];
-      return current ? current.fullPath : '/'
-    };
-
-    AbstractHistory.prototype.ensureURL = function ensureURL() {
-      // noop
-    };
-
-    return AbstractHistory;
-  }(History));
-
-  /*  */
-
-  var VueRouter = function VueRouter(options) {
-    if (options === void 0) options = {};
-
-    this.app = null;
-    this.apps = [];
-    this.options = options;
-    this.beforeHooks = [];
-    this.resolveHooks = [];
-    this.afterHooks = [];
-    this.matcher = createMatcher(options.routes || [], this);
-
-    var mode = options.mode || 'hash';
-    this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false;
-    if (this.fallback) {
-      mode = 'hash';
-    }
-    if (!inBrowser) {
-      mode = 'abstract';
-    }
-    this.mode = mode;
-
-    switch (mode) {
-      case 'history':
-        this.history = new HTML5History(this, options.base);
-        break
-      case 'hash':
-        this.history = new HashHistory(this, options.base, this.fallback);
-        break
-      case 'abstract':
-        this.history = new AbstractHistory(this, options.base);
-        break
-      default:
-        {
-          assert(false, ("invalid mode: " + mode));
+    /**
+     * 切换显示两个元素
+     *
+     * 切换是通过更新 class 来实现的，而具体的切换动画则是 class 关联的 css 来实现
+     *
+     * @param $from 当前显示的元素
+     * @param $to 待显示的元素
+     * @param direction 切换的方向
+     * @private
+     */
+    Router.prototype._animateElement = function($from, $to, direction) {
+        // todo: 可考虑如果入参不指定，那么尝试读取 $to 的属性，再没有再使用默认的
+        // 考虑读取点击的链接上指定的方向
+        if (typeof direction === 'undefined') {
+            direction = DIRECTION.rightToLeft;
         }
+
+        var animPageClasses = [
+            'page-from-center-to-left',
+            'page-from-center-to-right',
+            'page-from-right-to-center',
+            'page-from-left-to-center'].join(' ');
+
+        var classForFrom, classForTo;
+        switch(direction) {
+            case DIRECTION.rightToLeft:
+                classForFrom = 'page-from-center-to-left';
+                classForTo = 'page-from-right-to-center';
+                break;
+            case DIRECTION.leftToRight:
+                classForFrom = 'page-from-center-to-right';
+                classForTo = 'page-from-left-to-center';
+                break;
+            default:
+                classForFrom = 'page-from-center-to-left';
+                classForTo = 'page-from-right-to-center';
+                break;
+        }
+
+        $from.removeClass(animPageClasses).addClass(classForFrom);
+        $to.removeClass(animPageClasses).addClass(classForTo);
+
+        $from.animationEnd(function() {
+            $from.removeClass(animPageClasses);
+        });
+        $to.animationEnd(function() {
+            $to.removeClass(animPageClasses);
+        });
+    };
+
+    /**
+     * 获取当前显示的第一个 section
+     *
+     * @returns {*}
+     * @private
+     */
+    Router.prototype._getCurrentSection = function() {
+        return this.$view.find('.' + routerConfig.curPageClass).eq(0);
+    };
+
+    /**
+     * popState 事件关联着的后退处理
+     *
+     * 判断两个 state 判断是否是属于同一个文档，然后做对应的 section 或文档切换；
+     * 同时在切换后把新 state 设为当前 state
+     *
+     * @param {State} state 新 state
+     * @param {State} fromState 旧 state
+     * @private
+     */
+    Router.prototype._back = function(state, fromState) {
+        if (this._isTheSameDocument(state.url.full, fromState.url.full)) {
+            var $newPage = $('#' + state.pageId);
+            if ($newPage.length) {
+                var $currentPage = this._getCurrentSection();
+                this._animateSection($currentPage, $newPage, DIRECTION.leftToRight);
+                this._saveAsCurrentState(state);
+            } else {
+                location.href = state.url.full;
+            }
+        } else {
+            this._saveDocumentIntoCache($(document), fromState.url.full);
+            this._switchToDocument(state.url.full, false, false, DIRECTION.leftToRight);
+            this._saveAsCurrentState(state);
+        }
+    };
+
+    /**
+     * popState 事件关联着的前进处理,类似于 _back，不同的是切换方向
+     *
+     * @param {State} state 新 state
+     * @param {State} fromState 旧 state
+     * @private
+     */
+    Router.prototype._forward = function(state, fromState) {
+        if (this._isTheSameDocument(state.url.full, fromState.url.full)) {
+            var $newPage = $('#' + state.pageId);
+            if ($newPage.length) {
+                var $currentPage = this._getCurrentSection();
+                this._animateSection($currentPage, $newPage, DIRECTION.rightToLeft);
+                this._saveAsCurrentState(state);
+            } else {
+                location.href = state.url.full;
+            }
+        } else {
+            this._saveDocumentIntoCache($(document), fromState.url.full);
+            this._switchToDocument(state.url.full, false, false, DIRECTION.rightToLeft);
+            this._saveAsCurrentState(state);
+        }
+    };
+
+    /**
+     * popState 事件处理
+     *
+     * 根据 pop 出来的 state 和当前 state 来判断是前进还是后退
+     *
+     * @param event
+     * @private
+     */
+    Router.prototype._onPopState = function(event) {
+        var state = event.state;
+        // if not a valid state, do nothing
+        if (!state || !state.pageId) {
+            return;
+        }
+
+        var lastState = this._getLastState();
+
+        if (!lastState) {
+            console.error && console.error('Missing last state when backward or forward');
+            return;
+        }
+
+        if (state.id === lastState.id) {
+            return;
+        }
+
+        if (state.id < lastState.id) {
+            this._back(state, lastState);
+        } else {
+            this._forward(state, lastState);
+        }
+    };
+
+    /**
+     * 页面进入到一个新状态
+     *
+     * 把新状态 push 进去，设置为当前的状态，然后把 maxState 的 id +1。
+     *
+     * @param {String} url 新状态的 url
+     * @param {String} sectionId 新状态中显示的 section 元素的 id
+     * @private
+     */
+    Router.prototype._pushNewState = function(url, sectionId) {
+        var state = {
+            id: this._getNextStateId(),
+            pageId: sectionId,
+            url: Util.toUrlObject(url)
+        };
+
+        theHistory.pushState(state, '', url);
+        this._saveAsCurrentState(state);
+        this._incMaxStateId();
+    };
+
+    /**
+     * 生成一个随机的 id
+     *
+     * @returns {string}
+     * @private
+     */
+    Router.prototype._generateRandomId = function() {
+        return "page-" + (+new Date());
+    };
+
+    Router.prototype.dispatch = function(event) {
+        var e = new CustomEvent(event, {
+            bubbles: true,
+            cancelable: true
+        });
+
+        //noinspection JSUnresolvedFunction
+        window.dispatchEvent(e);
+    };
+
+    /**
+     * 判断一个链接是否使用 router 来处理
+     *
+     * @param $link
+     * @returns {boolean}
+     */
+    function isInRouterBlackList($link) {
+        var classBlackList = [
+            'external',
+            'tab-link',
+            'open-popup',
+            'close-popup',
+            'open-panel',
+            'close-panel'
+        ];
+
+        for (var i = classBlackList.length -1 ; i >= 0; i--) {
+            if ($link.hasClass(classBlackList[i])) {
+                return true;
+            }
+        }
+
+        var linkEle = $link.get(0);
+        var linkHref = linkEle.getAttribute('href');
+
+        var protoWhiteList = [
+            'http',
+            'https'
+        ];
+
+        //如果非noscheme形式的链接，且协议不是http(s)，那么路由不会处理这类链接
+        if (/^(\w+):/.test(linkHref) && protoWhiteList.indexOf(RegExp.$1) < 0) {
+            return true;
+        }
+
+        //noinspection RedundantIfStatementJS
+        if (linkEle.hasAttribute('external')) {
+            return true;
+        }
+
+        return false;
     }
-  };
 
-  var prototypeAccessors = {
-    currentRoute: {
-      configurable: true
-    }
-  };
+    /**
+     * 自定义是否执行路由功能的过滤器
+     *
+     * 可以在外部定义 $.config.routerFilter 函数，实参是点击链接的 Zepto 对象。
+     *
+     * @param $link 当前点击的链接的 Zepto 对象
+     * @returns {boolean} 返回 true 表示执行路由功能，否则不做路由处理
+     */
+    function customClickFilter($link) {
+        var customRouterFilter = $.smConfig.routerFilter;
+        if ($.isFunction(customRouterFilter)) {
+            var filterResult = customRouterFilter($link);
+            if (typeof filterResult === 'boolean') {
+                return filterResult;
+            }
+        }
 
-  VueRouter.prototype.match = function match(
-    raw,
-    current,
-    redirectedFrom
-  ) {
-    return this.matcher.match(raw, current, redirectedFrom)
-  };
-
-  prototypeAccessors.currentRoute.get = function() {
-    return this.history && this.history.current
-  };
-
-  VueRouter.prototype.init = function init(app /* Vue component instance */ ) {
-    var this$1 = this;
-
-    "development" !== 'production' && assert(
-      install.installed,
-      "not installed. Make sure to call `Vue.use(VueRouter)` " +
-      "before creating root instance."
-    );
-
-    this.apps.push(app);
-
-    // main app already initialized.
-    if (this.app) {
-      return
+        return true;
     }
 
-    this.app = app;
+    $(function() {
+        // 用户可选关闭router功能
+        if (!$.smConfig.router) {
+            return;
+        }
 
-    var history = this.history;
+        if (!Util.supportStorage()) {
+            return;
+        }
 
-    if (history instanceof HTML5History) {
-      history.transitionTo(history.getCurrentLocation());
-    } else if (history instanceof HashHistory) {
-      var setupHashListener = function() {
-        history.setupListeners();
-      };
-      history.transitionTo(
-        history.getCurrentLocation(),
-        setupHashListener,
-        setupHashListener
-      );
-    }
+        var $pages = $('.' + routerConfig.pageClass);
+        if (!$pages.length) {
+            var warnMsg = 'Disable router function because of no .page elements';
+            if (window.console && window.console.warn) {
+                console.warn(warnMsg);
+            }
+            return;
+        }
 
-    history.listen(function(route) {
-      this$1.apps.forEach(function(app) {
-        app._route = route;
-      });
+        var router = $.router = new Router();
+
+        $(document).on('click', 'a', function(e) {
+            var $target = $(e.currentTarget);
+
+            var filterResult = customClickFilter($target);
+            if (!filterResult) {
+                return;
+            }
+
+            if (isInRouterBlackList($target)) {
+                return;
+            }
+
+            e.preventDefault();
+
+            if ($target.hasClass('back')) {
+                router.back();
+            } else {
+                var url = $target.attr('href');
+                if (!url || url === '#') {
+                    return;
+                }
+
+                var ignoreCache = $target.attr('data-no-cache') === 'true';
+
+                router.load(url, ignoreCache);
+            }
+        });
     });
-  };
+}(Zepto);
 
-  VueRouter.prototype.beforeEach = function beforeEach(fn) {
-    return registerHook(this.beforeHooks, fn)
-  };
+/**
+ * @typedef {Object} State
+ * @property {Number} id
+ * @property {String} url
+ * @property {String} pageId
+ */
 
-  VueRouter.prototype.beforeResolve = function beforeResolve(fn) {
-    return registerHook(this.resolveHooks, fn)
-  };
+/**
+ * @typedef {Object} UrlObject 字符串 url 转为的对象
+ * @property {String} base url 的基本路径
+ * @property {String} full url 的完整绝对路径
+ * @property {String} origin 转换前的 url
+ * @property {String} fragment url 的 fragment
+ */
 
-  VueRouter.prototype.afterEach = function afterEach(fn) {
-    return registerHook(this.afterHooks, fn)
-  };
-
-  VueRouter.prototype.onReady = function onReady(cb, errorCb) {
-    this.history.onReady(cb, errorCb);
-  };
-
-  VueRouter.prototype.onError = function onError(errorCb) {
-    this.history.onError(errorCb);
-  };
-
-  VueRouter.prototype.push = function push(location, onComplete, onAbort) {
-    this.history.push(location, onComplete, onAbort);
-  };
-
-  VueRouter.prototype.replace = function replace(location, onComplete, onAbort) {
-    this.history.replace(location, onComplete, onAbort);
-  };
-
-  VueRouter.prototype.go = function go(n) {
-    this.history.go(n);
-  };
-
-  VueRouter.prototype.back = function back() {
-    this.go(-1);
-  };
-
-  VueRouter.prototype.forward = function forward() {
-    this.go(1);
-  };
-
-  VueRouter.prototype.getMatchedComponents = function getMatchedComponents(to) {
-    var route = to ?
-      to.matched ?
-      to :
-      this.resolve(to).route :
-      this.currentRoute;
-    if (!route) {
-      return []
-    }
-    return [].concat.apply([], route.matched.map(function(m) {
-      return Object.keys(m.components).map(function(key) {
-        return m.components[key]
-      })
-    }))
-  };
-
-  VueRouter.prototype.resolve = function resolve(
-    to,
-    current,
-    append
-  ) {
-    var location = normalizeLocation(
-      to,
-      current || this.history.current,
-      append,
-      this
-    );
-    var route = this.match(location, current);
-    var fullPath = route.redirectedFrom || route.fullPath;
-    var base = this.history.base;
-    var href = createHref(base, fullPath, this.mode);
-    return {
-      location: location,
-      route: route,
-      href: href,
-      // for backwards compat
-      normalizedTo: location,
-      resolved: route
-    }
-  };
-
-  VueRouter.prototype.addRoutes = function addRoutes(routes) {
-    this.matcher.addRoutes(routes);
-    if (this.history.current !== START) {
-      this.history.transitionTo(this.history.getCurrentLocation());
-    }
-  };
-
-  Object.defineProperties(VueRouter.prototype, prototypeAccessors);
-
-  function registerHook(list, fn) {
-    list.push(fn);
-    return function() {
-      var i = list.indexOf(fn);
-      if (i > -1) {
-        list.splice(i, 1);
-      }
-    }
-  }
-
-  function createHref(base, fullPath, mode) {
-    var path = mode === 'hash' ? '#' + fullPath : fullPath;
-    return base ? cleanPath(base + '/' + path) : path
-  }
-
-  VueRouter.install = install;
-  VueRouter.version = '3.0.1';
-
-  if (inBrowser && window.Vue) {
-    window.Vue.use(VueRouter);
-  }
-
-  return VueRouter;
-
-})));
+/**
+ * @typedef {Object} DocumentCache
+ * @property {*|HTMLElement} $doc 看做是 $(document)
+ * @property {*|HTMLElement} $content $doc 里的 routerConfig.innerViewClass 元素
+ */

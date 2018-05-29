@@ -1,5 +1,5 @@
 import Webcomponents from 'webcomponents-lite';
-// import ripple from 'jquery-ripple';
+import ripple from 'jquery-ripple';
 
 const MSG = {
 	support: '支持导入!',
@@ -105,6 +105,8 @@ class htmlImport {
 				link.onload = link.onreadystatechange = null;
 				link.parentNode.removeChild(link);
 			}
+
+			$('[data-ripple]').ripple();
 
 		};
 		link.onerror = function(e) {
