@@ -8,14 +8,45 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
-
 module.exports = {
 	entry: {
-		main: './src/js/app.js'
+		fc: [
+			'./src/js/intro.js',
+			'./src/js/util.js',
+			'./src/js/zepto-adapter.js',
+			'./src/js/device.js',
+			'./src/js/fastclick.js',
+			'./src/js/modal.js',
+			// './src/js/calendar.js',//日历
+			// './src/js/picker.js',//选择器
+			// './src/js/datetime-picker.js',
+			// './src/js/iscroll.js',
+			// './src/js/scroller.js',
+			// './src/js/tabs.js',
+			// './src/js/fixed-tab.js',
+			// './src/js/pull-to-refresh-js-scroll.js',
+			// './src/js/pull-to-refresh.js',
+			// './src/js/infinite-scroll.js',
+			// './src/js/searchbar.js',
+			'./src/js/panels.js',
+			'./src/js/router.js',
+			// './src/js/last-position.js',
+			'./src/js/init.js',
+			// './src/js/scroll-fix.js'
+		],
+		extend: [
+			'./src/js/swiper.js',
+			'./src/js/swiper-init.js',
+			'./src/js/photo-browser.js'
+		]
+		// ,cityPicker: [
+		// 	'./src/js/city-data.js',
+		// 	'./src/js/city-picker.js'
+		// ]
 	},
 	devtool: 'inline-source-map',
 	output: {
-		filename: './js/[name].[hash].js',
+		filename: './js/[name].js',
 		path: path.resolve(__dirname, 'dist')
 	},
 	module: {
@@ -48,9 +79,9 @@ module.exports = {
 			test: /\.html$/,
 			use: [{
 				loader: 'html-loader',
-				// options: {
-				// 	minimize: true
-				// }
+				options: {
+					minimize: true
+				}
 			}]
 		}, {
 			test: require.resolve('jquery'),
@@ -60,6 +91,14 @@ module.exports = {
 			}, {
 				loader: 'expose-loader',
 				options: '$'
+			}]
+		}, {
+			test: require.resolve('zepto'),
+			use: [{
+				loader: 'exports-loader',
+				options: 'window.Zepto'
+			}, {
+				loader: 'script-loader'
 			}]
 		}]
 	},
@@ -84,10 +123,10 @@ module.exports = {
 				robots: 'index,fun chat',
 				copyright: 'Copyright 友语 版权所有',
 				'apple-touch-fullscreen': 'yes',
-				'apple-mobile-web-app-capable': 'yes',//网站开启对web app程序的支持
-				'apple-mobile-web-app-status-bar-style': 'black-translucent',//在web app应用下状态条（屏幕顶部条）的颜色
-				'apple-mobile-web-app-title': 'fun chat',//添加到桌面时标题
-				'format-detection': 'telephone=no',//是否将网页内容中的手机号码显示为拨号的超链接
+				'apple-mobile-web-app-capable': 'yes', //网站开启对web app程序的支持
+				'apple-mobile-web-app-status-bar-style': 'black-translucent', //在web app应用下状态条（屏幕顶部条）的颜色
+				'apple-mobile-web-app-title': 'fun chat', //添加到桌面时标题
+				'format-detection': 'telephone=no', //是否将网页内容中的手机号码显示为拨号的超链接
 				'revisit-after': '1 days',
 				'theme-color': '#313443'
 			}
@@ -101,6 +140,7 @@ module.exports = {
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
+			Zepto: 'zepto',
 			_: 'lodash'
 		}),
 		new ExtractTextPlugin({
@@ -111,9 +151,9 @@ module.exports = {
 			fileName: 'manifest.json',
 			basePath: './',
 			seed: {
-				name: 'My Manifest',  // 用作当用户被提示安装应用时出现的文本
-				short_name: "Fun Chat",  // 用作当应用安装后出现在用户主屏幕上的文本
-				start_url: "/index.html",  // 打开后第一个出现的页面地址
+				name: 'My Manifest', // 用作当用户被提示安装应用时出现的文本
+				short_name: "Fun Chat", // 用作当应用安装后出现在用户主屏幕上的文本
+				start_url: "/index.html", // 打开后第一个出现的页面地址
 				/**
 				 *  display 配置项 设置 web 应用的显示模式
 				 * 	FullScreen 打开 Web 应用并占用整个可用的显示区域。
@@ -121,12 +161,12 @@ module.exports = {
 				 *	Minimal-ui 此模式类似于 fullscreen，但为终端用户提供了可访问的最小 UI 元素集合，例如，后退按钮、前进按钮、重载按钮以及查看网页地址的一些方式。
 				 *	Browser 使用操作系统内置的标准浏览器来打开 Web 应用
 				 */
-				display: "standalone",  // 定义应用的显示方式
+				display: "standalone", // 定义应用的显示方式
 				description: "逗聊APP 交友软件", // 参考 meta 中的 description
 				orientation: "natural", // 定义默认应用显示方向，竖屏、横屏
 				prefer_related_applications: false, // 是否设置对应应用
-				theme_color: "#383840",  // 主题颜色，用于控制浏览器地址栏着色
-				background_color: "#383840",  //  应用加载之前的背景色，用于应用启动时的过渡
+				theme_color: "#383840", // 主题颜色，用于控制浏览器地址栏着色
+				background_color: "#383840", //  应用加载之前的背景色，用于应用启动时的过渡
 				// 定义不同尺寸的图标，最终会根据应用场景选择合适大小的图标
 				icons: [{
 					"src": "e.png",

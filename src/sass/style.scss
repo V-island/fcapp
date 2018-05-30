@@ -5,7 +5,7 @@
 //--------------------------------
 .user-info {
 	@include flex-spindle(center);
-	@include flex-vertical(column);
+	// @include flex-vertical(column);
 
 	>.user-img {
 		border-radius: 50%;
