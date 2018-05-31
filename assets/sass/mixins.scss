@@ -1,0 +1,229 @@
+@mixin Newline {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+@mixin wrap-space {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@mixin scrollable {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@mixin flexbox {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+@mixin clearfix {
+    &:before, &:after {
+        content: " ";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+
+}
+
+@mixin justify-content($jc){
+    @if $jc == flex-start {
+        -webkit-box-pack: start;
+        -ms-flex-pack: start;
+        -webkit-justify-content: flex-start;
+        justify-content: flex-start;
+    }
+    @else if $jc == flex-end {
+        -webkit-box-pack: end;
+        -ms-flex-pack: end;
+        -webkit-justify-content: flex-end;
+        justify-content: flex-end;
+    }
+    @else if $jc == space-between {
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        -webkit-justify-content: space-between;
+        justify-content: space-between;
+    }
+    @else {
+        -webkit-box-pack: $jc;
+        -ms-flex-pack: $jc;
+        -webkit-justify-content: $jc;
+        justify-content: $jc;
+    }
+}
+
+@mixin hairline($position, $color) {
+    @if $position==top {
+        &:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: auto;
+            right: auto;
+            height: 1px;
+            width: 100%;
+            background-color: $color;
+            display: block;
+            z-index: 15;
+            transform-origin: 50% 0%;
+
+            @media only screen and (-webkit-min-device-pixel-ratio:2) {
+                transform: scaleY(0.5);
+            }
+
+            @media only screen and (-webkit-min-device-pixel-ratio:3) {
+                transform: scaleY(0.33);
+            }
+
+        }
+
+    }
+    @else if $position == left {
+        &:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: auto;
+            right: auto;
+            width: 1px;
+            height: 100%;
+            background-color: $color;
+            display: block;
+            z-index: 15;
+            transform-origin: 0% 50%;
+
+            @media only screen and (-webkit-min-device-pixel-ratio:2) {
+                transform: scaleY(0.5);
+            }
+
+            @media only screen and (-webkit-min-device-pixel-ratio:3) {
+                transform: scaleY(0.33);
+            }
+
+        }
+
+    }
+    @else if $position = bottom{
+        &:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            right: auto;
+            top: auto;
+            height: 1px;
+            width: 100%;
+            background-color: $color;
+            display: block;
+            z-index: 15;
+            transform-origin: 50% 100%;
+            @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+                transform: scaleY(0.5);
+            }
+            @media only screen and (-webkit-min-device-pixel-ratio: 3) {
+                transform: scaleY(0.33);
+            }
+        }
+    }
+    @else{
+        &:after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            left: auto;
+            bottom: auto;
+            width: 1px;
+            height: 100%;
+            background-color: $color;
+            display: block;
+            z-index: 15;
+            transform-origin: 100% 50%;
+            @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+                transform: scaleY(0.5);
+            }
+            @media only screen and (-webkit-min-device-pixel-ratio: 3) {
+                transform: scaleY(0.33);
+            }
+        }
+    }
+
+}
+
+@mixin hairline-remove($position){
+    @if $position!=left and $position!=top{
+        &:after {
+            display: none;
+        }
+    }
+    @else if $position!=right and $position!=bottom{
+        &:before {
+            display: none;
+        }
+    }
+}
+
+/**
+ * 垂直布局
+ * @param  {[string]}  column 顺序
+ * @param  {[string]}  column-reverse 倒序
+ */
+@mixin flex-vertical($col){
+    display: flex;
+    flex-direction: $col;
+}
+
+/**
+ * 主轴布局
+ * @param  {[string]}  start          左对齐
+ * @param  {[string]}  center         居中对齐
+ * @param  {[string]}  end            右对齐
+ * @param  {[string]}  space-around   flex 容器中的每个 flex 项的每一侧间距都是相等的。请注意，这意味着两个相邻 flex 项之间的空间将是第一个/最后一个 flex 项与其最近边缘之间的空间的两倍。
+ * @param  {[string]}  space-evenly   flex 容器起始边缘和第一个 flex 项之间的间距和每个相邻 flex 项之间的间距是相等。
+ * @param  {[string]}  space-between  任何两个相邻 flex 项之间的间距是相同的，但不一定等于第一个/最后一个 flex 项与 flex 容器边缘之间的间距;起始边缘和第一个项目之间的间距和末端边缘和最后一个项目之间的间距是相等的。
+ */
+@mixin flex-spindle($col){
+    display: flex;
+    justify-content: $col;
+}
+
+/**
+ * 主轴布局/垂直布局
+ */
+@mixin spindle-center($col) {
+    @include flex-spindle($col);
+    align-items: center;
+}
+
+/**
+ * 主轴布局/垂直布局
+ */
+@mixin flex-spindle-center($col, $flex) {
+    @include flex-spindle($col);
+    flex-direction: $flex;
+    align-items: center;
+}
+
+/**
+ * 水平/垂直布局
+ */
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin size($num) {
+    width: $num;
+    height: $num;
+}
