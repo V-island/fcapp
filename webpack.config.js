@@ -11,42 +11,47 @@ const webpack = require('webpack');
 module.exports = {
 	entry: {
 		fc: [
-			'./src/js/intro.js',
-			'./src/js/util.js',
-			'./src/js/zepto-adapter.js',
-			'./src/js/device.js',
-			'./src/js/fastclick.js',
-			'./src/js/modal.js',
-			// './src/js/calendar.js',//日历
-			// './src/js/picker.js',//选择器
-			// './src/js/datetime-picker.js',
-			// './src/js/iscroll.js',
-			// './src/js/scroller.js',
-			// './src/js/tabs.js',
-			// './src/js/fixed-tab.js',
-			// './src/js/pull-to-refresh-js-scroll.js',
-			// './src/js/pull-to-refresh.js',
-			// './src/js/infinite-scroll.js',
-			// './src/js/searchbar.js',
-			'./src/js/panels.js',
-			'./src/js/router.js',
-			// './src/js/last-position.js',
-			'./src/js/init.js',
-			// './src/js/scroll-fix.js'
-		],
-		extend: [
-			'./src/js/swiper.js',
-			'./src/js/swiper-init.js',
-			'./src/js/photo-browser.js'
+			'./assets/js/intro',
+			'./assets/js/util',
+			'./assets/js/zepto-adapter',
+			'./assets/js/device',
+			'./assets/js/fastclick',
+			'./assets/js/modal',
+			// './assets/js/calendar',//日历
+			// './assets/js/picker',//选择器
+			// './assets/js/datetime-picker',
+			// './assets/js/iscroll',
+			'./assets/js/scroller',
+			// './assets/js/tabs',
+			// './assets/js/fixed-tab',
+			// './assets/js/pull-to-refresh-js-scroll',
+			// './assets/js/pull-to-refresh',
+			// './assets/js/infinite-scroll',
+			// './assets/js/searchbar',
+			'./assets/js/panels',
+			'./assets/js/html-import',
+			'./assets/js/router',
+			'./assets/js/last-position',
+			'./assets/js/init',
+			'./assets/sass/fc.scss'
+			// './assets/js/scroll-fix'
 		]
+		// ,extend: [
+		// 	'./assets/js/swiper.js',
+		// 	'./assets/js/swiper-init.js',
+		// 	'./assets/js/photo-browser.js'
+		// ]
 		// ,cityPicker: [
-		// 	'./src/js/city-data.js',
-		// 	'./src/js/city-picker.js'
+		// 	'./assets/js/city-data.js',
+		// 	'./assets/js/city-picker.js'
+		// ]
+		// ,main: [
+		// 	'./assets/sass/fc.scss'
 		// ]
 	},
 	devtool: 'inline-source-map',
 	output: {
-		filename: './js/[name].js',
+		filename: './assets/js/[name].js',
 		path: path.resolve(__dirname, 'dist')
 	},
 	module: {
@@ -54,7 +59,6 @@ module.exports = {
 			test: /\.scss$/,
 			use: ExtractTextPlugin.extract({
 				fallback: 'style-loader',
-				//如果需要，可以在 sass-loader 之前将 resolve-url-loader 链接进来
 				use: ['css-loader', 'sass-loader']
 			})
 		}, {
@@ -62,7 +66,7 @@ module.exports = {
 			use: [{
 				loader: 'url-loader',
 				options: {
-					outputPath: 'src/img/',
+					outputPath: './assets/img',
 					limit: 8192
 				}
 			}]
@@ -111,10 +115,10 @@ module.exports = {
 		// 	skipWaiting: true
 		// }),
 		new HtmlWebpackPlugin({
-			title: 'Output Management',
+			title: 'Fun Chat',
 			filename: 'index.html',
-			template: './index.html',
-			favicon: './src/img/favicon.ico',
+			template: './assets/index.html',
+			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',
 				keywords: 'chat,fun chat',
@@ -132,11 +136,11 @@ module.exports = {
 			}
 		}),
 		new CopyWebpackPlugin([{
-			from: path.resolve(__dirname, 'src/pages'),
+			from: path.resolve(__dirname, 'assets/pages'),
 			to: './pages'
 		}, {
-			from: path.resolve(__dirname, 'src/public'),
-			to: './src/public'
+			from: path.resolve(__dirname, 'assets/public'),
+			to: './public'
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
@@ -144,7 +148,10 @@ module.exports = {
 			_: 'lodash'
 		}),
 		new ExtractTextPlugin({
-			filename: './css/[name].css',
+			// filename: './css/[name].css',
+			filename:  (getPath) => {
+				return getPath('assets/css/[name].css').replace('css/js', 'css');
+			},
 			allChunks: true
 		}),
 		new ManifestPlugin({
