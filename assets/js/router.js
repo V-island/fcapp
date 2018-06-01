@@ -1,65 +1,3 @@
-/**
- * 路由
- *
- * 路由功能将接管页面的链接点击行为，最后达到动画切换的效果，具体如下：
- *  1. 链接对应的是另一个页面，那么则尝试 ajax 加载，然后把新页面里的符合约定的结构提取出来，然后做动画切换；如果没法 ajax 或结构不符合，那么则回退为普通的页面跳转
- *  2. 链接是当前页面的锚点，并且该锚点对应的元素存在且符合路由约定，那么则把该元素做动画切入
- *  3. 浏览器前进后退（history.forward/history.back）时，也使用动画效果
- *  4. 如果链接有 back 这个 class，那么则忽略一切，直接调用 history.back() 来后退
- *
- * 路由功能默认开启，如果需要关闭路由功能，那么在 zepto 之后，msui 脚本之前设置 $.config.router = false 即可（intro.js 中会 extend 到 $.fcConfig 中）。
- *
- * 可以设置 $.config.routerFilter 函数来设置当前点击链接是否使用路由功能，实参是 a 链接的 zepto 对象；返回 false 表示不使用 router 功能。
- *
- * ajax 载入新的文档时，并不会执行里面的 js。到目前为止，在开启路由功能时，建议的做法是：
- *  把所有页面的 js 都放到同一个脚本里，js 里面的事件绑定使用委托而不是直接的绑定在元素上（因为动态加载的页面元素还不存在），然后所有页面都引用相同的 js 脚本。非事件类可以通过监控 pageInit 事件，根据里面的 pageId 来做对应区别处理。
- *
- * 如果有需要
- *
- * 对外暴露的方法
- *  - load
- *  - forward
- *  - back
- *
- * 事件
- * pageLoad* 系列在发生 ajax 加载时才会触发；当是块切换或已缓存的情况下，不会发送这些事件
- *  - pageLoadCancel: 如果前一个还没加载完,那么取消并发送该事件
- *  - pageLoadStart: 开始加载
- *  - pageLodComplete: ajax complete 完成
- *  - pageLoadError: ajax 发生 error
- *  - pageAnimationStart: 执行动画切换前，实参是 event，sectionId 和 $section
- *  - pageAnimationEnd: 执行动画完毕，实参是 event，sectionId 和 $section
- *  - beforePageRemove: 新 document 载入且动画切换完毕，旧的 document remove 之前在 window 上触发，实参是 event 和 $pageContainer
- *  - pageRemoved: 新的 document 载入且动画切换完毕，旧的 document remove 之后在 window 上触发
- *  - beforePageSwitch: page 切换前，在 pageAnimationStart 前，beforePageSwitch 之后会做一些额外的处理才触发 pageAnimationStart
- *  - pageInitInternal: （经 init.js 处理后，对外是 pageInit）紧跟着动画完成的事件，实参是 event，sectionId 和 $section
- *
- * 术语
- *  - 文档（document），不带 hash 的 url 关联着的应答 html 结构
- *  - 块（section），一个文档内有指定块标识的元素
- *
- * 路由实现约定
- *  - 每个文档的需要展示的内容必需位于指定的标识（routerConfig.sectionGroupClass）的元素里面，默认是: div.page-group （注意,如果改变这个需要同时改变 less 中的命名）
- *  - 每个块必需带有指定的块标识（routerConfig.pageClass），默认是 .page
- *
- *  即，使用路由功能的每一个文档应当是下面这样的结构（省略 <body> 等）:
- *      <div class="page-group">
- *          <div class="page">xxx</div>
- *          <div class="page">yyy</div>
- *      </div>
- *
- * 另，每一个块都应当有一个唯一的 ID，这样才能通过 #the-id 的形式来切换定位。
- * 当一个块没有 id 时，如果是第一个的默认的需要展示的块，那么会给其添加一个随机的 id；否则，没有 id 的块将不会被切换展示。
- *
- * 通过 history.state/history.pushState 以及用 sessionStorage 来记录当前 state 以及最大的 state id 来辅助前进后退的切换效果，所以在不支持 sessionStorage 的情况下，将不开启路由功能。
- *
- * 为了解决 ajax 载入页面导致重复 ID 以及重复 popup 等功能，上面约定了使用路由功能的所有可展示内容都必需位于指定元素内。从而可以在进行文档间切换时可以进行两个文档的整体移动，切换完毕后再把前一个文档的内容从页面之间移除。
- *
- * 默认地过滤了部分协议的链接，包括 tel:, javascript:, mailto:，这些链接将不会使用路由功能。如果有更多的自定义控制需求，可以在 $.config.routerFilter 实现
- *
- * 注: 以 _ 开头的函数标明用于此处内部使用，可根据需要随时重构变更，不对外确保兼容性。
- *
- */
 import Webcomponents from 'webcomponents-lite';
 
 +function($) {
@@ -91,6 +29,10 @@ import Webcomponents from 'webcomponents-lite';
         document.head.appendChild(Webcomponents);
     }
 
+    const CONFIG = {
+        rootUrl: 'home'
+    }
+
     const EVENTS = {
         pageLoadStart: 'pageLoadStart', // ajax 开始加载新页面前
         pageLoadCancel: 'pageLoadCancel', // 取消前一个 ajax 加载动作后
@@ -115,7 +57,8 @@ import Webcomponents from 'webcomponents-lite';
         allready: '导入加载已经完成，元素已经注册！',
         masthasname: '必须指定名称',
         maststring: '必须是字符串',
-        updatesuccess: '更新成功！'
+        updatesuccess: '更新成功！',
+        errorLastState: 'Missing last state when backward or forward'
     }
 
     const RULE = {
@@ -126,7 +69,7 @@ import Webcomponents from 'webcomponents-lite';
         dom: 'body'
     }
 
-    var Util = {
+    let Util = {
         /**
          * 获取 url 的 fragment（即 hash 中去掉 # 的剩余部分）
          *
@@ -137,7 +80,7 @@ import Webcomponents from 'webcomponents-lite';
          * @returns {String}
          */
         getUrlFragment: function(url) {
-            var hashIndex = url.indexOf('#');
+            let hashIndex = url.indexOf('#');
             return hashIndex === -1 ? '' : url.slice(hashIndex + 1);
         },
         /**
@@ -154,9 +97,9 @@ import Webcomponents from 'webcomponents-lite';
          * @returns {String}
          */
         getAbsoluteUrl: function(url) {
-            var link = document.createElement('a');
+            let link = document.createElement('a');
             link.setAttribute('href', url);
-            var absoluteUrl = link.href;
+            let absoluteUrl = link.href;
             link = null;
             return absoluteUrl;
         },
@@ -167,8 +110,19 @@ import Webcomponents from 'webcomponents-lite';
          * @returns {String}
          */
         getBaseUrl: function(url) {
-            var hashIndex = url.indexOf('#');
+            let hashIndex = url.indexOf('#');
             return hashIndex === -1 ? url.slice(0) : url.slice(0, hashIndex);
+        },
+        /**
+         * 获取页面hash
+         * @param  {[type]} str [description]
+         * @return {[type]}     [description]
+         */
+        getHashpage(str) {
+            let hash = str === undefined ? location.hash : str;
+            let _hash = hash.split('#')[1];
+            let hashIndex = _hash.indexOf('/');
+            return hashIndex === -1 ? '' : _hash.slice(hashIndex + 1);
         },
         /**
          * 把一个字符串的 url 转为一个可获取其 base 和 fragment 等的对象
@@ -177,12 +131,14 @@ import Webcomponents from 'webcomponents-lite';
          * @returns {UrlObject}
          */
         toUrlObject: function(url) {
-            var fullUrl = this.getAbsoluteUrl(url),
+            let fullUrl = this.getAbsoluteUrl(url),
                 baseUrl = this.getBaseUrl(fullUrl),
+                hashUrl = this.getHashpage(url),
                 fragment = this.getUrlFragment(url);
             return {
                 base: baseUrl,
                 full: fullUrl,
+                hash: hashUrl,
                 original: url,
                 fragment: fragment
             };
@@ -247,54 +203,8 @@ import Webcomponents from 'webcomponents-lite';
                     oldHash = newHash;
                 }
             }, 100);
-        },
-        /**
-         * 判断href发生改变状态
-         * @param  {[type]} oldURL [description]
-         * @param  {[type]} newURL [description]
-         * @return {[type]}        [description]
-         */
-        changehref(oldURL, newURL) {
-            let _self = this;
-            if (oldURL.indexOf('#') == -1) {
-                return;
-            }
-            let oldPage = this.getHashpage(oldURL);
-            // let oldAction = this.getHashaction(oldURL);
-            // let oldSearch = this.getHashsearch(oldURL);
-            let newPage = this.getHashpage(newURL);
-            // let newAction = this.getHashaction(newURL);
-            // let newSearch = this.getHashsearch(newURL);
-            // console.log(oldAction,newAction);
-            if (oldPage != newPage) {
-                _self.change = 'changePage';
-                return 'changePage';
-            }
-
-            // if (oldAction != newAction) {
-            //  _self.change = 'changeAction';
-            //  return 'changeAction';
-            // }
-
-            // if (oldSearch != newSearch) {
-            //  _self.change = 'changeSearch';
-            //  return 'changeSearch';
-            // }
-        },
-        /**
-         * 获取页面hash
-         * @param  {[type]} str [description]
-         * @return {[type]}     [description]
-         */
-        getHashpage(str) {
-            let hash = str === undefined ? location.hash : str;
-            hash = hash.split('#')[1];
-
-            if (hash.indexOf('?') > -1) {
-                hash = hash.split('?')[0];
-            }
-            return hash;
         }
+
     }
 
     var routerConfig = {
@@ -329,6 +239,9 @@ import Webcomponents from 'webcomponents-lite';
             Util.oldchange();
             window.addEventListener('popstate', this._onPopState.bind(this));
             window.addEventListener("hashchange", this._onHashchange.bind(this), false);
+            // window.addEventListener("HTMLImportsLoaded", function(e) {
+            //     console.log('正在进行终止其他导入预判');
+            // });
         }
 
         /**
@@ -348,61 +261,14 @@ import Webcomponents from 'webcomponents-lite';
             this.$view = $('body');
 
             // 用来保存 document 的 map
-            this.cache = {};
+            this.cache = [];
             let $doc = $(document);
             let currentUrl = location.href;
             let $pages = $('.' + routerConfig.pageClass);
 
             if (!$pages.length) {
-                this._setLocation();
+                this._switchToDocument();
                 return;
-            }
-
-            this._saveDocumentIntoCache($doc, currentUrl);
-
-            let curPageId;
-
-            let currentUrlObj = Util.toUrlObject(currentUrl);
-            let $allSection = $doc.find('.' + routerConfig.pageClass);
-            let $visibleSection = $doc.find('.' + routerConfig.curPageClass);
-            let $curVisibleSection = $visibleSection.eq(0);
-            let $hashSection;
-
-            if (currentUrlObj.fragment) {
-                $hashSection = $doc.find('#' + currentUrlObj.fragment);
-            }
-            if ($hashSection && $hashSection.length) {
-                $visibleSection = $hashSection.eq(0);
-            } else if (!$visibleSection.length) {
-                $visibleSection = $allSection.eq(0);
-            }
-            if (!$visibleSection.attr('id')) {
-                $visibleSection.attr('id', this._generateRandomId());
-            }
-
-            if ($curVisibleSection.length && ($curVisibleSection.attr('id') !== $visibleSection.attr('id'))) {
-                // 在 router 到 inner page 的情况下，刷新（或者直接访问该链接）
-                // 直接切换 class 会有「闪」的现象,或许可以采用 animateSection 来减缓一下
-                $curVisibleSection.removeClass(routerConfig.curPageClass);
-                $visibleSection.addClass(routerConfig.curPageClass);
-            } else {
-                $visibleSection.addClass(routerConfig.curPageClass);
-            }
-            curPageId = $visibleSection.attr('id');
-
-
-            // 新进入一个使用 history.state 相关技术的页面时，如果第一个 state 不 push/replace,
-            // 那么在后退回该页面时，将不触发 popState 事件
-            if (theHistory.state === null) {
-                let curState = {
-                    id: this._getNextStateId(),
-                    url: Util.toUrlObject(currentUrl),
-                    pageId: curPageId
-                };
-
-                theHistory.replaceState(curState, '', currentUrl);
-                this._saveAsCurrentState(curState);
-                this._incMaxStateId();
             }
         }
 
@@ -420,12 +286,8 @@ import Webcomponents from 'webcomponents-lite';
                 ignoreCache = false;
             }
 
-            if (this._isTheSameDocument(location.href, url)) {
-                this._switchToSection(Util.getUrlFragment(url));
-            } else {
-                this._saveDocumentIntoCache($(document), location.href);
-                this._switchToDocument(url, ignoreCache);
-            }
+            this._saveDocumentIntoCache($(document), location.href);
+            this._switchToDocument(ignoreCache);
         }
 
         /**
@@ -474,151 +336,11 @@ import Webcomponents from 'webcomponents-lite';
 
             if (route.children) {
                 route.children.forEach(function(child) {
-                    let childMatchAs = route.path ?
-                        (route.path + child.path) :
-                        undefined;
+                    let childMatchAs = child.path;
                     _this._addRouteRecord(child, pathList, _this, childMatchAs);
                 });
             }
             pathList.push(routes);
-        }
-
-        /**
-         * 模板导入
-         * @return {[type]}       [description]
-         */
-        _tplImport(param) {
-            let _self = this;
-            let link = document.createElement('link');
-            link.rel = 'import';
-            link.id = param.name;
-            link.href = param.path;
-
-            link.onload = function(e) {
-                console.log('Loaded import: ' + e.target.href);
-                let _target = e.target.import;
-                // console.log(_target.children);
-                let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
-                let ht = $(bodyHTML);
-                console.log(ht);
-                if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML == '') {
-                    for (let i = 0; i < _target.head.children.length; i++) {
-                        _self.setTpl(_target.head.children[i].id, _target.head.children[i].innerHTML);
-                    }
-                } else if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML != '') {
-                    bodyHTML = _target.head.innerHTML + bodyHTML;
-                }
-
-                //MAC safari bug
-                if (bodyHTML == '') {
-                    for (let i = 0; i < _target.children.length; i++) {
-                        bodyHTML = bodyHTML + _target.children[i].outerHTML;
-                    }
-                }
-
-                // _self.setTpl(param.name, bodyHTML);
-
-                // if (typeof(param.dom) != 'undefined' && param.init) {
-                //     console.log('进入加载dom ' + param.name);
-                //     _self.setdom(param);
-                // }
-
-                // if (typeof(param.component) != 'undefined') {
-                //     param.component.init();
-                // }
-                // //加载完成后清除头部引用
-                // if (!link.readyState || 'link' === link.readyState || 'complete' === link.readyState) {
-                //     link.onload = link.onreadystatechange = null;
-                //     link.parentNode.removeChild(link);
-                // }
-
-            };
-            link.onerror = function(e) {
-                console.error(MSG.errorsupport + e.target.href);
-                return;
-            };
-            document.head.appendChild(link);
-
-        }
-
-        _createTemplate(Href) {
-            let rules = this.matcher;
-            console.log(rules);
-            console.log(Href);
-            let i = _.findKey(rules, ['path', Href]);
-
-            if (rules[i]) {
-                console.log('router匹配成功');
-                this._tplImport(rules[i].template);
-            }else {
-                console.log('404未找到该页面');
-            }
-        }
-
-        /**
-         * 重置导航
-         *
-         * - 重置HASH并导入页面
-         */
-        _setLocation(_name) {
-            //重置默认导航
-            if (location.hash == '' || location.hash == '#' || location.hash === undefined) {
-                console.log('验证登录状态');
-                console.log('成功调转首页HOME');
-                location.hash = '#/home';
-            }else {
-                if (_name === undefined || _name == '') {
-                    console.log('再次验证登录状态');
-                    let _page = Util.getHashpage();
-                    console.log('验证成功正加载：' + _page + '页面');
-                    this._createTemplate(_page);
-                } else {
-                    console.log('正加载：' + _name + '页面');
-                    this._createTemplate(_name);
-                }
-            }
-        }
-
-        /**
-         * hashchange事件
-         *
-         */
-        _onHashchange(e) {
-            console.log('hashchange');
-            let _page = Util.getHashpage();
-            Util.changehref(e.oldURL, e.newURL);
-            this._setLocation(_page);
-            // if('Modal' in window){
-            //  Modal.close();
-            // }
-        }
-
-        /**
-         * 切换显示当前文档另一个块
-         *
-         * 把新块从右边切入展示，同时会把新的块的记录用 history.pushState 来保存起来
-         *
-         * 如果已经是当前显示的块，那么不做任何处理；
-         * 如果没对应的块，那么忽略。
-         *
-         * @param {String} sectionId 待切换显示的块的 id
-         * @private
-         */
-       _switchToSection(sectionId) {
-            if (!sectionId) {
-                return;
-            }
-
-            var $curPage = this._getCurrentSection(),
-                $newPage = $('#' + sectionId);
-
-            // 如果已经是当前页，不做任何处理
-            if ($curPage === $newPage) {
-                return;
-            }
-
-            this._animateSection($curPage, $newPage, DIRECTION.rightToLeft);
-            this._pushNewState('#' + sectionId, sectionId);
         }
 
         /**
@@ -631,23 +353,36 @@ import Webcomponents from 'webcomponents-lite';
          * 注意：不能在这里以及其之后用 location.href 来 **读取** 切换前的页面的 url，
          *     因为如果是 popState 时的调用，那么此时 location 已经是 pop 出来的 state 的了
          *
-         * @param {String} url 新的文档的 url
          * @param {Boolean=} ignoreCache 是否不使用缓存强制加载页面
          * @param {Boolean=} isPushState 是否需要 pushState
          * @param {String=} direction 新文档切入的方向
          * @private
          */
-        _switchToDocument(url, ignoreCache, isPushState, direction) {
-            var baseUrl = Util.toUrlObject(url).base;
-
-            if (ignoreCache) {
-                delete this.cache[baseUrl];
+        _switchToDocument(ignoreCache, isPushState, direction) {
+            if (ignoreCache === undefined) {
+                ignoreCache = false;
             }
 
-            var cacheDocument = this.cache[baseUrl];
-            var context = this;
+            console.log('验证登录状态');
+            console.log('当前HASH' + location.hash);
+            //重置默认导航
+            if (location.hash == '' || location.hash == '#' || location.hash === undefined) {
+                console.log('hash为空默认调转 #/home');
+                return location.hash = '#/' + CONFIG.rootUrl;
+            }
 
+            let url = Util.getHashpage();
+            console.log('验证成功正加载：' + url + '页面');
+            console.log(url);
+            if (ignoreCache) {
+                delete this.cache[url];
+            }
+            console.log(this.cache);
+            let cacheDocument = this.cache[url];
+            let context = this;
+            console.log(cacheDocument);
             if (cacheDocument) {
+                console.log(465);
                 this._doSwitchDocument(url, isPushState, direction);
             } else {
                 this._loadDocument(url, {
@@ -656,11 +391,11 @@ import Webcomponents from 'webcomponents-lite';
                             context._parseDocument(url, $doc);
                             context._doSwitchDocument(url, isPushState, direction);
                         } catch (e) {
-                            location.href = url;
+                            location.hash = url;
                         }
                     },
                     error: function() {
-                        location.href = url;
+                        location.hash = url;
                     }
                 });
             }
@@ -681,66 +416,53 @@ import Webcomponents from 'webcomponents-lite';
          */
         _doSwitchDocument(url, isPushState, direction) {
             if (typeof isPushState === 'undefined') {
-                isPushState = true;
+                isPushState = false;
             }
 
-            var urlObj = Util.toUrlObject(url);
-            var $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
-            var $newDoc = $($('<div></div>').append(this.cache[urlObj.base].$content).html());
+            console.log(url);
+            console.log(this.cache);
 
-            // 确定一个 document 展示 section 的顺序
-            // 1. 与 hash 关联的 element
-            // 2. 默认的标识为 current 的 element
-            // 3. 第一个 section
-            var $allSection = $newDoc.find('.' + routerConfig.pageClass);
-            var $visibleSection = $newDoc.find('.' + routerConfig.curPageClass);
-            var $hashSection;
+            let $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
+            let $newDoc = $($('<div></div>').append(this.cache[url].$content).html());
 
-            if (urlObj.fragment) {
-                $hashSection = $newDoc.find('#' + urlObj.fragment);
-            }
-            if ($hashSection && $hashSection.length) {
-                $visibleSection = $hashSection.eq(0);
-            } else if (!$visibleSection.length) {
+            let $allSection = $newDoc.find('.' + routerConfig.pageClass);
+            let $visibleSection = $newDoc.find('.' + routerConfig.curPageClass);
+
+            if (!$visibleSection.length) {
                 $visibleSection = $allSection.eq(0);
             }
             if (!$visibleSection.attr('id')) {
                 $visibleSection.attr('id', this._generateRandomId());
             }
 
-            var $currentSection = this._getCurrentSection();
-            $currentSection.trigger(EVENTS.beforePageSwitch, [$currentSection.attr('id'), $currentSection]);
+            let $currentSection = this._getCurrentSection();
 
-            $allSection.removeClass(routerConfig.curPageClass);
+            if (!$currentSection.length) {
+                $currentSection.trigger(EVENTS.beforePageSwitch, [$currentSection.attr('id'), $currentSection]);
+            }
+
+            if (!$allSection.length) {
+                $allSection.removeClass(routerConfig.curPageClass);
+            }
+
             $visibleSection.addClass(routerConfig.curPageClass);
 
             // prepend 而不 append 的目的是避免 append 进去新的 document 在后面，
             // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
             this.$view.prepend($newDoc);
 
-            this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
-
+            if (!$currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
             if (isPushState) {
                 this._pushNewState(url, $visibleSection.attr('id'));
             }
         }
 
         /**
-         * 判断两个 url 指向的页面是否是同一个
-         *
-         * 判断方式: 如果两个 url 的 base 形式（不带 hash 的绝对形式）相同，那么认为是同一个页面
-         *
-         * @param {String} url
-         * @param {String} anotherUrl
-         * @returns {Boolean}
-         * @private
+         * 模板导入
+         * @return {[type]}       [description]
          */
-        _isTheSameDocument(url, anotherUrl) {
-            return Util.toUrlObject(url).base === Util.toUrlObject(anotherUrl).base;
-        }
-
         /**
-         * ajax 加载 url 指定的页面内容
+         * link import 加载 url 指定的页面内容
          *
          * 加载过程中会发出以下事件
          *  pageLoadCancel: 如果前一个还没加载完,那么取消并发送该事件
@@ -752,42 +474,44 @@ import Webcomponents from 'webcomponents-lite';
          * @param {String} url url
          * @param {Object=} callback 回调函数配置，可选，可以配置 success\error 和 complete
          *      所有回调函数的 this 都是 null，各自实参如下：
-         *      success: $doc, status, xhr
-         *      error: xhr, status, err
-         *      complete: xhr, status
+         *      success: $doc
+         *      error: e
          *
          * @private
          */
-       _loadDocument(url, callback) {
-            if (this.xhr && this.xhr.readyState < 4) {
-                this.xhr.onreadystatechange = function() {
-                };
-                this.xhr.abort();
-                this.dispatch(EVENTS.pageLoadCancel);
-            }
-
-            this.dispatch(EVENTS.pageLoadStart);
-
+        _loadDocument(url, callback) {
+            console.log('进入导入');
+            let _self = this;
+            let param = _self._createTemplate(url);
+            let link = document.createElement('link');
+            link.rel = 'import';
+            link.id = param.name;
+            link.href = param.path;
             callback = callback || {};
-            var self = this;
 
-            this.xhr = $.ajax({
-                url: url,
-                success: $.proxy(function(data, status, xhr) {
-                    // 给包一层 <html/>，从而可以拿到完整的结构
-                    var $doc = $('<html></html>');
-                    $doc.append(data);
-                    callback.success && callback.success.call(null, $doc, status, xhr);
-                }, this),
-                error: function(xhr, status, err) {
-                    callback.error && callback.error.call(null, xhr, status, err);
-                    self.dispatch(EVENTS.pageLoadError);
-                },
-                complete: function(xhr, status) {
-                    callback.complete && callback.complete.call(null, xhr, status);
-                    self.dispatch(EVENTS.pageLoadComplete);
+            link.onload = function(e) {
+                console.log('Loaded import: ' + e.target.href);
+                let _target = e.target.import;
+                let $doc = $(_target);
+
+                callback.success && callback.success.call(null, $doc);
+
+                //加载完成后清除头部引用
+                if (!link.readyState || 'link' === link.readyState || 'complete' === link.readyState) {
+                    link.onload = link.onreadystatechange = null;
+                    link.parentNode.removeChild(link);
                 }
-            });
+
+            };
+            link.onerror = function(e) {
+                console.error(MSG.errorsupport + e.target.href);
+                callback.error && callback.error.call(null, e);
+                self.dispatch(EVENTS.pageLoadError);
+                return;
+            };
+
+            _self.dispatch(EVENTS.pageLoadStart);
+            document.head.appendChild(link);
         }
 
         /**
@@ -798,8 +522,7 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _parseDocument(url, $doc) {
-            var $innerView = $doc.find('.' + routerConfig.sectionGroupClass);
-
+            let $innerView = $doc.find('.' + routerConfig.sectionGroupClass);
             if (!$innerView.length) {
                 throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
             }
@@ -817,10 +540,9 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _saveDocumentIntoCache(doc, url) {
-            var urlAsKey = Util.toUrlObject(url).base;
-            var $doc = $(doc);
+            let $doc = $(doc);
 
-            this.cache[urlAsKey] = {
+            this.cache[url] = {
                 $doc: $doc,
                 $content: $doc.find('.' + routerConfig.sectionGroupClass)
             };
@@ -835,7 +557,7 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _getLastState() {
-            var currentState = sessionStorage.getItem(this.sessionNames.currentState);
+            let currentState = sessionStorage.getItem(this.sessionNames.currentState);
             try {
                 currentState = JSON.parse(currentState);
             } catch(e) {
@@ -864,7 +586,7 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _getNextStateId() {
-            var maxStateId = sessionStorage.getItem(this.sessionNames.maxStateId);
+            let maxStateId = sessionStorage.getItem(this.sessionNames.maxStateId);
             return maxStateId ? parseInt(maxStateId, 10) + 1 : 1;
         }
 
@@ -888,7 +610,8 @@ import Webcomponents from 'webcomponents-lite';
          */
         _animateDocument($from, $to, $visibleSection, direction) {
             var sectionId = $visibleSection.attr('id');
-
+            console.log('进入了动画切换函数');
+            return;
 
             var $visibleSectionInFrom = $from.find('.' + routerConfig.curPageClass);
             $visibleSectionInFrom.addClass(routerConfig.visiblePageClass).removeClass(routerConfig.curPageClass);
@@ -910,6 +633,72 @@ import Webcomponents from 'webcomponents-lite';
                 // 外层（init.js）中会绑定 pageInitInternal 事件，然后对页面进行初始化
                 $visibleSection.trigger(EVENTS.pageInit, [sectionId, $visibleSection]);
             });
+        }
+
+        /**
+         * 匹配路由
+         * @param  {[type]} Href [description]
+         * @return {[type]}      [description]
+         */
+        _createTemplate(Href) {
+            let rules = this.matcher;
+            let template = false;
+            console.log(rules);
+            console.log(Href);
+
+            rules.forEach(function(child) {
+                let name = child.name !== undefined ? child.name : CONFIG.rootUrl;
+                if (Href == name) template = child;
+            });
+
+            return template;
+        }
+
+        /**
+         * hashchange事件
+         *
+         */
+        _onHashchange(e) {
+            console.log('hashchange');
+            this._changehref(e.oldURL, e.newURL);
+            this._switchToDocument();
+            // if('Modal' in window){
+            //  Modal.close();
+            // }
+        }
+
+        /**
+         * 判断href发生改变状态
+         * @param  {[type]} oldURL [description]
+         * @param  {[type]} newURL [description]
+         * @return {[type]}        [description]
+         */
+        _changehref(oldURL, newURL) {
+            let _self = this;
+            if (oldURL.indexOf('#') == -1) {
+                return;
+            }
+            let oldPage = Util.getHashpage(oldURL);
+            // let oldAction = Util.getHashaction(oldURL);
+            // let oldSearch = Util.getHashsearch(oldURL);
+            let newPage = Util.getHashpage(newURL);
+            // let newAction = Util.getHashaction(newURL);
+            // let newSearch = Util.getHashsearch(newURL);
+            // console.log(oldAction,newAction);
+            if (oldPage != newPage) {
+                this.change = 'changePage';
+                return 'changePage';
+            }
+
+            // if (oldAction != newAction) {
+            //  _self.change = 'changeAction';
+            //  return 'changeAction';
+            // }
+
+            // if (oldSearch != newSearch) {
+            //  _self.change = 'changeSearch';
+            //  return 'changeSearch';
+            // }
         }
 
         /**
@@ -1055,16 +844,16 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _onPopState(event) {
-            var state = event.state;
+            let state = event.state;
             // if not a valid state, do nothing
             if (!state || !state.pageId) {
                 return;
             }
 
-            var lastState = this._getLastState();
+            let lastState = this._getLastState();
 
             if (!lastState) {
-                console.error && console.error('Missing last state when backward or forward');
+                console.error && console.error(MSG.errorLastState);
                 return;
             }
 
@@ -1089,10 +878,10 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _pushNewState(url, sectionId) {
-            var state = {
+            let state = {
                 id: this._getNextStateId(),
                 pageId: sectionId,
-                url: Util.toUrlObject(url)
+                url: url
             };
 
             theHistory.pushState(state, '', url);
@@ -1110,13 +899,16 @@ import Webcomponents from 'webcomponents-lite';
             return "page-" + (+new Date());
         }
 
+        /**
+         * 创建并触发自定义函数
+         * @param  {[type]} event EVENTS事件
+         */
         dispatch(event) {
-            var e = new CustomEvent(event, {
+            let e = new CustomEvent(event, {
                 bubbles: true,
                 cancelable: true
             });
 
-            //noinspection JSUnresolvedFunction
             window.dispatchEvent(e);
         }
 
