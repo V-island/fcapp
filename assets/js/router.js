@@ -118,7 +118,7 @@ import Webcomponents from 'webcomponents-lite';
          * @param  {[type]} str [description]
          * @return {[type]}     [description]
          */
-        getHashpage(str) {
+        getHashpage: function(str) {
             let hash = str === undefined ? location.hash : str;
             let _hash = hash.split('#')[1];
             let hashIndex = _hash.indexOf('/');
@@ -131,6 +131,7 @@ import Webcomponents from 'webcomponents-lite';
          * @returns {UrlObject}
          */
         toUrlObject: function(url) {
+            console.log(url);
             let fullUrl = this.getAbsoluteUrl(url),
                 baseUrl = this.getBaseUrl(fullUrl),
                 hashUrl = this.getHashpage(url),
@@ -162,7 +163,7 @@ import Webcomponents from 'webcomponents-lite';
          * @param  {[type]} str [description]
          * @return {[type]}     [description]
          */
-        replaceNote(str) {
+        replaceNote: function(str) {
             return str.replace(/(\n)/g, '')
                 .replace(/(\t)/g, '')
                 .replace(/(\r)/g, '')
@@ -176,7 +177,7 @@ import Webcomponents from 'webcomponents-lite';
          * 监听URL
          * @return {[type]} [description]
          */
-        oldchange() {
+        oldchange: function() {
             if ("onhashchange" in window.document.body) {
                 return;
             }
@@ -237,11 +238,8 @@ import Webcomponents from 'webcomponents-lite';
             this._init();
             this.xhr = null;
             Util.oldchange();
-            window.addEventListener('popstate', this._onPopState.bind(this));
+            window.addEventListener('popstate', this._onPopState.bind(this), false);
             window.addEventListener("hashchange", this._onHashchange.bind(this), false);
-            // window.addEventListener("HTMLImportsLoaded", function(e) {
-            //     console.log('正在进行终止其他导入预判');
-            // });
         }
 
         /**
@@ -261,39 +259,18 @@ import Webcomponents from 'webcomponents-lite';
             this.$view = $('body');
 
             // 用来保存 document 的 map
-            this.cache = [];
-            let $doc = $(document);
-            let currentUrl = location.href;
+            this.cache = {};
             let $pages = $('.' + routerConfig.pageClass);
-
             if (!$pages.length) {
-                this._switchToDocument();
-                return;
+                this._switchToDocument(location.href);
             }
-        }
-
-        /**
-         * 切换到 url 指定的块或文档
-         *
-         * 如果 url 指向的是当前页面，那么认为是切换块；
-         * 否则是切换文档
-         *
-         * @param {String} url url
-         * @param {Boolean=} ignoreCache 是否强制请求不使用缓存，对 document 生效，默认是 false
-         */
-        load(url, ignoreCache) {
-            if (ignoreCache === undefined) {
-                ignoreCache = false;
-            }
-
-            this._saveDocumentIntoCache($(document), location.href);
-            this._switchToDocument(ignoreCache);
         }
 
         /**
          * 调用 history.forward()
          */
         forward() {
+            // theHistory.go(1);
             theHistory.forward();
         }
 
@@ -301,6 +278,7 @@ import Webcomponents from 'webcomponents-lite';
          * 调用 history.back()
          */
         back() {
+            // theHistory.go(-1);
             theHistory.back();
         }
 
@@ -329,18 +307,47 @@ import Webcomponents from 'webcomponents-lite';
         _addRouteRecord(route, oldPathList, _this, matchAs) {
             let pathList = oldPathList || [];
             let routes = {
-                path: matchAs === undefined ? route.path : matchAs,
-                name: route.name,
+                name: matchAs === undefined ? route.name : matchAs,
+                path: route.path,
+                component: route.component,
                 template: route.template || true,
             };
 
             if (route.children) {
                 route.children.forEach(function(child) {
-                    let childMatchAs = child.path;
+                    let childMatchAs = child.name ? (route.name +'/'+ child.name) : undefined;
                     _this._addRouteRecord(child, pathList, _this, childMatchAs);
                 });
             }
             pathList.push(routes);
+        }
+
+        /**
+         * 切换显示当前文档另一个块
+         *
+         * 把新块从右边切入展示，同时会把新的块的记录用 history.pushState 来保存起来
+         *
+         * 如果已经是当前显示的块，那么不做任何处理；
+         * 如果没对应的块，那么忽略。
+         *
+         * @param {String} sectionId 待切换显示的块的 id
+         * @private
+         */
+        _switchToSection(sectionId) {
+            if (!sectionId) {
+                return;
+            }
+
+            var $curPage = this._getCurrentSection(),
+                $newPage = $('#' + sectionId);
+
+            // 如果已经是当前页，不做任何处理
+            if ($curPage === $newPage) {
+                return;
+            }
+
+            this._animateSection($curPage, $newPage, DIRECTION.rightToLeft);
+            this._pushNewState('#' + sectionId, sectionId);
         }
 
         /**
@@ -353,36 +360,31 @@ import Webcomponents from 'webcomponents-lite';
          * 注意：不能在这里以及其之后用 location.href 来 **读取** 切换前的页面的 url，
          *     因为如果是 popState 时的调用，那么此时 location 已经是 pop 出来的 state 的了
          *
+         * @param {String} url 新的文档的 url
          * @param {Boolean=} ignoreCache 是否不使用缓存强制加载页面
          * @param {Boolean=} isPushState 是否需要 pushState
          * @param {String=} direction 新文档切入的方向
          * @private
          */
-        _switchToDocument(ignoreCache, isPushState, direction) {
+        _switchToDocument(url, ignoreCache, isPushState, direction) {
             if (ignoreCache === undefined) {
                 ignoreCache = false;
             }
 
             console.log('验证登录状态');
-            console.log('当前HASH' + location.hash);
-            //重置默认导航
-            if (location.hash == '' || location.hash == '#' || location.hash === undefined) {
+            if (location.hash == '' || location.hash == '#/' || location.hash === undefined) {
                 console.log('hash为空默认调转 #/home');
                 return location.hash = '#/' + CONFIG.rootUrl;
             }
 
-            let url = Util.getHashpage();
-            console.log('验证成功正加载：' + url + '页面');
             console.log(url);
+            console.log('验证成功正加载：' + url + '页面');
             if (ignoreCache) {
                 delete this.cache[url];
             }
-            console.log(this.cache);
             let cacheDocument = this.cache[url];
             let context = this;
-            console.log(cacheDocument);
             if (cacheDocument) {
-                console.log(465);
                 this._doSwitchDocument(url, isPushState, direction);
             } else {
                 this._loadDocument(url, {
@@ -416,11 +418,8 @@ import Webcomponents from 'webcomponents-lite';
          */
         _doSwitchDocument(url, isPushState, direction) {
             if (typeof isPushState === 'undefined') {
-                isPushState = false;
+                isPushState = true;
             }
-
-            console.log(url);
-            console.log(this.cache);
 
             let $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
             let $newDoc = $($('<div></div>').append(this.cache[url].$content).html());
@@ -431,6 +430,7 @@ import Webcomponents from 'webcomponents-lite';
             if (!$visibleSection.length) {
                 $visibleSection = $allSection.eq(0);
             }
+
             if (!$visibleSection.attr('id')) {
                 $visibleSection.attr('id', this._generateRandomId());
             }
@@ -446,15 +446,29 @@ import Webcomponents from 'webcomponents-lite';
             }
 
             $visibleSection.addClass(routerConfig.curPageClass);
-
             // prepend 而不 append 的目的是避免 append 进去新的 document 在后面，
             // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
             this.$view.prepend($newDoc);
 
-            if (!$currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
+            if ($currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
             if (isPushState) {
                 this._pushNewState(url, $visibleSection.attr('id'));
             }
+        }
+
+        /**
+         * 判断两个 url 指向的页面是否是同一个
+         *
+         * 判断方式: 如果两个 url 的 hash 形式相同，那么认为是同一个页面
+         *
+         * @param {String} url
+         * @param {String} anotherUrl
+         * @returns {Boolean}
+         * @private
+         */
+        _isTheSameDocument(url, anotherUrl) {
+            console.log(url, anotherUrl);
+            return Util.toUrlObject(url).hash === Util.toUrlObject(anotherUrl).hash;
         }
 
         /**
@@ -480,7 +494,6 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _loadDocument(url, callback) {
-            console.log('进入导入');
             let _self = this;
             let param = _self._createTemplate(url);
             let link = document.createElement('link');
@@ -509,9 +522,32 @@ import Webcomponents from 'webcomponents-lite';
                 self.dispatch(EVENTS.pageLoadError);
                 return;
             };
-
+            console.log(param);
             _self.dispatch(EVENTS.pageLoadStart);
             document.head.appendChild(link);
+            _self._readyImport(param.component,'init');
+        }
+
+        _readyImport(obj, fn) {
+            var _self = this;
+            console.log(obj);
+            if(typeof(obj) == 'undefined'){
+                console.warn(MSG.cantfindobj);
+                return;
+            }
+
+            //console.log(window.WebComponents);
+            //读取成功后
+            window.addEventListener('HTMLImportsLoaded', function(e) {
+                console.log(e);
+                console.info(MSG.importready);
+                obj[fn]();
+            });
+
+            // window.addEventListener('WebComponentsReady', function(e) {
+            //     console.info(MSG.allready);
+            //     obj[fn]();
+            // });
         }
 
         /**
@@ -558,12 +594,13 @@ import Webcomponents from 'webcomponents-lite';
          */
         _getLastState() {
             let currentState = sessionStorage.getItem(this.sessionNames.currentState);
+
             try {
                 currentState = JSON.parse(currentState);
             } catch(e) {
                 currentState = null;
             }
-
+            console.log(currentState);
             return currentState;
         }
 
@@ -610,8 +647,6 @@ import Webcomponents from 'webcomponents-lite';
          */
         _animateDocument($from, $to, $visibleSection, direction) {
             var sectionId = $visibleSection.attr('id');
-            console.log('进入了动画切换函数');
-            return;
 
             var $visibleSectionInFrom = $from.find('.' + routerConfig.curPageClass);
             $visibleSectionInFrom.addClass(routerConfig.visiblePageClass).removeClass(routerConfig.curPageClass);
@@ -619,7 +654,6 @@ import Webcomponents from 'webcomponents-lite';
             $visibleSection.trigger(EVENTS.pageAnimationStart, [sectionId, $visibleSection]);
 
             this._animateElement($from, $to, direction);
-
             $from.animationEnd(function() {
                 $visibleSectionInFrom.removeClass(routerConfig.visiblePageClass);
                 // 移除 document 前后，发送 beforePageRemove 和 pageRemoved 事件
@@ -643,8 +677,7 @@ import Webcomponents from 'webcomponents-lite';
         _createTemplate(Href) {
             let rules = this.matcher;
             let template = false;
-            console.log(rules);
-            console.log(Href);
+            Href = Util.getHashpage(Href);
 
             rules.forEach(function(child) {
                 let name = child.name !== undefined ? child.name : CONFIG.rootUrl;
@@ -661,7 +694,8 @@ import Webcomponents from 'webcomponents-lite';
         _onHashchange(e) {
             console.log('hashchange');
             this._changehref(e.oldURL, e.newURL);
-            this._switchToDocument();
+            this._switchToDocument(e.newURL);
+
             // if('Modal' in window){
             //  Modal.close();
             // }
@@ -796,9 +830,9 @@ import Webcomponents from 'webcomponents-lite';
          */
         _back(state, fromState) {
             if (this._isTheSameDocument(state.url.full, fromState.url.full)) {
-                var $newPage = $('#' + state.pageId);
+                let $newPage = $('#' + state.pageId);
                 if ($newPage.length) {
-                    var $currentPage = this._getCurrentSection();
+                    let $currentPage = this._getCurrentSection();
                     this._animateSection($currentPage, $newPage, DIRECTION.leftToRight);
                     this._saveAsCurrentState(state);
                 } else {
@@ -820,9 +854,9 @@ import Webcomponents from 'webcomponents-lite';
          */
         _forward(state, fromState) {
             if (this._isTheSameDocument(state.url.full, fromState.url.full)) {
-                var $newPage = $('#' + state.pageId);
+                let $newPage = $('#' + state.pageId);
                 if ($newPage.length) {
-                    var $currentPage = this._getCurrentSection();
+                    let $currentPage = this._getCurrentSection();
                     this._animateSection($currentPage, $newPage, DIRECTION.rightToLeft);
                     this._saveAsCurrentState(state);
                 } else {
@@ -881,9 +915,8 @@ import Webcomponents from 'webcomponents-lite';
             let state = {
                 id: this._getNextStateId(),
                 pageId: sectionId,
-                url: url
+                url: Util.toUrlObject(url)
             };
-
             theHistory.pushState(state, '', url);
             this._saveAsCurrentState(state);
             this._incMaxStateId();
@@ -991,7 +1024,6 @@ import Webcomponents from 'webcomponents-lite';
 
         $(document).on('click', 'a', function(e) {
             let $target = $(e.currentTarget);
-
             let filterResult = customClickFilter($target);
             if (!filterResult) {
                 return;
@@ -1010,10 +1042,7 @@ import Webcomponents from 'webcomponents-lite';
                 if (!url || url === '#') {
                     return;
                 }
-
-                let ignoreCache = $target.attr('data-no-cache') === 'true';
-
-                router.load(url, ignoreCache);
+                location.hash = url;
             }
         });
     });

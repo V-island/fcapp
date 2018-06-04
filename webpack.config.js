@@ -33,7 +33,6 @@ module.exports = {
 			'./assets/js/router',
 			'./assets/js/last-position',
 			'./assets/js/init',
-			'./assets/sass/fc.scss'
 			// './assets/js/scroll-fix'
 		]
 		// ,extend: [
@@ -45,9 +44,10 @@ module.exports = {
 		// 	'./assets/js/city-data.js',
 		// 	'./assets/js/city-picker.js'
 		// ]
-		// ,main: [
-		// 	'./assets/sass/fc.scss'
-		// ]
+		,main: [
+			'./assets/sass/fc.scss',
+			
+		]
 	},
 	devtool: 'inline-source-map',
 	output: {

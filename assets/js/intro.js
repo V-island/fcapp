@@ -1,3 +1,11 @@
+// gages
+import Login from './pages/login';
+import Home from './pages/home';
+import Live from './pages/live';
+
+import User from './pages/user';
+import UserDetail from './pages/user_detail';
+
 + function($) {
     "use strict";
 
@@ -20,7 +28,7 @@
         pagesFile: [{
             name: 'login',
             path: '../pages/login.html',
-            // component: Login,
+            component: Login,
             dom: 'body',
             init: 1
         }, {
@@ -29,13 +37,13 @@
         }, {
             name: 'home',
             path: '../pages/home.html',
-            // component: Home,
+            component: Home,
             dom: 'body',
             init: 1
         }, {
             name: 'live',
             path: '../pages/live.html',
-            // component: Live,
+            component: Live,
             mode: 'replace',
             dom: 'body',
             init: 1
@@ -48,14 +56,14 @@
         }, {
             name: 'user',
             path: '../pages/user.html',
-            // component: User,
+            component: User,
             mode: 'replace',
             dom: 'body',
             init: 1,
             children: [{
-                name: 'user_detail',
+                name: 'detail',
                 path: '../pages/user_detail.html',
-                // component: UserDetail,
+                component: UserDetail,
                 mode: 'replace',
                 dom: 'body',
                 init: 1
