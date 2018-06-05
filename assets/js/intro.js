@@ -19,6 +19,12 @@ import UserDetail from './pages/user_detail';
     };
 
     const routes = {
+        //apihost:'http://192.168.8.15:9000',
+        //host:'http://120.76.84.82:8090/',
+        //apiip: 'http://192.168.0.126:8000',
+        //apitest: 'http://www.easy-mock.com/mock/59c4c72ee0dc663341b4ca37/v1/',
+        //pagesRoot: '../pages/',
+        importJs: '@webcomponents/webcomponentsjs/webcomponents-lite',
         publicFile: {
             actions_lives: {
                 name: 'actions_lives',
@@ -71,7 +77,8 @@ import UserDetail from './pages/user_detail';
         }]
     };
 
-    $.fcConfig = $.extend(defaults, $.config);
+    // $.fcConfig = $.extend(defaults, $.config);
+    $.fcConfig = defaults;
     $.routesConfig = routes;
 
 }(Zepto);

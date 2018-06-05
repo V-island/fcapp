@@ -1,5 +1,3 @@
-import Webcomponents from 'webcomponents-lite';
-
 +function($) {
 	'use strict';
 

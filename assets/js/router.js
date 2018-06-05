@@ -1,33 +1,5 @@
-import Webcomponents from 'webcomponents-lite';
-
 +function($) {
     'use strict';
-
-    /**
-     * 验证浏览器是否支持CustomEvent
-     * @return {boolean}
-     */
-    if (!window.CustomEvent) {
-        window.CustomEvent = function(type, config) {
-            config = config || { bubbles: false, cancelable: false, detail: undefined};
-            var e = document.createEvent('CustomEvent');
-            e.initCustomEvent(type, config.bubbles, config.cancelable, config.detail);
-            return e;
-        };
-
-        window.CustomEvent.prototype = window.Event.prototype;
-    }
-
-    /**
-     * 验证浏览器是否支持html import导入
-     * @return {boolean}
-     */
-    if (!'import' in document.createElement('link')) {
-        if (window.console && window.console.warn) {
-            console.warn(MSG.nosupport);
-        }
-        document.head.appendChild(Webcomponents);
-    }
 
     const CONFIG = {
         rootUrl: 'home'
@@ -67,6 +39,30 @@ import Webcomponents from 'webcomponents-lite';
         template: '../pages/test.html',
         component: false,
         dom: 'body'
+    }
+
+    /**
+     * 验证浏览器是否支持CustomEvent
+     * @return {boolean}
+     */
+    if (!window.CustomEvent) {
+        window.CustomEvent = function(type, config) {
+            config = config || { bubbles: false, cancelable: false, detail: undefined};
+            let e = document.createEvent('CustomEvent');
+            e.initCustomEvent(type, config.bubbles, config.cancelable, config.detail);
+            return e;
+        };
+
+        window.CustomEvent.prototype = window.Event.prototype;
+    }
+
+    /**
+     * 验证浏览器是否支持html import导入
+     * @return {boolean}
+     */
+    if (!('import' in document.createElement('link'))) {
+        console.log(MSG.nosupport);
+        require($.routesConfig.importJs);
     }
 
     let Util = {
@@ -149,7 +145,7 @@ import Webcomponents from 'webcomponents-lite';
          * @returns {Boolean}
          */
         supportStorage: function() {
-            var mod = 'fc.router.storage.ability';
+            let mod = 'fc.router.storage.ability';
             try {
                 sessionStorage.setItem(mod, mod);
                 sessionStorage.removeItem(mod);
@@ -208,7 +204,7 @@ import Webcomponents from 'webcomponents-lite';
 
     }
 
-    var routerConfig = {
+    let routerConfig = {
         sectionGroupClass: 'page-group',
         // 表示是当前 page 的 class
         curPageClass: 'page-current',
@@ -220,12 +216,12 @@ import Webcomponents from 'webcomponents-lite';
         pageClass: 'page'
     }
 
-    var DIRECTION = {
+    let DIRECTION = {
         leftToRight: 'from-left-to-right',
         rightToLeft: 'from-right-to-left'
     }
 
-    var theHistory = window.history;
+    let theHistory = window.history;
 
     class Router {
 
@@ -388,16 +384,16 @@ import Webcomponents from 'webcomponents-lite';
                 this._doSwitchDocument(url, isPushState, direction);
             } else {
                 this._loadDocument(url, {
-                    success: function($doc) {
+                    success: function($doc, $component) {
                         try {
-                            context._parseDocument(url, $doc);
+                            context._parseDocument(url, $doc, $component);
                             context._doSwitchDocument(url, isPushState, direction);
                         } catch (e) {
-                            location.hash = url;
+                            // location.hash = url;
                         }
                     },
                     error: function() {
-                        location.hash = url;
+                        // location.hash = url;
                     }
                 });
             }
@@ -449,7 +445,8 @@ import Webcomponents from 'webcomponents-lite';
             // prepend 而不 append 的目的是避免 append 进去新的 document 在后面，
             // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
             this.$view.prepend($newDoc);
-
+            console.log(this.cache);
+            this._readyImport(this.cache[url].$component,'init');
             if ($currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
             if (isPushState) {
                 this._pushNewState(url, $visibleSection.attr('id'));
@@ -467,7 +464,6 @@ import Webcomponents from 'webcomponents-lite';
          * @private
          */
         _isTheSameDocument(url, anotherUrl) {
-            console.log(url, anotherUrl);
             return Util.toUrlObject(url).hash === Util.toUrlObject(anotherUrl).hash;
         }
 
@@ -507,7 +503,7 @@ import Webcomponents from 'webcomponents-lite';
                 let _target = e.target.import;
                 let $doc = $(_target);
 
-                callback.success && callback.success.call(null, $doc);
+                callback.success && callback.success.call(null, $doc, param.component);
 
                 //加载完成后清除头部引用
                 if (!link.readyState || 'link' === link.readyState || 'complete' === link.readyState) {
@@ -515,34 +511,30 @@ import Webcomponents from 'webcomponents-lite';
                     link.parentNode.removeChild(link);
                 }
 
+                $('[data-ripple]').ripple();
             };
             link.onerror = function(e) {
                 console.error(MSG.errorsupport + e.target.href);
-                callback.error && callback.error.call(null, e);
+                // callback.error && callback.error.call(null, e);
                 self.dispatch(EVENTS.pageLoadError);
                 return;
             };
-            console.log(param);
             _self.dispatch(EVENTS.pageLoadStart);
             document.head.appendChild(link);
-            _self._readyImport(param.component,'init');
         }
 
         _readyImport(obj, fn) {
             var _self = this;
-            console.log(obj);
             if(typeof(obj) == 'undefined'){
                 console.warn(MSG.cantfindobj);
                 return;
             }
-
-            //console.log(window.WebComponents);
+            obj[fn](Zepto);
             //读取成功后
-            window.addEventListener('HTMLImportsLoaded', function(e) {
-                console.log(e);
-                console.info(MSG.importready);
-                obj[fn]();
-            });
+            // window.addEventListener('HTMLImportsLoaded', function(e) {
+            //     console.info(MSG.importready);
+            //     obj[fn]();
+            // });
 
             // window.addEventListener('WebComponentsReady', function(e) {
             //     console.info(MSG.allready);
@@ -557,13 +549,13 @@ import Webcomponents from 'webcomponents-lite';
          * @param $doc ajax 载入的页面的 jq 对象，可以看做是该页面的 $(document)
          * @private
          */
-        _parseDocument(url, $doc) {
+        _parseDocument(url, $doc, $component) {
             let $innerView = $doc.find('.' + routerConfig.sectionGroupClass);
             if (!$innerView.length) {
                 throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
             }
 
-            this._saveDocumentIntoCache($doc, url);
+            this._saveDocumentIntoCache($doc, url, $component);
         }
 
         /**
@@ -573,14 +565,16 @@ import Webcomponents from 'webcomponents-lite';
          *
          * @param {*} doc doc
          * @param {String} url url
+         * @param {*} component component
          * @private
          */
-        _saveDocumentIntoCache(doc, url) {
+        _saveDocumentIntoCache(doc, url, component) {
             let $doc = $(doc);
 
             this.cache[url] = {
                 $doc: $doc,
-                $content: $doc.find('.' + routerConfig.sectionGroupClass)
+                $content: $doc.find('.' + routerConfig.sectionGroupClass),
+                $component: component
             };
         }
 
@@ -678,7 +672,7 @@ import Webcomponents from 'webcomponents-lite';
             let rules = this.matcher;
             let template = false;
             Href = Util.getHashpage(Href);
-
+            console.log(Href);
             rules.forEach(function(child) {
                 let name = child.name !== undefined ? child.name : CONFIG.rootUrl;
                 if (Href == name) template = child;
@@ -695,7 +689,6 @@ import Webcomponents from 'webcomponents-lite';
             console.log('hashchange');
             this._changehref(e.oldURL, e.newURL);
             this._switchToDocument(e.newURL);
-
             // if('Modal' in window){
             //  Modal.close();
             // }

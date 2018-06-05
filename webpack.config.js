@@ -11,6 +11,9 @@ const webpack = require('webpack');
 module.exports = {
 	entry: {
 		fc: [
+			// 'es5-shim',
+			// 'es6-shim',
+			'./assets/js/components/webcomponents-bundle',
 			'./assets/js/intro',
 			'./assets/js/util',
 			'./assets/js/zepto-adapter',
@@ -29,10 +32,10 @@ module.exports = {
 			// './assets/js/infinite-scroll',
 			// './assets/js/searchbar',
 			'./assets/js/panels',
-			'./assets/js/html-import',
 			'./assets/js/router',
 			'./assets/js/last-position',
 			'./assets/js/init',
+			'./assets/sass/fc.scss'
 			// './assets/js/scroll-fix'
 		]
 		// ,extend: [
@@ -44,10 +47,6 @@ module.exports = {
 		// 	'./assets/js/city-data.js',
 		// 	'./assets/js/city-picker.js'
 		// ]
-		,main: [
-			'./assets/sass/fc.scss',
-			
-		]
 	},
 	devtool: 'inline-source-map',
 	output: {
@@ -55,7 +54,14 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist')
 	},
 	module: {
-		rules: [{
+		rules: [
+		// {
+		// 	test: /\.js$/,
+		// 	use: [{
+		// 		loader: "babel-loader"
+		// 	}]
+		// },
+		{
 			test: /\.scss$/,
 			use: ExtractTextPlugin.extract({
 				fallback: 'style-loader',
@@ -90,11 +96,13 @@ module.exports = {
 		}, {
 			test: require.resolve('jquery'),
 			use: [{
-				loader: 'expose-loader',
+				loader: 'exports-loader',
 				options: 'jQuery'
 			}, {
-				loader: 'expose-loader',
+				loader: 'exports-loader',
 				options: '$'
+			}, {
+				loader: 'script-loader'
 			}]
 		}, {
 			test: require.resolve('zepto'),
@@ -144,8 +152,9 @@ module.exports = {
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
-			Zepto: 'zepto',
-			_: 'lodash'
+			Zepto: 'zepto'
+			// _: 'lodash'
+			// template: 'es6-templates'
 		}),
 		new ExtractTextPlugin({
 			// filename: './css/[name].css',
