@@ -78,6 +78,16 @@ $names: search, filter, arrow-back, home, favorite, live, message, me, female, m
 
 }
 
+
+$messages: comment, friends, hi, like, message, service;
+
+@each $message in $messages {
+    .message-#{$message}{
+        @include iconImage($message, 'icons/messages');
+    }
+
+}
+
 $users: account, blacklist, live, price, score, setting, video, watch, invite, arrow-forward, arrow-forward-active, stars;
 
 @each $user in $users {

@@ -234,7 +234,6 @@
             this._init();
             this.xhr = null;
             Util.oldchange();
-            window.addEventListener('popstate', this._onPopState.bind(this));
             window.addEventListener("hashchange", this._onHashchange.bind(this), false);
         }
 
@@ -257,25 +256,18 @@
             // 用来保存 document 的 map
             this.cache = {};
             let $pages = $('.' + routerConfig.pageClass);
+            let currentUrl = location.href;
             if (!$pages.length) {
-                this._switchToDocument(location.href);
+                this._switchToDocument(currentUrl);
             }
-        }
-
-        /**
-         * 调用 history.forward()
-         */
-        forward() {
-            // theHistory.go(1);
-            theHistory.forward();
         }
 
         /**
          * 调用 history.back()
          */
         back() {
-            // theHistory.go(-1);
-            theHistory.back();
+            theHistory.go(-2);
+            // theHistory.back();
         }
 
         /**
@@ -319,34 +311,6 @@
         }
 
         /**
-         * 切换显示当前文档另一个块
-         *
-         * 把新块从右边切入展示，同时会把新的块的记录用 history.pushState 来保存起来
-         *
-         * 如果已经是当前显示的块，那么不做任何处理；
-         * 如果没对应的块，那么忽略。
-         *
-         * @param {String} sectionId 待切换显示的块的 id
-         * @private
-         */
-        _switchToSection(sectionId) {
-            if (!sectionId) {
-                return;
-            }
-
-            var $curPage = this._getCurrentSection(),
-                $newPage = $('#' + sectionId);
-
-            // 如果已经是当前页，不做任何处理
-            if ($curPage === $newPage) {
-                return;
-            }
-
-            this._animateSection($curPage, $newPage, DIRECTION.rightToLeft);
-            this._pushNewState('#' + sectionId, sectionId);
-        }
-
-        /**
          * 载入显示一个新的文档
          *
          * - 如果有缓存，那么直接利用缓存来切换
@@ -358,11 +322,10 @@
          *
          * @param {String} url 新的文档的 url
          * @param {Boolean=} ignoreCache 是否不使用缓存强制加载页面
-         * @param {Boolean=} isPushState 是否需要 pushState
          * @param {String=} direction 新文档切入的方向
          * @private
          */
-        _switchToDocument(url, ignoreCache, isPushState, direction) {
+        _switchToDocument(url, ignoreCache, direction) {
             if (ignoreCache === undefined) {
                 ignoreCache = false;
             }
@@ -381,13 +344,13 @@
             let cacheDocument = this.cache[url];
             let context = this;
             if (cacheDocument) {
-                this._doSwitchDocument(url, isPushState, direction);
+                this._doSwitchDocument(url, direction);
             } else {
                 this._loadDocument(url, {
                     success: function($doc, $component) {
                         try {
                             context._parseDocument(url, $doc, $component);
-                            context._doSwitchDocument(url, isPushState, direction);
+                            context._doSwitchDocument(url, direction);
                         } catch (e) {
                             // location.hash = url;
                         }
@@ -408,15 +371,10 @@
          * - 如果需要 pushState，那么把最新的状态 push 进去并把当前状态更新为该状态
          *
          * @param {String} url 待切换的文档的 url
-         * @param {Boolean} isPushState 加载页面后是否需要 pushState，默认是 true
          * @param {String} direction 动画切换方向，默认是 DIRECTION.rightToLeft
          * @private
          */
-        _doSwitchDocument(url, isPushState, direction) {
-            if (typeof isPushState === 'undefined') {
-                isPushState = true;
-            }
-
+        _doSwitchDocument(url, direction) {
             let $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
             let $newDoc = $($('<div></div>').append(this.cache[url].$content).html());
 
@@ -448,29 +406,8 @@
             console.log(this.cache);
             this._readyImport(this.cache[url].$component,'init');
             if ($currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
-            if (isPushState) {
-                this._pushNewState(url, $visibleSection.attr('id'));
-            }
         }
 
-        /**
-         * 判断两个 url 指向的页面是否是同一个
-         *
-         * 判断方式: 如果两个 url 的 hash 形式相同，那么认为是同一个页面
-         *
-         * @param {String} url
-         * @param {String} anotherUrl
-         * @returns {Boolean}
-         * @private
-         */
-        _isTheSameDocument(url, anotherUrl) {
-            return Util.toUrlObject(url).hash === Util.toUrlObject(anotherUrl).hash;
-        }
-
-        /**
-         * 模板导入
-         * @return {[type]}       [description]
-         */
         /**
          * link import 加载 url 指定的页面内容
          *
@@ -578,58 +515,6 @@
         }
 
         /**
-         * 从 sessionStorage 中获取保存下来的「当前状态」
-         *
-         * 如果解析失败，那么认为当前状态是 null
-         *
-         * @returns {State|null}
-         * @private
-         */
-        _getLastState() {
-            let currentState = sessionStorage.getItem(this.sessionNames.currentState);
-
-            try {
-                currentState = JSON.parse(currentState);
-            } catch(e) {
-                currentState = null;
-            }
-            console.log(currentState);
-            return currentState;
-        }
-
-        /**
-         * 把一个状态设为当前状态，保存仅 sessionStorage 中
-         *
-         * @param {State} state
-         * @private
-         */
-        _saveAsCurrentState(state) {
-            sessionStorage.setItem(this.sessionNames.currentState, JSON.stringify(state));
-        }
-
-        /**
-         * 获取下一个 state 的 id
-         *
-         * 读取 sessionStorage 里的最后的状态的 id，然后 + 1；如果原没设置，那么返回 1
-         *
-         * @returns {number}
-         * @private
-         */
-        _getNextStateId() {
-            let maxStateId = sessionStorage.getItem(this.sessionNames.maxStateId);
-            return maxStateId ? parseInt(maxStateId, 10) + 1 : 1;
-        }
-
-        /**
-         * 把 sessionStorage 里的最后状态的 id 自加 1
-         *
-         * @private
-         */
-        _incMaxStateId() {
-            sessionStorage.setItem(this.sessionNames.maxStateId, this._getNextStateId());
-        }
-
-        /**
          * 从一个文档切换为显示另一个文档
          *
          * @param $from 目前显示的文档
@@ -671,7 +556,6 @@
             let rules = this.matcher;
             let template = false;
             Href = Util.getHashpage(Href);
-            console.log(Href);
             rules.forEach(function(child) {
                 let name = child.name !== undefined ? child.name : CONFIG.rootUrl;
                 if (Href == name) template = child;
@@ -686,68 +570,17 @@
          */
         _onHashchange(e) {
             console.log('hashchange');
-            this._changehref(e.oldURL, e.newURL);
-            this._switchToDocument(e.newURL);
-            // if('Modal' in window){
-            //  Modal.close();
-            // }
-        }
-
-        /**
-         * 判断href发生改变状态
-         * @param  {[type]} oldURL [description]
-         * @param  {[type]} newURL [description]
-         * @return {[type]}        [description]
-         */
-        _changehref(oldURL, newURL) {
             let _self = this;
-            if (oldURL.indexOf('#') == -1) {
+            let oldURL = e.oldURL;
+            let newURL = e.newURL;
+
+            // if (oldURL.indexOf('#') == -1) {
+            //     return;
+            // }
+            if (!Util.getHashpage(newURL)) {
                 return;
             }
-            let oldPage = Util.getHashpage(oldURL);
-            // let oldAction = Util.getHashaction(oldURL);
-            // let oldSearch = Util.getHashsearch(oldURL);
-            let newPage = Util.getHashpage(newURL);
-            // let newAction = Util.getHashaction(newURL);
-            // let newSearch = Util.getHashsearch(newURL);
-            // console.log(oldAction,newAction);
-            if (oldPage != newPage) {
-                this.change = 'changePage';
-                return 'changePage';
-            }
-
-            // if (oldAction != newAction) {
-            //  _self.change = 'changeAction';
-            //  return 'changeAction';
-            // }
-
-            // if (oldSearch != newSearch) {
-            //  _self.change = 'changeSearch';
-            //  return 'changeSearch';
-            // }
-        }
-
-        /**
-         * 把当前文档的展示 section 从一个 section 切换到另一个 section
-         *
-         * @param $from
-         * @param $to
-         * @param direction
-         * @private
-         */
-        _animateSection($from, $to, direction) {
-            var toId = $to.attr('id');
-            $from.trigger(EVENTS.beforePageSwitch, [$from.attr('id'), $from]);
-
-            $from.removeClass(routerConfig.curPageClass);
-            $to.addClass(routerConfig.curPageClass);
-            $to.trigger(EVENTS.pageAnimationStart, [toId, $to]);
-            this._animateElement($from, $to, direction);
-            $to.animationEnd(function() {
-                $to.trigger(EVENTS.pageAnimationEnd, [toId, $to]);
-                // 外层（init.js）中会绑定 pageInitInternal 事件，然后对页面进行初始化
-                $to.trigger(EVENTS.pageInit, [toId, $to]);
-            });
+            this._switchToDocument(newURL);
         }
 
         /**
@@ -808,113 +641,6 @@
          */
         _getCurrentSection() {
             return this.$view.find('.' + routerConfig.curPageClass).eq(0);
-        }
-
-        /**
-         * popState 事件关联着的后退处理
-         *
-         * 判断两个 state 判断是否是属于同一个文档，然后做对应的 section 或文档切换；
-         * 同时在切换后把新 state 设为当前 state
-         *
-         * @param {State} state 新 state
-         * @param {State} fromState 旧 state
-         * @private
-         */
-        _back(state, fromState) {
-            if (this._isTheSameDocument(state.url.full, fromState.url.full)) {
-                let $newPage = $('#' + state.pageId);
-                if ($newPage.length) {
-                    let $currentPage = this._getCurrentSection();
-                    this._animateSection($currentPage, $newPage, DIRECTION.leftToRight);
-                    this._saveAsCurrentState(state);
-                } else {
-                    location.href = state.url.full;
-                }
-            } else {
-                this._saveDocumentIntoCache($(document), fromState.url.full);
-                this._switchToDocument(state.url.full, false, false, DIRECTION.leftToRight);
-                this._saveAsCurrentState(state);
-            }
-        }
-
-        /**
-         * popState 事件关联着的前进处理,类似于 _back，不同的是切换方向
-         *
-         * @param {State} state 新 state
-         * @param {State} fromState 旧 state
-         * @private
-         */
-        _forward(state, fromState) {
-            if (this._isTheSameDocument(state.url.full, fromState.url.full)) {
-                let $newPage = $('#' + state.pageId);
-                if ($newPage.length) {
-                    let $currentPage = this._getCurrentSection();
-                    this._animateSection($currentPage, $newPage, DIRECTION.rightToLeft);
-                    this._saveAsCurrentState(state);
-                } else {
-                    location.href = state.url.full;
-                }
-            } else {
-                this._saveDocumentIntoCache($(document), fromState.url.full);
-                this._switchToDocument(state.url.full, false, false, DIRECTION.rightToLeft);
-                this._saveAsCurrentState(state);
-            }
-        }
-
-        /**
-         * popState 事件处理
-         *
-         * 根据 pop 出来的 state 和当前 state 来判断是前进还是后退
-         *
-         * @param event
-         * @private
-         */
-        _onPopState(event) {
-            let state = event.state;
-            console.log(event);
-
-            // if not a valid state, do nothing
-            if (!state || !state.pageId) {
-                return;
-            }
-
-            let lastState = this._getLastState();
-            console.log(lastState);
-            return;
-            if (!lastState) {
-                console.error && console.error(MSG.errorLastState);
-                return;
-            }
-
-            if (state.id === lastState.id) {
-                return;
-            }
-
-            if (state.id < lastState.id) {
-                this._back(state, lastState);
-            } else {
-                this._forward(state, lastState);
-            }
-        }
-
-        /**
-         * 页面进入到一个新状态
-         *
-         * 把新状态 push 进去，设置为当前的状态，然后把 maxState 的 id +1。
-         *
-         * @param {String} url 新状态的 url
-         * @param {String} sectionId 新状态中显示的 section 元素的 id
-         * @private
-         */
-        _pushNewState(url, sectionId) {
-            let state = {
-                id: this._getNextStateId(),
-                pageId: sectionId,
-                url: Util.toUrlObject(url)
-            };
-            // theHistory.pushState(state, '', url);
-            this._saveAsCurrentState(state);
-            this._incMaxStateId();
         }
 
         /**

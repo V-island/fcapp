@@ -2,7 +2,8 @@
 import Login from './pages/login';
 import Home from './pages/home';
 import Live from './pages/live';
-
+import Favorite from './pages/favorite';
+import Message from './pages/message';
 import User from './pages/user';
 import UserDetail from './pages/user_detail';
 
@@ -54,11 +55,17 @@ import UserDetail from './pages/user_detail';
             dom: 'body',
             init: 1
         }, {
-            path: '/favorite',
-            name: 'favorite'
+            name: 'favorite',
+            path: '../pages/favorite.html',
+            component: Favorite,
+            dom: 'body',
+            init: 1
         }, {
-            path: '/message',
-            name: 'message'
+            name: 'message',
+            path: '../pages/message.html',
+            component: Message,
+            dom: 'body',
+            init: 1
         }, {
             name: 'user',
             path: '../pages/user.html',

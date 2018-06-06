@@ -63,6 +63,9 @@
     color: $color-text;
     text-align: center;
     white-space: nowrap;
+    &.primary {
+        color: $color-primary;
+    }
 }
 
 // Retain specified title color
