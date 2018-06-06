@@ -37,12 +37,13 @@ module.exports = {
 			'./assets/js/init',
 			'./assets/sass/fc.scss'
 			// './assets/js/scroll-fix'
+		],
+		'fc-extend': [
+			// './assets/js/swiper.js',
+			// './assets/js/swiper-init.js',
+			// './assets/js/photo-browser.js'
+			'jquery-ripple'
 		]
-		// ,extend: [
-		// 	'./assets/js/swiper.js',
-		// 	'./assets/js/swiper-init.js',
-		// 	'./assets/js/photo-browser.js'
-		// ]
 		// ,cityPicker: [
 		// 	'./assets/js/city-data.js',
 		// 	'./assets/js/city-picker.js'
@@ -104,15 +105,17 @@ module.exports = {
 			}, {
 				loader: 'script-loader'
 			}]
-		}, {
-			test: require.resolve('zepto'),
-			use: [{
-				loader: 'exports-loader',
-				options: 'window.Zepto'
-			}, {
-				loader: 'script-loader'
-			}]
-		}]
+		}
+		// , {
+		// 	test: require.resolve('zepto'),
+		// 	use: [{
+		// 		loader: 'exports-loader',
+		// 		options: 'window.Zepto'
+		// 	}, {
+		// 		loader: 'script-loader'
+		// 	}]
+		// }
+		]
 	},
 	plugins: [
 		new CleanWebpackPlugin(['dist']),
@@ -151,8 +154,8 @@ module.exports = {
 			to: './public'
 		}]),
 		new webpack.ProvidePlugin({
-			$: 'jquery',
-			Zepto: 'zepto'
+			$: 'jquery'
+			// ,Zepto: 'zepto'
 			// _: 'lodash'
 			// template: 'es6-templates'
 		}),

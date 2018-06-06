@@ -1,5 +1,5 @@
 let user = {
-	init: function($) {
+	init: function() {
 		console.log('这里是userjs');
 	}
 }

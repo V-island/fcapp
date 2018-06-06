@@ -24,4 +24,4 @@
         return $(".page-current")[0] || $(".page")[0] || document.body;
     };
 
-}(Zepto);
+}(jQuery);

@@ -10,7 +10,7 @@ let userDetail = {
 			console.log(_type, _title, _placeholder);
 		})
 	},
-	init: function($) {
+	init: function() {
 		console.log('这里是userDetailjs');
 		this.event();
 	}

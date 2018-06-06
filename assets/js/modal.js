@@ -557,4 +557,4 @@
         modalPreloaderTitle: '加载中',
         modalContainer : document.body ? document.body : 'body'
     };
-}(Zepto);
+}(jQuery);

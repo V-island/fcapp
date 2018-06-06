@@ -1,5 +1,5 @@
 let home = {
-	event: function($) {
+	event: function() {
 		$('.card-content','.card-list').on('click', function() {
 			$.alert('She is looking forward to your true love', 'Not enough coins', function() {
 				// modal.popup();
@@ -7,10 +7,10 @@ let home = {
 			});
 		});
 	},
-	init: function($) {
+	init: function() {
 		console.log('这里是homejs');
 		// homeSwiper();
-		this.event($);
+		this.event();
 	}
 }
 export default home;

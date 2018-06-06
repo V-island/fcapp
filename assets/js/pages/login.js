@@ -1,5 +1,5 @@
 let login = {
-	init: function($) {
+	init: function() {
 		console.log('这里是登录js');
 	}
 }

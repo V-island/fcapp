@@ -317,4 +317,4 @@
     };
 
     $.initSwipePanels();
-}(Zepto);
+}(jQuery);

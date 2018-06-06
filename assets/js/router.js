@@ -234,7 +234,7 @@
             this._init();
             this.xhr = null;
             Util.oldchange();
-            window.addEventListener('popstate', this._onPopState.bind(this), false);
+            window.addEventListener('popstate', this._onPopState.bind(this));
             window.addEventListener("hashchange", this._onHashchange.bind(this), false);
         }
 
@@ -510,8 +510,6 @@
                     link.onload = link.onreadystatechange = null;
                     link.parentNode.removeChild(link);
                 }
-
-                $('[data-ripple]').ripple();
             };
             link.onerror = function(e) {
                 console.error(MSG.errorsupport + e.target.href);
@@ -529,7 +527,6 @@
                 console.warn(MSG.cantfindobj);
                 return;
             }
-            obj[fn](Zepto);
             //读取成功后
             // window.addEventListener('HTMLImportsLoaded', function(e) {
             //     console.info(MSG.importready);
@@ -540,6 +537,8 @@
             //     console.info(MSG.allready);
             //     obj[fn]();
             // });
+            obj[fn]();
+            $('[data-ripple]').ripple();
         }
 
         /**
@@ -872,13 +871,16 @@
          */
         _onPopState(event) {
             let state = event.state;
+            console.log(event);
+
             // if not a valid state, do nothing
             if (!state || !state.pageId) {
                 return;
             }
 
             let lastState = this._getLastState();
-
+            console.log(lastState);
+            return;
             if (!lastState) {
                 console.error && console.error(MSG.errorLastState);
                 return;
@@ -910,7 +912,7 @@
                 pageId: sectionId,
                 url: Util.toUrlObject(url)
             };
-            theHistory.pushState(state, '', url);
+            // theHistory.pushState(state, '', url);
             this._saveAsCurrentState(state);
             this._incMaxStateId();
         }
@@ -1039,7 +1041,7 @@
             }
         });
     });
-}(Zepto);
+}(jQuery);
 
 /**
  * @typedef {Object} State

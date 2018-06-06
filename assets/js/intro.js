@@ -81,4 +81,4 @@ import UserDetail from './pages/user_detail';
     $.fcConfig = defaults;
     $.routesConfig = routes;
 
-}(Zepto);
+}(jQuery);

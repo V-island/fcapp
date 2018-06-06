@@ -1,6 +1,6 @@
 let live = {
 	templateDOM: {},
-	event: function($) {
+	event: function() {
 		let _self = this;
 		let btn = $('.live-buttons');
 
@@ -28,11 +28,11 @@ let live = {
 			});
 		});
 	},
-	init: function($) {
+	init: function() {
 		console.log('这里是livejs');
 		// let publicTpl = HTMLImport.attachTo(PUBLICFILE.actions_lives);
 		// this.templateDOM = publicTpl.tpl;
-		this.event($);
+		this.event();
 	}
 }
 export default live;
