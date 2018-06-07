@@ -213,7 +213,9 @@
         // 并且，别的地方已经使用了，所以不方便做变更，故新增一个
         visiblePageClass: 'page-visible',
         // 表示是 page 的 class，注意，仅是标志 class，而不是所有的 class
-        pageClass: 'page'
+        pageClass: 'page',
+        // 根目录
+        rootUrl: 'home'
     }
 
     let DIRECTION = {
@@ -333,7 +335,7 @@
             console.log('验证登录状态');
             if (location.hash == '' || location.hash == '#/' || location.hash === undefined) {
                 console.log('hash为空默认调转 #/home');
-                return location.hash = '#/' + CONFIG.rootUrl;
+                return location.hash = '#/' + routerConfig.rootUrl;
             }
 
             console.log(url);
@@ -557,7 +559,7 @@
             let template = false;
             Href = Util.getHashpage(Href);
             rules.forEach(function(child) {
-                let name = child.name !== undefined ? child.name : CONFIG.rootUrl;
+                let name = child.name !== undefined ? child.name : routerConfig.rootUrl;
                 if (Href == name) template = child;
             });
 

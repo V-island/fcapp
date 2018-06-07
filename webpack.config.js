@@ -14,6 +14,7 @@ module.exports = {
 			// 'es5-shim',
 			// 'es6-shim',
 			'./assets/js/components/webcomponents-bundle',
+			// './assets/js/components/AgoraRTCSDK-2.3.0',
 			'./assets/js/intro',
 			'./assets/js/util',
 			'./assets/js/zepto-adapter',
