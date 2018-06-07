@@ -223,6 +223,13 @@
     align-items: center;
 }
 
+/**
+ * 多行/列排列
+ */
+@mixin flex-werp($werp) {
+    flex-wrap: $werp;
+}
+
 @mixin size($num) {
     width: $num;
     height: $num;

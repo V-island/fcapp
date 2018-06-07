@@ -2,11 +2,15 @@
 // ----------------------------------
 //
 .tag {
-	display: flex;
-	justify-content: center;
-	flex-wrap: wrap;
-	align-items: center;
+	@include flex-center;
+	@include flex-werp(wrap);
 
+	&.tag-avatar {
+		@include flex-werp(nowrap);
+		overflow-y: auto;
+		justify-content: start;
+		margin: auto -0.75rem;
+	}
 	label.tag-label {
 		background: $tag-bg-color;
 		border-radius: $tag-border-radius;
@@ -34,7 +38,7 @@
 
 		}
 	}
-	label.gift-label{
+	label.gift-label {
 		@include size(4.2rem);
 		border: 1px solid transparent;
 		text-align: center;
@@ -58,7 +62,7 @@
 			border-color: $color-primary;;
 		}
 	}
-	label.recharge-label{
+	label.recharge-label {
 		background: none;
 		border-radius: 3rem;
 		border: $tag-recharge-border-default;
@@ -83,7 +87,7 @@
 			border-color: $color-primary;
 		}
 	}
-	label.share-label{
+	label.share-label {
 		margin: 0 1.2rem;
 		@include flex-spindle-center(space-around, column);
 
@@ -97,7 +101,28 @@
 			margin-top: 0.35rem;
 		}
 	}
-	.tag-anchor{
+	label.user-info {
+		@include flex-spindle-center(center, column);
+		padding: 0 0.5rem;
+
+		&:first-child{
+			padding-left: 0.75rem;
+		}
+
+		&:last-child{
+			padding-right: 0.75rem;
+		}
+
+		.user-img{
+			@include size(3.15rem);
+		}
+
+		.user-name{
+			font-size: 0.5rem;
+			line-height: 1.35rem;
+		}
+	}
+	.tag-anchor {
 		width: 3.15rem;
 		height: 3.15rem;
 		border: $tag-border-default;
