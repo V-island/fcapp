@@ -433,13 +433,10 @@
 
 		span{
 			color: $color-primary;
+		}
 
-			.anchor &{
-				color: $live-anchor-txt-color;
-			}
+		&.anchor span{
+			color: $live-anchor-txt-color;
 		}
 	}
 }
-
-// user-header-box
-// ------------------------------

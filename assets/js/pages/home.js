@@ -12,7 +12,7 @@ let home = {
 	homeSwiper: function() {
 		//暂时设计每个slide大小需要一致
 		const TSPEED = 300; //切换速度300ms
-		const _TSPEED = TSPEED - 200; //切换速度300ms
+		const _TSPEED = TSPEED - 250; //切换速度50ms
 
 		let navSwiper = new Swiper('.nav-tab', {
 			wrapperClass: 'buttons-tab',
@@ -28,7 +28,9 @@ let home = {
 					line.css('width', navSlideWidth);
 					line.transition(TSPEED);
 				},
-
+				touchstart: function(e) {
+					e.preventDefault();
+				}
 			},
 		})
 
@@ -40,6 +42,9 @@ let home = {
 			watchSlidesProgress: true,
 			resistanceRatio: 0,
 			on: {
+				touchstart: function(e) {
+					e.preventDefault();
+				},
 				touchMove: function() {
 					let progress = this.progress;
 					let navsum = navSwiper.slides[navSwiper.slides.length - 1].offsetLeft;
@@ -95,9 +100,9 @@ let home = {
 			}
 		})
 
-		navSwiper.$el.on('touchstart', function(e) {
-			e.preventDefault();
-		})
+		// navSwiper.$el.on('touchstart', function(e) {
+		// 	e.preventDefault();
+		// })
 
 		navSwiper.on('tap', function(e) {
 
