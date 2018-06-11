@@ -440,8 +440,20 @@
             link.onload = function(e) {
                 console.log('Loaded import: ' + e.target.href);
                 let _target = e.target.import;
+                console.log(_target);
+                let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
+                bodyHTML = Util.replaceNote(bodyHTML);
+                let html = Template.render(bodyHTML, {
+                    BAR_ITEM_Home: 'Home',
+                    BAR_ITEM_Favorite: 'Favorite',
+                    BAR_ITEM_Message: 'Message',
+                    BAR_ITEM_Me: 'Me'
+                });
+                console.log(html);
+                let $html = $(html);
+                console.log($html);
                 let $doc = $(_target);
-
+                console.log($doc);
                 callback.success && callback.success.call(null, $doc, param.component);
 
                 //加载完成后清除头部引用
