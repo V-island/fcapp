@@ -18,6 +18,7 @@ module.exports = {
 			'./assets/js/intro',
 			'./assets/js/util',
 			'./assets/js/zepto-adapter',
+			'./assets/js/lang',
 			'./assets/js/device',
 			'./assets/js/fastclick',
 			'./assets/js/modal',

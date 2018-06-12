@@ -1,6 +1,12 @@
-let Lang = {
-	home:{
-		
+const Lang = {
+	home: {
+
+	},
+	BAR: {
+		Home: 'Home',
+		Favorite: 'Favorite',
+		Message: 'Message',
+		Me: 'Me'
 	}
 
 }

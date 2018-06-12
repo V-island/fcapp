@@ -440,18 +440,8 @@
             link.onload = function(e) {
                 console.log('Loaded import: ' + e.target.href);
                 let _target = e.target.import;
-                console.log(_target);
                 let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
-                bodyHTML = Util.replaceNote(bodyHTML);
-                let html = Template.render(bodyHTML, {
-                    BAR_ITEM_Home: 'Home',
-                    BAR_ITEM_Favorite: 'Favorite',
-                    BAR_ITEM_Message: 'Message',
-                    BAR_ITEM_Me: 'Me'
-                });
-                console.log(html);
-                let $doc = $(html);
-                console.log($doc);
+                let $doc = Util.replaceNote(bodyHTML);
                 // let $doc = $(_target);
                 // console.log($doc);
                 callback.success && callback.success.call(null, $doc, param.component);
@@ -493,18 +483,20 @@
         }
 
         /**
-         * 对于 ajax 加载进来的页面，把其缓存起来
+         * 对于 import 加载进来的页面装载模板语言包
+         * ，把其缓存起来
          *
          * @param {String} url url
-         * @param $doc ajax 载入的页面的 jq 对象，可以看做是该页面的 $(document)
+         * @param $doc import html
          * @private
          */
         _parseDocument(url, $doc, $component) {
-            let $innerView = $doc.find('.' + routerConfig.sectionGroupClass);
-            console.log($innerView);
-            if (!$innerView.length) {
-                throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
-            }
+            $doc = Template.render($doc, {
+                BAR_ITEM_Home: 'Home',
+                BAR_ITEM_Favorite: 'Favorite',
+                BAR_ITEM_Message: 'Message',
+                BAR_ITEM_Me: 'Me'
+            });
 
             this._saveDocumentIntoCache($doc, url, $component);
         }
@@ -522,9 +514,12 @@
         _saveDocumentIntoCache(doc, url, component) {
             let $doc = $(doc);
 
+            if (!$doc.hasClass(routerConfig.sectionGroupClass)) {
+                throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
+            }
+
             this.cache[url] = {
-                $doc: $doc,
-                $content: $doc.find('.' + routerConfig.sectionGroupClass),
+                $content: $doc,
                 $component: component
             };
         }

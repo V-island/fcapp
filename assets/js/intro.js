@@ -85,7 +85,6 @@ import UserDetail from './pages/user_detail';
         }]
     };
 
-    // $.fcConfig = $.extend(defaults, $.config);
     $.fcConfig = defaults;
     $.routesConfig = routes;
 
