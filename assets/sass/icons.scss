@@ -88,10 +88,10 @@ $lives: attention, close, news, share, gift, thumbs-upion;
 
 @each $live in $lives {
     .live-#{$live}{
-        @include iconImage($live, 'live/icon');
+        @include iconImage($live, 'lives/icon');
 
         @if $live == thumbs-upion {
-            @include iconActive($live, 'live/icon');
+            @include iconActive($live, 'lives/icon');
         }
     }
 
@@ -128,10 +128,10 @@ $modals: fecebook, tumblr, Twitter, cards, paypal, confirm, phiz, video, live, c
 
 @each $modal in $modals {
     .modal-#{$modal}{
-        @include iconImage($modal, 'modal/icon');
+        @include iconImage($modal, 'modals/icon');
 
-        @else if $name == confirm {
-            @include iconActive($name, 'modal/icon');
+        @if $modal == confirm {
+            @include iconActive($modal, 'modals/icon');
         }
     }
 
