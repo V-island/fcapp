@@ -450,10 +450,10 @@
                     BAR_ITEM_Me: 'Me'
                 });
                 console.log(html);
-                let $html = $(html);
-                console.log($html);
-                let $doc = $(_target);
+                let $doc = $(html);
                 console.log($doc);
+                // let $doc = $(_target);
+                // console.log($doc);
                 callback.success && callback.success.call(null, $doc, param.component);
 
                 //加载完成后清除头部引用
@@ -501,6 +501,7 @@
          */
         _parseDocument(url, $doc, $component) {
             let $innerView = $doc.find('.' + routerConfig.sectionGroupClass);
+            console.log($innerView);
             if (!$innerView.length) {
                 throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
             }

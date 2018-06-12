@@ -38,11 +38,9 @@ $ionicons-version: "4.1.0" !default;
     -moz-osx-font-smoothing: grayscale;
 }
 
-$names: search, filter, arrow-back, home, favorite, live, message, me, female, male, attention, close, gift, news, share, fecebook, tumblr, Twitter, cards, paypal, confirm, phiz, thumbs-upion, add;
-
 @mixin iconImage($name, $file) {
-    background-image: url("#{$imgBaseUrl}/#{$file}/icon-#{$name}.png");
-    background: image-set(url("#{$imgBaseUrl}/#{$file}/icon-#{$name}.png") 1x, url("#{$imgBaseUrl}/#{$file}/icon-#{$name}@2x.png") 2x) center;
+    background-image: url("#{$imgBaseUrl}/#{$file}-#{$name}.png");
+    background: image-set(url("#{$imgBaseUrl}/#{$file}-#{$name}.png") 1x, url("#{$imgBaseUrl}/#{$file}-#{$name}@2x.png") 2x) center;
 }
 
 @mixin iconActive($name, $file) {
@@ -51,73 +49,105 @@ $names: search, filter, arrow-back, home, favorite, live, message, me, female, m
     }
 }
 
+.icon-star{
+    @include iconImage(star-outline, 'icon');
+    &.active {
+        @include iconImage(star, 'icon');
+    }
+}
+
+// Live Icon
+// -----------------------------
+
+$names: search, filter, arrow-back, home, favorite, live, message, me, female, male, add;
+
 @each $name in $names {
     .icon-#{$name}{
-        @include iconImage($name, 'icons');
+        @include iconImage($name, 'icon');
 
         @if $name == home {
-            @include iconActive($name, 'icons');
+            @include iconActive($name, 'icon');
         }
         @else if $name == favorite {
-            @include iconActive($name, 'icons');
+            @include iconActive($name, 'icon');
         }
         @else if $name == message {
-            @include iconActive($name, 'icons');
+            @include iconActive($name, 'icon');
         }
         @else if $name == me {
-            @include iconActive($name, 'icons');
+            @include iconActive($name, 'icon');
         }
-        @else if $name == confirm {
-            @include iconActive($name, 'icons');
-        }
-        @else if $name == thumbs-upion {
-            @include iconActive($name, 'icons');
-        }
-
     }
 
 }
 
+// Live Icon
+// -----------------------------
+
+$lives: attention, close, news, share, gift, thumbs-upion;
+
+@each $live in $lives {
+    .live-#{$live}{
+        @include iconImage($live, 'live/icon');
+
+        @if $live == thumbs-upion {
+            @include iconActive($live, 'live/icon');
+        }
+    }
+
+}
+
+// Message Icon
+// -----------------------------
 
 $messages: comment, friends, hi, like, message, service;
 
 @each $message in $messages {
     .message-#{$message}{
-        @include iconImage($message, 'icons/messages');
+        @include iconImage($message, 'messages/icon');
     }
 
 }
+
+// User Icon
+// -----------------------------
 
 $users: account, blacklist, live, price, score, setting, video, watch, invite, arrow-forward, arrow-forward-active, stars;
 
 @each $user in $users {
     .user-#{$user}{
-        @include iconImage($user, 'icons/users');
+        @include iconImage($user, 'users/icon');
     }
 
 }
 
-.icon-star{
-    @include iconImage(star-outline, 'icons');
-    &.active {
-        @include iconImage(star, 'icons');
+// Modal Icon
+// -----------------------------
+
+$modals: fecebook, tumblr, Twitter, cards, paypal, confirm, phiz, video, live, close;
+
+@each $modal in $modals {
+    .modal-#{$modal}{
+        @include iconImage($modal, 'modal/icon');
+
+        @else if $name == confirm {
+            @include iconActive($name, 'modal/icon');
+        }
     }
+
 }
+
+// Modal Icon
+// -----------------------------
 
 $gifts: guardian-heart;
 
-@mixin giftImage($gift) {
-    background-image: url("#{$imgBaseUrl}/gifts/gift-#{$gift}.png");
-    background: image-set(url("#{$imgBaseUrl}/gifts/gift-#{$gift}.png") 1x, url("#{$imgBaseUrl}/gifts/gift-#{$gift}@2x.png") 2x) center;
-}
-
 @each $gift in $gifts {
     .gift-#{$gift}{
-        @include giftImage($gift);
+        @include iconImage($gift, 'gifts/gift');
     }
 
 }
-
 
 // Ionicons Icon Font CSS
 // --------------------------
