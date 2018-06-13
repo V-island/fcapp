@@ -152,16 +152,15 @@ $themes: primary, danger, warning, success, recharge;
 }
 
 .buttons {
-    display: flex;
-    justify-content: space-between;
+    @include flex-spindle(space-between);
 
     &.buttons-block {
-        justify-content: center;
+        @include flex-spindle(center);
     }
 
     &.buttons-vertical {
-        justify-content: center;
-        flex-direction: column;
+        @include flex-spindle(center);
+        @include flex-vertical(column);
     }
 
 }

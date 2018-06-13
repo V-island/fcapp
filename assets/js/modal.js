@@ -24,7 +24,7 @@
         let buttonsHTML = '';
         if (params.buttons && params.buttons.length > 0) {
             for (let i = 0; i < params.buttons.length; i++) {
-                buttonsHTML += '<span class="modal-button' + (params.buttons[i].bold ? ' modal-button-bold' : '') + '" data-ripple>' + params.buttons[i].text + '</span>';
+                buttonsHTML += '<span class="modal-button' + (params.buttons[i].fill ? ' modal-button-fill' : '') + '" data-ripple>' + params.buttons[i].text + '</span>';
             }
         }
         let extraClass = params.extraClass || '';
@@ -62,9 +62,10 @@
      * @param  {[string]} text       内容文字
      * @param  {[string]} title      标题文字
      * @param  {[function]} callbackOk 通过事件
+     * @param  {[string]} button     提示按钮
      * @return {[object]}            params
      */
-    $.alert = function(text, title, callbackOk) {
+    $.alert = function(text, title, callbackOk, button) {
         if (typeof title === 'function') {
             callbackOk = arguments[1];
             title = undefined;
@@ -73,7 +74,7 @@
             text: text || '',
             title: typeof title === 'undefined' ? defaults.modalTitle : title,
             buttons: [{
-                text: defaults.modalButtonOk,
+                text: typeof button === 'undefined' ? defaults.modalButtonOk : button,
                 bold: true,
                 onClick: callbackOk
             }]
@@ -86,9 +87,10 @@
      * @param  {[string]} title          标题文字
      * @param  {[function]} callbackOk     通过事件
      * @param  {[function]} callbackCancel 取消事件
+     * @param  {[string]} prompt         提示按钮
      * @return {[object]}                params
      */
-    $.confirm = function(text, title, callbackOk, callbackCancel) {
+    $.confirm = function(text, title, callbackOk, callbackCancel, prompt) {
         if (typeof title === 'function') {
             callbackCancel = arguments[2];
             callbackOk = arguments[1];
@@ -97,12 +99,13 @@
         return $.modal({
             text: text || '',
             title: typeof title === 'undefined' ? defaults.modalTitle : title,
+            closeBtn: true,
             buttons: [{
-                text: defaults.modalButtonCancel,
+                text: typeof prompt === 'undefined' ? defaults.confirmButtonCancel : defaults.modalButtonCancel,
+                fill: true,
                 onClick: callbackCancel
             }, {
-                text: defaults.modalButtonOk,
-                bold: true,
+                text: typeof prompt === 'undefined' ? defaults.confirmButtonOk : defaults.modalButtonOk,
                 onClick: callbackOk
             }]
         });
@@ -114,25 +117,27 @@
      * @param  {[string]} title          标题文字
      * @param  {[function]} callbackOk     通过事件
      * @param  {[function]} callbackCancel 取消事件
+     * @param  {[string]} prompt         提示按钮
      * @return {[object]}                params
      */
-    $.prompt = function (text, title, callbackOk, callbackCancel) {
+    $.prompt = function (text, title, callbackOk, callbackCancel, prompt) {
         if (typeof title === 'function') {
             callbackCancel = arguments[2];
             callbackOk = arguments[1];
             title = undefined;
         }
         return $.modal({
-            text: text || '',
+            // text: text || '',
             title: typeof title === 'undefined' ? defaults.modalTitle : title,
-            afterText: '<input type="text" class="modal-text-input">',
+            closeBtn: true,
+            afterText: '<input type="text" class="modal-text-input" placeholder="'+ text +'">',
             buttons: [
                 {
-                    text: defaults.modalButtonCancel
+                    text: typeof prompt === 'undefined' ? defaults.confirmButtonCancel : defaults.modalButtonCancel,
+                    fill: true
                 },
                 {
-                    text: defaults.modalButtonOk,
-                    bold: true
+                    text: typeof prompt === 'undefined' ? defaults.confirmButtonOk : defaults.modalButtonOk
                 }
             ],
             onClick: function (modal, index) {
@@ -552,8 +557,11 @@
     });
     let defaults =  $.modal.prototype.defaults  = {
         modalStack: true,
-        modalButtonOk: 'BUY NOW',
-        modalButtonCancel: '取消',
+        modalTitle: false,
+        modalButtonOk: $.langConfig.PUBLIC.ModalButtonOk,
+        modalButtonCancel: $.langConfig.PUBLIC.ModalButtonCancel,
+        confirmButtonOk: $.langConfig.PUBLIC.ConfirmButtonOk,
+        confirmButtonCancel: $.langConfig.PUBLIC.ConfirmButtonCancel,
         modalPreloaderTitle: '加载中',
         modalContainer : document.body ? document.body : 'body'
     };

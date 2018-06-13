@@ -179,7 +179,7 @@
  * @param  {[string]}  column-reverse 倒序
  */
 @mixin flex-vertical($col){
-    display: flex;
+    @include flexbox;
     flex-direction: $col;
 }
 
@@ -193,7 +193,7 @@
  * @param  {[string]}  space-between  任何两个相邻 flex 项之间的间距是相同的，但不一定等于第一个/最后一个 flex 项与 flex 容器边缘之间的间距;起始边缘和第一个项目之间的间距和末端边缘和最后一个项目之间的间距是相等的。
  */
 @mixin flex-spindle($col){
-    display: flex;
+    @include flexbox;
     justify-content: $col;
 }
 
@@ -218,7 +218,7 @@
  * 水平/垂直布局
  */
 @mixin flex-center {
-    display: flex;
+    @include flexbox;
     justify-content: center;
     align-items: center;
 }

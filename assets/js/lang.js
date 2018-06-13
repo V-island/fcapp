@@ -1,10 +1,10 @@
 // lang
 import en from './lang/EN';
+import zh_cn from './lang/ZH-CN';
 
-+ function($) {
-    "use strict";
++function($) {
+	"use strict";
 
-    // $.fcConfig = defaults;
-    console.log(en);
+	$.langConfig = en;
 
 }(jQuery);

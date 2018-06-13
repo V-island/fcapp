@@ -13,28 +13,28 @@
     	    		<p class="user-txt"><i class="icon icon-female"></i>ID:123456</p>
     	    	</div>
     	    </div>
-    	    <a class="user-detail" href="#/user/detail">Detail<i class="icon user-arrow-forward-active"></i></a>
+    	    <a class="user-detail" href="#/user/detail">{{USER.Detail}}<i class="icon user-arrow-forward-active"></i></a>
     	</header>
         <!-- 工具栏 -->
         <nav class="bar bar-tab">
             <a class="tab-item" href="#/home" data-ripple>
                 <span class="icon icon-home"></span>
-                <span class="tab-label">Home</span>
+                <span class="tab-label">{{BAR.Home}}</span>
             </a>
             <a class="tab-item" href="#/favorite" data-ripple>
                 <span class="icon icon-favorite"></span>
-                <span class="tab-label">Favorite</span>
+                <span class="tab-label">{{BAR.Favorite}}</span>
             </a>
             <a class="tab-item icons" href="javascript:void(0);">
                 <span class="icon icon-live"></span>
             </a>
             <a class="tab-item" href="#/message" data-ripple>
                 <span class="icon icon-message"></span>
-                <span class="tab-label">Message</span>
+                <span class="tab-label">{{BAR.Message}}</span>
             </a>
             <a class="tab-item active" href="#/user" data-ripple>
                 <span class="icon icon-me"></span>
-                <span class="tab-label">Me</span>
+                <span class="tab-label">{{BAR.Me}}</span>
             </a>
         </nav>
         <!-- 这里是页面内容区 -->
@@ -42,14 +42,14 @@
             <ul class="list list-user">
         	    <li class="list-item" data-ripple>
         	        <span class="icon user-video list-item-graphic"></span>
-        	        <span class="list-item-text">My video</span>
+        	        <span class="list-item-text">{{USER.Lists.My_Video}}</span>
         	        <span class="list-item-meta-txt">10</span>
         	        <span class="icon user-arrow-forward list-item-meta"></span>
         	    </li>
         	    <li class="line"></li>
         	    <li class="list-item" data-ripple>
         	        <span class="icon user-watch list-item-graphic"></span>
-        	        <span class="list-item-text">Watch history</span>
+        	        <span class="list-item-text">{{USER.Lists.Watch_History}}</span>
         	        <span class="list-item-meta-txt">10</span>
         	        <span class="icon user-arrow-forward list-item-meta"></span>
         	    </li>
@@ -59,21 +59,21 @@
     	    <ul class="list list-user">
     		    <li class="list-item" data-ripple>
     		        <span class="icon user-price list-item-graphic"></span>
-    		        <span class="list-item-text">Chatting price</span>
-    		        <span class="list-item-meta-txt color-price">10 Gold/Min</span>
+    		        <span class="list-item-text">{{USER.Lists.Chatting_Price}}</span>
+    		        <span class="list-item-meta-txt color-price">10 {{PUBLIC.Billing}}</span>
     		        <span class="icon user-arrow-forward list-item-meta"></span>
     		    </li>
     		    <li class="line"></li>
     		    <li class="list-item" data-ripple>
     		        <span class="icon user-account list-item-graphic"></span>
-    		        <span class="list-item-text">Account</span>
+    		        <span class="list-item-text">{{USER.Lists.Account}}</span>
     		        <span class="list-item-meta-txt color-account">254</span>
     		        <span class="icon user-arrow-forward list-item-meta"></span>
     		    </li>
     		    <li class="line"></li>
     		    <li class="list-item" data-ripple>
     		        <span class="icon user-score list-item-graphic"></span>
-    		        <span class="list-item-text">Score</span>
+    		        <span class="list-item-text">{{USER.Lists.Score}}</span>
     		        <span class="list-item-meta-txt color-score">1254</span>
     		        <span class="icon user-arrow-forward list-item-meta"></span>
     		    </li>
@@ -83,14 +83,14 @@
 		    <ul class="list list-user">
 			    <li class="list-item" data-ripple>
 			        <span class="icon user-live list-item-graphic"></span>
-			        <span class="list-item-text">Live certification</span>
+			        <span class="list-item-text">{{USER.Lists.Live_Certification}}</span>
 			        <span class="list-item-meta-txt">Popular</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
 			    <li class="line"></li>
 			    <li class="list-item" data-ripple>
 			        <span class="icon user-invite list-item-graphic"></span>
-			        <span class="list-item-text">Invite</span>
+			        <span class="list-item-text">{{USER.Lists.Invite}}</span>
 			        <span class="list-item-meta-txt">Earn Money</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
@@ -100,13 +100,13 @@
 		    <ul class="list list-user">
 			    <li class="list-item" data-ripple>
 			        <span class="icon user-blacklist list-item-graphic"></span>
-			        <span class="list-item-text">Blacklist</span>
+			        <span class="list-item-text">{{USER.Lists.Blacklist}}</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
 			    <li class="line"></li>
 			    <li class="list-item" data-ripple>
 			        <span class="icon user-setting list-item-graphic"></span>
-			        <span class="list-item-text">Setting</span>
+			        <span class="list-item-text">{{USER.Lists.Setting}}</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
 			</ul>

@@ -2,28 +2,28 @@
     <div class="page">
         <!-- 标题栏 -->
         <header class="bar bar-flex">
-            <h1 class="title primary">Favorite</h1>
+            <h1 class="title primary">{{BAR.Favorite}}</h1>
         </header>
         <!-- 工具栏 -->
         <nav class="bar bar-tab">
             <a class="tab-item" href="#/home" data-ripple>
                 <span class="icon icon-home"></span>
-                <span class="tab-label">Home</span>
+                <span class="tab-label">{{BAR.Home}}</span>
             </a>
             <a class="tab-item active" href="#/favorite" data-ripple>
                 <span class="icon icon-favorite"></span>
-                <span class="tab-label">Favorite</span>
+                <span class="tab-label">{{BAR.Favorite}}</span>
             </a>
             <a class="tab-item icons" href="javascript:void(0);">
                 <span class="icon icon-live"></span>
             </a>
             <a class="tab-item" href="#/message" data-ripple>
                 <span class="icon icon-message"></span>
-                <span class="tab-label">Message</span>
+                <span class="tab-label">{{BAR.Message}}</span>
             </a>
             <a class="tab-item" href="#/user" data-ripple>
                 <span class="icon icon-me"></span>
-                <span class="tab-label">Me</span>
+                <span class="tab-label">{{BAR.Me}}</span>
             </a>
         </nav>
         <!-- 这里是页面内容区 -->
@@ -65,8 +65,8 @@
                                 <img src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
                             </div>
                             <div class="showdom">
-                                <span class="tag-label">10/Gold/Min</span>
-                                <span class="tag-label busy">Busy</span>
+                                <span class="tag-label">10/{{PUBLIC.Billing}}</span>
+                                <span class="tag-label busy">{{PUBLIC.Status.Busy}}</span>
                             </div>
                         </div>
                         <div class="card-foot">
@@ -87,8 +87,8 @@
                                 <img src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
                             </div>
                             <div class="showdom">
-                                <span class="tag-label">10/Gold/Min</span>
-                                <span class="tag-label waiting">waiting</span>
+                                <span class="tag-label">10/{{PUBLIC.Billing}}</span>
+                                <span class="tag-label waiting">{{PUBLIC.Status.Waiting}}</span>
                             </div>
                         </div>
                         <div class="card-foot">
@@ -109,8 +109,8 @@
 
             <div class="box-cards">
                 <div class="cards-header">
-                    <p>You may also like</p>
-                    <p class="refresh">Another batch</p>
+                    <p>{{FAVORITE.You_May_Also_Like}}</p>
+                    <p class="refresh">{{FAVORITE.Another_Batch}}</p>
                 </div>
                 <div class="row">
                     <div class="col-33 card card-avatar">

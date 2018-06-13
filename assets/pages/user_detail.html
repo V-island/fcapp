@@ -5,63 +5,63 @@
             <a class="icon-btn back" data-ripple>
                 <i class="icon icon-arrow-back"></i>
             </a>
-            <h1 class="title">Personal details</h1>
+            <h1 class="title">{{BAR.PERSONAL_DETAIL}}</h1>
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block">
             <ul class="list list-user list-info">
                 <li class="list-item user-avatar">
-                    <span class="list-item-text">Profile photo</span>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Profile_Photo}}</span>
                     <div class="list-item-graphic user-info">
                         <img class="user-img" src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
                     </div>
                 </li>
-                <li class="list-item " data-ripple data-madal-prompt data-madal-title="Modify  username" data-input-placeholder="Fill in a new username">
-                    <span class="list-item-text">Username</span>
+                <li class="list-item" data-ripple data-madal-username>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Username.Title}}</span>
                     <span class="list-item-meta-txt">Geraldine</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple>
-                    <span class="list-item-text">Gender</span>
-                    <span class="list-item-meta-txt">Female</span>
+                <li class="list-item" data-ripple data-madal-gender>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Gender.Title}}</span>
+                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Gender.Madal.Male}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-title="Modify birthday">
-                    <span class="list-item-text">Age</span>
+                <li class="list-item" data-ripple data-madal-age>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Age.Title}}</span>
                     <span class="list-item-meta-txt">23</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-prompt data-madal-title="Modify  height" data-input-placeholder="Fill in height (cm)">
-                    <span class="list-item-text">Height</span>
-                    <span class="list-item-meta-txt">165cm</span>
+                <li class="list-item" data-ripple data-madal-height>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Height.Title}}</span>
+                    <span class="list-item-meta-txt">165{{PERSONAL_DETAIL.Height.Unit}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-prompt data-madal-title="Modify  body weight" data-input-placeholder="Fill in height (cm)">
-                    <span class="list-item-text">Body weight</span>
-                    <span class="list-item-meta-txt">50kg</span>
+                <li class="list-item" data-ripple data-madal-weight>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Body_Weight.Title}}</span>
+                    <span class="list-item-meta-txt">50{{PERSONAL_DETAIL.Body_Weight.Unit}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
             </ul>
             <!-- /.list list-user -->
             <ul class="list list-user list-info">
-                <li class="list-item" data-ripple>
-                    <span class="list-item-text">Interest</span>
-                    <span class="list-item-meta-txt">Sing</span>
+                <li class="list-item" data-ripple data-madal-interest>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Interest.Title}}</span>
+                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Interest.Madal.Lists[0]}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple>
-                    <span class="list-item-text">Your type</span>
-                    <span class="list-item-meta-txt">Sexy and hot</span>
+                <li class="list-item" data-ripple data-madal-type>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Your_Type.Title}}</span>
+                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Your_Type.Madal.Lists[0]}} and {{PERSONAL_DETAIL.Your_Type.Madal.Lists[1]}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple>
-                    <span class="list-item-text">Love</span>
-                    <span class="list-item-meta-txt">Sunshine and warm</span>
+                <li class="list-item" data-ripple data-madal-love>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Love.Title}}</span>
+                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Love.Madal.Lists[0]}} and {{PERSONAL_DETAIL.Love.Madal.Lists[1]}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-title="Why make friends">
-                    <span class="list-item-text">Why make friends</span>
-                    <span class="list-item-meta-txt">Long contact, no longer alone</span>
+                <li class="list-item" data-ripple data-madal-friends>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Why_Make_Friends.Title}}</span>
+                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Why_Make_Friends.Madal.Lists[0]}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
             </ul>
@@ -69,5 +69,3 @@
         </div>
     </div>
 </div>
-<div class="modal-overlay"></div>
-<div class="popup-overlay"></div>

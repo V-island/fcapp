@@ -127,7 +127,7 @@ $users: account, blacklist, live, price, score, setting, video, watch, invite, a
 $modals: fecebook, tumblr, Twitter, cards, paypal, confirm, phiz, video, live, close;
 
 @each $modal in $modals {
-    .modal-#{$modal}{
+    .modals-#{$modal}{
         @include iconImage($modal, 'modals/icon');
 
         @if $modal == confirm {

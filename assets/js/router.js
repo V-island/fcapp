@@ -491,12 +491,7 @@
          * @private
          */
         _parseDocument(url, $doc, $component) {
-            $doc = Template.render($doc, {
-                BAR_ITEM_Home: 'Home',
-                BAR_ITEM_Favorite: 'Favorite',
-                BAR_ITEM_Message: 'Message',
-                BAR_ITEM_Me: 'Me'
-            });
+            $doc = Template.render($doc, $.langConfig);
 
             this._saveDocumentIntoCache($doc, url, $component);
         }

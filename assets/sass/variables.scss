@@ -77,11 +77,13 @@ $tag-recharge-border-default: $tag-border-width solid $color-text-gray-light;
 //---------------------------------------------------
 $modal-bg-color: #3D4150;
 $modal-close-color: $color-text-secondary;
-$modal-buton-color: $color-primary;
-$modal-buton-bg: $modal-bg-color;
+$modal-buton-color: $modal-bg-color;
+$modal-buton-bg: $color-primary;
 $modal-buton-active-bg: #d4d4d4;
 $modal-duration: 400ms;
 $modal-border-radius: 0.1rem;
+$modal-input-bg-color: #2C2C33;
+$modal-input-text-color: #666;
 $actions-modal-bg-color: $color-text;
 $actions-modal-title-color: $color-text-gray;
 $actions-modal-duration: 300ms;
