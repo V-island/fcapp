@@ -1,3 +1,6 @@
+import {
+    getCurrentPage
+} from './util';
 /*======================================================
 ************   Panels   ************
 ======================================================*/
@@ -21,7 +24,7 @@
         var clientLeft = panel[0].clientLeft;
 
         // Transition End;
-        var transitionEndTarget = effect === 'reveal' ? $($.getCurrentPage()) : panel;
+        var transitionEndTarget = effect === 'reveal' ? $(getCurrentPage()) : panel;
         var openedTriggered = false;
 
         function panelTransitionEnd() {

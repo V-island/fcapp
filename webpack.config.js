@@ -16,7 +16,6 @@ module.exports = {
 			// './assets/js/components/template-web',
 			// './assets/js/components/AgoraRTCSDK-2.3.0',
 			'./assets/js/intro',
-			'./assets/js/util',
 			'./assets/js/zepto-adapter',
 			'./assets/js/lang',
 			'./assets/js/device',
@@ -34,9 +33,9 @@ module.exports = {
 			// './assets/js/infinite-scroll',
 			// './assets/js/searchbar',
 			'./assets/js/panels',
+			'./assets/js/init',
 			'./assets/js/router',
 			'./assets/js/last-position',
-			'./assets/js/init',
 			'./assets/js/navigator',
 			'./assets/sass/fc.scss'
 			// './assets/js/scroll-fix'

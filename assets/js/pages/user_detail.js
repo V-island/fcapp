@@ -1,3 +1,5 @@
+import Picker from 'better-picker';
+
 let userDetail = {
 	event: function() {
 		let Info = $('.list-info');
@@ -22,7 +24,26 @@ let userDetail = {
 		// 性别
 		Info.on('click', '.list-item[data-madal-gender]', function(e) {
 			let _self = $(this);
+			let _madal = $.langConfig.PERSONAL_DETAIL.Gender.Madal;
 
+			$.options({
+				buttons: [{
+					text: _madal.Male,
+					value: _madal.Male,
+					fill: true,
+					onClick: function(text, value) {
+						console.log('确认修改' + value);
+						_self.find(metaClass).text(text);
+					}
+				}, {
+					text: _madal.Female,
+					value: _madal.Female,
+					onClick: function(text, value) {
+						console.log('确认修改' + value);
+						_self.find(metaClass).text(text);
+					}
+				}]
+			});
 		});
 
 		// 年龄
@@ -84,7 +105,18 @@ let userDetail = {
 
 		Info.on('click', '.list-item[data-madal-friends]', function(e) {
 			let _self = $(this);
+			let _madal = $.langConfig.PERSONAL_DETAIL.Why_Make_Friends.Madal;
+			console.log(Picker);
+			console.log(_madal.Lists);
+			let picker = new Picker({
+				data: [_madal.Lists]
+			});
+			picker.show();
 
+			picker.on('picker.valuechange', function(selectedVal, selectedIndex) {
+				console.log(selectedVal);
+				console.log(selectedIndex);
+			});
 		});
 	},
 	init: function() {

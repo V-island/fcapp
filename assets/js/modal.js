@@ -58,6 +58,47 @@
     };
 
     /**
+     * 选择表
+     * @param  {[object]} params [description]
+     * @return {[type]}        [description]
+     */
+    $.options = function (params) {
+        params = params || {};
+        let buttonsHTML = '';
+        if (params.buttons && params.buttons.length > 0) {
+            for (let i = 0; i < params.buttons.length; i++) {
+                buttonsHTML += '<li class="list-item" data-value="'+ params.buttons[i].value +'" data-ripple>' + params.buttons[i].text + '</li>';
+            }
+        }
+        let titleHTML = params.title ? '<div class="modal-title">' + params.title + '</div>' : '';
+        let closeHTML = params.closeBtn ? '<a href="javascript: void(0)" class="modal-close"><i class="ion ion-md-close"></i></a>' : '';
+        let headerHTML = titleHTML || closeHTML ? '<div class="modal-header">' + (titleHTML + closeHTML) + '</div>' : '';
+        let modalHTML = '<div class="modal">' + headerHTML + '<ul class="list modal-list">' + buttonsHTML + '</ul></div>';
+
+        _modalTemplateTempDiv.innerHTML = modalHTML;
+
+        let modal = $(_modalTemplateTempDiv).children();
+
+        $(defaults.modalContainer).append(modal[0]);
+
+        // Add events on buttons
+        modal.find('.list-item').each(function (index, el) {
+            $(el).on('click', function (e) {
+                if (params.buttons[index].close !== false) $.closeModal(modal);
+                if (params.buttons[index].onClick) {
+                    let _self = $(this);
+                    let _value = _self.data('value');
+                    let _text = _self.text();
+                    params.buttons[index].onClick(_text, _value);
+                };
+            });
+        });
+
+        $.openModal(modal);
+        return modal[0];
+    };
+
+    /**
      * 警告框
      * @param  {[string]} text       内容文字
      * @param  {[string]} title      标题文字
@@ -289,8 +330,6 @@
         let cancelHTML = params.cancelBtn ? '<a href="javascript: void(0)" class="button button-link actions-button-cancel" data-ripple>Cancel</a>' : '';
         let modalHTML = '<div class="actions-modal">' + (headerHTML + modal + cancelHTML) + '</div>';
 
-        let _modalTemplateTempDiv = document.createElement('div');
-
         _modalTemplateTempDiv.innerHTML = modalHTML;
 
         let _modal = $(_modalTemplateTempDiv).children();
@@ -341,7 +380,7 @@
 
         return modal[0];
     };
-    /*
+
     $.pickerModal = function (pickerModal, removeOnClose) {
         if (typeof removeOnClose === 'undefined') removeOnClose = true;
         if (typeof pickerModal === 'string' && pickerModal.indexOf('<') >= 0) {
@@ -358,6 +397,7 @@
         $.openModal(pickerModal);
         return pickerModal[0];
     };
+
     $.loginScreen = function (modal) {
         if (!modal) modal = '.login-screen';
         modal = $(modal);
@@ -369,7 +409,7 @@
         $.openModal(modal);
         return modal[0];
     };
-    */
+
 
     /**
      * //显示一个消息，会在2秒钟后自动消失
