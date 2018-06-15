@@ -4,18 +4,9 @@ import EventEmitter from './eventEmitter';
 import {
     extend,
     createDom,
-    addEvent,
     addClass,
     removeClass
 } from './util';
-
-// import pickerTemplate from './picker.handlebars';
-// import './picker.styl';
-
-const PickerHtml = {
-    pickerHTML:'',
-    itemHTML: '<li class="wheel-item" data-val="{{value}}">{{text}}</li>',
-}
 
 export default class Picker extends EventEmitter {
     constructor(options) {
@@ -25,25 +16,29 @@ export default class Picker extends EventEmitter {
             data: [],
             title: '',
             selectedIndex: null,
-            showCls: 'show'
+            closeBtn: true,
+            wrapperClass: 'wheels-wrapper',
+            pickerClass: 'wheels',
+            confirmClass: 'btn-confirm',
+            closeClass: 'btn-close',
+            iconCloseClass: 'modal-close',
+            scrollClass: 'wheels-scroll',
+            itemClass: 'wheels-item',
+            showClass: 'active'
         };
 
         extend(this.options, options);
 
         this.data = this.options.data;
-        this.pickerEl = createDom(this._pickerTemplate({
-            data: this.data,
-            title: this.options.title
-        }));
+        this.modalEl = createDom(this._pickerTemplate(this.options));
 
-        document.body.appendChild(this.pickerEl);
+        document.body.append(this.modalEl);
 
-        this.maskEl = this.pickerEl.getElementsByClassName('mask-hook')[0];
-        this.wheelEl = this.pickerEl.getElementsByClassName('wheel-hook');
-        this.panelEl = this.pickerEl.getElementsByClassName('panel-hook')[0];
-        this.confirmEl = this.pickerEl.getElementsByClassName('confirm-hook')[0];
-        this.cancelEl = this.pickerEl.getElementsByClassName('cancel-hook')[0];
-        this.scrollEl = this.pickerEl.getElementsByClassName('wheel-scroll-hook');
+        this.pickerEl = this.modalEl.getElementsByClassName(this.options.pickerClass);
+        this.confirmEl = this.modalEl.getElementsByClassName(this.options.confirmClass)[0];
+        this.cancelEl = this.modalEl.getElementsByClassName(this.options.closeClass)[0];
+        this.closeEl = this.modalEl.getElementsByClassName(this.options.iconCloseClass)[0];
+        this.scrollEl = this.modalEl.getElementsByClassName(this.options.itemClass);
 
         this._init();
     }
@@ -51,6 +46,7 @@ export default class Picker extends EventEmitter {
     _init() {
         this.selectedIndex = [];
         this.selectedVal = [];
+        this.selectedText = [];
         if (this.options.selectedIndex) {
             this.selectedIndex = this.options.selectedIndex;
         } else {
@@ -63,51 +59,75 @@ export default class Picker extends EventEmitter {
     }
 
     _bindEvent() {
-        addEvent(this.pickerEl, 'touchmove', (e) => {
+        let _self = this;
+
+        _self.modalEl.addEventListener('touchmove', function(e) {
             e.preventDefault();
         });
 
-        addEvent(this.confirmEl, 'click', () => {
-            this.hide();
+        _self.confirmEl.addEventListener('click', function() {
+            _self.hide();
 
             let changed = false;
-            for (let i = 0; i < this.data.length; i++) {
-                let index = this.wheels[i].getSelectedIndex();
-                this.selectedIndex[i] = index;
+            for (let i = 0; i < _self.data.length; i++) {
+                let index = _self.wheels[i].getSelectedIndex();
+                _self.selectedIndex[i] = index;
 
-                let value = null;
-                if (this.data[i].length) {
-                    value = this.data[i][index].value;
+                let value = null,
+                    text = null;
+                if (_self.data[i].length) {
+                    value = _self.data[i][index].value;
+                    text = _self.data[i][index].text;
                 }
-                if (this.selectedVal[i] !== value) {
+                if (_self.selectedVal[i] !== value) {
                     changed = true;
                 }
-                this.selectedVal[i] = value;
+                _self.selectedVal[i] = value;
+                _self.selectedText[i] = text;
             }
 
-            this.trigger('picker.select', this.selectedVal, this.selectedIndex);
+            _self.trigger('picker.select', _self.selectedVal, _self.selectedIndex);
 
             if (changed) {
-                this.trigger('picker.valuechange', this.selectedVal, this.selectedIndex);
+                _self.trigger('picker.valuechange', _self.selectedVal, _self.selectedText, _self.selectedIndex);
             }
         });
 
-        addEvent(this.cancelEl, 'click', () => {
-            this.hide();
-            this.trigger('picker.cancel');
+        _self.cancelEl.addEventListener('click', function() {
+            _self.hide();
+            _self.trigger('picker.cancel');
+        });
+
+        _self.closeEl.addEventListener('click', function() {
+            _self.hide();
+            _self.trigger('picker.cancel');
         });
     }
 
-    _createWheel(wheelEl, i) {
-        this.wheels[i] = new BScroll(wheelEl[i], {
+    _createWheel(pickerEl, i) {
+        this.wheels[i] = new BScroll(pickerEl[i], {
             wheel: true,
-            selectedIndex: this.selectedIndex[i]
+            selectedIndex: this.selectedIndex[i],
+            wheel: {
+                selectedIndex: this.selectedIndex[i],
+                /** 默认值就是下面配置的两个，为了展示二者的作用，这里再配置一下 */
+                wheelWrapperClass: this.options.scrollClass,
+                wheelItemClass: this.options.itemClass
+            },
+            probeType: 3
         });
         ((index) => {
+            let showCls = this.options.showClass;
+
+            this.wheels[index].on('beforeScrollStart', () => {
+                let currentIndex = this.wheels[index].getSelectedIndex();
+                removeClass(this.scrollEl[currentIndex], showCls);
+            });
             this.wheels[index].on('scrollEnd', () => {
                 let currentIndex = this.wheels[index].getSelectedIndex();
                 if (this.selectedIndex[i] !== currentIndex) {
                     this.selectedIndex[i] = currentIndex;
+                    addClass(this.scrollEl[currentIndex], showCls);
                     this.trigger('picker.change', index, currentIndex);
                 }
             });
@@ -116,30 +136,44 @@ export default class Picker extends EventEmitter {
     }
 
     _pickerTemplate(options) {
-
+        options = options || {};
+        let modalHTML = '';
+        let buttonsHTML = '';
+        let afterTextHTML = '';
+        if (options.buttons && options.buttons.length > 0) {
+            for (let i = 0; i < options.buttons.length; i++) {
+                buttonsHTML += '<span class="modal-button ' + (options.buttons[i].fill ? 'modal-button-fill ' + options.closeClass : options.confirmClass) + '" data-ripple>' + options.buttons[i].text + '</span>';
+            }
+        }
+        let titleHTML = options.title ? '<div class="modal-title">' + options.title + '</div>' : '';
+        let closeHTML = options.closeBtn ? '<a href="javascript: void(0)" class="'+ options.iconCloseClass +'"><i class="ion ion-md-close"></i></a>' : '';
+        options.data.forEach((_data, index) => {
+            afterTextHTML += '<div class="'+ options.pickerClass +'"><ul class="'+ options.scrollClass +'">'+ this._itemTemplate(_data) +'</ul></div>';
+        });
+        modalHTML = '<div class="modal"><div class="modal-header">' + (titleHTML + closeHTML) + '</div><div class="modal-inner '+ options.wrapperClass +'">' + afterTextHTML + '</div><div class="modal-buttons">' + buttonsHTML + '</div></div>';
+        return modalHTML;
     }
 
     _itemTemplate(data) {
-        let html;
-        datas.forEach((data, index) => {
-            let item = PickerHtml.itemHTML.replace('{{value}}', data[index].value);
-            html += item.replace('{{text}}', data[index].text);
+        let html = '';
+        data.forEach((_data, index) => {
+            html += '<li class="'+ this.options.itemClass + ' ' + (index === 0 ? this.options.showClass : '') +'" data-val="'+ _data.value +'">'+ _data.text +'</li>';
         });
         return html;
     }
 
+    /**
+     * Picker.show()
+     * 显示筛选器
+     * @param  {Function} next 为筛选器显示后执行的回调函数
+     * @return {[type]}        [description]
+     */
     show(next) {
-        this.pickerEl.style.display = 'block';
-        let showCls = this.options.showCls;
-
         window.setTimeout(() => {
-            addClass(this.maskEl, showCls);
-            addClass(this.panelEl, showCls);
-
             if (!this.wheels) {
                 this.wheels = [];
                 for (let i = 0; i < this.data.length; i++) {
-                    this._createWheel(this.wheelEl, i);
+                    this._createWheel(this.pickerEl, i);
                 }
             } else {
                 for (let i = 0; i < this.data.length; i++) {
@@ -151,19 +185,26 @@ export default class Picker extends EventEmitter {
         }, 0);
     }
 
+    /**
+     * Picker.hide()
+     * 隐藏筛选器，一般来说，筛选器内部已经实现了隐藏逻辑，不必主动调用。
+     * @return {[type]} [description]
+     */
     hide() {
-        let showCls = this.options.showCls;
-        removeClass(this.maskEl, showCls);
-        removeClass(this.panelEl, showCls);
-
         window.setTimeout(() => {
-            this.pickerEl.style.display = 'none';
             for (let i = 0; i < this.data.length; i++) {
                 this.wheels[i].disable();
             }
         }, 500);
     }
 
+    /**
+     * Picker.refillColumn()
+     * 重填某一列的数据
+     * @param  {[type]} index 为列序号
+     * @param  {[type]} data  为数据数组
+     * @return {[type]}       [description]
+     */
     refillColumn(index, data) {
         let scrollEl = this.scrollEl[index];
         let wheel = this.wheels[index];
@@ -190,6 +231,12 @@ export default class Picker extends EventEmitter {
         }
     }
 
+    /**
+     * Picker.refill()
+     * 重填全部数据
+     * @param  {[type]} datas 为二位数组，如[lists1, lists2, lists3]
+     * @return {[type]}       [description]
+     */
     refill(datas) {
         let ret = [];
         if (!datas.length) {
@@ -201,8 +248,35 @@ export default class Picker extends EventEmitter {
         return ret;
     }
 
+    /**
+     * Picker.scrollColumn()
+     * 复位某一列的默认选项
+     * @param  {[type]} index 为列序号
+     * @param  {[type]} dist  为选项的下标，起始值为0
+     * @return {[type]}       [description]
+     */
     scrollColumn(index, dist) {
         let wheel = this.wheels[index];
         wheel.wheelTo(dist);
     }
 }
+
+/**
+ * picker.change
+ * 当一列滚动停止的时候，会派发 picker.change 事件，同时会传递列序号 index 及滚动停止的位置 selectedIndex。
+ */
+
+/**
+ * picker.select
+ * 当用户点击确定的时候，会派发 picker.select 事件，同时会传递每列选择的值数组 selectedVal 和每列选择的序号数组 selectedIndex。
+ */
+
+/**
+ * picker.cancel
+ * 当用户点击取消的时候，会派发picker.cancel事件。
+ */
+
+/**
+ * picker.valuechange
+ * 当用户点击确定的时候，如果本次选择的数据和上一次不一致，会派发 picker.valuechange 事件，同时会传递每列选择的值数组 selectedVal 和每列选择的序号数组 selectedIndex。
+ */

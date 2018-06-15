@@ -1,4 +1,4 @@
-import Picker from 'better-picker';
+// import Picker from 'better-picker';
 
 let userDetail = {
 	event: function() {
@@ -49,7 +49,14 @@ let userDetail = {
 		// 年龄
 		Info.on('click', '.list-item[data-madal-age]', function(e) {
 			let _self = $(this);
+			let _title = $.langConfig.PERSONAL_DETAIL.Age.Madal.Title;
 
+			$.dateTimePickerModal(_title,
+				function(value) {
+					console.log('确认修改' + value);
+					_self.find(metaClass).text(value);
+				},
+			);
 		});
 
 		// 身高
@@ -67,7 +74,6 @@ let userDetail = {
 					console.log('取消修改' + value);
 				}
 			);
-
 		});
 
 		// 体重
@@ -85,38 +91,78 @@ let userDetail = {
 					console.log('取消修改' + value);
 				}
 			);
-
 		});
 
 		Info.on('click', '.list-item[data-madal-interest]', function(e) {
 			let _self = $(this);
+			let _madal = $.langConfig.PERSONAL_DETAIL.Interest.Madal;
+
+			$.checkboxModal({
+				text: _madal.Text,
+				title: _madal.Title,
+				data: _madal.Lists,
+				closeBtn: true,
+				selected: 3,
+			}, function(data) {
+				let text = [];
+				data.forEach((_data, index) => {
+				    text.push(_data.text);
+				});
+				_self.find(metaClass).text(text.join(' and '));
+			});
 
 		});
 
 		Info.on('click', '.list-item[data-madal-type]', function(e) {
 			let _self = $(this);
+			let _madal = $.langConfig.PERSONAL_DETAIL.Your_Type.Madal;
+
+			$.checkboxModal({
+				text: _madal.Text,
+				title: _madal.Title,
+				data: _madal.Lists,
+				closeBtn: true,
+				selected: 3,
+			}, function(data) {
+				let text = [];
+				data.forEach((_data, index) => {
+				    text.push(_data.text);
+				});
+				_self.find(metaClass).text(text.join(' and '));
+			});
 
 		});
 
 		Info.on('click', '.list-item[data-madal-love]', function(e) {
 			let _self = $(this);
+			let _madal = $.langConfig.PERSONAL_DETAIL.Love.Madal;
+
+			$.checkboxModal({
+				text: _madal.Text,
+				title: _madal.Title,
+				data: _madal.Lists,
+				closeBtn: true,
+				selected: 3,
+			}, function(data) {
+				let text = [];
+				data.forEach((_data, index) => {
+				    text.push(_data.text);
+				});
+				_self.find(metaClass).text(text.join(' and '));
+			});
 
 		});
 
 		Info.on('click', '.list-item[data-madal-friends]', function(e) {
 			let _self = $(this);
 			let _madal = $.langConfig.PERSONAL_DETAIL.Why_Make_Friends.Madal;
-			console.log(Picker);
-			console.log(_madal.Lists);
-			let picker = new Picker({
-				data: [_madal.Lists]
-			});
-			picker.show();
 
-			picker.on('picker.valuechange', function(selectedVal, selectedIndex) {
-				console.log(selectedVal);
-				console.log(selectedIndex);
-			});
+			$.pickerModal(_madal.Lists, _madal.Title,
+				function(value, text) {
+					console.log('确认修改' + text);
+					_self.find(metaClass).text(text);
+				},
+			);
 		});
 	},
 	init: function() {

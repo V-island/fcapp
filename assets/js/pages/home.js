@@ -1,12 +1,17 @@
 import Swiper from 'swiper';
 
 let home = {
+	LANG: {},
+
 	event: function() {
 		$('.card-content','.card-list').on('click', function() {
-			$.alert('She is looking forward to your true love', 'Not enough coins', function() {
+			console.log(this.LANG);
+			let _notCoins = this.LANG.NotCoins.Text;
+
+			$.alert(_notCoins.Text, _notCoins.Title, function() {
 				// modal.popup();
 				location.hash = '#/live';
-			});
+			}, _notCoins.ButtonsText);
 		});
 	},
 	homeSwiper: function() {
@@ -128,6 +133,7 @@ let home = {
 	},
 	init: function() {
 		console.log('这里是homejs');
+		this.LANG = $.langConfig.HOME.Madal;
 		this.homeSwiper();
 		this.event();
 	}

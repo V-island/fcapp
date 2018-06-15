@@ -8,6 +8,13 @@ const Lang = {
 			Singing: 'Singing',
 			Emotion: 'Emotion',
 			Art: 'Art'
+		},
+		Madal: {
+			NotCoins: {
+				Title: 'Not enough coins',
+				Text: 'She is looking forward to your true love',
+				ButtonsText: 'BUY NOW'
+			}
 		}
 	},
 	FAVORITE: {

@@ -22,8 +22,6 @@ module.exports = {
 			'./assets/js/fastclick',
 			'./assets/js/modal',
 			// './assets/js/calendar',//日历
-			// './assets/js/picker',//选择器
-			// './assets/js/datetime-picker',
 			// './assets/js/iscroll',
 			'./assets/js/scroller',
 			// './assets/js/tabs',

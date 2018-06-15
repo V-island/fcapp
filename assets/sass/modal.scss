@@ -171,6 +171,20 @@
         transform: translate3d( 0,100%,0);
     }
 }
+.popup-text {
+    text-align: center;
+    color: $color-primary;
+    font-size: 0.6rem;
+    margin-bottom: 0.35rem;
+    line-height: 1.5;
+}
+.popup-list {
+    .list-item-meta {
+        width: 0.5rem !important;
+        height: 0.5rem !important;
+    }
+}
+
 .login-screen.modal-in, .login-screen.modal-out {
     display: block;
 }
@@ -242,7 +256,7 @@ html.with-statusbar-overlay {
     position: relative;
     @include hairline(top, $actions-modal-color-split);
 }
-//toast
+// toast
 .toast {
   background: rgba(0, 0, 0, .8);
   border-radius: 1rem;
@@ -252,4 +266,35 @@ html.with-statusbar-overlay {
   line-height: 2rem;
   font-size: 0.8rem;
   width: auto;
+}
+// Picker
+.wheels-wrapper {
+    @include flexbox;
+
+    .wheels {
+        @include flex;
+        height: 3.15rem;
+        overflow: hidden;
+        font-size: 0.7rem;
+    }
+
+    .wheels-scroll {
+        line-height: 1.05rem;
+        padding: 0;
+        margin-top: 1.05rem;
+    }
+
+    .wheels-item {
+        list-style: none;
+        height: 1.05rem;
+        overflow: hidden;
+        white-space: nowrap;
+        color: $picker-text-color;
+        border-left: 2px solid transparent;
+
+        &.active {
+            color: $picker-text-color-active;
+            border-color: $color-primary;
+        }
+    }
 }

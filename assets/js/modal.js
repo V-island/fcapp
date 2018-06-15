@@ -1,3 +1,6 @@
+import Picker from './picker';
+import DateTimePicker from 'pickerjs';
+
 +function ($) {
     "use strict";
     let _modalTemplateTempDiv = document.createElement('div');
@@ -42,12 +45,17 @@
 
         $(defaults.modalContainer).append(modal[0]);
 
+        let picker;
+        if (typeof params.onEvent === 'function') {
+            picker = params.onEvent(modal[0]);
+        }
+
         // Add events on buttons
         modal.find('.modal-button').each(function (index, el) {
             $(el).on('click', function (e) {
                 if (params.buttons[index].close !== false) $.closeModal(modal);
                 if (params.buttons[index].onClick) params.buttons[index].onClick(modal, e);
-                if (params.onClick) params.onClick(modal, index);
+                if (params.onClick) params.onClick(modal, index, picker);
             });
         });
         modal.find('.modal-close').on('click', function(e) {
@@ -114,9 +122,10 @@
         return $.modal({
             text: text || '',
             title: typeof title === 'undefined' ? defaults.modalTitle : title,
+            closeBtn: true,
+            verticalButtons: true,
             buttons: [{
                 text: typeof button === 'undefined' ? defaults.modalButtonOk : button,
-                bold: true,
                 onClick: callbackOk
             }]
         });
@@ -354,17 +363,15 @@
     /**
      * 弹出整页
      * @param  {[string]} modal         [description]
-     * @param  {[type]} removeOnClose [description]
+     * @param  {[function]} removeOnClose [description]
      * @return {[type]}               [description]
      */
-    $.popup = function (modal, removeOnClose) {
-        if (typeof removeOnClose === 'undefined') removeOnClose = true;
+    $.popup = function (modal, callbackOnClose) {
         if (typeof modal === 'string' && modal.indexOf('<') >= 0) {
             let _modal = document.createElement('div');
             _modal.innerHTML = modal.trim();
             if (_modal.childNodes.length > 0) {
                 modal = _modal.childNodes[0];
-                if (removeOnClose) modal.classList.add('remove-on-close');
                 $(defaults.modalContainer).append(modal);
             }
             else return false; //nothing found
@@ -376,38 +383,139 @@
         if (modal.find('.' + defaults.viewClass).length > 0) {
             $.sizeNavbars(modal.find('.' + defaults.viewClass)[0]);
         }
-        $.openModal(modal);
+        if (typeof callbackOnClose === 'function') callbackOnClose(modal);
 
+        $.openModal(modal);
         return modal[0];
     };
 
-    $.pickerModal = function (pickerModal, removeOnClose) {
-        if (typeof removeOnClose === 'undefined') removeOnClose = true;
-        if (typeof pickerModal === 'string' && pickerModal.indexOf('<') >= 0) {
-            pickerModal = $(pickerModal);
-            if (pickerModal.length > 0) {
-                if (removeOnClose) pickerModal.addClass('remove-on-close');
-                $(defaults.modalContainer).append(pickerModal[0]);
+    /**
+     * 弹框滑动选择
+     * @param  {[array]} data           为二位数组，如[lists1, lists2, lists3]
+     * @param  {[string]} title          标题文字
+     * @param  {[function]} callbackOk     通过事件
+     * @param  {[function]} callbackCancel 取消事件
+     * @return {[type]}                [description]
+     */
+    $.pickerModal = function (data, title, callbackOk, callbackCancel) {
+        if (typeof title === 'function') {
+            callbackCancel = arguments[2];
+            callbackOk = arguments[1];
+            title = false;
+        }
+        let picker = new Picker({
+            data: [data],
+            title: title,
+            buttons: [{
+                text: defaults.confirmButtonCancel,
+                fill: true,
+            }, {
+                text: defaults.confirmButtonOk
+            }]
+        });
+
+        picker.show();
+        picker.on('picker.valuechange', function(selectedVal, selectedText, selectedIndex) {
+            $.closeModal(picker.modalEl);
+            callbackOk(selectedIndex, selectedText);
+        });
+        picker.on('picker.cancel', function() {
+            $.closeModal(picker.modalEl);
+        });
+
+        $.openModal(picker.modalEl);
+        return picker.modalEl;
+    };
+
+    /**
+     * 日期时间选择器
+     * @param  {[type]} title          标题文字
+     * @param  {[type]} callbackOk     通过事件
+     * @param  {[type]} callbackCancel 取消事件
+     * @return {[type]}                [description]
+     */
+    $.dateTimePickerModal = function (title, callbackOk, callbackCancel) {
+        if (typeof title === 'function') {
+            callbackOk = arguments[1];
+            callbackCancel = arguments[2];
+            title = undefined;
+        }
+        return $.modal({
+            title: typeof title === 'undefined' ? defaults.modalTitle : title,
+            closeBtn: true,
+            afterText: '<div class="data-time-picker"></div>',
+            buttons: [
+                {
+                    text: defaults.confirmButtonCancel,
+                    fill: true
+                },
+                {
+                    text: defaults.confirmButtonOk
+                }
+            ],
+            onClick: function (modal, index, picker) {
+                if (index === 0 && callbackCancel) callbackCancel(picker.getDate());
+                if (index === 1 && callbackOk) callbackOk(picker.getDate());
+            },
+            onEvent: function (modal) {
+                let _element = modal.querySelector('.data-time-picker');
+                let picker = new DateTimePicker(_element, {
+                    inline: true,
+                    format: 'YYYY-MM-DD',
+                    rows: 3,
+                });
+                return picker;
             }
-            else return false; //nothing found
-        }
-        pickerModal = $(pickerModal);
-        if (pickerModal.length === 0) return false;
-        pickerModal.show();
-        $.openModal(pickerModal);
-        return pickerModal[0];
+        });
     };
 
-    $.loginScreen = function (modal) {
-        if (!modal) modal = '.login-screen';
-        modal = $(modal);
-        if (modal.length === 0) return false;
-        modal.show();
-        if (modal.find('.' + defaults.viewClass).length > 0) {
-            $.sizeNavbars(modal.find('.' + defaults.viewClass)[0]);
-        }
-        $.openModal(modal);
-        return modal[0];
+    /**
+     * 多选弹框
+     * @param  {[type]} params     [description]
+     * @param  {[type]} callbackOk 通过事件
+     * @return {[type]}            [description]
+     */
+    $.checkboxModal = function (params, callbackOk) {
+        params = params || {};
+        let modalHTML = '',
+            listHTML = '';
+        let titleHTML = params.title ? '<h1 class="title">'+ params.title +'</h1>' : '';
+        let closeHTML = params.closeBtn ? '<div class="icon-btn close-popup" data-ripple><i class="icon icon-arrow-back"></i></div>' : '';
+        let textHTML = params.text ? '<p class="popup-text">' + params.text + '</p>' : '';
+        let selected = params.selected ? params.selected : 3;
+
+        params.data.forEach((_data, index) => {
+            listHTML += '<li class="list-item" data-val="'+ _data.value +'" data-ripple><span class="list-item-text">'+ _data.text +'</span><span class="icon user-checkbox list-item-meta"></span></li>';
+        });
+        modalHTML = '<div class="popup"><header class="bar bar-flex">'+ (closeHTML + titleHTML) +'</header><div class="content block">'+ textHTML + '<ul class="list list-user list-info popup-list">'+ listHTML +'</ul></div></div>';
+        return $.popup(modalHTML, function(modal) {
+            modal.find('.list-item').on('click', function() {
+                let _self = $(this);
+                let _item = modal.find('.list-item.active');
+
+                if (_self.hasClass('active')) {
+                    _self.removeClass('active');
+                }else {
+                    if (_item.length >= selected) {
+                        return;
+                    }
+                    _self.addClass('active');
+                }
+            });
+            modal.find('.close-popup').on('click', function(e) {
+                let _item = modal.find('.list-item.active');
+                let _Data = [];
+
+                modal.find('.list-item.active').each(function (index, el) {
+                    let _child = {};
+                    _child.value = $(el).data('val');
+                    _child.text = $(el).find('.list-item-text').text();
+                    _Data.push(_child);
+                });
+                callbackOk(_Data);
+            });
+            $('[data-ripple]').ripple();
+        });
     };
 
 

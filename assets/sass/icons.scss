@@ -112,11 +112,15 @@ $messages: comment, friends, hi, like, message, service;
 // User Icon
 // -----------------------------
 
-$users: account, blacklist, live, price, score, setting, video, watch, invite, arrow-forward, arrow-forward-active, stars;
+$users: account, blacklist, live, price, score, setting, video, watch, invite, arrow-forward, arrow-forward-active, stars, checkbox;
 
 @each $user in $users {
     .user-#{$user}{
         @include iconImage($user, 'users/icon');
+
+        @if $user == checkbox {
+            @include iconActive($user, 'users/icon');
+        }
     }
 
 }
