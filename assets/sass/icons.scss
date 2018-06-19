@@ -59,7 +59,7 @@ $ionicons-version: "4.1.0" !default;
 // Live Icon
 // -----------------------------
 
-$names: search, filter, arrow-back, home, favorite, live, message, me, female, male, add;
+$names: search, filter, arrow-back, home, favorite, live, message, me, female, male, add, eye, eye-black;
 
 @each $name in $names {
     .icon-#{$name}{

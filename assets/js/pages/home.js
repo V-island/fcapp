@@ -1,12 +1,16 @@
 import Swiper from 'swiper';
 
 let home = {
-	LANG: {},
-
+	init: function() {
+		console.log('这里是homejs');
+		this.homeSwiper();
+		this.event();
+	},
 	event: function() {
+		const LANG = $.langConfig.HOME.Madal;
+
 		$('.card-content','.card-list').on('click', function() {
-			console.log(this.LANG);
-			let _notCoins = this.LANG.NotCoins.Text;
+			let _notCoins = LANG.NotCoins;
 
 			$.alert(_notCoins.Text, _notCoins.Title, function() {
 				// modal.popup();
@@ -130,12 +134,6 @@ let home = {
 				bulletActiveClass: 'active',
 			}
 		})
-	},
-	init: function() {
-		console.log('这里是homejs');
-		this.LANG = $.langConfig.HOME.Madal;
-		this.homeSwiper();
-		this.event();
 	}
 }
 export default home;

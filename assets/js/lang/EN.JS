@@ -42,6 +42,29 @@ const Lang = {
 			Setting: 'Setting'
 		}
 	},
+	LOGIN: {
+		Title: 'Welcome',
+		Froms: {
+			Country: {
+				Title: 'Country'
+			},
+			Telephone: {
+				Placeholder: 'Your  telephone  number'
+			},
+			Password: {
+				Title: 'Password',
+				Placeholder: '8-12 bit character'
+			}
+		},
+		Buttons: {
+			Login: 'Login',
+			Forget_password: 'Forget  password?',
+			Register: 'Register'
+		},
+		Third_party: {
+			Title: 'or login'
+		}
+	},
 	PERSONAL_DETAIL: {
 		Profile_Photo: 'Profile photo',
 		Username: {

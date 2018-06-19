@@ -56,6 +56,11 @@
         line-height: 1.5rem;
     }
 
+    &.button-block {
+        display: block;
+        width: 100%;
+    }
+
     i.icon {
         &:first-child {
             margin-right: 0.5rem;

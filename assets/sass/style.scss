@@ -440,3 +440,53 @@
 		}
 	}
 }
+
+// login-wrapper
+// ------------------------------
+.login-wrapper{
+	overflow: hidden;
+}
+
+.login-content{
+	padding: 2.45rem;
+
+	.login-title{
+		font-size: 1.5rem;
+		color: $color-text;
+	}
+}
+
+.login-footer{
+	text-align: center;
+
+	>p {
+		font-size: 0.5rem;
+		color: $color-text-gray-light;
+	    margin-bottom: 1.75rem;
+	    min-width: 7.5rem;
+	    display: inline-block;
+	    position: relative;
+
+	    $starts: after, before;
+	    @each $start in $starts {
+		    &:#{$start}{
+		    	content: "";
+	    	    height: 1px;
+	    	    width: 2.1rem;
+	    	    display: block;
+	    	    background: $color-text-gray-light;
+	    	    position: absolute;
+	    	    top: 0.35rem;
+
+		        @if $start == after {
+		            left: 0;
+		        }
+		        @else {
+		        	right: 0;
+		        }
+
+		    }
+
+		}
+	}
+}

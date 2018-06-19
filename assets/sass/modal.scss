@@ -119,10 +119,10 @@
     }
     .modal-buttons-vertical & {
         border-radius: 0;
-        &:last-child {
-            border-radius: 0 0 0.35rem 0.35rem;
-            @include hairline-remove(bottom);
-        }
+        // &:last-child {
+        //     border-radius: 0 0 0.35rem 0.35rem;
+        //     @include hairline-remove(bottom);
+        // }
     }
 }
 .modal-no-buttons {

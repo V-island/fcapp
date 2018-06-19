@@ -1,1 +1,62 @@
-<p>这里是登录页面</p>
+<div class="page-group">
+    <div class="page">
+        <!-- 这里是页面内容区 -->
+        <div class="content login-wrapper">
+            <div class="login-content">
+                <h2 class="login-title">{{LOGIN.Title}}</h2>
+
+                <form>
+                	<div class="form-group">
+                		<label class="form-label">{{LOGIN.Froms.Country.Title}}</label>
+						<div class="form-control country">English</div>
+						<i class="icon user-arrow-forward mete"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">+86</label>
+            		    <input type="tel" class="form-control" placeholder="{{LOGIN.Froms.Telephone.Placeholder}}">
+                	</div>
+                	<!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">{{LOGIN.Froms.Password.Title}}</label>
+            		    <input type="password" class="form-control" placeholder="{{LOGIN.Froms.Password.Placeholder}}">
+            		    <i class="icon icon-eye-black"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+					<div class="form-group form-button">
+						<div class="button button-primary button-block" data-ripple>{{LOGIN.Buttons.Login}}</div>
+					</div>
+					<!-- /.form-group -->
+
+					<div class="form-section">
+						<a class="section-link" href="" data-ripple>{{LOGIN.Buttons.Forget_password}}</a>
+						<a class="section-link" href="" data-ripple>{{LOGIN.Buttons.Register}}</a>
+					</div>
+
+                </form>
+            </div>
+            <!-- /.login-content -->
+            <div class="login-footer">
+                <p>{{LOGIN.Third_party.Title}}</p>
+                <div class="tag">
+                    <label class="share-label" data-ripple>
+                        <i class="icon modals-fecebook"></i>
+                        <span>Facebook</span>
+                    </label>
+                    <label class="share-label" data-ripple>
+                        <i class="icon modals-Twitter"></i>
+                        <span>Twitter</span>
+                    </label>
+                    <label class="share-label" data-ripple>
+                        <i class="icon modals-tumblr"></i>
+                        <span>Tumblr</span>
+                    </label>
+                </div>
+            </div>
+            <!-- /.login-footer -->
+        </div>
+    </div>
+</div>

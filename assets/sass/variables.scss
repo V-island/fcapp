@@ -129,6 +129,18 @@ $list-message-text-secondary: #B2B2B2;
 $list-message-meta-color: #FF5E5E;
 $list-message-border-color: #666;
 
+// Forms
+//---------------------------------------------------
+$form-group-margin-bottom: 1.05rem;
+$input-height-base: 1.5rem;
+$padding-base-horizontal: 0.6rem;
+$font-size-base: 0.6rem;
+$line-height-base: 1.42857143;
+$input-color: $color-text;
+$input-label-color: #B2B2B2;
+$input-bg: transparent;
+$input-border: 1px solid #666;
+
 //live
 //---------------------------------------------------
 $live-mask-bg-color: rgba(51, 51, 51, 0.2);//#333

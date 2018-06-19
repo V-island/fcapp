@@ -1,4 +1,4 @@
-@mixin Newline {
+@mixin newline {
     word-wrap: break-word;
     word-break: break-all;
 }
@@ -41,6 +41,12 @@
         clear: both;
     }
 
+}
+
+@mixin transition($tra) {
+    -webkit-transition: $tra;
+    -o-transition: $tra;
+    transition: $tra;
 }
 
 @mixin justify-content($jc){
