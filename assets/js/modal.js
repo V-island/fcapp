@@ -518,6 +518,33 @@ import DateTimePicker from 'pickerjs';
         });
     };
 
+    /**
+     * 国家语言选择
+     * @param  {[type]} callbackOk 通过事件
+     * @return {[type]}            [description]
+     */
+    $.countryModal = function (callbackOk) {
+        let params = $.langConfig.COUNTRY;
+        let modalHTML = '',
+            listHTML = '';
+        let titleHTML = params.Title ? '<h1 class="title">'+ params.Title +'</h1>' : '';
+        let closeHTML = '<div class="icon-btn close-popup" data-ripple><i class="icon icon-arrow-back"></i></div>';
+
+        params.Lists.forEach((_data, index) => {
+            listHTML += '<li class="list-item" data-val="'+ _data.value +'" data-lang="'+ _data.lang +'" data-ripple><span class="list-item-text">'+ _data.text +'</span><span class="icon user-checkbox list-item-meta"></span></li>';
+        });
+        modalHTML = '<div class="popup"><header class="bar bar-flex no-bg">'+ (closeHTML + titleHTML) +'</header><div class="content block"><ul class="list list-user list-info popup-list no-bg">'+ listHTML +'</ul></div></div>';
+        return $.popup(modalHTML, function(modal) {
+            modal.find('.list-item').on('click', function() {
+                let _self = $(this);
+                let _value = _self.data('val');
+                let _lang = _self.data('lang');
+                callbackOk(_Data);
+            });
+            $('[data-ripple]').ripple();
+        });
+    }
+
 
     /**
      * //显示一个消息，会在2秒钟后自动消失

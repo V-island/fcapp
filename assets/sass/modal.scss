@@ -152,7 +152,7 @@
     height: 100%;
     z-index: 10400;
     color: $color-text;
-    background-color: $popup-bg-color;
+    background-color: $color-bg;
     box-sizing: border-box;
     display: none;
     @include scrollable;

@@ -133,7 +133,9 @@ a {
 .clearfix {
     @include clearfix;
 }
-
+.no-bg {
+    background: none !important;
+}
 //color
 .color-price{
     color: #FCC635 !important;

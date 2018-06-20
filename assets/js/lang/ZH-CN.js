@@ -118,7 +118,28 @@ const Lang = {
 			Busy: '繁忙',
 			Waiting: '等待'
 		}
-	}
+	},
+	COUNTRY: [{
+		text: '中国',
+		value: '+86',
+		lang: 'zh_cn'
+	}, {
+		text: '英国',
+		value: '+44',
+		lang: 'en'
+	}, {
+		text: '美国',
+		value: '+1',
+		lang: 'en'
+	}, {
+		text: '法国',
+		value: '+33',
+		lang: 'en'
+	}, {
+		text: '巴西',
+		value: '+55',
+		lang: 'en'
+	}]
 
 }
 
