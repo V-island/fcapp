@@ -45,6 +45,7 @@
 
 @mixin transition($tra) {
     -webkit-transition: $tra;
+    -moz-transition: $tra;
     -o-transition: $tra;
     transition: $tra;
 }

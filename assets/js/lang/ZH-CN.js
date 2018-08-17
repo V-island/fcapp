@@ -35,6 +35,34 @@ const Lang = {
 			Setting: '设置'
 		}
 	},
+	LOGIN: {
+		Title: '您好',
+		Buttons: {
+			Login: '登录',
+			Forget_password: '忘记密码?',
+			Register: '注册'
+		},
+		Third_party: {
+			Title: '第三方'
+		},
+		Find_Password: {
+			Title: '忘记密码',
+			Buttons: {
+				Next: '下一步',
+				Confirm: '确定'
+			}
+		}
+	},
+	REGISTER: {
+		Title: '注册',
+		Buttons: {
+			Title: '确认注册'
+		},
+		Terms: {
+			Text: 'Registration indicates that you agree to the',
+			Title: '服务条款'
+		}
+	},
 	PERSONAL_DETAIL: {
 		Profile_Photo: '头像照片',
 		Username: {
@@ -117,29 +145,58 @@ const Lang = {
 		Status: {
 			Busy: '繁忙',
 			Waiting: '等待'
-		}
+		},
+		Froms: {
+			Country: {
+				Title: '国家',
+				Name: '中国',
+				Lang: 'zh_cn'
+			},
+			Telephone: {
+				Title: '密码',
+				Placeholder: '8-12 位',
+				Verification: 'code'
+			},
+			Verification: {
+				Title: 'Verification',
+				Placeholder: '4 -6 numbers'
+			},
+			Password: {
+				Title: '密码',
+				Placeholder: '8-12 位'
+			}
+		},
+		ModalTitle: '提示',
+		ModalButtonOk: '是',
+		ModalButtonCancel: '否',
+		ConfirmButtonOk: '确定',
+		ConfirmButtonCancel: '取消',
+		modalPreloaderTitle: '等待中'
 	},
-	COUNTRY: [{
-		text: '中国',
-		value: '+86',
-		lang: 'zh_cn'
-	}, {
-		text: '英国',
-		value: '+44',
-		lang: 'en'
-	}, {
-		text: '美国',
-		value: '+1',
-		lang: 'en'
-	}, {
-		text: '法国',
-		value: '+33',
-		lang: 'en'
-	}, {
-		text: '巴西',
-		value: '+55',
-		lang: 'en'
-	}]
+	COUNTRY: {
+		Title: 'Country',
+		Lists: [{
+			text: '中国',
+			value: '+86',
+			lang: 'zh_cn'
+		}, {
+			text: '英国',
+			value: '+44',
+			lang: 'en'
+		}, {
+			text: '美国',
+			value: '+1',
+			lang: 'en'
+		}, {
+			text: '法国',
+			value: '+33',
+			lang: 'en'
+		}, {
+			text: '巴西',
+			value: '+55',
+			lang: 'en'
+		}]
+	}
 
 }
 

@@ -7,44 +7,29 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
+const PRODUCTION = 'production';
+
 module.exports = {
 	entry: {
 		fc: [
 			// 'es5-shim',
 			// 'es6-shim',
 			'./assets/js/components/webcomponents-bundle',
-			// './assets/js/components/template-web',
-			// './assets/js/components/AgoraRTCSDK-2.3.0',
-			'./assets/js/intro',
 			'./assets/js/zepto-adapter',
 			'./assets/js/lang',
 			'./assets/js/device',
 			'./assets/js/fastclick',
-			'./assets/js/modal',
-			// './assets/js/calendar',//日历
-			// './assets/js/iscroll',
 			'./assets/js/scroller',
-			// './assets/js/tabs',
-			// './assets/js/fixed-tab',
-			// './assets/js/pull-to-refresh-js-scroll',
-			// './assets/js/pull-to-refresh',
-			// './assets/js/infinite-scroll',
-			// './assets/js/searchbar',
 			'./assets/js/panels',
 			'./assets/js/init',
 			'./assets/js/router',
 			'./assets/js/last-position',
 			'./assets/js/navigator',
-			'./assets/sass/fc.scss'
-			// './assets/js/scroll-fix'
+			'./assets/scss/fc.scss'
 		],
 		'fc-extend': [
 			'jquery-ripple'
 		]
-		// ,cityPicker: [
-		// 	'./assets/js/city-data.js',
-		// 	'./assets/js/city-picker.js'
-		// ]
 	},
 	devtool: 'inline-source-map',
 	output: {
@@ -57,15 +42,25 @@ module.exports = {
 			test: /\.scss$/,
 			use: ExtractTextPlugin.extract({
 				fallback: 'style-loader',
-				use: ['css-loader', 'sass-loader']
+				use: [{
+					loader: 'css-loader',
+					options: {
+						module: true,
+						minimize: process.env.WEBPACK_MODE === PRODUCTION,
+						// sourceMap: true,
+						localIdentName: '[local]'
+					}
+				}, {
+					loader: 'sass-loader'
+				}]
 			})
 		}, {
 			test: /\.(png|svg|jpg|gif)$/,
 			use: [{
 				loader: 'url-loader',
 				options: {
-					name: '[path][name].[ext]',
-					// outputPath: './assets/img',
+					name: '[hash].[ext]',
+					outputPath: '/assets/img',
 					limit: 8192
 				}
 			}]
@@ -153,7 +148,7 @@ module.exports = {
 		}]),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
-			Template: 'art-template/lib/template-web'
+			// Template: 'art-template/lib/template-web'
 			// ,Zepto: 'zepto'
 			// _: 'lodash'
 		}),

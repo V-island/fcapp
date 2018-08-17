@@ -1,33 +1,29 @@
-.buttons-tab {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    position: relative;
-
-    .tab-link {
+.navs-wrapper {
+    .navs-content {
+        @include spindle-center(space-around);
+        position: relative;
+    }
+    .navs-item {
         color: $color-primary;
         font-size: 0.651rem;
         line-height: 1.5rem;
         -webkit-box-flex: 1;
         -ms-flex: 1;
-        // border: 0;
-        // border-bottom: 2px solid transparent;
+        flex: 1 0 0;
+        @include transition(all .3s);
 
-        // &.active {
-        //     color: $color-primary;
-        //     // border-color: $color-primary;
-        //     font-size: 0.85rem;
-        //     z-index: 100;
-        // }
-
+        &.active {
+            @include transition(all .3s);
+            font-size: 0.85rem;
+        }
     }
-
-    > .line {
+    .navs-line {
         width: auto;
         height: 0.07rem;
         position: absolute;
         bottom: 0;
         left: 0;
+        @include transition(all .3s);
 
         >span {
             width: 1.75rem;
@@ -36,37 +32,24 @@
             display: block;
             margin: auto;
         }
-
     }
-
 }
 
-.tabs-container {
-    margin: 0 auto;
-    position: relative;
-    overflow: hidden;
-    list-style: none;
-    padding: 0;    /* Fix of Webkit flickering */
-    z-index: 1;
-    // width: 100%;
-    // height: 100%;
 
-    .tabs-wrapper {
+.pages-wrapper {
+    min-height: 1px;
+    overflow: hidden;
+
+    .pages-content {
         position: relative;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        display: flex;
-        transition-property: transform;
-        box-sizing: content-box;
+        overflow: hidden;
+        white-space: nowrap;
+        @include flex-spindle(start);
     }
 
-    .tab-item {
-        flex-shrink: 0;
-        width: 100%;
-        height: 100%;
-        position: relative;
-        transition-property: transform;
+    .pages-item {
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
 }

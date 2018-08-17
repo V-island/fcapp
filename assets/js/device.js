@@ -103,4 +103,4 @@ Device/OS Detection
     device.isWeixin = /MicroMessenger/i.test(ua);
 
     $.device = device;
-})(jQuery);
+})($);

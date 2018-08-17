@@ -238,4 +238,4 @@
             this.style.display = defaultDisplay(this.nodeName);
         });
     };
-})(jQuery);
+})($);

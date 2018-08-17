@@ -6,7 +6,8 @@
   "main": "src/js/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server dist",
+    "star": "http-server dist",
+    "start": "http-server dist -S -c -k",
     "build": "webpack"
   },
   "repository": {
@@ -45,13 +46,17 @@
   "dependencies": {
     "@webcomponents/webcomponentsjs": "^1.1.0",
     "art-template": "^4.12.2",
-    "better-scroll": "^1.12.1",
+    "axios": "^0.18.0",
+    "better-scroll": "^1.12.4",
+    "cropperjs": "^1.4.1",
     "ionicons": "^4.1.1",
     "jquery": "^3.3.1",
     "jquery-ripple": "^0.2.4",
     "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "pickerjs": "^0.2.0",
+    "sendbird": "^3.0.69",
     "swiper": "^4.2.6",
-    "zepto": "^1.2.0"
+    "wolfy87-eventemitter": "^5.2.5"
   }
 }

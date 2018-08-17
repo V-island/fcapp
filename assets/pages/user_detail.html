@@ -5,63 +5,61 @@
             <a class="icon-btn back" data-ripple>
                 <i class="icon icon-arrow-back"></i>
             </a>
-            <h1 class="title">{{BAR.PERSONAL_DETAIL}}</h1>
+            <h1 class="title">{{PERSONAL_DETAIL.Title}}</h1>
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block">
             <ul class="list list-user list-info">
-                <li class="list-item user-avatar">
-                    <span class="list-item-text">{{PERSONAL_DETAIL.Profile_Photo}}</span>
+                <li class="list-item user-avatar item-avatar" data-ripple>
+                    <span class="list-item-text">{{PERSONAL_DETAIL.Profile_photo.Title}}</span>
                     <div class="list-item-graphic user-info">
-                        <img class="user-img" src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
+                        <div class="user-img {{if UserDetail.user_sex == 1}} avatar-male {{else}} avatar-female {{/if}}" style="{{if UserDetail.user_head}} background-image: url({{UserDetail.user_head}}); {{/if}}">
+                        </div>
                     </div>
                 </li>
-                <li class="list-item" data-ripple data-madal-username>
+                <li class="list-item item-username" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Username.Title}}</span>
-                    <span class="list-item-meta-txt">Geraldine</span>
+                    <span class="list-item-meta-txt">{{UserDetail.user_name}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-gender>
+                <li class="list-item item-gender" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Gender.Title}}</span>
-                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Gender.Madal.Male}}</span>
+                    <span class="list-item-meta-txt" data-sex="{{UserDetail.user_sex}}" >{{if UserDetail.user_sex == 1}} {{PERSONAL_DETAIL.Gender.Madal.Male}} {{else}} {{PERSONAL_DETAIL.Gender.Madal.Female}} {{/if}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-age>
+                <li class="list-item item-age" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Age.Title}}</span>
-                    <span class="list-item-meta-txt">23</span>
+                    <span class="list-item-meta-txt">{{UserDetail.user_age}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-height>
+                <li class="list-item item-height" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Height.Title}}</span>
-                    <span class="list-item-meta-txt">165{{PERSONAL_DETAIL.Height.Unit}}</span>
+                    <span class="list-item-meta-txt">{{UserDetail.user_height}} {{PERSONAL_DETAIL.Height.Unit}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-weight>
+                <li class="list-item item-weight" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Body_Weight.Title}}</span>
-                    <span class="list-item-meta-txt">50{{PERSONAL_DETAIL.Body_Weight.Unit}}</span>
+                    <span class="list-item-meta-txt">{{UserDetail.user_weight}} {{PERSONAL_DETAIL.Body_Weight.Unit}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
             </ul>
             <!-- /.list list-user -->
             <ul class="list list-user list-info">
-                <li class="list-item" data-ripple data-madal-interest>
+                <li class="list-item item-interest" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Interest.Title}}</span>
-                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Interest.Madal.Lists[0].text}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-type>
+                <li class="list-item item-type" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Your_Type.Title}}</span>
-                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Your_Type.Madal.Lists[0].text}} and {{PERSONAL_DETAIL.Your_Type.Madal.Lists[1].text}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-love>
+                <li class="list-item item-love" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Love.Title}}</span>
-                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Love.Madal.Lists[0].text}} and {{PERSONAL_DETAIL.Love.Madal.Lists[1].text}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
-                <li class="list-item" data-ripple data-madal-friends>
+                <li class="list-item item-friends" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Why_Make_Friends.Title}}</span>
-                    <span class="list-item-meta-txt">{{PERSONAL_DETAIL.Why_Make_Friends.Madal.Lists[0].text}}</span>
+                    <span class="list-item-meta-txt">{{UserDetail.make_friends_goal}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
             </ul>

@@ -1,8 +1,27 @@
+import Template from 'art-template/lib/template-web';
+import Tabs from './tabs';
+import {
+    fcConfig
+} from './intro';
+import {
+    getLangConfig
+} from './lang';
+
+import {
+    checkLogin,
+    checkCountry
+} from './api';
+
+import {
+    replaceNote
+} from './util';
+
 +function($) {
     'use strict';
 
     const CONFIG = {
-        rootUrl: 'home'
+        rootUrl: 'home',
+        loginUrl: 'login'
     }
 
     const EVENTS = {
@@ -34,12 +53,13 @@
     }
 
     const RULE = {
-        path: '/test',
         name: 'test',
-        template: '../pages/test.html',
+        path: '../test/test.html',
         component: false,
-        dom: 'body'
+        init: 0
     }
+
+    const LANG = getLangConfig();
 
     /**
      * 验证浏览器是否支持CustomEvent
@@ -62,7 +82,7 @@
      */
     if (!('import' in document.createElement('link'))) {
         console.log(MSG.nosupport);
-        require($.routesConfig.importJs);
+        require(fcConfig.importJs);
     }
 
     let Util = {
@@ -116,6 +136,11 @@
          */
         getHashpage: function(str) {
             let hash = str === undefined ? location.hash : str;
+
+            if (hash.indexOf('?') > -1) {
+                hash = hash.split('?')[0];
+            }
+
             let _hash = hash.split('#')[1];
             let hashIndex = _hash.indexOf('/');
             return hashIndex === -1 ? '' : _hash.slice(hashIndex + 1);
@@ -214,6 +239,8 @@
         visiblePageClass: 'page-visible',
         // 表示是 page 的 class，注意，仅是标志 class，而不是所有的 class
         pageClass: 'page',
+        // 表示是当前 nav 的 class
+        barTabClass: '.bar-tab',
         // 根目录
         rootUrl: 'home'
     }
@@ -259,6 +286,7 @@
             this.cache = {};
             let $pages = $('.' + routerConfig.pageClass);
             let currentUrl = location.href;
+
             if (!$pages.length) {
                 this._switchToDocument(currentUrl);
             }
@@ -301,11 +329,13 @@
                 path: route.path,
                 component: route.component,
                 template: route.template || true,
+                init: route.init || 0,
+                navTabs: route.navTabs || 0
             };
 
             if (route.children) {
                 route.children.forEach(function(child) {
-                    let childMatchAs = child.name ? (route.name +'/'+ child.name) : undefined;
+                    let childMatchAs = child.name ? (routes.name +'/'+ child.name) : undefined;
                     _this._addRouteRecord(child, pathList, _this, childMatchAs);
                 });
             }
@@ -332,26 +362,23 @@
                 ignoreCache = false;
             }
 
-            console.log('验证登录状态');
             if (location.hash == '' || location.hash == '#/' || location.hash === undefined) {
-                console.log('hash为空默认调转 #/home');
-                return location.hash = '#/' + routerConfig.rootUrl;
+                return location.href = '#/' + routerConfig.rootUrl;
             }
-
             console.log(url);
-            console.log('验证成功正加载：' + url + '页面');
             if (ignoreCache) {
                 delete this.cache[url];
             }
+
             let cacheDocument = this.cache[url];
             let context = this;
             if (cacheDocument) {
                 this._doSwitchDocument(url, direction);
             } else {
                 this._loadDocument(url, {
-                    success: function($doc, $component) {
+                    success: function(doc, param) {
                         try {
-                            context._parseDocument(url, $doc, $component);
+                            context._parseDocument(url, doc, param);
                             context._doSwitchDocument(url, direction);
                         } catch (e) {
                             // location.hash = url;
@@ -377,37 +404,67 @@
          * @private
          */
         _doSwitchDocument(url, direction) {
-            let $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
-            let $newDoc = $($('<div></div>').append(this.cache[url].$content).html());
-
-            let $allSection = $newDoc.find('.' + routerConfig.pageClass);
-            let $visibleSection = $newDoc.find('.' + routerConfig.curPageClass);
-
-            if (!$visibleSection.length) {
-                $visibleSection = $allSection.eq(0);
+            // 判断是否登录
+            if (checkLogin() && this.cache[url].init !== 1) {
+                return location.href = '#/login';
             }
+            // if (this.cache[url].init !== 1) {
+            //     return location.href = '#/login';
+            // }
 
-            if (!$visibleSection.attr('id')) {
-                $visibleSection.attr('id', this._generateRandomId());
-            }
+            //读取成功后
+            // window.addEventListener('HTMLImportsLoaded', function(e) {
+            //     console.info(MSG.importready);
+            //     obj[fn]();
+            // });
 
-            let $currentSection = this._getCurrentSection();
+            // window.addEventListener('WebComponentsReady', function(e) {
+            //     console.info(MSG.allready);
+            //     obj[fn]();
+            // });
 
-            if (!$currentSection.length) {
-                $currentSection.trigger(EVENTS.beforePageSwitch, [$currentSection.attr('id'), $currentSection]);
-            }
+            // 判读国家列表
+            let _country = checkCountry();
+            _country.then(() => {
+                let classDoc = this.cache[url].component.attachTo(this.cache[url].content);
+                classDoc.on('pageLoadStart', (newDoc)  => {
+                    let $currentDoc = this.$view.find('.' + routerConfig.sectionGroupClass);
+                    let $newDoc = $(newDoc);
+                    let $allSection = $newDoc.find('.' + routerConfig.pageClass);
+                    let $visibleSection = $newDoc.find('.' + routerConfig.curPageClass);
 
-            if (!$allSection.length) {
-                $allSection.removeClass(routerConfig.curPageClass);
-            }
+                    if (!$visibleSection.length) {
+                        $visibleSection = $allSection.eq(0);
+                    }
 
-            $visibleSection.addClass(routerConfig.curPageClass);
-            // prepend 而不 append 的目的是避免 append 进去新的 document 在后面，
-            // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
-            this.$view.prepend($newDoc);
-            console.log(this.cache);
-            this._readyImport(this.cache[url].$component,'init');
-            if ($currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
+                    if (!$visibleSection.attr('id')) {
+                        $visibleSection.attr('id', this._generateRandomId());
+                    }
+
+                    let $currentSection = this._getCurrentSection();
+
+                    if (!$currentSection.length) {
+                        $currentSection.trigger(EVENTS.beforePageSwitch, [$currentSection.attr('id'), $currentSection]);
+                    }
+
+                    if (!$allSection.length) {
+                        $allSection.removeClass(routerConfig.curPageClass);
+                    }
+
+                    // 判断Nav Tabs
+                    if (this.cache[url].navTabs === 1) {
+                        let tabs = new Tabs($visibleSection[0]);
+                        // console.log(tabs);
+                    }
+
+                    $visibleSection.addClass(routerConfig.curPageClass);
+                    // prepend 而不 append 的目的是避免 append 进去新的 document 在后面，
+                    // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
+                    this.$view.prepend($newDoc);
+                    $('[data-ripple]').ripple();
+                    if ($currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
+                });
+            });
         }
 
         /**
@@ -441,10 +498,9 @@
                 console.log('Loaded import: ' + e.target.href);
                 let _target = e.target.import;
                 let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
-                let $doc = Util.replaceNote(bodyHTML);
-                // let $doc = $(_target);
-                // console.log($doc);
-                callback.success && callback.success.call(null, $doc, param.component);
+                let doc = replaceNote(bodyHTML);
+
+                callback.success && callback.success.call(null, doc, param);
 
                 //加载完成后清除头部引用
                 if (!link.readyState || 'link' === link.readyState || 'complete' === link.readyState) {
@@ -462,40 +518,6 @@
             document.head.appendChild(link);
         }
 
-        _readyImport(obj, fn) {
-            var _self = this;
-            if(typeof(obj) == 'undefined'){
-                console.warn(MSG.cantfindobj);
-                return;
-            }
-            //读取成功后
-            // window.addEventListener('HTMLImportsLoaded', function(e) {
-            //     console.info(MSG.importready);
-            //     obj[fn]();
-            // });
-
-            // window.addEventListener('WebComponentsReady', function(e) {
-            //     console.info(MSG.allready);
-            //     obj[fn]();
-            // });
-            obj[fn]();
-            $('[data-ripple]').ripple();
-        }
-
-        /**
-         * 对于 import 加载进来的页面装载模板语言包
-         * ，把其缓存起来
-         *
-         * @param {String} url url
-         * @param $doc import html
-         * @private
-         */
-        _parseDocument(url, $doc, $component) {
-            $doc = Template.render($doc, $.langConfig);
-
-            this._saveDocumentIntoCache($doc, url, $component);
-        }
-
         /**
          * 把一个页面的相关信息保存到 this.cache 中
          *
@@ -506,16 +528,18 @@
          * @param {*} component component
          * @private
          */
-        _saveDocumentIntoCache(doc, url, component) {
-            let $doc = $(doc);
+        _parseDocument(url, doc, param) {
+            // let $doc = $(doc);
 
-            if (!$doc.hasClass(routerConfig.sectionGroupClass)) {
-                throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
-            }
+            // if (!$doc.hasClass(routerConfig.sectionGroupClass)) {
+            //     throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
+            // }
 
             this.cache[url] = {
-                $content: $doc,
-                $component: component
+                content: doc,
+                component: param.component,
+                navTabs: param.navTabs,
+                init: param.init
             };
         }
 
@@ -565,7 +589,6 @@
                 let name = child.name !== undefined ? child.name : routerConfig.rootUrl;
                 if (Href == name) template = child;
             });
-
             return template;
         }
 
@@ -585,6 +608,7 @@
             if (!Util.getHashpage(newURL)) {
                 return;
             }
+
             this._switchToDocument(newURL);
         }
 
@@ -719,13 +743,13 @@
     /**
      * 自定义是否执行路由功能的过滤器
      *
-     * 可以在外部定义 $.config.routerFilter 函数，实参是点击链接的 Zepto 对象。
+     * 可以在外部定义 fcConfig.routerFilter 函数，实参是点击链接的 Zepto 对象。
      *
      * @param $link 当前点击的链接的 Zepto 对象
      * @returns {boolean} 返回 true 表示执行路由功能，否则不做路由处理
      */
     function customClickFilter($link) {
-        var customRouterFilter = $.fcConfig.routerFilter;
+        var customRouterFilter = fcConfig.routerFilter;
         if ($.isFunction(customRouterFilter)) {
             var filterResult = customRouterFilter($link);
             if (typeof filterResult === 'boolean') {
@@ -738,7 +762,7 @@
 
     $(function() {
         // 用户可选关闭router功能
-        if (!$.fcConfig.router) {
+        if (!fcConfig.router) {
             return;
         }
 
@@ -746,7 +770,7 @@
             return;
         }
 
-        let router = $.router = new Router($.routesConfig.pagesFile);
+        let router = $.router = new Router(fcConfig.pagesFile);
 
         $(document).on('click', 'a', function(e) {
             let $target = $(e.currentTarget);

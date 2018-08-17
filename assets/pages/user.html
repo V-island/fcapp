@@ -2,109 +2,81 @@
     <div class="page">
     	<!-- 标题栏 -->
     	<header class="bar bar-flex bar-user">
-    		<div class="user-image" style="background-image: url('http://www.opixer.com/var/thumb/759bf2bdcb9eb0294ece2d804e52cba8-1280-900.jpg');"></div>
+    		<div class="bar-image"></div>
     	    <div class="user-info across">
-    	    	<img class="user-img" src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
+                <div class="user-img avatar-male" style="{{if UserInfo.user_head}} background-image: url({{UserInfo.user_head}}); {{/if}}"></div>
     	    	<div class="across-body">
     	    		<div class="across-title">
-    	    			<p class="user-name">Geraldine</p>
-    	    			<i class="icon user-stars">4</i>
+    	    			<p class="user-name">{{UserInfo.user_name}}</p>
+    	    			<i class="icon user-stars">{{UserInfo.live_level}}</i>
     	    		</div>
-    	    		<p class="user-txt"><i class="icon icon-female"></i>ID:123456</p>
+    	    		<p class="user-txt">{{if UserInfo.user_sex == 1}} <i class="icon icon-male"></i> {{else if UserInfo.user_sex == 2}} <i class="icon icon-female"></i> {{/if}}ID:{{UserInfo.user_id}}</p>
     	    	</div>
     	    </div>
     	    <a class="user-detail" href="#/user/detail">{{USER.Detail}}<i class="icon user-arrow-forward-active"></i></a>
     	</header>
-        <!-- 工具栏 -->
-        <nav class="bar bar-tab">
-            <a class="tab-item" href="#/home" data-ripple>
-                <span class="icon icon-home"></span>
-                <span class="tab-label">{{BAR.Home}}</span>
-            </a>
-            <a class="tab-item" href="#/favorite" data-ripple>
-                <span class="icon icon-favorite"></span>
-                <span class="tab-label">{{BAR.Favorite}}</span>
-            </a>
-            <a class="tab-item icons" href="javascript:void(0);">
-                <span class="icon icon-live"></span>
-            </a>
-            <a class="tab-item" href="#/message" data-ripple>
-                <span class="icon icon-message"></span>
-                <span class="tab-label">{{BAR.Message}}</span>
-            </a>
-            <a class="tab-item active" href="#/user" data-ripple>
-                <span class="icon icon-me"></span>
-                <span class="tab-label">{{BAR.Me}}</span>
-            </a>
-        </nav>
         <!-- 这里是页面内容区 -->
         <div class="content">
             <ul class="list list-user">
-        	    <li class="list-item" data-ripple>
+        	    <li class="list-item" data-href="#/user/video" data-ripple>
         	        <span class="icon user-video list-item-graphic"></span>
         	        <span class="list-item-text">{{USER.Lists.My_Video}}</span>
-        	        <span class="list-item-meta-txt">10</span>
+        	        <span class="list-item-meta-txt">{{UserInfo.vmount}}</span>
         	        <span class="icon user-arrow-forward list-item-meta"></span>
         	    </li>
-        	    <li class="line"></li>
-        	    <li class="list-item" data-ripple>
+        	    <li class="list-item" data-href="#/user/watch" data-ripple>
         	        <span class="icon user-watch list-item-graphic"></span>
         	        <span class="list-item-text">{{USER.Lists.Watch_History}}</span>
-        	        <span class="list-item-meta-txt">10</span>
+        	        <span class="list-item-meta-txt">{{UserInfo.wmount}}</span>
         	        <span class="icon user-arrow-forward list-item-meta"></span>
         	    </li>
         	</ul>
         	<!-- /.list list-user -->
 
     	    <ul class="list list-user">
-    		    <li class="list-item" data-ripple>
+    		    <li class="list-item" data-href="#/user/price" data-ripple>
     		        <span class="icon user-price list-item-graphic"></span>
     		        <span class="list-item-text">{{USER.Lists.Chatting_Price}}</span>
-    		        <span class="list-item-meta-txt color-price">10 {{PUBLIC.Billing}}</span>
+    		        <span class="list-item-meta-txt color-price">{{UserInfo.live_price}} {{PUBLIC.Billing}}</span>
     		        <span class="icon user-arrow-forward list-item-meta"></span>
     		    </li>
-    		    <li class="line"></li>
-    		    <li class="list-item" data-ripple>
+    		    <li class="list-item" data-href="#/user/account" data-ripple>
     		        <span class="icon user-account list-item-graphic"></span>
     		        <span class="list-item-text">{{USER.Lists.Account}}</span>
-    		        <span class="list-item-meta-txt color-account">254</span>
+    		        <span class="list-item-meta-txt color-account">{{UserInfo.user_package}}</span>
     		        <span class="icon user-arrow-forward list-item-meta"></span>
     		    </li>
-    		    <li class="line"></li>
-    		    <li class="list-item" data-ripple>
+    		    <li class="list-item" data-href="#/user/score" data-ripple>
     		        <span class="icon user-score list-item-graphic"></span>
     		        <span class="list-item-text">{{USER.Lists.Score}}</span>
-    		        <span class="list-item-meta-txt color-score">1254</span>
+    		        <span class="list-item-meta-txt color-score">{{UserInfo.user_score}}</span>
     		        <span class="icon user-arrow-forward list-item-meta"></span>
     		    </li>
     		</ul>
     		<!-- /.list list-user -->
 
 		    <ul class="list list-user">
-			    <li class="list-item" data-ripple>
+			    <li class="list-item" data-href="#/user/proof" data-ripple>
 			        <span class="icon user-live list-item-graphic"></span>
 			        <span class="list-item-text">{{USER.Lists.Live_Certification}}</span>
-			        <span class="list-item-meta-txt">Popular</span>
+			        <span class="list-item-meta-txt">{{if UserInfo.user_authentication == 2}} Verified {{else}} Not Certified {{/if}}</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
-			    <li class="line"></li>
-			    <li class="list-item" data-ripple>
+			    <li class="list-item" data-href="#/user/invite" data-ripple>
 			        <span class="icon user-invite list-item-graphic"></span>
 			        <span class="list-item-text">{{USER.Lists.Invite}}</span>
-			        <span class="list-item-meta-txt">Earn Money</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
 			</ul>
 			<!-- /.list list-user -->
 
 		    <ul class="list list-user">
-			    <li class="list-item" data-ripple>
+			    <li class="list-item" data-href="#/user/blacklist" data-ripple>
 			        <span class="icon user-blacklist list-item-graphic"></span>
 			        <span class="list-item-text">{{USER.Lists.Blacklist}}</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>
 			    </li>
-			    <li class="line"></li>
-			    <li class="list-item" data-ripple>
+			    <li class="list-item" data-href="#/user/setting" data-ripple>
 			        <span class="icon user-setting list-item-graphic"></span>
 			        <span class="list-item-text">{{USER.Lists.Setting}}</span>
 			        <span class="icon user-arrow-forward list-item-meta"></span>

@@ -35,5 +35,13 @@
         "src": "assets/img/chat-512.png",
         "sizes": "512x512",
         "type": "image/png"
-    }]
+    }],
+    "permissions": {
+        "audio-capture": {
+            "description": "Required to capture audio using getUserMedia()"
+        },
+        "video-capture": {
+            "description": "Required to capture video using getUserMedia()"
+        }
+    }
 }

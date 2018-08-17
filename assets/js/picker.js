@@ -17,6 +17,7 @@ export default class Picker extends EventEmitter {
             title: '',
             selectedIndex: null,
             closeBtn: true,
+            valueEqualText: false,
             wrapperClass: 'wheels-wrapper',
             pickerClass: 'wheels',
             confirmClass: 'btn-confirm',
@@ -59,48 +60,48 @@ export default class Picker extends EventEmitter {
     }
 
     _bindEvent() {
-        let _self = this;
+        let self = this;
 
-        _self.modalEl.addEventListener('touchmove', function(e) {
+        self.modalEl.addEventListener('touchmove', function(e) {
             e.preventDefault();
         });
 
-        _self.confirmEl.addEventListener('click', function() {
-            _self.hide();
+        self.confirmEl.addEventListener('click', function() {
+            self.hide();
 
             let changed = false;
-            for (let i = 0; i < _self.data.length; i++) {
-                let index = _self.wheels[i].getSelectedIndex();
-                _self.selectedIndex[i] = index;
+            for (let i = 0; i < self.data.length; i++) {
+                let index = self.wheels[i].getSelectedIndex();
+                self.selectedIndex[i] = index;
 
                 let value = null,
                     text = null;
-                if (_self.data[i].length) {
-                    value = _self.data[i][index].value;
-                    text = _self.data[i][index].text;
+                if (self.data[i].length) {
+                    value = self.options.valueEqualText ? self.data[i][index].text : self.data[i][index].value;
+                    text = self.data[i][index].text;
                 }
-                if (_self.selectedVal[i] !== value) {
+                if (self.selectedVal[i] !== value) {
                     changed = true;
                 }
-                _self.selectedVal[i] = value;
-                _self.selectedText[i] = text;
+                self.selectedVal[i] = value;
+                self.selectedText[i] = text;
             }
 
-            _self.trigger('picker.select', _self.selectedVal, _self.selectedIndex);
+            self.trigger('picker.select', self.selectedVal, self.selectedIndex);
 
             if (changed) {
-                _self.trigger('picker.valuechange', _self.selectedVal, _self.selectedText, _self.selectedIndex);
+                self.trigger('picker.valuechange', self.selectedVal, self.selectedText, self.selectedIndex);
             }
         });
 
-        _self.cancelEl.addEventListener('click', function() {
-            _self.hide();
-            _self.trigger('picker.cancel');
+        self.cancelEl.addEventListener('click', function() {
+            self.hide();
+            self.trigger('picker.cancel');
         });
 
-        _self.closeEl.addEventListener('click', function() {
-            _self.hide();
-            _self.trigger('picker.cancel');
+        self.closeEl.addEventListener('click', function() {
+            self.hide();
+            self.trigger('picker.cancel');
         });
     }
 
@@ -157,7 +158,7 @@ export default class Picker extends EventEmitter {
     _itemTemplate(data) {
         let html = '';
         data.forEach((_data, index) => {
-            html += '<li class="'+ this.options.itemClass + ' ' + (index === 0 ? this.options.showClass : '') +'" data-val="'+ _data.value +'">'+ _data.text +'</li>';
+            html += '<li class="'+ this.options.itemClass + ' ' + (index === 0 ? this.options.showClass : '') +'" data-val="'+ (this.options.valueEqualText ? _data.text : _data.value) +'">'+ _data.text +'</li>';
         });
         return html;
     }
