@@ -242,7 +242,7 @@ import {
         // 表示是当前 nav 的 class
         barTabClass: '.bar-tab',
         // 根目录
-        rootUrl: 'home'
+        rootUrl: 'login'
     }
 
     let DIRECTION = {

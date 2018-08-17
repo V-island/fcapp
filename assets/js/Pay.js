@@ -163,7 +163,7 @@ export default class Pay extends EventEmitter {
 
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
-						.then(function(res) {
+						.then((res) => {
 							let token = res.payUrl.split('token=');
 							return token[1];
 						});
@@ -172,7 +172,7 @@ export default class Pay extends EventEmitter {
 			},
 
 			// onAuthorize() is called when the buyer approves the payment
-			onAuthorize: function(data, actions) {
+			onAuthorize: (data, actions) => {
 				// Set up a url on your server to execute the payment
 				var EXECUTE_URL = data.returnUrl.split("?")[0];
 
@@ -184,9 +184,10 @@ export default class Pay extends EventEmitter {
 
 				// Make a call to your server to execute the payment
 				return paypal.request.post(EXECUTE_URL, _data)
-					.then(function(res) {
+					.then((res) => {
 						modal.alert(res.message, (_modal) => {
 							modal.closeModal(_modal);
+							this.trigger('picker.success');
 						});
 					});
 			}
@@ -198,3 +199,8 @@ export default class Pay extends EventEmitter {
 	    return new Pay(element, options);
 	}
 }
+
+/**
+ * pay.success
+ * 当支付结束后的时候，会派发 pay.success 事件
+ */

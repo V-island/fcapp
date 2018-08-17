@@ -2,247 +2,131 @@
     <div class="page">
         <!-- 标题栏 -->
         <header class="bar bar-flex">
-            <div class="icon-btn" data-ripple>
-                <i class="icon icon-search"></i>
-            </div>
             <div class="title-content navs-wrapper">
                 <nav class="navs-content">
-                    <div class="navs-item" data-index="0">{{HOME.New.Title}}</div>
-                    <div class="navs-item" data-index="1">{{HOME.Hot.Title}}</div>
                     <div class="navs-item active" data-index="2">{{HOME.Video.Title}}</div>
-                    <div class="navs-line"><span></span></div>
                 </nav>
-            </div>
-            <div class="icon-btn" data-ripple>
-                <i class="icon icon-filter"></i>
             </div>
         </header>
         <!-- 这里是页面内容区 -->
-        <div class="content">
-            <div class="slide-wrapper">
-                <div class="slide-content">
-                    <div class="slide-item pages-new">
-                        <div class="content-block">
-                            {{if NewAdList}}
-                                <div class="banner">
-                                    <div class="banner-box">
-                                        {{each NewAdList}}
-                                            <a href="#" class="banner-item" data-id="{{$value.id}}">
-                                                <img src="{{$value.show_url}}" alt="{{$value.img_title}}">
-                                            </a>
-                                        {{/each}}
-                                    </div>
-                                    <div class="banner-pagination"></div>
-                                </div>
-                                <!-- /.banner -->
-                            {{/if}}
-
-                            {{if NewList}}
-                                <div class="row box-cards" data-page="1">
-                                    {{each NewList}}
-                                        <div class="col-50 card card-list" data-user-info="{{$value}}">
-                                            <div class="card-content">
-                                                <div class="media" style="background-image: url({{$value.everyday_img}});"></div>
-                                                <div class="showdom">
-                                                    <span class="tag-label">{{$value.live_price}}/{{PUBLIC.Billing}}</span>
-                                                    {{if $value.status == 1}}
-                                                        <span class="tag-label busy">{{PUBLIC.Status.Busy}}</span>
-                                                    {{else if $value.status == 3}}
-                                                        <span class="tag-label waiting">{{PUBLIC.Status.Waiting}}</span>
-                                                    {{/if}}
-                                                </div>
-                                            </div>
-                                            <div class="card-foot">
-                                                <div class="user-img avatar-female">
-                                                    <img src="{{$value.user_head}}">
-                                                </div>
-                                                <div class="foot-info">
-                                                    <h3 class="name">
-                                                        {{$value.user_name}}
-                                                    </h3>
-                                                    <p class="txt">{{$value.heat}} {{PUBLIC.Heat}}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {{/each}}
-                                </div>
-                                <!-- /.box-cards -->
-                            {{/if}}
-                        </div>
+        <div class="content pages-video">
+            <div class="content-block">
+                {{if VideoType}}
+                    <div class="tag">
+                        {{each VideoType}}
+                            <label class="tag-label" data-id="{{$value.id}}" ><span>#</span>{{$value.video_type}}</label>
+                        {{/each}}
                     </div>
-                    <!-- /.slide-item -->
-                    <div class="slide-item pages-hot">
-                        <div class="content-block">
-                            {{if HotAdList}}
-                                <div class="banner">
-                                    <div class="banner-box">
-                                        {{each HotAdList}}
-                                            <a href="#" class="banner-item" data-id="{{$value.id}}">
-                                                <img src="{{$value.show_url}}" alt="{{$value.img_title}}">
-                                            </a>
-                                        {{/each}}
-                                    </div>
-                                    <div class="banner-pagination"></div>
-                                </div>
-                                <!-- /.banner -->
-                            {{/if}}
+                    <!-- /.tag -->
+                {{/if}}
 
-                            {{if HotList}}
-                                <div class="row box-cards" data-page="1">
-                                    {{each HotList}}
-                                        <div class="col-50 card card-list" data-user-info="{{$value}}">
-                                            <div class="card-content">
-                                                <div class="media" style="background-image: url({{$value.everyday_img}});"></div>
-                                                <div class="showdom">
-                                                    <span class="tag-label">{{$value.live_price}}/{{PUBLIC.Billing}}</span>
-                                                    {{if $value.status == 1}}
-                                                        <span class="tag-label busy">{{PUBLIC.Status.Busy}}</span>
-                                                    {{else if $value.status == 3}}
-                                                        <span class="tag-label waiting">{{PUBLIC.Status.Waiting}}</span>
-                                                    {{/if}}
-                                                </div>
-                                            </div>
-                                            <div class="card-foot">
+                <div class="row box-cards" data-page="1">
+                    {{if FreeVideoList}}
+                        <div class="col-100 cards-header video-header">
+                            <p>{{HOME.Video.Free.Title}}</p>
+                            <a class="refresh" href="#/home/freevideo">{{HOME.Video.Free.More}}</a>
+                        </div>
+                        {{each FreeVideoList}}
+                            <div class="col-50 card card-video" data-user-info="{{$value}}">
+                                <div class="card-content">
+                                    <div class="media" style="background-image: url({{$value.img_url}});"></div>
+                                    <div class="showdom">
+                                        <p class="summary-txt">{{$value.video_description}}</p>
+                                        <div class="video-info">
+                                            <div class="user-info">
                                                 <div class="user-img">
                                                     <img src="{{$value.user_head}}">
                                                 </div>
-                                                <div class="foot-info">
-                                                    <h3 class="name">
-                                                        {{$value.user_name}}
-                                                    </h3>
-                                                    <p class="txt">{{$value.heat}} {{PUBLIC.Heat}}</p>
-                                                </div>
+                                                <p class="user-name">{{$value.user_name}}</p>
+                                            </div>
+                                            <div class="user-follow">
+                                                <span class="tag-label praise">
+                                                    {{if $value.support > 999}}
+                                                        999+
+                                                    {{else}}
+                                                        {{$value.support}}
+                                                    {{/if}}
+                                                </span>
+                                                <span class="tag-label eye">
+                                                    {{if $value.watch_number > 999}}
+                                                        999+
+                                                    {{else}}
+                                                        {{$value.watch_number}}
+                                                    {{/if}}
+                                                </span>
                                             </div>
                                         </div>
-                                    {{/each}}
-                                </div>
-                                <!-- /.box-cards -->
-                            {{/if}}
-                        </div>
-                    </div>
-                    <!-- /.slide-item -->
-                    <div class="slide-item pages-video active">
-                        <div class="content-block">
-                            {{if VideoType}}
-                                <div class="tag">
-                                    {{each VideoType}}
-                                        <label class="tag-label" data-id="{{$value.id}}" ><span>#</span>{{$value.video_type}}</label>
-                                    {{/each}}
-                                </div>
-                                <!-- /.tag -->
-                            {{/if}}
-
-                            <div class="row box-cards" data-page="1">
-                                {{if FreeVideoList}}
-                                    <div class="col-100 cards-header video-header">
-                                        <p>{{HOME.Video.Free.Title}}</p>
-                                        <a class="refresh" href="#/home/freevideo">{{HOME.Video.Free.More}}</a>
                                     </div>
-                                    {{each FreeVideoList}}
-                                        <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                            <div class="card-content">
-                                                <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                                <div class="showdom">
-                                                    <p class="summary-txt">{{$value.video_description}}</p>
-                                                    <div class="video-info">
-                                                        <div class="user-info">
-                                                            <div class="user-img">
-                                                                <img src="{{$value.user_head}}">
-                                                            </div>
-                                                            <p class="user-name">{{$value.user_name}}</p>
-                                                        </div>
-                                                        <div class="user-follow">
-                                                            <span class="tag-label praise">
-                                                                {{if $value.support > 999}}
-                                                                    999+
-                                                                {{else}}
-                                                                    {{$value.support}}
-                                                                {{/if}}
-                                                            </span>
-                                                            <span class="tag-label eye">
-                                                                {{if $value.watch_number > 999}}
-                                                                    999+
-                                                                {{else}}
-                                                                    {{$value.watch_number}}
-                                                                {{/if}}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {{/each}}
-                                {{/if}}
-
-                                {{if VideoList}}
-                                    <div class="col-100 cards-header video-header">
-                                        <p>{{HOME.Video.Exciting.Title}}</p>
-                                    </div>
-                                    {{each VideoList}}
-                                        <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                            <div class="card-content">
-                                                <div class="card-video-header">
-                                                    <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
-                                                </div>
-                                                <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                                <div class="showdom">
-                                                    <p class="summary-txt">{{$value.video_description}}</p>
-                                                    <div class="video-info">
-                                                        <div class="user-info">
-                                                            <div class="user-img avatar-female">
-                                                                <img src="{{$value.user_head}}">
-                                                            </div>
-                                                            <p class="user-name">{{$value.user_name}}</p>
-                                                        </div>
-                                                        <div class="user-follow">
-                                                            <span class="tag-label praise">
-                                                                {{if $value.support > 999}}
-                                                                    999+
-                                                                {{else}}
-                                                                    {{$value.support}}
-                                                                {{/if}}
-                                                            </span>
-                                                            <span class="tag-label eye">
-                                                                {{if $value.watch_number > 999}}
-                                                                    999+
-                                                                {{else}}
-                                                                    {{$value.watch_number}}
-                                                                {{/if}}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {{/each}}
-                                {{/if}}
+                                </div>
                             </div>
-                            <!-- /.box-cards -->
+                        {{/each}}
+                    {{/if}}
+
+                    {{if VideoList}}
+                        <div class="col-100 cards-header video-header">
+                            <p>{{HOME.Video.Exciting.Title}}</p>
                         </div>
-                    </div>
-                    <!-- /.slide-item active -->
+                        {{each VideoList}}
+                            <div class="col-50 card card-video" data-user-info="{{$value}}">
+                                <div class="card-content">
+                                    <div class="card-video-header">
+                                        <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
+                                    </div>
+                                    <div class="media" style="background-image: url({{$value.img_url}});"></div>
+                                    <div class="showdom">
+                                        <p class="summary-txt">{{$value.video_description}}</p>
+                                        <div class="video-info">
+                                            <div class="user-info">
+                                                <div class="user-img avatar-female">
+                                                    <img src="{{$value.user_head}}">
+                                                </div>
+                                                <p class="user-name">{{$value.user_name}}</p>
+                                            </div>
+                                            <div class="user-follow">
+                                                <span class="tag-label praise">
+                                                    {{if $value.support > 999}}
+                                                        999+
+                                                    {{else}}
+                                                        {{$value.support}}
+                                                    {{/if}}
+                                                </span>
+                                                <span class="tag-label eye">
+                                                    {{if $value.watch_number > 999}}
+                                                        999+
+                                                    {{else}}
+                                                        {{$value.watch_number}}
+                                                    {{/if}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/each}}
+                    {{/if}}
                 </div>
-                <div class="pulldown-wrapper">
-                    <div class="loading-down">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <!-- /.pulldown-wrapper -->
-                <div class="pullup-wrapper">
-                    <div class="loading-down">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <!-- /.pullup-wrapper -->
+                <!-- /.box-cards -->
             </div>
+            <div class="pulldown-wrapper">
+                <div class="loading-down">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <!-- /.pulldown-wrapper -->
+            <div class="pullup-wrapper">
+                <div class="loading-down">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <!-- /.pullup-wrapper -->
         </div>
     </div>
 </div>

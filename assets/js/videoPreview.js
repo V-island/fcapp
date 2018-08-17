@@ -5,6 +5,7 @@ import SendBirdAction from './SendBirdAction';
 import SignalingClient from './signalingClient';
 import Client from './client';
 import Modal from './modal';
+import Pay from './Pay';
 import {
     fcConfig
 } from './intro';
@@ -16,7 +17,8 @@ import {
     follow,
     praiseVideo,
     commentVideo,
-    videoGifts
+    videoGifts,
+    selAllGoods
 } from './api';
 import {
     getLangConfig
@@ -48,6 +50,8 @@ export default class VideoPreview extends EventEmitter {
             videoClass: 'video',
             iconAttentionClass: 'live-attention',
             iconAddAttentionClass: 'live-add-attention',
+            commentAmountClass: 'countComment-amount',
+            supportAmountClass: 'support-amount',
             btnNewsClass: 'btn-news',
             btnThumbsClass: 'btn-thumbs',
             btnShareClass: 'btn-share',
@@ -70,6 +74,9 @@ export default class VideoPreview extends EventEmitter {
         this.btnThumbsEl = this.previewModalEl.getElementsByClassName(this.options.btnThumbsClass)[0];
         this.btnShareEl = this.previewModalEl.getElementsByClassName(this.options.btnShareClass)[0];
         this.btnGiftEl = this.previewModalEl.getElementsByClassName(this.options.btnGiftClass)[0];
+
+        this.commentAmountEl = this.previewModalEl.getElementsByClassName(this.options.commentAmountClass)[0];
+        this.supportAmountEl = this.previewModalEl.getElementsByClassName(this.options.supportAmountClass)[0];
 
         this._init();
     }
@@ -139,7 +146,7 @@ export default class VideoPreview extends EventEmitter {
                 if (_val === null) {
                     return;
                 }
-
+                this.commentAmountEl.innerHTML = parseInt(this.commentAmountEl.innerHTML) + 1;
                 let getJoinGroupChannel = this._joinGroupChannel(this.options.comment_channel, _val);
                 let getCommentVideo = commentVideo(this.options.id, _val);
 
@@ -153,14 +160,15 @@ export default class VideoPreview extends EventEmitter {
 
         // 点赞
         addEvent(this.btnThumbsEl, 'click', () => {
-
             if (hasClass(this.btnThumbsEl, this.options.showClass)) return false;
 
+            this.supportAmountEl.innerHTML = parseInt(this.supportAmountEl.innerHTML) + 1;
+            toggleClass(this.btnThumbsEl, this.options.showClass);
             let getJoinGroupChannel = this._joinGroupChannel(this.options.praise_channel, LANG.MESSAGE.Like.Text);
             let getPraiseVideo = praiseVideo(this.options.id, 1);
 
             Promise.all([getJoinGroupChannel, getPraiseVideo]).then((data) => {
-                toggleClass(this.btnThumbsEl, this.options.showClass);
+                return;
             });
         });
 
@@ -239,7 +247,7 @@ export default class VideoPreview extends EventEmitter {
 
                 videoGifts(vuser_id, id, parseInt(giftId), 1).then((data) =>{
                     if (!data) return;
-
+                    modal.toast(LANG.MESSAGE.Gift.Text);
                     setUserInfo('userPackage', data);
                     userPackageEl.innerHTML = data;
                     this._joinGroupChannel(this.options.gift_channel, LANG.MESSAGE.Gift.Text, giftUrl);
@@ -249,9 +257,21 @@ export default class VideoPreview extends EventEmitter {
 
             // 充值
             addEvent(btnRechargeEl, 'click', () => {
-                let rechargeModalEl = modal.actions(this.tpl.live_recharge, {
-                    title: LANG.LIVE_PREVIEW.Actions.Recharge,
-                    closeBtn: true
+                selAllGoods().then((data) => {
+                    const _data = {};
+                    _data.UserInfo = this.localInfo;
+                    _data.AllGoodsList = data ? data : false;
+
+                    let rechargeModalEl = modal.actions(Template.render(this.tpl.live_recharge, _data), {
+                        title: LANG.LIVE_PREVIEW.Actions.Recharge,
+                        closeBtn: true
+                    });
+
+                    let pay = new Pay(rechargeModalEl);
+
+                    pay.on('pay.success', () => {
+                        modal.closeModal(rechargeModalEl);
+                    });
                 });
             });
         });
@@ -301,11 +321,11 @@ export default class VideoPreview extends EventEmitter {
         html += '</div><div class="lives-header"><div class="lives-attention"><div class="user-info across"><div class="user-img avatar-female">';
         html += options.user_head ? '<img src="'+ options.user_head +'">' : '';
         html += '</div><div class="across-body"><p class="user-name">'+ options.user_name +'</p><p class="user-txt">'+ options.watch_number + ' ' + LANG.PUBLIC.Heat +'</p></div>';
-        html += '</div><i class="icon '+ options.btnAddAttentionClass + ' ' + (options.followStatus == 1 ? options.iconAddAttentionClass : options.iconAttentionClass) +'" data-id="'+ options.id +'"></i></div><div class="icon live-close '+ options.btnLiveCloseClass +'"></div></div>';
+        html += '</div><i class="icon '+ options.btnAddAttentionClass + ' ' + (options.followStatus == 1 ? options.iconAddAttentionClass : options.iconAttentionClass) +'" data-id="'+ options.vuser_id +'"></i></div><div class="icon live-close '+ options.btnLiveCloseClass +'"></div></div>';
         html += '<div class="video-preview-content"><p class="preview-text">'+ options.video_description +'</p></div>';
         html += '<div class="video-preview-footer"><div class="lives-buttons">';
-        html += '<div class="video-preview-item '+ options.btnNewsClass +'"><i class="icon live-news"></i><span>'+ options.countComment +'</span></div>';
-        html += '<div class="video-preview-item '+ options.btnThumbsClass +'"><i class="icon live-thumbs-upion"></i><span>'+ options.support +'</span></div>';
+        html += '<div class="video-preview-item '+ options.btnNewsClass +'"><i class="icon live-news"></i><span class="'+ options.commentAmountClass +'">'+ options.countComment +'</span></div>';
+        html += '<div class="video-preview-item '+ options.btnThumbsClass +'"><i class="icon live-thumbs-upion"></i><span class="'+ options.supportAmountClass +'">'+ options.support +'</span></div>';
         html += '<div class="video-preview-item '+ options.btnShareClass +'"><i class="icon live-share"></i></div></div>';
         html += '<div class="'+ options.btnGiftClass +'"><i class="icon live-gift"></i></div>';
         html += '</div></div>';

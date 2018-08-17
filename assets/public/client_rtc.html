@@ -84,52 +84,22 @@
     <div class="actions-modal-group recharge-group">
         <p class="recharge-label">
             <span>{{LIVE_PREVIEW.Recharge.Select_Amount}}</span>
-            <span class="money">{{LIVE_PREVIEW.Actions.Account}}10 {{LIVE_PREVIEW.Actions.Coins}}</span>
+            <span class="money">{{LIVE_PREVIEW.Actions.Account}}{{UserInfo.user_package}} {{LIVE_PREVIEW.Actions.Coins}}</span>
         </p>
         <div class="tag">
-            <label class="recharge-label" data-ripple>
-                <p class="cost">1000 {{LIVE_PREVIEW.Actions.Coins}}</p>
-                <p>10$</p>
-            </label>
-            <label class="recharge-label active" data-ripple>
-                <p class="cost">3000 {{LIVE_PREVIEW.Actions.Coins}}</p>
-                <p>30$</p>
-            </label>
-            <label class="recharge-label" data-ripple>
-                <p class="cost">3000 {{LIVE_PREVIEW.Actions.Coins}}</p>
-                <p>50$</p>
-            </label>
-            <label class="recharge-label" data-ripple>
-                <p class="cost">1000,0 {{LIVE_PREVIEW.Actions.Coins}}</p>
-                <p>100$</p>
-            </label>
-            <label class="recharge-label" data-ripple>
-                <p class="cost">3000,0 {{LIVE_PREVIEW.Actions.Coins}}</p>
-                <p>300$</p>
-            </label>
-            <label class="recharge-label" data-ripple>
-                <p class="cost">5000,0 {{LIVE_PREVIEW.Actions.Coins}}</p>
-                <p>500$</p>
-            </label>
+            {{if AllGoodsList}}
+                {{each AllGoodsList}}
+                    <label class="recharge-label {{if $index == 0}}active{{/if}}" data-id="{{$value.id}}" data-currency="USD" data-ripple>
+                        <p class="cost">{{$value.title}} {{LIVE_PREVIEW.Actions.Coins}}</p>
+                        <p>{{$value.goods_price}}</p>
+                    </label>
+                {{/each}}
+            {{/if}}
         </div>
     </div>
     <div class="actions-modal-group recharge-group">
-        <p class="recharge-label">
-            <span>{{LIVE_PREVIEW.Recharge.Payment_Method}}</span>
-        </p>
-        <ul class="list">
-            <li class="list-item active" data-ripple>
-                <span class="icon modals-paypal list-item-graphic"></span>
-                <span class="list-item-text">{{LIVE_PREVIEW.Recharge.PayPal}}</span>
-                <span class="icon modals-confirm list-item-meta"></span>
-            </li>
-            <li class="list-item" data-ripple>
-                <span class="icon modals-cards list-item-graphic"></span>
-                <span class="list-item-text">{{LIVE_PREVIEW.Recharge.Credit_Card}}</span>
-                <span class="icon modals-confirm list-item-meta"></span>
-            </li>
-        </ul>
-        <div class="button button-primary" data-ripple>{{LIVE_PREVIEW.Recharge.Buttons}}</div>
+        <div id="paypal-button" class="button-paypal hide"></div>
+        <div id="credit-card-button" class="button button-primary" data-ripple>{{USER_ACCOUNT.Buttons}}</div>
     </div>
 </script>
 

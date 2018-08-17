@@ -1,14 +1,9 @@
 import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
-import SignalingClient from '../signalingClient';
-import Client from '../client';
 import Modal from '../modal';
 import VideoPreview from '../videoPreview';
 
-import SendBirdAction from '../SendBirdAction';
-import { MessageChat } from '../components/MessageChat';
-import { Spinner } from '../components/Spinner';
 
 import {
 	body,
@@ -102,8 +97,6 @@ export default class OtherDetails extends EventEmitter {
 	}
 
 	_init() {
-		this.btnPrivateLetterEl = this.OtherDetailsEl.getElementsByClassName(this.options.btnPrivateLetterClass)[0];
-		this.btnVideoChatEl = this.OtherDetailsEl.getElementsByClassName(this.options.btnVideoChatClass)[0];
 		this.btnAddAttentionEl = this.OtherDetailsEl.getElementsByClassName(this.options.btnAddAttentionClass)[0];
 
 		// tab
@@ -153,52 +146,6 @@ export default class OtherDetails extends EventEmitter {
 		        status = 2;
 		    }
 		    follow(index, status);
-		});
-
-		// 发消息
-		addEvent(this.btnPrivateLetterEl, 'click', () => {
-			const {userId} = getUserInfo();
-			const {userid} = getVariableFromUrl();
-			const SendBird = new SendBirdAction();
-
-			// SendBird SDK 初始化
-			Spinner.start(body);
-			SendBird.connect(userId).then(user => {
-				SendBirdAction.getInstance()
-				.createChannelWithUserIds(userid)
-					.then(channel => {
-						MessageChat.getInstance().render(channel.url, false);
-					})
-					.catch(error => {
-						errorAlert(error.message);
-					});
-				Spinner.remove();
-			}).catch(() => {
-				redirectToIndex('SendBird connection failed.');
-			});
-		});
-
-		// 视频呼叫
-		addEvent(this.btnVideoChatEl, 'click', () => {
-		    let localInfo = getUserInfo();
-
-		    if (parseInt(localInfo.userPackage / this.info.live_price) < 1) {
-		        return modal.alert(LANG.HOME.Madal.NotCoins.Text, LANG.HOME.Madal.NotCoins.Title, () => {
-		            location.href = '#/user';
-		        }, LANG.HOME.Madal.NotCoins.ButtonsText);
-		    }
-
-		    this.signal = new SignalingClient(Appid, Appcert);
-
-		    this.signal.login(localInfo.userId).then((uid) => {
-		        let client = new Client(this.signal, localInfo, this.info.live_price);
-		        client.invite({
-		            userAccount: this.info.user_id,
-		            userName: this.info.user_name,
-		            userHead: this.info.user_head,
-		            userSex: this.info.user_sex
-		        });
-		    });
 		});
 	}
 
