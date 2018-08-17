@@ -1,0 +1,26 @@
+.calling-sprite {
+    background-image: url('#{$imgBaseUrl}/sprite/sprite-call.png');
+    background-repeat: no-repeat;
+    background-position: -45px -90px;
+    background-size: 8640px 360px;
+    -webkit-animation: sprite_anim 2.5s steps(25) infinite;
+    animation: sprite_anim 2.5s steps(25) infinite;
+}
+
+@-webkit-keyframes sprite_anim {
+    0% {
+        background-position: 0 -90px;
+    }
+    100% {
+        background-position: -8640px -90px;
+    }
+}
+
+@keyframes sprite_anim {
+    0% {
+        background-position: 0 -90px;
+    }
+    100% {
+        background-position: -8640px -90px;
+    }
+}

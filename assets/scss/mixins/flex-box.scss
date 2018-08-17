@@ -1,0 +1,83 @@
+@mixin flexbox {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+@mixin flex {
+    -ms-flex: 1 1 0.000000001px;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+    -webkit-flex-basis: 0.000000001px;
+    flex-basis: 0.000000001px;
+    width: 1%;
+}
+
+/**
+ * 垂直/倒序布局
+ * @param  {[string]}  column           竖直顺序
+ * @param  {[string]}  column-reverse   竖直倒序
+ * @param  {[string]}  row              横向顺序
+ * @param  {[string]}  row-reverse      横向倒序
+ */
+@mixin flex-vertical($col){
+    @include flexbox;
+    flex-direction: $col;
+}
+
+/**
+ * 主轴布局
+ * @param  {[string]}  start          左对齐
+ * @param  {[string]}  center         居中对齐
+ * @param  {[string]}  end            右对齐
+ * @param  {[string]}  space-around   flex 容器中的每个 flex 项的每一侧间距都是相等的。请注意，这意味着两个相邻 flex 项之间的空间将是第一个/最后一个 flex 项与其最近边缘之间的空间的两倍。
+ * @param  {[string]}  space-evenly   flex 容器起始边缘和第一个 flex 项之间的间距和每个相邻 flex 项之间的间距是相等。
+ * @param  {[string]}  space-between  任何两个相邻 flex 项之间的间距是相同的，但不一定等于第一个/最后一个 flex 项与 flex 容器边缘之间的间距;起始边缘和第一个项目之间的间距和末端边缘和最后一个项目之间的间距是相等的。
+ */
+@mixin flex-spindle($col){
+    @include flexbox;
+    justify-content: $col;
+}
+
+/**
+ * 主轴布局/垂直布局
+ */
+@mixin spindle-center($col) {
+    @include flex-spindle($col);
+    align-items: center;
+}
+
+/**
+ * 垂直居中
+ */
+@mixin spindle-vertical($col) {
+    @include flex-vertical($col);
+    align-items: center;
+}
+
+/**
+ * 主轴布局/垂直布局
+ */
+@mixin flex-spindle-center($col, $flex) {
+    @include flex-spindle($col);
+    flex-direction: $flex;
+    align-items: center;
+}
+
+/**
+ * 水平/垂直布局
+ */
+@mixin flex-center {
+    @include flexbox;
+    justify-content: center;
+    align-items: center;
+}
+
+/**
+ * 多行/列排列
+ */
+@mixin flex-werp($werp) {
+    flex-wrap: $werp;
+}

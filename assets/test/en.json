@@ -1,0 +1,504 @@
+{
+    "HOME": {
+        "New": {
+            "Title": "New"
+        },
+        "Hot": {
+            "Title": "Hot"
+        },
+        "Video": {
+            "Title": "Video",
+            "Free": {
+                "Title": "Free",
+                "More": "More"
+            },
+            "Exciting": {
+                "Title": "Exciting"
+            }
+        },
+        "FreeVideo": {
+            "Title": "Free video"
+        },
+        "VideoType": [
+            {
+                "Id": 1,
+                "Title": "Dance"
+            },
+            {
+                "Id": 2,
+                "Title": "Singing"
+            },
+            {
+                "Id": 3,
+                "Title": "Emotion"
+            },
+            {
+                "Id": 4,
+                "Title": "Art"
+            }
+        ],
+        "Madal": {
+            "NotCoins": {
+                "Title": "Not enough coins",
+                "Text": "She is looking forward to your true love",
+                "ButtonsText": "BUY NOW"
+            },
+            "DataIncomplete": {
+                "Title": "Data incomplete",
+                "Text": "Confirm that you are already <span class=\"color-danger\">18</span> years old , then, go to Improve",
+                "ButtonsText": "GO"
+            },
+            "NewDay": {
+                "Text": "A new day£¬say hello to everyone£¡<br/><span class=\"color-primary\">For others  preview£¨5s£©</span>"
+            },
+            "Online": {
+                "Title": "If you like her, get in touch with her bravely",
+                "Buttons_Maybe": "Maybe later",
+                "Buttons_Call": "Call"
+            },
+            "NotOnline": {
+                "Title": "Maybe shi is busy£¬ you can leave her a message",
+                "Buttons_Maybe": "Maybe later",
+                "Buttons_Details": "Details"
+            }
+        }
+    },
+    "LIVE_RECORD": {
+        "UploadTitle": "Video is uploading...",
+        "Photo": {
+            "Title": "Clipping",
+            "Madal": {
+                "Take": "Take a photo",
+                "Select": "Select from the photo  album"
+            },
+            "Buttons": "CONFIRM"
+        },
+        "Prompt": "The video will be checked £¬<br/> and only high quality video can earn money",
+        "EditVideoInfo": {
+            "Title": "Release",
+            "Text": "Video introduction...",
+            "AddTag": "Add tag",
+            "Buttons": {
+                "Release": "RELEASE",
+                "SaveLocal": "Save the local"
+            }
+        },
+        "Madal": {
+            "DeleteVideo": {
+                "Text": "Are you sure delete the recorded video£¿"
+            },
+            "ExitRecord": {
+                "Text": "Recorded video file will be lost after exiting£¿"
+            }
+        }
+    },
+    "FAVORITE": {
+        "You_May_Also_Like": "You may also like",
+        "Another_Batch": "Another batch"
+    },
+    "MESSAGE": {
+        "Like": "Like",
+        "Comment": "Comment",
+        "System_Message": "System  message",
+        "Customer_Service": "Customer service",
+        "Friends": "Friends"
+    },
+    "USER": {
+        "Detail": "Detail",
+        "Lists": {
+            "My_Video": "My video",
+            "Watch_History": "Watch history",
+            "Chatting_Price": "Chatting price",
+            "Account": "Account",
+            "Score": "Score",
+            "Live_Certification": "Live certification",
+            "Invite": "Invite",
+            "Blacklist": "Blacklist",
+            "Setting": "Setting"
+        }
+    },
+    "USER_VIDEO": {
+        "Title": "Your video clips",
+        "Add_Title": "Add",
+        "Add_Text": "(To earn money)"
+    },
+    "USER_WATCH": {
+        "Title": "Watch history"
+    },
+    "USER_PRICE": {
+        "Title": "Chatting price",
+        "Current_Price": "Current price:",
+        "Certified": "The more star rating£¬the more money",
+        "Non_Certified": "Non certified",
+        "Button": "GO",
+        "Certified_Remarks": {
+            "Title": "How to improve the star rating",
+            "Content": [
+                {
+                    "Title": "Chatting time",
+                    "Text": "Every day£¬The time of chatting must be more than two hours"
+                },
+                {
+                    "Title": "Score",
+                    "Text": "The score represents the user's  approval of you"
+                },
+                {
+                    "Title": "Somebody's go od opinions",
+                    "Text": "That's very important£¬five star awards will take up an important part of your performance"
+                }
+            ]
+        },
+        "Non_Certified_Remarks": {
+            "Title": "Live information incomplete",
+            "Content": [
+                "You must improve your live information£»",
+                "After that£¬ you can earn money by chatting£»"
+            ]
+        }
+    },
+    "USER_ACCOUNT": {
+        "Title": "Account",
+        "Buttons": "CONFIRM",
+        "Remarks_Content": "read and agree the",
+        "Remarks_Text": "Services Terms"
+    },
+    "USER_SCORE": {
+        "Title": "Score  exchange",
+        "Total": "Total",
+        "Live": "Live",
+        "Video": "Video",
+        "Secondary_Title": "Exchange cash",
+        "Score": "score"
+    },
+    "USER_INVITE": {
+        "Title": "Invite"
+    },
+    "USER_BLACKLIST": {
+        "Title": "Blacklist"
+    },
+    "USER_SETTING": {
+        "Title": "Setting",
+        "Account_Security": "Account security",
+        "Message_Notification": {
+            "Title": "Message notification",
+            "Text": "After opening, the  text message or video invitation can only be received for the first time. <br/>Please open it in the settings - notification function to ensure normal function."
+        },
+        "Message_Sound": "Message sound",
+        "Message_Shock": "Message shock",
+        "Help": "Help",
+        "Suggestion": "Suggestion",
+        "About_Me": "About me",
+        "Quit": "Quit"
+    },
+    "USER_SETTING_SECURITY": {
+        "Title": "Account security",
+        "Text": "Mobile phone number registered"
+    },
+    "USER_SETTING_HELP": {
+        "Title": "Help",
+        "Content": [
+            {
+                "Title": "Security of mobile phone registration",
+                "Text": "Mobile phones can be used to get passwords back at any time to ensure account safety."
+            },
+            {
+                "Title": "How to be the network anchor",
+                "Text": "Mobile phones can be used to get passwords back at any time to ensure account safety."
+            },
+            {
+                "Title": "How can the anchors get more invitations",
+                "Text": "Mobile phones can be used to get passwords back at any time to ensure account safety."
+            },
+            {
+                "Title": "What's the use of short video",
+                "Text": "Mobile phones can be used to get passwords back at any time to ensure account safety."
+            }
+        ]
+    },
+    "USER_SETTING_SUGGESTION": {
+        "Title": "Suggestion"
+    },
+    "USER_SETTING_ABOUT": {
+        "Title": "About me",
+        "Version": "version:",
+        "Company": "company:",
+        "Address": "address:"
+    },
+    "LOGIN": {
+        "Title": "Welcome",
+        "Buttons": {
+            "Login": "Login",
+            "Forget_password": "Forget  password?",
+            "Register": "Register"
+        },
+        "Third_party": {
+            "Title": "or login"
+        },
+        "Find_Password": {
+            "Title": "Find password",
+            "Buttons": {
+                "Next": "Next",
+                "Confirm": "Confirm"
+            }
+        },
+        "Set_Password": {
+            "Title": "Set password"
+        }
+    },
+    "REGISTER": {
+        "Title": "Register",
+        "Buttons": {
+            "Title": "Sign up"
+        },
+        "Terms": {
+            "Text": "Registration indicates that you agree to the",
+            "Title": "terms of service"
+        }
+    },
+    "PERSONAL_DETAIL": {
+        "Title": "Personal details",
+        "Profile_photo": {
+            "Title": "Profile photo"
+        },
+        "Username": {
+            "Title": "Username",
+            "Madal": {
+                "Title": "Modify  username",
+                "Placeholder": "Fill in a new username"
+            }
+        },
+        "Gender": {
+            "Title": "Gender",
+            "Madal": {
+                "Male": "Male",
+                "Female": "Female"
+            }
+        },
+        "Age": {
+            "Title": "Age",
+            "Madal": {
+                "Title": "Modify birthday"
+            }
+        },
+        "Height": {
+            "Title": "Height",
+            "Unit": "cm",
+            "Madal": {
+                "Title": "Modify  height",
+                "Placeholder": "Fill in height (cm)"
+            }
+        },
+        "Body_Weight": {
+            "Title": "Body weight",
+            "Unit": "kg",
+            "Madal": {
+                "Title": "Modify  body weight",
+                "Placeholder": "Fill in body weight (kg)"
+            }
+        },
+        "Interest": {
+            "Title": "Interest",
+            "Madal": {
+                "Title": "Interest",
+                "Text": "Up to %S items can be selected"
+            }
+        },
+        "Your_Type": {
+            "Title": "Your type",
+            "Madal": {
+                "Title": "Your type",
+                "Text": "Up to %S items can be selected"
+            }
+        },
+        "Love": {
+            "Title": "Love",
+            "Madal": {
+                "Title": "Your favorite type",
+                "Text": "Up to %S items can be selected"
+            }
+        },
+        "Why_Make_Friends": {
+            "Title": "Why make friends",
+            "Madal": {
+                "Title": "Why make friends",
+                "Lists": [
+                    {
+                        "text": "Long contact, no longer alone"
+                    },
+                    {
+                        "text": "For one night"
+                    },
+                    {
+                        "text": "Whatever, let me get excited."
+                    },
+                    {
+                        "text": "Make myself happy every day"
+                    },
+                    {
+                        "text": "Looking for a friend"
+                    },
+                    {
+                        "text": "The needs of Physiology"
+                    },
+                    {
+                        "text": "Other purpose"
+                    }
+                ]
+            }
+        }
+    },
+    "LIVE_INFORMATION": {
+        "Title": "Live information",
+        "Progress": {
+            "First": "Upload information",
+            "Second": "Review"
+        },
+        "Upload_Video": "Upload video",
+        "Upload_Photos": "Upload photos",
+        "Remarks": [
+            "The video will be shown to others to get more invitation.",
+            "The photo willshow your beauty. Even you can change it every day",
+            "You can change your information at any time, but it may take a little while"
+        ],
+        "Under_Review": {
+            "Title": "Under review",
+            "Text": "We will giving the results in a working day"
+        },
+        "Audit_Failure": {
+            "Title": "Very sorry",
+            "Text": "You did not pass verification",
+            "Remarks": {
+                "Title": "Reason for failure",
+                "Text": "Pictures or videos involve politics, religion, etc."
+            }
+        },
+        "Upload_Pass": {
+            "Title": "Show  your  best side to  the other  people"
+        },
+        "Btn_Submit": "SUBMIT",
+        "Btn_Modify": "Modify",
+        "Btn_Auth": "Re-authenticate"
+    },
+    "LIVE_PREVIEW": {
+        "Actions": {
+            "Account": "account:",
+            "Coins": "coins",
+            "ShareTo": "Share to",
+            "Comment": "Comment",
+            "Gift": "Gift",
+            "Recharge": "Recharge",
+            "Send": "Send"
+        },
+        "Share": {
+            "Facebook": "Facebook",
+            "Twitter": "Twitter",
+            "Tumblr": "Tumblr"
+        },
+        "Recharge": {
+            "Select_Amount": "Select Amount",
+            "Payment_Method": "Payment Method",
+            "PayPal": "PayPal",
+            "Credit_Card": "Credit Card",
+            "Buttons": "CONFIRM"
+        },
+        "Called_Caller": {
+            "Title": "calling...",
+            "Buttons_Cancel": "CANCEL",
+            "Buttons_Refuse": "REFUSE",
+            "Buttons_Accept": "ACCEPT"
+        },
+        "Refuse_Call": {
+            "Title": "She is busy, you can see other anchors",
+            "Buttons_Call_Again": "CALL AGAIN",
+            "Buttons_Maybe": "Myabe Later"
+        },
+        "End_Live_User": {
+            "Title": "Rating",
+            "Text": "Are you satisfied with me?",
+            "Chat_Length": "Chat length£º",
+            "Min": "min",
+            "Buttons_Submit": "SUBMIT",
+            "Buttons_Maybe": "Myabe Later"
+        },
+        "End_Live_Anchor": {
+            "Title": "Live Details",
+            "Live_Time_Today": "Live broadcast time today:",
+            "Min": "min",
+            "Chat_Length": "Chat length",
+            "Increase_Score": "Increase Score",
+            "Text": "The gift received on this broadcast",
+            "Buttons_Yes": "Take a rest",
+            "Buttons_Live_Again": "Live Again"
+        },
+        "Madal": {
+            "Online": {
+                "Title": "If you like her, get in touch with her bravely",
+                "Buttons_Maybe": "Maybe later",
+                "Buttons_Call": "Call"
+            },
+            "NotOnline": {
+                "Title": "Maybe shi is busy£¬ you can leave her a message",
+                "Buttons_Maybe": "Maybe later",
+                "Buttons_Details": "Details"
+            },
+            "QuitLive": {
+                "Text": "Are you sure you want to quit?"
+            },
+            "InsufficientAmount": {
+                "Title": "Insufficient Amount",
+                "Text": "Your gold coins will be used <span> after 1 minutes</span> please recharge in"
+            }
+        }
+    },
+    "BAR": {
+        "Home": "Home",
+        "Favorite": "Favorite",
+        "Message": "Message",
+        "Me": "Me",
+        "History": "History",
+        "Lives_Btn": {
+            "Live": "Live",
+            "Video": "Video"
+        }
+    },
+    "PUBLIC": {
+        "Billing": "Gold/Min",
+        "Review": "Review",
+        "Refuse": "Refuse",
+        "Free": "Free",
+        "Heat": "heat",
+        "Country": "Country",
+        "No_More": "No more~",
+        "Status": {
+            "Busy": "Busy",
+            "Waiting": "waiting"
+        },
+        "Froms": {
+            "Country": {
+                "Title": "Country",
+                "Name": "English",
+                "Lang": "en"
+            },
+            "Telephone": {
+                "Title": 1,
+                "Placeholder": "Your  telephone  number",
+                "Verification": "code"
+            },
+            "Verification": {
+                "Title": "Verification",
+                "Placeholder": "4 -6 numbers"
+            },
+            "Password": {
+                "Title": "Password",
+                "Placeholder": "8-12 bit character"
+            }
+        },
+        "ModalTitle": "Prompt",
+        "modalAlertButton": "I know",
+        "ModalButtonOk": "YES",
+        "ModalButtonCancel": "NO",
+        "ConfirmButtonOk": "Confirm",
+        "ConfirmButtonCancel": "Cancel",
+        "modalPreloaderTitle": "Loading"
+    }
+}

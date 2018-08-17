@@ -1,0 +1,12 @@
+<!-- small video list -->
+<script id="list_favorite_items" type="text/html">
+    {{if FollowList}}
+        <li>
+            <a href="#/details?userid={{FollowList.user_id}}" class="list-item" data-ripple>
+                <span class="list-item-graphic image" style="{{if FollowList.user_head}} background-image: url({{FollowList.user_head}}); {{/if}}"></span>
+                <span class="list-item-text">{{FollowList.user_name}}</span>
+            </a>
+            <span class="btn-follow" data-id="{{FollowList.user_id}}" data-ripple>{{FAVORITE.Follow}}</span>
+        </li>
+    {{/if}}
+</script>

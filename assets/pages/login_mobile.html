@@ -1,0 +1,63 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 这里是页面内容区 -->
+        <div class="content login-wrapper">
+            <div class="login-content">
+                <h2 class="login-title">{{LOGIN.Title}}</h2>
+
+                <form class="form-login">
+                    <input type="hidden" name="phoneCode" value="{{PUBLIC.Froms.Telephone.Title}}" />
+                	<div class="form-group">
+                		<label class="form-label">{{PUBLIC.Froms.Country.Title}}</label>
+						<div class="form-control country" data-lang="{{PUBLIC.Froms.Country.Lang}}">{{PUBLIC.Froms.Country.Name}}</div>
+						<i class="icon user-arrow-forward mete"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">+{{PUBLIC.Froms.Telephone.Title}}</label>
+            		    <input type="tel" name="userPhone" class="form-control" placeholder="{{PUBLIC.Froms.Telephone.Placeholder}}">
+                	</div>
+                	<!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">{{PUBLIC.Froms.Password.Title}}</label>
+            		    <input type="password" name="userPassword" class="form-control" placeholder="{{PUBLIC.Froms.Password.Placeholder}}">
+            		    <i class="icon icon-eye-black btn-bright"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+					<div class="form-group form-button">
+                        <button type="submit" class="button button-primary button-block" data-ripple>{{LOGIN.Buttons.Login}}</button>
+					</div>
+					<!-- /.form-group -->
+
+					<div class="form-section">
+						<a class="section-link" href="#/login/find" data-ripple>{{LOGIN.Buttons.Forget_password}}</a>
+						<a class="section-link" href="#/register" data-ripple>{{LOGIN.Buttons.Register}}</a>
+					</div>
+
+                </form>
+            </div>
+            <!-- /.login-content -->
+            <div class="login-footer">
+                <p>{{LOGIN.Third_party.Title}}</p>
+                <div class="tag tag-share">
+                    <label class="share-label">
+                        <i class="icon modals-fecebook" data-ripple></i>
+                        <span>Facebook</span>
+                    </label>
+                    <label class="share-label">
+                        <i class="icon modals-Twitter" data-ripple></i>
+                        <span>Twitter</span>
+                    </label>
+                    <label class="share-label">
+                        <i class="icon modals-tumblr" data-ripple></i>
+                        <span>Tumblr</span>
+                    </label>
+                </div>
+            </div>
+            <!-- /.login-footer -->
+        </div>
+    </div>
+</div>

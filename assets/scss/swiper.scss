@@ -1,0 +1,148 @@
+.navs-wrapper {
+    .navs-content {
+        @include spindle-center(space-around);
+        position: relative;
+    }
+    .navs-item {
+        color: $color-primary;
+        font-size: 0.651rem;
+        line-height: 1.5rem;
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        flex: 1 0 0;
+        @include transition(all .3s);
+
+        &.active {
+            @include transition(all .3s);
+            font-size: 0.85rem;
+        }
+    }
+    .navs-line {
+        width: auto;
+        height: 0.07rem;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        @include transition(all .3s);
+
+        >span {
+            width: 1.75rem;
+            height: 0.07rem;
+            background: $color-primary;
+            display: block;
+            margin: auto;
+        }
+    }
+}
+
+
+.slide-wrapper {
+    min-height: 1px;
+    height: 100%;
+    overflow: hidden;
+
+    .slide-content {
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap;
+        height: 100%;
+        @include flex-spindle(start);
+    }
+
+    .slide-item {
+        box-sizing: border-box;
+        overflow: hidden;
+        height: 100%;
+        @include transition(all .6s);
+    }
+
+}
+
+.pages-new,
+.pages-hot,
+.pages-video {
+    .box-cards{
+        min-height: 30rem;
+    }
+    .box-free-cards {
+        min-height: auto;
+    }
+}
+.pulldown-wrapper {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: -1rem;
+    @include flex-center;
+}
+.pullup-wrapper {
+    width: 100%;
+    padding: 0.8rem 0;
+    @include flex-center;
+}
+
+.favorite-wrapper {
+    margin: 0 !important;
+    padding: 0.75rem 0;
+    overflow: hidden;
+
+    .favorite-content {
+        min-height: 100%;
+    }
+}
+
+/*
+<div class="loading-down">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+*/
+
+$nths: 1, 2, 3, 4, 5;
+.loading-down {
+    width: 5rem;
+    height: 1rem;
+    text-align: center;
+
+    >span {
+        display: inline-block;
+        @include size(0.6rem);
+        margin-right: 0.25rem;
+        border-radius: 50%;
+        background: $color-primary;
+        -webkit-animation: load_down 1.04s ease infinite;
+        animation: load_down 1.04s ease infinite;
+        &:last-child {
+            margin-right: 0px;
+        }
+    }
+
+    @each $nth in $nths {
+        >span:nth-child(#{$nth}) {
+            -webkit-animation-delay: $nth*0.13s;
+            animation-delay: $nth*0.13s;
+        }
+
+    }
+}
+
+@-webkit-keyframes load_down {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+
+}
+@keyframes load_down {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

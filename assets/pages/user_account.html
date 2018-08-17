@@ -1,0 +1,62 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-flex">
+            <a class="icon-btn back" data-ripple>
+                <i class="icon icon-arrow-back"></i>
+            </a>
+            <h1 class="title">{{USER_ACCOUNT.Title}}</h1>
+            <a class="font-btn" href="#/user/account/history" data-ripple>{{BAR.History}}</a>
+        </header>
+        <!-- 这里是页面内容区 -->
+        <div class="content block">
+            <div class="user-wrapper">
+                <div class="banner">
+                    <div class="banner-box">
+                        <a href="#" class="banner-item">
+                            <img src="http://www.opixer.com/var/thumb/a4430993ef8cfca015e83a1e5680edc5-1280-900.jpg">
+                        </a>
+                    </div>
+                </div>
+                <!-- /.banner -->
+            </div>
+
+            <div class="recharge-group theme-white">
+                <p class="recharge-label">
+                    <span>{{LIVE_PREVIEW.Recharge.Select_Amount}}</span>
+                    <span class="money">{{LIVE_PREVIEW.Actions.Account}}{{UserInfo.user_package}} {{LIVE_PREVIEW.Actions.Coins}}</span>
+                </p>
+                <div class="tag">
+                    {{if AllGoodsList}}
+                        {{each AllGoodsList}}
+                            <label class="recharge-label {{if $index == 0}}active{{/if}}" data-id="{{$value.id}}" data-currency="USD" data-ripple>
+                                <p class="cost">{{$value.title}} {{LIVE_PREVIEW.Actions.Coins}}</p>
+                                <p>{{$value.goods_price}}</p>
+                            </label>
+                        {{/each}}
+                    {{/if}}
+                </div>
+            </div>
+            <div class="recharge-group theme-white">
+                <!-- <p class="recharge-label">
+                    <span>{{LIVE_PREVIEW.Recharge.Payment_Method}}</span>
+                </p>
+                <ul class="list">
+                    <li class="list-item active" data-id="1" data-ripple>
+                        <span class="icon modals-paypal list-item-graphic"></span>
+                        <span class="list-item-text">{{LIVE_PREVIEW.Recharge.PayPal}}</span>
+                        <span class="icon modals-confirm list-item-meta"></span>
+                    </li>
+                    <li class="list-item" data-id="2" data-ripple>
+                        <span class="icon modals-cards list-item-graphic"></span>
+                        <span class="list-item-text">{{LIVE_PREVIEW.Recharge.Credit_Card}}</span>
+                        <span class="icon modals-confirm list-item-meta"></span>
+                    </li>
+                </ul> -->
+                <div id="paypal-button" class="button-paypal hide"></div>
+                <div id="credit-card-button" class="button button-primary" data-ripple>{{USER_ACCOUNT.Buttons}}</div>
+                <p class="account-pay">{{USER_ACCOUNT.Remarks_Content}} <a class="color-primary" href="">{{USER_ACCOUNT.Remarks_Text}}</a></p>
+            </div>
+        </div>
+    </div>
+</div>

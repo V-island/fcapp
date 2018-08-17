@@ -1,0 +1,538 @@
+//
+// Bars
+// --------------------------------------------------
+.bar {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 10;
+    height: $bar-base-height;
+    padding-right: $bar-side-spacing;
+    padding-left: $bar-side-spacing;
+    background-color: $bar-bg-color;
+    // @include hairline(bottom, $border-default-color);
+    -webkit-backface-visibility: hidden;
+    // Make sure the bar is visible when a modal animates in.
+    backface-visibility: hidden;
+}
+
+// Modifier class to dock any bar below .bar-nav
+.bar-header-secondary {
+    top: $bar-base-height;
+}
+
+// Modifier class for footer bars
+.bar-footer {
+    bottom: 0;
+}
+
+// Modifier class to dock any bar above a standard bar
+.bar-footer-secondary {
+    bottom: $bar-base-height;
+}
+
+// Modifier class to dock any bar above a .bar-tab
+.bar-footer-secondary-tab {
+    bottom: $bar-tab-height;
+}
+
+// Give the footers the correct border
+.bar-footer, .bar-footer-secondary, .bar-footer-secondary-tab {
+    @include hairline(top, $border-default-color);
+    @include hairline-remove(bottom);
+}
+
+// Nav bar
+// --------------------------------------------------
+// Bar docked to top of viewport for showing page title and actions
+.bar-nav {
+    top: 0;
+}
+
+// Centered text in the .bar-nav
+//
+// We position the absolutely to make sure the title is always centered
+.title {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: $font-size-default;
+    font-weight: $font-weight;
+    line-height: $bar-base-height;
+    color: $color-text;
+    text-align: center;
+    white-space: nowrap;
+    &.primary {
+        color: $color-primary;
+    }
+}
+
+// Retain specified title color
+.title a {
+    color: inherit;
+}
+
+// flexbox bar
+// --------------------------------------------------
+// Bar docked to top and used forFlexbox layout navigation
+.bar-flex {
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(to right, $bar-gradient-color-left, $bar-gradient-color-right);
+
+    .icon-btn {
+        flex: 0 0 auto;
+        text-align: center;
+        width: 2rem;
+        height: 1.8rem;
+        border-radius: 0.9rem;
+    }
+
+    .back + .title {
+        // margin-left: -2rem;
+    }
+
+    .font-btn {
+        flex: 0 0 auto;
+        text-align: center;
+        font-size: 0.6rem;
+        line-height: 1.5;
+    }
+
+    .title-content {
+        flex: 1 auto;
+        text-align: center;
+        overflow: hidden;
+        margin: 0 1rem;
+    }
+
+}
+
+// Tab bar
+// --------------------------------------------------
+// Bar docked to bottom and used for primary app navigation
+.bar-tab {
+    bottom: 0;
+    width: 100%;
+    height: $bar-tab-height;
+    padding: 0;
+    table-layout: fixed;
+    z-index: 2002;
+    @include hairline(top, $border-default-color);
+    @include hairline-remove(bottom);
+
+    // Navigational tab (Nested to be more specific for the icons in tab-items)
+    .tab-item {
+        position: relative;
+        display: table-cell;
+        width: 1%;
+        height: $bar-tab-height;
+        color: #929292;
+        text-align: center;
+        vertical-align: middle;
+
+        // Active states for the tab bar
+        &.active, &:active {
+            color: $color-primary;
+        }
+        &.icons{
+            >.icon{
+                @include size(2.1rem);
+                border-radius: 50%;
+            }
+        }
+
+        // Activity badge on an icon
+        .badge {
+            position: absolute;
+            top: .1rem;
+            left: 50%;
+            z-index: 100;
+            height: .8rem;
+            min-width: .8rem;
+            padding: 0 .2rem;
+            font-size: .6rem;
+            line-height: .8rem;
+            color: white;
+            vertical-align: top;
+            background: red;
+            border-radius: .5rem;
+            margin-left: .1rem;
+        }
+
+        // Tab icon
+        .icon {
+            top: 0.05rem;
+            font-size: 1.2rem;
+            line-height: 1.2rem;
+            padding-top: 0;
+            padding-bottom: 0;
+            @include size(1.2rem);
+
+            // Make the text smaller if it's used with an icon '
+            ~.tab-label {
+                display: block;
+                font-size: 0.55rem;
+                position: relative;
+                top: 0.15rem;
+            }
+        }
+
+    }
+
+    .tab-live-box {
+        @include size(3.15rem);
+        position: absolute;
+        bottom: 4.5em;
+        right: 1.4rem;
+        border-radius: 50%;
+        background: $color-primary;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-image: url('#{$imgBaseUrl}/call-backdrop.png');
+        background: image-set(url('#{$imgBaseUrl}/call-backdrop.png') 1x, url('#{$imgBaseUrl}/call-backdrop@2x.png') 2x) center;
+
+        &:before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            @include size(3.15rem);
+            border-radius: 50%;
+            background: transparent;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-image: url('#{$imgBaseUrl}/call-mask.png');
+            background: image-set(url('#{$imgBaseUrl}/call-mask.png') 1x, url('#{$imgBaseUrl}/call-mask@2x.png') 2x) center;
+            -webkit-animation: live_box_anim 1s cubic-bezier(0.46, 0.03, 0.52, 0.96) infinite;
+            animation: live_box_anim 1s cubic-bezier(0.46, 0.03, 0.52, 0.96) infinite;
+        }
+
+        .user-img {
+            border-radius: 50%;
+            vertical-align: middle;
+            @include size(1.4rem);
+            position: absolute;
+            top: 0.875rem;
+            left: 0.875rem;
+        }
+
+        @-webkit-keyframes live_box_anim {
+            0% {
+                transform: rotate(0deg);
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes live_box_anim {
+            0% {
+                transform: rotate(0deg);
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+            }
+        }
+    }
+
+}
+
+// User bar
+// --------------------------------------------------
+.bar-user {
+    height: $bar-user-height;
+    position: relative;
+    padding: 0 0.7rem;
+    @include spindle-center(space-between);
+
+    .user-info.across{
+        justify-content: start !important;
+        flex-grow: 1;
+    }
+
+    .user-img{
+        width: 3.85rem !important;
+        height: 3.85rem !important;
+    }
+
+    .across-body{
+        flex-grow: 1;
+    }
+
+    .across-title{
+        @include spindle-center(start);
+
+        i.icon{
+            width: 1.4rem;
+            height: 0.7rem;
+            font-size: 0.5rem;
+            line-height: 1.5;
+            text-align: right;
+            padding: 0.1rem 0.2rem;
+            flex: 0 0 1.4rem;
+            margin-right: 0.35rem;
+        }
+    }
+
+    .user-name{
+        font-size: 1.25rem !important;
+        margin-right: 0.35rem;
+    }
+
+    .user-detail{
+        font-size: 0.6rem;
+        color: $color-primary;
+
+        i.icon{
+            width: 0.35rem;
+            height: 0.7rem;
+            margin-left: 0.35rem;
+        }
+    }
+
+    .user-txt{
+        font-size: 0.6rem !important;
+
+        i.icon{
+            @include size(0.7rem);
+            margin-right: 0.35rem;
+        }
+    }
+}
+
+// OtherDetails bar
+// --------------------------------------------------
+.bar-details{
+    height: $bar-details-height;
+    padding: 0;
+    @include flex-spindle-center(start, column);
+    align-items: normal;
+
+    >.nav-header{
+        @include flex-spindle(start);
+        align-items: start;
+        background: none;
+        padding: 0.1rem 0.35rem;
+    }
+
+    >.nav-content{
+        @include flex-center();
+        padding: 0 0.7rem;
+
+        .price-title{
+            margin-left: 0.35rem;
+        }
+        .btn-add-attention{
+            @include size(1.4rem);
+        }
+    }
+}
+
+// OtherDetails nav
+// --------------------------------------------------
+.nav-details{
+    @include spindle-center(start);
+    background: $bar-gradient-color-right;
+    box-shadow: 0 0 0.7rem rgba(0 ,0 ,0, 0.5);
+    bottom: 0;
+    width: 100%;
+    height: $bar-nav-height;
+    padding: 0;
+    z-index: 2002;
+
+    >.bar-item{
+        @include spindle-center(center);
+        flex: 1 0 0;
+        height: 3.15rem;
+
+        .tab-label{
+            font-size: 0.6rem;
+        }
+
+        i.icon{
+            @include size(1.4rem);
+            margin-right: 0.35rem;
+        }
+
+        &:after {
+            content: "";
+            width: 1px;
+            background: $bar-color-split;
+            position: absolute;
+            top: 0.35rem;
+            right: 0;
+            bottom: 0.35rem;
+        }
+    }
+}
+
+// Image background
+// --------------------------------------------------
+.bar .bar-image{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url('#{$imgBaseUrl}/users/user-bg.png');
+    background: image-set(url('#{$imgBaseUrl}/users/user-bg.png') 1x, url('#{$imgBaseUrl}/users/user-bg@2x.png') 2x) center;
+    opacity: 0.3;
+    z-index: -1;
+}
+
+// Bars with buttons
+// --------------------------------------------------
+.bar .button {
+    position: relative;
+    top: 0.35rem;
+    z-index: 20;
+    // Position the buttons on top of .title
+    margin-top: 0;
+    font-weight: $font-weight-light;
+
+    // Give buttons that are floated left and right side margin
+    &.pull-right {
+        margin-left: $bar-side-spacing;
+    }
+
+    &.pull-left {
+        margin-right: $bar-side-spacing;
+    }
+
+}
+
+// Bars with link buttons (Line the text up with content)
+.bar .button-link {
+    top: 0;
+    padding: 0;
+    font-size: 0.8rem;
+    line-height: $bar-base-height;
+    height: $bar-base-height;
+    color: $color-primary;
+    border: 0;
+
+    &:active, &.active {
+        color: darken($color-primary, 10%);
+    }
+
+}
+
+// Bars with block buttons
+//
+// Add proper padding
+.bar .button-block {
+    top: 0.35rem;
+    font-size: 0.8rem;
+    // Scale down font size to fit in bar.
+    width: 100%;
+}
+
+// Nav buttons (Only applicable within bars)
+//
+// Buttons inside bars that sit closer against the viewport.
+.bar .button-nav {
+    &.pull-left {
+        margin-left: -0.25rem;
+
+        .icon-left-nav {
+            margin-right: -0.15rem;
+        }
+
+    }
+
+    &.pull-right {
+        margin-right: -0.25rem;
+
+        .icon-right-nav {
+            margin-left: -0.15rem;
+        }
+
+    }
+
+}
+
+// Bars with Ratchicons
+// --------------------------------------------------
+.bar {
+    .icon {
+        position: relative;
+        z-index: 20;
+        // Position the buttons on top of .title
+        padding: .5rem .1rem;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+
+    // Vertical center the larger icons in buttons.
+    .button .icon {
+        padding: 0;
+    }
+
+    // Handle carets in the titles
+    .title .icon {
+        padding: 0;
+
+        // Specific postioning of the caret icon within a title. Used with popover.js.
+        &.icon-caret {
+            top: 0.2rem;
+            margin-left: -0.25rem;
+        }
+
+    }
+
+}
+
+.bar-flex {
+    line-height: 1.8rem;
+    .icon {
+        padding: 0;
+        @include size(1rem);
+    }
+    .icon-filter{
+        width: .8rem;
+        height: .85rem;
+    }
+    .icon-arrow-back{
+        width: 0.5rem;
+        height: 0.9rem;
+    }
+
+}
+
+.bar-footer .icon {
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+}
+
+// Bars for search forms
+// --------------------------------------------------
+// Position/size search bar within the bar
+.bar input[type="search"] {
+    height: 1.45rem;
+    margin: 0.3rem 0;
+}

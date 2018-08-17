@@ -1,0 +1,188 @@
+<div class="page-group">
+    <div class="page">
+    	<!-- 标题栏 -->
+    	<header class="bar bar-flex bar-user bar-details">
+    		<div class="bar-image"></div>
+
+            <div class="bar-flex nav-header">
+                <a class="icon-btn back" data-ripple>
+                    <i class="icon icon-arrow-back"></i>
+                </a>
+            </div>
+
+            <div class="nav-content">
+                <div class="user-info across">
+                    <div class="user-img {{if UserDetail.user_sex == 1}} avatar-male {{else}} avatar-female {{/if}}" style="{{if UserDetail.user_head}} background-image: url({{UserDetail.user_head}}); {{/if}}">
+                        </div>
+                    <div class="across-body">
+                        <div class="across-title">
+                            <p class="user-name">{{UserDetail.user_name}}</p>
+                            <i class="icon user-stars">{{UserDetail.live_level}}</i>
+                        </div>
+                        <p class="user-txt">
+                            {{if UserDetail.user_sex == 1}} <i class="icon icon-male"></i> {{else if UserDetail.user_sex == 2}} <i class="icon icon-female"></i> {{/if}}
+                            ID:{{UserDetail.user_id}}
+                            <span class="price-title color-price">{{UserDetail.live_price}} {{PUBLIC.Billing}}</span>
+                        </p>
+                    </div>
+                </div>
+                <i class="icon live-attention btn-add-attention" data-id="{{UserDetail.user_id}}"></i>
+            </div>
+    	</header>
+
+        <nav class="bar nav-details">
+            <div class="bar-item btn-private-letter" data-ripple>
+                <i class="icon icon-private-letter"></i>
+                <span class="tab-label">{{OTHER_DETAILS.Private_Letter}}</span>
+            </div>
+            <div class="bar-item active btn-video-chat" data-ripple>
+                <i class="icon icon-video-chat"></i>
+                <span class="tab-label color-primary">{{OTHER_DETAILS.Video_Chat}}</span>
+            </div>
+        </nav>
+
+        <!-- 这里是页面内容区 -->
+        <div class="content other-details-wrapper">
+            <div class="tab">
+                <div class="tab-item active" data-ripple>Information</div>
+                <div class="tab-item" data-ripple>Video</div>
+            </div>
+            <!-- /.tab -->
+
+            <div class="other-details-content slide-wrapper">
+                <div class="slide-content">
+                    <div class="slide-item">
+                        <div class="list-table">
+                            <div class="item">
+                                <div class="item-label">{{PERSONAL_DETAIL.Age.Title}}</div>
+                                <div class="item-control">{{UserDetail.user_age}} {{PERSONAL_DETAIL.Age.Unit}}</div>
+                            </div>
+                            <div class="item">
+                                <div class="item-label">{{PERSONAL_DETAIL.Height.Title}}</div>
+                                <div class="item-control">{{UserDetail.user_height}} {{PERSONAL_DETAIL.Height.Unit}}</div>
+                            </div>
+                            <div class="item line">
+                                <div class="item-label">{{PERSONAL_DETAIL.Body_Weight.Shorthand}}</div>
+                                <div class="item-control">{{UserDetail.user_weight}} {{PERSONAL_DETAIL.Body_Weight.Unit}}</div>
+                            </div>
+                            <div class="item line">
+                                <div class="item-label">{{PERSONAL_DETAIL.Your_Type.Shorthand}}</div>
+                                <div class="item-control">
+                                    {{if UserDetail.hobbyList}}
+                                        <div class="tag tags-label">
+                                            {{each UserDetail.hobbyList}}
+                                                <label class="tag-label bg-success">{{$value.hobby_name}}</label>
+                                            {{/each}}
+                                        </div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="item line">
+                                <div class="item-label">{{PERSONAL_DETAIL.Interest.Title}}</div>
+                                <div class="item-control">
+                                    {{if UserDetail.myTypeList}}
+                                        <div class="tag tags-label">
+                                            {{each UserDetail.myTypeList}}
+                                                <label class="tag-label bg-primary">{{$value.type_name}}</label>
+                                            {{/each}}
+                                        </div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="item line">
+                                <div class="item-label">{{PERSONAL_DETAIL.Love.Title}}</div>
+                                <div class="item-control">
+                                    {{if UserDetail.otherTypeList}}
+                                        <div class="tag tags-label">
+                                            {{each UserDetail.otherTypeList}}
+                                                <label class="tag-label bg-danger">{{$value.type_name}}</label>
+                                            {{/each}}
+                                        </div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="item-label">{{PERSONAL_DETAIL.Why_Make_Friends.Shorthand}}</div>
+                                <div class="item-control">{{UserDetail.make_friends_goal}}</div>
+                            </div>
+                        </div>
+                        <!-- /.list-table -->
+                    </div>
+                    <!-- /.slide-item -->
+
+                    <div class="slide-item pages-video">
+                        <div class="row box-cards" data-page="1">
+                            {{if VideoList}}
+                                {{each VideoList}}
+                                    <div class="col-50 card card-video" data-user-info="{{$value}}">
+                                        <div class="card-content">
+                                            <div class="card-video-header">
+                                                {{if $value.type == 1}}
+                                                    <span class="status-label free">{{PUBLIC.Free}}</span>
+                                                {{else if $value.type == 2}}
+                                                    <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
+                                                {{/if}}
+                                            </div>
+                                            <div class="media" style="background-image: url({{$value.img_url}});"></div>
+                                            <div class="showdom">
+                                                <p class="summary-txt">{{$value.video_description}}</p>
+                                                <div class="video-info">
+                                                    <div class="user-info">
+                                                        <div class="user-img avatar-female">
+                                                            <img src="{{$value.user_head}}">
+                                                        </div>
+                                                        <p class="user-name">{{$value.user_name}}</p>
+                                                    </div>
+                                                    <div class="user-follow">
+                                                        <span class="tag-label praise">
+                                                            {{if $value.support > 999}}
+                                                                999+
+                                                            {{else}}
+                                                                {{$value.support}}
+                                                            {{/if}}
+                                                        </span>
+                                                        <span class="tag-label eye">
+                                                            {{if $value.watch_number > 999}}
+                                                                999+
+                                                            {{else}}
+                                                                {{$value.watch_number}}
+                                                            {{/if}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            {{/if}}
+                        </div>
+                        <!-- /.box-cards -->
+
+                        <div class="pulldown-wrapper">
+                            <div class="loading-down">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <!-- /.pulldown-wrapper -->
+                        <div class="pullup-wrapper">
+                            <div class="loading-down">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <!-- /.pullup-wrapper -->
+                    </div>
+                    <!-- /.slide-item -->
+                </div>
+            </div>
+            <!-- /.other-details-content -->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-flex">
+            <a class="icon-btn back" data-ripple>
+                <i class="icon icon-arrow-back"></i>
+            </a>
+            <h1 class="title">{{USER_SETTING_HELP.Title}}</h1>
+        </header>
+        <!-- 这里是页面内容区 -->
+        <div class="content block">
+            <ul class="list list-user list-info">
+                {{if USER_SETTING_HELP.Content}}
+                    {{each USER_SETTING_HELP.Content}}
+                        <li class="list-info-item">
+                            <p class="list-item" data-ripple>
+                                <span class="list-item-text">{{$value.Title}}</span>
+                                <span class="icon user-arrow-forward list-item-meta"></span>
+                            </p>
+                            <p class="list-info-text">{{$value.Text}}</p>
+                        </li>
+                    {{/each}}
+                {{/if}}
+            </ul>
+            <!-- /.list list-user -->
+        </div>
+    </div>
+</div>

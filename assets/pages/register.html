@@ -1,0 +1,56 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-flex no-bg">
+            <a class="icon-btn back" data-ripple>
+                <i class="icon icon-arrow-back"></i>
+            </a>
+            <h1 class="title">{{REGISTER.Title}}</h1>
+        </header>
+        <!-- 这里是页面内容区 -->
+        <div class="content login-wrapper">
+            <div class="login-content">
+                <form class="form-register">
+                    <input type="hidden" name="phoneCode" value="{{PUBLIC.Froms.Telephone.Title}}" />
+                    <input type="hidden" name="country_id" value="" />
+                	<div class="form-group">
+                		<label class="form-label">{{PUBLIC.Froms.Country.Title}}</label>
+						<div class="form-control country" data-lang="{{PUBLIC.Froms.Country.Lang}}">{{PUBLIC.Froms.Country.Name}}</div>
+						<i class="icon user-arrow-forward mete"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">+{{PUBLIC.Froms.Telephone.Title}}</label>
+            		    <input type="tel" name="userPhone" class="form-control" placeholder="{{PUBLIC.Froms.Telephone.Placeholder}}">
+                        <div class="button fill-primary btn-verification disabled">{{PUBLIC.Froms.Telephone.Verification}}</div>
+                	</div>
+                	<!-- /.form-group -->
+
+                    <div class="form-group">
+                        <label class="form-label">{{PUBLIC.Froms.Verification.Title}}</label>
+                        <input type="text" name="authCode" class="form-control" placeholder="{{PUBLIC.Froms.Verification.Placeholder}}">
+                    </div>
+                    <!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">{{PUBLIC.Froms.Password.Title}}</label>
+            		    <input type="text" name="userPassword" class="form-control" placeholder="{{PUBLIC.Froms.Password.Placeholder}}">
+            		    <i class="icon icon-eye btn-bright"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+					<div class="form-group form-button">
+						<button type="submit" class="button button-primary button-block" data-ripple>{{REGISTER.Buttons.Title}}</button>
+					</div>
+					<!-- /.form-group -->
+
+                    <div class="form-section">
+                        <p class="section-span">{{REGISTER.Terms.Text}}<br/><a href="#/register/terms">{{REGISTER.Terms.Title}}</a></p>
+                    </div>
+                </form>
+            </div>
+            <!-- /.login-content -->
+        </div>
+    </div>
+</div>

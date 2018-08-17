@@ -1,0 +1,17 @@
+.stars {
+	@include flex-spindle-center(center, row-reverse);
+
+	>i.icon {
+		width: 1rem;
+		height: 1rem;
+		margin: 0 0.5rem;
+	}
+
+	.stars-label {
+		font-size: 0.7rem;
+		color: $color-text;
+		line-height: 1rem;
+		margin: 0 0.35rem;
+	    order: -1;
+	}
+}

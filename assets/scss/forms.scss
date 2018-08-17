@@ -1,0 +1,244 @@
+/* === Forms === */
+// Inputs
+input[type="text"],
+input[type="password"],
+input[type="search"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="number"],
+select,
+textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    border: none;
+    background-color: $input-bg;
+    border-radius: 0 0 0 0;
+    box-shadow: none;
+    outline:none;
+}
+
+input[type="date"],
+input[type="datetime-local"] {
+    line-height: 2.2rem;
+}
+input:-webkit-autofill {
+    color: $input-color;
+    -webkit-box-shadow: 0 0 0px 1000px $color-bg inset !important;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+}
+
+textarea {
+    resize: none;
+}
+
+input, textarea, [contenteditable] {
+  color: $color-text-gray;
+  caret-color: $color-primary;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0 $padding-base-horizontal;
+    margin: 0;
+    width: 100%;
+    height: $input-height-base;
+    color: $input-color;
+    font-size: $font-size-base;
+    font-family: inherit;
+    line-height: $line-height-base;
+    @include transition("border-color ease-in-out .15s");
+
+    &.country{
+        line-height: 1.5rem;
+        text-align: right;
+    }
+}
+
+// Form groups
+.form-group {
+    @include spindle-center(start);
+    margin-bottom: $form-group-margin-bottom;
+    border-bottom: $input-border;
+
+    .form-label {
+        flex: 1 0 3.5rem;
+        color: $input-label-color;
+        font-size: $font-size-base;
+        @include newline;
+    }
+
+    .btn-verification{
+        border-radius: 1rem;
+        margin: 0;
+        font-size: 0.6rem;
+        padding: 0 0.3rem;
+        height: 1rem;
+        line-height: 1.5;
+        width: auto;
+        max-width: 5rem;
+        min-width: 2.5rem;
+    }
+
+    .icon {
+        @include size(0.7rem);
+        flex: 1 0 0.7rem;
+
+        &.mete {
+            width: 0.35rem;
+            flex: 1 0 0.35rem;
+        }
+    }
+    &.active{
+        border-color: $color-text;
+    }
+}
+
+// Form Button
+.form-button {
+    border: none;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+// Form Section
+.form-section{
+    @include spindle-center(space-between);
+    color: $color-primary;
+    font-size: 0.6rem;
+
+    .section-link {
+        margin: 0;
+        padding: 0 0.35rem;
+        line-height: 1.5;
+    }
+
+    .section-span {
+        color: $color-text;
+        line-height: 1.5;
+
+        >a {
+            color: $color-primary;
+            text-decoration: underline;
+        }
+    }
+}
+
+
+/* === switch === */
+
+.switch-ellipse{
+  align-self: center;
+  -webkit-box-flex: 0;
+  flex: 0 0 auto;
+  margin-top: 5px;
+  display: inline-block;
+  position: relative;
+  height: 22px;
+  width: 36px;
+  background-color: #fff;
+  border-radius: 1000px;
+  border: 2px solid rgba(0,0,0,.1);
+  -webkit-transition: all .1s;
+  transition: all .1s;
+}
+.switch-circle{
+  position: absolute;
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,.1);
+  box-shadow: -1px 1px 1px #999;
+  top: 0;
+  left: 0;
+  -webkit-transition: all .3s;
+  transition: all .3s;
+}
+
+.switch-ellipse.active{
+  background-color: #fc9153;
+  border-color: transparent;
+  -webkit-transition: all .2s ease .2s;
+  transition: all .2s ease .2s;
+}
+
+.switch-ellipse.active .switch-circle {
+  left: 14px;
+  border: 1px solid #fff;
+  box-shadow: -1px 1px 1px #e8864c;
+  -webkit-transition: all .3s ease .05s;
+  transition: all .3s ease .05s;
+}
+
+// <div class="switch">
+// <input type="checkbox" class="switch-input">
+// <i class="switch-ui"></i>
+// </div>
+.switch {
+    position: relative;
+    @include flex-center;
+
+    .switch-input {
+        position: absolute;
+        z-index: 1;
+        width: 48px;
+        height: 28px;
+        opacity: 0;
+        &:checked{
+            +.switch-ui{
+                &:before{
+                    -webkit-transform: scale(0);
+                    transform: scale(0);
+                }
+                &:after{
+                    -webkit-transform: translateX(20px);
+                    transform: translateX(20px);
+                }
+            }
+        }
+    }
+    .switch-ui {
+        position: relative;
+        display: block;
+        width: 48px;
+        height: 28px;
+        box-sizing: content-box;
+        border: 1px solid #e4e4e4;
+        border-radius: 28px;
+        background-color: #e4e4e4;
+        &:after, &:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            background-color: #fff;
+            -webkit-transition: -webkit-transform .4s cubic-bezier(.25,.1,.25,1.28);
+            transition: -webkit-transform .4s cubic-bezier(.25,.1,.25,1.28);
+            transition: transform .4s cubic-bezier(.25,.1,.25,1.28);
+            transition: transform .4s cubic-bezier(.25,.1,.25,1.28),-webkit-transform .4s cubic-bezier(.25,.1,.25,1.28);
+        }
+        &:after {
+            width: 28px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,.4);
+        }
+    }
+}

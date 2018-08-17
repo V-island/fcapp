@@ -1,0 +1,199 @@
+<!-- 主叫 -->
+<script id="client_caller" type="text/html">
+    <div class="popup-box">
+        <div class="popup-header">
+            <div class="user-info">
+                <div class="user-img {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                    {{if LiveInfo.userHead}}
+                        <img src="{{LiveInfo.userHead}}">
+                    {{/if}}
+                </div>
+                <p class="user-name">{{LiveInfo.userName}} {{if LiveInfo.userSex == 1}} <i class="icon icon-male"></i> {{else}} <i class="icon icon-female"></i> {{/if}}</p>
+            </div>
+        </div>
+
+        <div class="popup-content calling-box">
+            <i class="calling-sprite"></i>
+            {{LIVE_PREVIEW.Called_Caller.Title}}
+        </div>
+
+        <div class="buttons buttons-block">
+            <div class="button button-danger btn-cancel" data-ripple>{{LIVE_PREVIEW.Called_Caller.Buttons_Cancel}}</div>
+        </div>
+    </div>
+</script>
+
+<!-- 被叫 -->
+<script id="client_called" type="text/html">
+    <div class="popup-box">
+        <div class="popup-header">
+            <div class="user-info">
+                <div class="user-img {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                    {{if LiveInfo.userHead}}
+                        <img src="{{LiveInfo.userHead}}">
+                    {{/if}}
+                </div>
+                <p class="user-name">{{LiveInfo.userName}} {{if LiveInfo.userSex == 1}} <i class="icon icon-male"></i> {{else}} <i class="icon icon-female"></i> {{/if}}</p>
+            </div>
+        </div>
+
+        <div class="popup-content calling-box">
+            <i class="calling-sprite"></i>
+            {{LIVE_PREVIEW.Called_Caller.Title}}
+        </div>
+
+        <div class="buttons">
+            <div class="button button-danger btn-refuse" data-ripple>{{LIVE_PREVIEW.Called_Caller.Buttons_Refuse}}</div>
+            <div class="button button-success btn-accept" data-ripple>{{LIVE_PREVIEW.Called_Caller.Buttons_Accept}}</div>
+        </div>
+    </div>
+</script>
+
+<!-- 呼叫被拒绝 -->
+<script id="refuse_call" type="text/html">
+    <div class="popup-box">
+        <div class="popup-header">
+            <div class="user-info">
+                <div class="user-img {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                    {{if LiveInfo.userHead}}
+                        <img src="{{LiveInfo.userHead}}">
+                    {{/if}}
+                </div>
+                <p class="user-name">{{LiveInfo.userName}} {{if LiveInfo.userSex == 1}} <i class="icon icon-male"></i> {{else}} <i class="icon icon-female"></i> {{/if}}</p>
+            </div>
+        </div>
+
+        <div class="popup-content">
+            <p>{{LIVE_PREVIEW.Refuse_Call.Title}}</p>
+            <div class="tag tag-anchor">
+                <label class="anchor-label {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                    <img src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
+                </label>
+                <label class="anchor-label {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                    <img src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
+                </label>
+                <label class="anchor-label {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                    <img src="http://www.opixer.com/var/thumb/10b0e941baa19b6049cf9c677eff2f09-1280-900.jpg">
+                </label>
+            </div>
+        </div>
+
+        <div class="buttons  buttons-vertical">
+            <div class="button button-success btn-call-again" data-ripple>{{LIVE_PREVIEW.Refuse_Call.Buttons_Call_Again}}</div>
+            <div class="button button-link btn-maybe" data-ripple>{{LIVE_PREVIEW.Refuse_Call.Buttons_Maybe}}</div>
+        </div>
+    </div>
+</script>
+
+<!-- 直播结束 用户端 -->
+<script id="end_live_user" type="text/html">
+    <div class="popup remove-on-close">
+        <div class="popup-box live-end">
+            <div class="popup-header">
+                <p class="header-title">{{LIVE_PREVIEW.End_Live_User.Title}}</p>
+                <div class="user-info">
+                    <div class="user-img {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                        {{if LiveInfo.userHead}}
+                            <img src="{{LiveInfo.userHead}}">
+                        {{/if}}
+                    </div>
+                    <p class="user-name">{{LiveInfo.userName}} {{if LiveInfo.userSex == 1}} <i class="icon icon-male"></i> {{else}} <i class="icon icon-female"></i> {{/if}}</p>
+                </div>
+                <p class="header-txt">{{LIVE_PREVIEW.End_Live_User.Chat_Length}} {{LiveEndTime}}{{LIVE_PREVIEW.End_Live_User.Min}}</p>
+            </div>
+
+            <div class="popup-content">
+                <p>{{LIVE_PREVIEW.End_Live_User.Text}}</p>
+                <div class="stars">
+                    <i class="icon icon-star" data-index="5"></i>
+                    <i class="icon icon-star" data-index="4"></i>
+                    <i class="icon icon-star" data-index="3"></i>
+                    <i class="icon icon-star" data-index="2"></i>
+                    <i class="icon icon-star" data-index="1"></i>
+                    <span class="stars-label">0</span>
+                </div>
+            </div>
+
+            <div class="buttons buttons-vertical">
+                <div class="button button-primary btn-submit" data-ripple>{{LIVE_PREVIEW.End_Live_User.Buttons_Submit}}</div>
+                <div class="button button-link btn-maybe" data-ripple>{{LIVE_PREVIEW.End_Live_User.Buttons_Maybe}}</div>
+            </div>
+
+        </div>
+    </div>
+</script>
+
+<!-- 直播结束 主播端 -->
+<script id="end_live_anchor" type="text/html">
+    <div class="popup remove-on-close">
+        <div class="popup-box live-end">
+            <div class="popup-header">
+                <p class="header-title">{{LIVE_PREVIEW.End_Live_Anchor.Title}}</p>
+                <div class="user-info">
+                    <div class="user-img avatar-female">
+                        {{if TodayLive.user_head}}
+                            <img src="{{TodayLive.user_head}}">
+                        {{/if}}
+                    </div>
+                    <p class="user-name">{{TodayLive.user_name}}</p>
+                </div>
+                <p class="header-txt">{{LIVE_PREVIEW.End_Live_Anchor.Live_Time_Today}} {{TodayLive.today_chat_time}}{{LIVE_PREVIEW.End_Live_Anchor.Min}}</p>
+                <div class="anchor-score">
+                    <div class="score-item">
+                        <h3>{{TodayLive.room_chat_time}}<small>{{LIVE_PREVIEW.End_Live_Anchor.Min}}</small></h3>
+                        <p>{{LIVE_PREVIEW.End_Live_Anchor.Chat_Length}}</p>
+                    </div>
+                    <div class="score-item">
+                        <h3>{{TodayLive.user_reward_score}}</h3>
+                        <p>{{LIVE_PREVIEW.End_Live_Anchor.Increase_Score}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-content score-box">
+                <p>{{LIVE_PREVIEW.End_Live_Anchor.Text}}</p>
+                {{if TodayLive.list}}
+                    <div class="tag score-gift">
+                        {{each TodayLive.list}}
+                            <div class="item">
+                                <span class="item-img" style="{{if $value.gifts_url}} background-image: url({{$value.gifts_url}}); {{/if}}"></span>
+                                <span class="item-amount">X {{$value.amount}}</span>
+                            </div>
+                        {{/each}}
+                    </div>
+                {{/if}}
+            </div>
+
+            <div class="buttons buttons-vertical">
+                <div class="button button-primary btn-live-again" data-ripple>{{LIVE_PREVIEW.End_Live_Anchor.Buttons_Live_Again}}</div>
+                <div class="button button-link btn-yes" data-ripple>{{LIVE_PREVIEW.End_Live_Anchor.Buttons_Yes}}</div>
+            </div>
+
+        </div>
+    </div>
+</script>
+
+<!-- 礼物弹框 -->
+<script id="gifts_bullet_box" type="text/html">
+    {{if GiftList}}
+        <div class="lives-attention gifts-items {{ 'gifts-items' + GiftsId }}" data-amount="1">
+            {{each GiftList}}
+                {{if $value.id == GiftsId}}
+                    <div class="user-info across">
+                        <div class="user-img {{if LiveInfo.userSex == 1}} avatar-male {{else}} avatar-female {{/if}}">
+                            {{if LiveInfo.userHead}}
+                                <img src="{{LiveInfo.userHead}}">
+                            {{/if}}
+                        </div>
+                        <div class="across-body">
+                            <p class="user-name">{{LiveInfo.userName}}</p>
+                            <p class="user-txt">{{$value.gifts_name}}</p>
+                        </div>
+                        <i class="icon" style="{{if $value.gifts_url}} background-image: url({{$value.gifts_url}}); {{/if}}"></i>
+                        <p class="gift-amount">X1</p>
+                    </div>
+                {{/if}}
+            {{/each}}
+        </div>
+    {{/if}}
+</script>

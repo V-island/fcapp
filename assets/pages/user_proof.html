@@ -1,0 +1,100 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-flex">
+            <a class="icon-btn back" data-ripple>
+                <i class="icon icon-arrow-back"></i>
+            </a>
+            <h1 class="title">{{LIVE_INFORMATION.Title}}</h1>
+        </header>
+        <!-- 这里是页面内容区 -->
+        <div class="content block live-upload-wrapper">
+            {{if HasAudit != 2}}
+                <div class="live-upload-progress">
+                    <div class="progress-items {{if HasAudit == 0}} active {{/if}}">
+                        <div class="items-icons-box">
+                            <span class="items-icons">1</span>
+                        </div>
+                        <span class="items-txt">{{LIVE_INFORMATION.Progress.First}}</span>
+                    </div>
+                    <!-- /.progress-items -->
+                    <div class="progress-items {{if HasAudit == 1 || HasAudit == 3}} active {{/if}}">
+                        <div class="items-icons-box">
+                            <span class="items-icons">2</span>
+                        </div>
+                        <span class="items-txt">{{LIVE_INFORMATION.Progress.Second}}</span>
+                    </div>
+                    <!-- /.progress-items -->
+                </div>
+                <!-- /.live-upload-progress -->
+            {{else}}
+                <p class="live-upload-pass">{{LIVE_INFORMATION.Upload_Pass.Title}}</p>
+            {{/if}}
+
+            <!-- 审核成功或未上传 -->
+            {{if HasAudit == 0 || HasAudit == 2}}
+                <div class="upload-content">
+                    <div class="upload-items upload-video">
+                        <i class="icon user-upload-video"></i>
+                        <p class="title">{{LIVE_INFORMATION.Upload_Video}}</p>
+                        <i class="icon user-video-play choose-icon"></i>
+                    </div>
+                    <!-- /.upload-items -->
+                    <div class="upload-items upload-photos">
+                        <i class="icon user-upload-photos"></i>
+                        <p class="title">{{LIVE_INFORMATION.Upload_Photos}}</p>
+                    </div>
+                    <!-- /.upload-items -->
+                </div>
+                <!-- /.upload-content -->
+                <div class="remarks-box">
+                    {{each LIVE_INFORMATION.Remarks}}
+                        <p class="remarks-txt">{{$value}}</p>
+                    {{/each}}
+                </div>
+                <!-- /.remarks-box -->
+            {{/if}}
+
+            <!-- 审核中 -->
+            {{if HasAudit == 1}}
+                <div class="upload-content upload-status">
+                    <i class="icon user-under-review"></i>
+                    <p class="title">{{LIVE_INFORMATION.Under_Review.Title}}</p>
+                    <p class="text">{{LIVE_INFORMATION.Under_Review.Text}}</p>
+                </div>
+            {{/if}}
+
+            <!-- 审核失败 -->
+            {{if HasAudit == 3}}
+                <div class="upload-content upload-status">
+                    <i class="icon user-audit-failure"></i>
+                    <p class="title">{{LIVE_INFORMATION.Audit_Failure.Title}}</p>
+                    <p class="text">{{LIVE_INFORMATION.Audit_Failure.Text}}</p>
+                </div>
+                <!-- /.upload-content upload-status -->
+                <div class="remarks-box">
+                    <p class="remarks-title">{{LIVE_INFORMATION.Audit_Failure.Remarks.Title}}</p>
+                    <p class="remarks-audit-text">{{LIVE_INFORMATION.Audit_Failure.Remarks.Text}}</p>
+                </div>
+                <!-- /.remarks-box -->
+            {{/if}}
+
+            <div class="buttons buttons-vertical">
+                {{if HasAudit == 0}}
+                    <div class="button button-primary button-block btn-live-submit disabled" data-ripple>{{LIVE_INFORMATION.Btn_Submit}}</div>
+                {{/if}}
+
+                <!-- 审核失败 -->
+                {{if HasAudit == 3}}
+                    <div class="button button-primary button-block btn-live-return" data-ripple>{{LIVE_INFORMATION.Btn_Auth}}</div>
+                {{/if}}
+
+                <!-- 审核成功 -->
+                {{if HasAudit == 2}}
+                    <div class="button button-primary button-block btn-live-return" data-ripple>{{LIVE_INFORMATION.Btn_Modify}}</div>
+                {{/if}}
+            </div>
+            <!-- /.buttons -->
+        </div>
+    </div>
+</div>

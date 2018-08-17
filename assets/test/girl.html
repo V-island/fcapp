@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        .girl{
+            background: url('img.png');
+            width: 160px;    //务必设置box的宽度，这样其他不在box中就不会显示
+            height: 185px;
+            background-size: 1120px 212px;
+            -webkit-animation: demo 2s steps(7) infinite; //steps（7）表示设置7步完成动画
+        }
+        @-webkit-keyframes demo{
+            0%{ background-position: 0 0 }
+            100%{ background-position: -1120px 0} //设置背景图的位置从0 到-1120px
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="girl"></div>
+</div>
+</body>
+</html>
