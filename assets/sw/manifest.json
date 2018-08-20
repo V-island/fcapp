@@ -8,32 +8,20 @@
     "orientation": "portrait-primary",
     "theme_color": "#FFDD33",
     "icons": [{
-        "src": "assets/img/chat-32.png",
-        "sizes": "32x32",
-        "type": "image/png"
-    }, {
-        "src": "assets/img/chat-72.png",
+        "src": "assets/img/72.png",
         "sizes": "72x72",
         "type": "image/png"
     }, {
-        "src": "assets/img/chat-128.png",
-        "sizes": "128x128",
+        "src": "assets/img/96.png",
+        "sizes": "96x96",
         "type": "image/png"
     }, {
-        "src": "assets/img/chat-144.png",
+        "src": "assets/img/144.png",
         "sizes": "144x144",
         "type": "image/png"
     }, {
-        "src": "assets/img/chat-192.png",
+        "src": "assets/img/192.png",
         "sizes": "192x192",
-        "type": "image/png"
-    }, {
-        "src": "assets/img/chat-256.png",
-        "sizes": "256x256",
-        "type": "image/png"
-    }, {
-        "src": "assets/img/chat-512.png",
-        "sizes": "512x512",
         "type": "image/png"
     }],
     "permissions": {
