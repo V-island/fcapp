@@ -495,6 +495,7 @@ const Lang = {
 		Heat: 'heat',
 		Country: 'Country',
 		No_More: 'No more~',
+		Terms_Of_Service: 'Terms of Service',
 		Status: {
 			Busy: 'Busy',
 			Waiting: 'waiting'
