@@ -1,14 +1,16 @@
 // lang
-import en from './lang/EN';
-import zh_cn from './lang/ZH-CN';
+import CN from './lang/zh_CN';
+import US from './lang/en_US';
+import JP from './lang/ja_JP';
 
 const LANG_NAME = 'LANG';
 const DEFAULT = {
-	lang: en
+	lang: US
 };
 const LANG = {
-	'en': en,
-	'zh': zh_cn
+    'zh': CN,
+	'en': US,
+	'jp': JP,
 };
 
 /**
@@ -22,7 +24,7 @@ export function getLangConfig() {
 		return JSON.parse(lang);
     }else {
     	localStorage.setItem(LANG_NAME, JSON.stringify(DEFAULT.lang));
-    	return en;
+    	return DEFAULT.lang;
     }
 };
 
@@ -31,6 +33,12 @@ export function getLangConfig() {
  * @return {[type]} [description]
  */
 export function setLangConfig(lang) {
-    const _lang = LANG[lang] || en;
-    localStorage.setItem(LANG_NAME, JSON.stringify(_lang));
+    return new Promise((resolve, reject) => {
+        if (LANG[lang]) {
+            localStorage.setItem(LANG_NAME, JSON.stringify(LANG[lang]));
+            resolve(true);
+        }else {
+            reject(false);
+        }
+    });
 };

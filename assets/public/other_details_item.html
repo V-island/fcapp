@@ -83,7 +83,7 @@
             <div class="showdom">
                 <p class="summary-txt">{{VideosList.video_description}}</p>
                 <div class="video-info">
-                    <p class="video-time">{{VideosList.create_time}}</p>
+                    <p class="video-time">{{VideosList.create_time | dateFormat 'YYYY-MM-DD'}}</p>
                     <div class="user-follow">
                         <span class="tag-label praise">
                             {{if VideosList.support > 999}}

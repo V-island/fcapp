@@ -25,6 +25,7 @@ const modal = new Modal();
 
 // const baseURL = 'http://10.30.11.112:8080/live-app/open/gate';
 // const baseURL = 'https://10.30.11.112:8443/live-app/open/gate';
+// const baseURL = 'https://10.30.11.112:8443/live-app/register';
 const Type = 'POST';
 const MacType = 1; // 设备类型 1.手机 2.PC
 const PhoneType = null;
@@ -1560,24 +1561,21 @@ export function createOrder(goodsId, type) {
 };
 
 /**
- * 支付接口
- * @param {[type]} orderId     订单号
- * @param {[type]} total       总金额
- * @param {[type]} currency    货币
- * @param {[type]} description 描述
+ * 交易历史记录
+ * @param  {Number} _page   当前页
+ * @param  {Number} _number 条数
+ * @return {[type]}         [description]
  */
-export function Pay(orderId, total, currency, description) {
+export function payHistory(_page = 1, _number = 10) {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
-		orderId: orderId,
-		total: total,
-		currency: currency,
-		description: description
+		page: _page,
+		number: _number
 	}
 
 	return new Promise((resolve) => {
-		getPost('/Pay', _params, (response) => {
+		getPost('/payHistory', _params, (response) => {
 			resolve(response.data);
 		}, (response) => {
 			resolve(false);

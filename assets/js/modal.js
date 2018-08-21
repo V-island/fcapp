@@ -677,7 +677,7 @@ export default class Modal extends EventEmitter {
         params.forEach((_data, index) => {
             listHTML += '<li class="list-item '+ (lang == _data.language_code ? 'active' : '') +'" data-id="'+ _data.id +'" data-lang-id="'+ _data.language_id +'" data-lang="'+ _data.language_code +'" data-ripple><span class="list-item-text">'+ _data.country_name +'</span><span class="icon user-checkbox list-item-meta"></span></li>';
         });
-        modalHTML = '<div class="popup remove-on-close"><header class="bar bar-flex no-bg">'+ (closeHTML + titleHTML) +'</header><div class="content block"><ul class="list list-user list-info popup-list no-bg">'+ listHTML +'</ul></div></div>';
+        modalHTML = '<div class="popup remove-on-close"><header class="bar bar-flex no-bg">'+ (closeHTML + titleHTML) +'</header><div class="content block"><ul class="list list-info popup-list no-bg">'+ listHTML +'</ul></div></div>';
         return self.popup(modalHTML, function(modal) {
             modal.find('.list-item').on('click', function() {
                 let _self = $(this);
@@ -685,13 +685,16 @@ export default class Modal extends EventEmitter {
                 let _langId = _self.data('langId');
                 let _lang = _self.data('lang');
 
-                setLocalStorage(COUNTRY_ID_NAME, {
-                    id: _id,
-                    langId: _langId,
-                    gain: false
+                setLangConfig(_lang).then((result) => {
+                    setLocalStorage(COUNTRY_ID_NAME, {
+                        id: _id,
+                        langId: _langId,
+                        gain: false
+                    });
+                    refreshURL();
+                }).catch((reason) => {
+                    refreshURL();
                 });
-                setLangConfig(_lang);
-                refreshURL();
             });
         });
     }

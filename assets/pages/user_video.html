@@ -42,7 +42,7 @@
                                 <div class="showdom">
                                     <p class="summary-txt">{{$value.video_description}}</p>
                                     <div class="video-info">
-                                        <p class="video-time">{{$value.create_time}}</p>
+                                        <p class="video-time">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}</p>
                                         <div class="user-follow">
                                             <span class="tag-label praise">
                                                 {{if $value.support > 999}}

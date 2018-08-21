@@ -9,32 +9,23 @@
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block">
-            <div class="list list-history">
-                <a href="#" class="list-item" data-ripple>
-                    <span class="icon user-paypal list-item-graphic"></span>
-                    <span class="list-item-text">111111@gmail.com
-                        <span class="list-item-secondary">2018-01-01<span class="list-item-status color-review">{{PUBLIC.Review}}</span></span>
-                    </span>
-                    <span class="list-item-meta-txt">￥500</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
-                </a>
-                <a href="#" class="list-item" data-ripple>
-                    <span class="icon user-paypal list-item-graphic"></span>
-                    <span class="list-item-text">111111@gmail.com
-                        <span class="list-item-secondary">2018-01-01</span>
-                    </span>
-                    <span class="list-item-meta-txt">￥500</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
-                </a>
-                <a href="#" class="list-item" data-ripple>
-                    <span class="icon user-visa list-item-graphic"></span>
-                    <span class="list-item-text">111111@gmail.com
-                        <span class="list-item-secondary">2018-01-01<span class="list-item-status color-refuse">{{PUBLIC.Refuse}}</span></span>
-                    </span>
-                    <span class="list-item-meta-txt">￥500</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
-                </a>
-            </div>
+            {{if HistoryList}}
+                <div class="list list-history">
+                    {{each HistoryList}}
+                        <a href="#" class="list-item" data-ripple>
+                            <span class="icon user-paypal list-item-graphic"></span>
+                            <span class="list-item-text">{{$value.goods_id}}
+                                <span class="list-item-secondary">{{$value.end_time | dateFormat 'YYYY-MM-DD'}}
+                                    <span class="list-item-status color-review">{{PUBLIC.Review}}</span>
+                                    <span class="list-item-status color-refuse">{{PUBLIC.Refuse}}</span>
+                                </span>
+                            </span>
+                            <span class="list-item-meta-txt">￥{{$value.title}}</span>
+                            <span class="icon user-arrow-forward list-item-meta"></span>
+                        </a>
+                    {{/each}}
+                </div>
+            {{/if}}
         </div>
     </div>
 </div>

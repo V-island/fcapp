@@ -23,12 +23,16 @@ import {
     addEvent,
     getData,
     setData,
+    dateFormat,
     showHideDom,
     importTemplate
 } from '../util';
 
 const LANG = getLangConfig();
 const modal = new Modal();
+Template.defaults.imports.dateFormat = (date, format) => {
+	return dateFormat(date, format);
+};
 
 export default class UserVideo extends EventEmitter {
 	constructor(element, options) {

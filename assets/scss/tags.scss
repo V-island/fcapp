@@ -29,7 +29,8 @@
 	&.tag-share{
 		@include flex-spindle(space-around);
 	}
-	&.tag-anchor {
+	&.tag-anchor,
+	&.tag-recharge {
 		@include flex-spindle(center);
 	}
 	&.tags-label {
@@ -121,6 +122,7 @@
 		padding: 0.2rem;
 		margin: 0.35rem 0.2rem;
 		text-align: center;
+		height: 2.1rem;
 
 		>p{
 			line-height: 1;

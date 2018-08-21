@@ -200,25 +200,15 @@ export const dataAges = str => {
     return false;
 };
 
-// 版本
-export const compareVersion = (a, b) =>{
-    var as = a.split('.');
-    var bs = b.split('.');
-    if (a === b) return 0;
-
-    for (var i = 0; i < as.length; i++) {
-        var x = parseInt(as[i]);
-        if (!bs[i]) return 1;
-        var y = parseInt(bs[i]);
-        if (x < y) return -1;
-        if (x > y) return 1;
-    }
-    return -1;
-};
-
-// 获取Page
-export const getCurrentPage = () => {
-    return document.querySelector('.page-current') || document.querySelector('.page') || document.body;
+/**
+ * 时间截取
+ * @param  {[type]} str       日期 2001-01-01
+ * @param  {[type]} format    格式 YYYY-MM-DD
+ * @return {[type]}           [description]
+ */
+export const dateFormat = (str, format) => {
+    const now = new Date(str).getTime();
+    return moment.unix(now.toString().length === 13 ? now / 1000 : now).format(format);
 };
 
 export const timestampToTime = timestamp => {
@@ -241,6 +231,27 @@ export const timestampToDateString = timestamp => {
 
 export const timestampFromNow = timestamp => {
     return moment(timestamp).fromNow();
+};
+
+// 版本
+export const compareVersion = (a, b) =>{
+    var as = a.split('.');
+    var bs = b.split('.');
+    if (a === b) return 0;
+
+    for (var i = 0; i < as.length; i++) {
+        var x = parseInt(as[i]);
+        if (!bs[i]) return 1;
+        var y = parseInt(bs[i]);
+        if (x < y) return -1;
+        if (x > y) return 1;
+    }
+    return -1;
+};
+
+// 获取Page
+export const getCurrentPage = () => {
+    return document.querySelector('.page-current') || document.querySelector('.page') || document.body;
 };
 
 // 比对操作

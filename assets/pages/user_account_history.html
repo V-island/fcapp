@@ -9,32 +9,19 @@
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block">
-            <div class="list list-history">
-                <a href="#" class="list-item" data-ripple>
-                    <span class="icon user-gold list-item-graphic"></span>
-                    <span class="list-item-text">ID:12346789
-                        <span class="list-item-secondary">2018-01-01</span>
-                    </span>
-                    <span class="list-item-meta-txt">+500</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
-                </a>
-                <a href="#" class="list-item" data-ripple>
-                    <span class="icon user-gold list-item-graphic"></span>
-                    <span class="list-item-text">ID:12346789
-                        <span class="list-item-secondary">2018-01-01</span>
-                    </span>
-                    <span class="list-item-meta-txt">+500</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
-                </a>
-                <a href="#" class="list-item" data-ripple>
-                    <span class="icon user-gold list-item-graphic"></span>
-                    <span class="list-item-text">ID:12346789
-                        <span class="list-item-secondary">2018-01-01</span>
-                    </span>
-                    <span class="list-item-meta-txt">+500</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
-                </a>
-            </div>
+            {{if HistoryList}}
+                <div class="list list-history">
+                    {{each HistoryList}}
+                        <div class="list-item" data-ripple>
+                            <span class="icon user-gold list-item-graphic"></span>
+                            <span class="list-item-text">ID:{{$value.goods_id}}
+                                <span class="list-item-secondary">{{$value.end_time | dateFormat 'YYYY-MM-DD'}}</span>
+                            </span>
+                            <span class="list-item-meta-txt">+{{$value.title}}</span>
+                        </div>
+                    {{/each}}
+                </div>
+            {{/if}}
         </div>
     </div>
 </div>

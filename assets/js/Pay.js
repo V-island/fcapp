@@ -84,19 +84,24 @@ export default class Pay extends EventEmitter {
 		const script = document.createElement("script");
 
 		return new Promise((resolve) => {
-			script.setAttribute("type", "text/javascript");
-			script.setAttribute("src", paypalConfig.paypalSDKAPI);
-			script.onload = script.onreadystatechange = function(e) {
-				if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-					resolve(true);
-					// Handle memory leak in IE
-					script.onload = script.onreadystatechange = null;
+			if(typeof(paypal) == 'undefined'){
+				console.log('加载paypal');
+				script.setAttribute("type", "text/javascript");
+				script.setAttribute("src", paypalConfig.paypalSDKAPI);
+				script.onload = script.onreadystatechange = function(e) {
+					if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+						resolve(true);
+						// Handle memory leak in IE
+						script.onload = script.onreadystatechange = null;
+					}
+				};
+				if (heads.length) {
+					heads[0].appendChild(script);
+				} else {
+					document.documentElement.appendChild(script);
 				}
-			};
-			if (heads.length) {
-				heads[0].appendChild(script);
-			} else {
-				document.documentElement.appendChild(script);
+			}else {
+				resolve(true);
 			}
 		});
 	}
@@ -164,6 +169,7 @@ export default class Pay extends EventEmitter {
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
 						.then((res) => {
+							console.log(res);
 							let token = res.payUrl.split('token=');
 							return token[1];
 						});

@@ -1,6 +1,6 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
-
+import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
@@ -13,14 +13,17 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
+const modal = new Modal();
 
 export default class Login extends EventEmitter {
 	constructor(element, options) {
 	    super();
 
 	    this.options = {
-    		shareLabelClass: 'share-label',
-    		dataIndex: 'href',
+    		btnMobileClass: 'btn-mobile',
+    		btnFecebookClass: 'btn-fecebook',
+    		btnTwitterClass: 'btn-twitter',
+    		dataIndex: 'href'
         };
 
 	    extend(this.options, options);
@@ -38,14 +41,26 @@ export default class Login extends EventEmitter {
 	}
 
 	_bindEvent() {
-		this.shareLabelEl = this.LoginEl.getElementsByClassName(this.options.shareLabelClass);
+		this.btnMobileEl = this.LoginEl.getElementsByClassName(this.options.btnMobileClass)[0];
+		this.btnFecebookEl = this.LoginEl.getElementsByClassName(this.options.btnFecebookClass)[0];
+		this.btnTwitterEl = this.LoginEl.getElementsByClassName(this.options.btnTwitterClass)[0];
 
-		Array.prototype.slice.call(this.shareLabelEl).forEach(labelEl => {
-			addEvent(labelEl, 'click', () => {
-				const Url = getData(labelEl, this.options.dataIndex);
-				return location.href = Url;
-	        });
-		});
+		// mobile 登录
+		addEvent(this.btnMobileEl, 'click', () => {
+			const Url = getData(this.btnMobileEl, this.options.dataIndex);
+			return location.href = Url;
+        });
+
+        // Facebook 登录
+		addEvent(this.btnFecebookEl, 'click', () => {
+			const Url = getData(labelEl, this.options.dataIndex);
+			return location.href = Url;
+        });
+
+        // Twitter 登录
+		addEvent(this.btnTwitterEl, 'click', () => {
+			return modal.toast(LANG.LOGIN.Third_party.Text);
+        });
 	}
 
 	static attachTo(element, options) {

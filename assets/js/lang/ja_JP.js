@@ -254,6 +254,7 @@ const Lang = {
 		},
 		Third_party: {
 			Title: 'or login',
+			Text: 'coming soon',
 			Mobile: 'Mobile',
 			Facebook: 'Facebook',
 			Snapchat: 'Snapchat',
@@ -503,7 +504,7 @@ const Lang = {
 		Froms: {
 			Country: {
 				Title: 'Country',
-				Name: 'English',
+				Name: 'USA',
 				Lang: 'en'
 			},
 			Telephone: {

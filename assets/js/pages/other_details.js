@@ -31,12 +31,16 @@ import {
     removeClass,
     toggleClass,
     errorAlert,
+    dateFormat,
     importTemplate,
     getVariableFromUrl
 } from '../util';
 
 const LANG = getLangConfig();
 const modal = new Modal();
+Template.defaults.imports.dateFormat = (date, format) => {
+	return dateFormat(date, format);
+};
 
 export default class OtherDetails extends EventEmitter {
 	constructor(element, options) {

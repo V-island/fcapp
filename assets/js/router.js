@@ -242,7 +242,8 @@ import {
         // 表示是当前 nav 的 class
         barTabClass: '.bar-tab',
         // 根目录
-        rootUrl: 'login'
+        rootUrl: 'home',
+        notloginUrl: 'login'
     }
 
     let DIRECTION = {
@@ -363,6 +364,9 @@ import {
             }
 
             if (location.hash == '' || location.hash == '#/' || location.hash === undefined) {
+                if (checkLogin()) {
+                    return location.href = '#/' + routerConfig.notloginUrl;
+                }
                 return location.href = '#/' + routerConfig.rootUrl;
             }
             console.log(url);

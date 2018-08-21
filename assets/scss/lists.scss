@@ -399,6 +399,11 @@
             }
         }
 
+        .list-item-text{
+            color: $color-text;
+            flex-grow: 1;
+        }
+
         &.no-bg {
             border-bottom: 1px solid $list-user-border-color;
         }

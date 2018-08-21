@@ -899,13 +899,14 @@ p.lives-remark{
 	    margin: 0 0 1rem 0;
 	}
 	.login-banner{
-		width: 14.35rem;
+		width: 100%;
 		height: 11.55rem;
 		background-image: url("#{$imgBaseUrl}/login-banner-bg.png");
 		background: image-set(url("#{$imgBaseUrl}/login-banner-bg.png") 1x, url("#{$imgBaseUrl}/login-banner-bg@2x.png") 2x) center;
 		background-position: center;
 	    background-size: contain;
 	    background-repeat: no-repeat;
+        margin: auto;
 	}
 }
 
@@ -1122,7 +1123,9 @@ p.lives-remark{
 // user-wrapper
 //------------------------------
 .user-wrapper{
-	padding: 0 0.75rem;
+	margin: 0 !important;
+    padding: 0.75rem;
+	// padding: 0 0.75rem;
 	// height: 100%;
 
 	.banner{
