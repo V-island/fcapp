@@ -503,13 +503,11 @@ const Lang = {
 		},
 		Froms: {
 			Country: {
-				Title: 'Country',
-				Name: 'USA',
-				Lang: 'en'
+				Title: 'Country'
 			},
 			Telephone: {
-				Title: 1,
 				Placeholder: 'Your  telephone  number',
+				Text: 'Please input the correct phone number',
 				Verification: 'code'
 			},
 			Verification: {

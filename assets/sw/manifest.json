@@ -1,6 +1,6 @@
 {
-    "name": "Fun Chat",
-    "short_name": "Fun Chat",
+    "name": "Shine Live",
+    "short_name": "Shine Live",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#383840",
@@ -8,6 +8,10 @@
     "orientation": "portrait-primary",
     "theme_color": "#FFDD33",
     "icons": [{
+        "src": "assets/img/32.png",
+        "sizes": "32x32",
+        "type": "image/png"
+    }, {
         "src": "assets/img/72.png",
         "sizes": "72x72",
         "type": "image/png"

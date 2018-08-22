@@ -8,9 +8,9 @@ const DEFAULT = {
 	lang: US
 };
 const LANG = {
-    'zh': CN,
-	'en': US,
-	'jp': JP,
+    'zh_CN': CN,
+	'en_US': US,
+	'ja_JP': JP,
 };
 
 /**

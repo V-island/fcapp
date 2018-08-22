@@ -23,25 +23,14 @@ export const errorAlert = (message, reload = true) => {
     // }
 };
 
-// 判断是否为手机号
-export const isPoneAvailable = (pone) => {
-    var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
-    if (!myreg.test(pone)) {
-        return false;
-    } else {
-        return true;
-    }
-};
-
-
 // 倒计时60s
 export const addCountdown = (element, val) => {
     if (val == 0) {
-        element.removeClass('disabled');
-        element.text(LANG.PUBLIC.Froms.Telephone.Verification);
+        removeClass(element, 'disabled');
+        element.innerText = LANG.PUBLIC.Froms.Telephone.Verification;
         return false;
     } else {
-        element.text(val + 's');
+        element.innerText = `${val}s`;
         val--;
         setTimeout(function() {
             addCountdown(element, val)

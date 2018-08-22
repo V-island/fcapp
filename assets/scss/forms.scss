@@ -62,7 +62,7 @@ input, textarea, [contenteditable] {
     line-height: $line-height-base;
     @include transition("border-color ease-in-out .15s");
 
-    &.country{
+    &.countryName{
         line-height: 1.5rem;
         text-align: right;
     }
