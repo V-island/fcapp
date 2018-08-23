@@ -158,7 +158,7 @@ export default class Modal extends EventEmitter {
         if (isModal) {
             modal.show();
             modal.css({
-                marginTop: - Math.round(modal.outerHeight() / 2) + 'px'
+                marginTop: - Math.round(modal.outerWidth() / 2) + 'px'
             });
         }
         if (isToast) {

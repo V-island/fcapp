@@ -13,7 +13,7 @@
         <!-- 这里是页面内容区 -->
         <div class="content block withdraw-wrapper">
             <div class="withdraw-content active paypal-page">
-                <div class="withdraw-item active">
+                <div class="withdraw-item {{if !paypalAccount}} active {{/if}}">
                     <p class="item-title">{{USER_SCORE.Withdraw.Paypal.Text}}</p>
 
                     <form class="form-cards">
@@ -27,14 +27,24 @@
 
                     </form>
                 </div>
-                <div class="withdraw-item">
+                <div class="withdraw-item {{if paypalAccount}} active {{/if}}">
                     <div class="list list-history">
-                        <div class="list-item" data-ripple>
+                        <div class="list-item">
                             <span class="icon user-paypal list-item-graphic"></span>
                             <span class="list-item-text">{{PUBLIC.Froms.Paypal_Account.Title}}
-                                <span class="list-item-secondary">11111111@gmail.com</span>
+                                <span class="list-item-secondary">{{paypalAccount}}</span>
                             </span>
-                            <span class="list-item-meta-txt">￥{{$value.title}}</span>
+                            <span class="list-item-meta-txt btn-modify">{{PUBLIC.Buttons.Modify}}</span>
+                        </div>
+
+                        <div class="list-item item-withdraw">
+                            <span class="list-item-text">{{USER_SCORE.Withdraw.Title}}</span>
+                            <span class="list-item-meta-txt"><small>{{CurrencyCode}}</small>{{Money}}</span>
+                        </div>
+
+                        <div class="buttons buttons-vertical">
+                            <div class="button button-primary btn-confirm" data-type="1" data-ripple>{{PUBLIC.ConfirmButtonOk}}</div>
+                            <a class="button button-link back" data-ripple>{{PUBLIC.ConfirmButtonCancel}}</a>
                         </div>
                     </div>
                 </div>
@@ -42,7 +52,7 @@
             <!-- /.withdraw-content paypal-page -->
 
             <div class="withdraw-content visa-page">
-                <div class="withdraw-item active">
+                <div class="withdraw-item {{if !visaAccount}} active {{/if}}">
                     <p class="item-title">{{USER_SCORE.Withdraw.Visa.Text}}</p>
 
                     <form class="form-cards">
@@ -54,6 +64,7 @@
                         <!-- /.form-group -->
 
                         <div class="form-group datatime">
+                            <input type="hidden" name="time" value="" />
                             <label class="form-label">{{PUBLIC.Froms.Expiration_Data.Title}}</label>
                             <div class="form-control control-title dataTimeValue"></div>
                             <i class="icon user-arrow-forward mete"></i>
@@ -68,7 +79,7 @@
 
                         <div class="form-group">
                             <label class="form-label">{{PUBLIC.Froms.CSC.Title}}</label>
-                            <input type="tel" name="account" class="form-control" placeholder="{{PUBLIC.Froms.CSC.Placeholder}}">
+                            <input type="tel" name="csc" class="form-control" placeholder="{{PUBLIC.Froms.CSC.Placeholder}}">
                         </div>
                         <!-- /.form-group -->
 
@@ -76,8 +87,26 @@
 
                     </form>
                 </div>
-                <div class="withdraw-item">
-                    4
+                <div class="withdraw-item {{if visaAccount}} active {{/if}}">
+                    <div class="list list-history">
+                        <div class="list-item">
+                            <span class="icon user-visa list-item-graphic"></span>
+                            <span class="list-item-text">{{PUBLIC.Froms.Paypal_Account.Title}}
+                                <span class="list-item-secondary">{{visaAccount}}</span>
+                            </span>
+                            <span class="list-item-meta-txt btn-modify">{{PUBLIC.Buttons.Modify}}</span>
+                        </div>
+
+                        <div class="list-item item-withdraw">
+                            <span class="list-item-text">{{USER_SCORE.Withdraw.Title}}</span>
+                            <span class="list-item-meta-txt"><small>{{CurrencyCode}}</small>{{Money}}</span>
+                        </div>
+
+                        <div class="buttons buttons-vertical">
+                            <div class="button button-primary btn-confirm" data-type="2" data-ripple>{{PUBLIC.ConfirmButtonOk}}</div>
+                            <a class="button button-link back" data-ripple>{{PUBLIC.ConfirmButtonCancel}}</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- /.withdraw-content visa-page -->

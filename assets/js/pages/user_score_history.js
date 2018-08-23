@@ -6,7 +6,7 @@ import {
 } from '../lang';
 
 import {
-    personCenter
+    applyCashHistory
 } from '../api';
 
 import {
@@ -45,9 +45,9 @@ export default class UserScoreHistory extends EventEmitter {
 	init(element) {
 		this._page = 1;
 		this._number = 10;
-		let getPayHistory = payHistory(this._page, this._number);
+		let getapplyCashHistory = applyCashHistory(this._page, this._number);
 
-		getPayHistory.then((data) => {
+		getapplyCashHistory.then((data) => {
 			this.data.HistoryList = data;
 
 			this.UserScoreHistoryEl = createDom(Template.render(element, this.data));
@@ -67,7 +67,7 @@ export default class UserScoreHistory extends EventEmitter {
 		addEvent(this.contentEl, 'scroll', () => {
 			if (isScrollBottom(this.contentEl)) {
 				let index = this._page + 1;
-				payHistory(index, this._number).then((data) => {
+				applyCashHistory(index, this._number).then((data) => {
 					if (!data) return;
 
 					data.forEach((itemData, index) => {

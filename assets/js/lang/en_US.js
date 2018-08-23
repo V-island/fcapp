@@ -186,6 +186,14 @@ const Lang = {
 				Title: 'Visa',
 				Text: 'Link your Visa account'
 			}
+		},
+		Very_Sorry: {
+			Title: 'Very sorry',
+			Text: 'You did not pass review'
+		},
+		Under_Review: {
+			Title: 'Under review',
+			Text: 'We will giving the results in a working day'
 		}
 	},
 	USER_INVITE: {
@@ -546,7 +554,8 @@ const Lang = {
 			}
 		},
 		Buttons: {
-			Save: 'Save'
+			Save: 'Save',
+			Modify: 'Modify'
 		},
 		ModalTitle: 'Prompt',
 		modalAlertButton: 'I know',

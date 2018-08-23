@@ -31,7 +31,7 @@
                         {{each AllGoodsList}}
                             <label class="recharge-label {{if $index == 0}}active{{/if}}" data-id="{{$value.id}}" data-currency="USD" data-ripple>
                                 <p class="cost">{{$value.title}} {{LIVE_PREVIEW.Actions.Coins}}</p>
-                                <p>{{$value.goods_price}}</p>
+                                <p>{{$value.total_price}}</p>
                             </label>
                         {{/each}}
                     {{/if}}

@@ -160,7 +160,7 @@ export default class Pay extends EventEmitter {
 			payment: (data, actions) => {
 				return createOrder(this.goodsId, this.payType).then((order) => {
 					let _data = {
-						keyword: 'Pay',
+						keyword: 'pay',
 						order_id: order.order_id,
 						total: order.goods_price
 						// currency: ''

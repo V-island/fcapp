@@ -991,9 +991,11 @@ export function praiseVideo(videoId, status = 1) {
  * @param  {[type]} userId 	用户ID
  * @return {[type]}         [description]
  */
-export function searchUserInfo(userId) {
+export function searchUserInfo(_userID) {
+	let {userId} = getUserInfo();
 	let _params = {
-		userId: userId
+		userId: _userID,
+		loginUserId: userId
 	}
 
 	return new Promise((resolve) => {
@@ -1615,11 +1617,12 @@ export function extractScore() {
  */
 export function applyCash(money, account, type = 1) {
 	let {userId} = getUserInfo();
+	let { currency_code } = getLocalStorage(COUNTRY_ID_NAME);
 	let _params = {
 		user_id: userId,
 		blank_account: account,
 		blank_type: type,
-		total_money: money
+		total_money: money + currency_code
 	}
 
 	return new Promise((resolve) => {
@@ -1663,6 +1666,44 @@ export function bindBlank(account, type = 1, time, csc) {
 	});
 };
 
+/**
+ * 判断用户是否已有账号
+ * @param  {Number}  type 账户类型 1.paypal 2.visa
+ * @return {Boolean}      [description]
+ */
+export function hasBindBlank(type = 1) {
+	let { userId } = getUserInfo();
+	let _params = {
+		user_id: userId,
+		blank_type: type
+	}
+
+	return new Promise((resolve) => {
+		getPost('/hasBindBlank', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+
+export function applyCashHistory(_page = 1, _number = 10) {
+	let {userId} = getUserInfo();
+	let _params = {
+		user_id: userId,
+		page: _page,
+		number: _number
+	}
+
+	return new Promise((resolve) => {
+		getPost('/applyCashHistory', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
 
 //------------------------------------------------------------------------------------------------------
 //-----商品订单模块

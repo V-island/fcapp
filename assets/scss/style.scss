@@ -10,7 +10,7 @@
     background: image-set(url('#{$imgBaseUrl}/users/avatar-#{$image}.png') 1x, url('#{$imgBaseUrl}/users/avatar-#{$image}@2x.png') 2x) center;
 }
 .user-info {
-	@include flex-spindle(center);
+	@include flex-spindle(start);
 	// @include flex-vertical(column);
 
 	>.user-img {
@@ -1603,5 +1603,26 @@ p.lives-remark{
 		font-size: 0.6rem;
 		padding-left: 0.7rem;
 		margin-bottom: 0.35rem;
+	}
+	.list-history {
+		.btn-modify {
+			font-size: 0.5rem;
+		    font-weight: 300;
+		}
+		>.item-withdraw {
+			.list-item-text {
+				height: 1.2rem;
+				line-height: 1.2rem;
+			}
+			.list-item-meta-txt {
+				line-height: 1.2rem;
+			}
+		}
+		>.buttons{
+			margin-top: 1.2rem;
+			>.button {
+				min-width: 10rem;
+			}
+		}
 	}
 }
