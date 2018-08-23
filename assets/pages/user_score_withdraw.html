@@ -1,0 +1,86 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-flex">
+            <a class="icon-btn back" data-ripple>
+                <i class="icon icon-arrow-back"></i>
+            </a>
+            <div class="title nav-tabs">
+                <div class="tab-pane active">{{USER_SCORE.Withdraw.Paypal.Title}}</div>
+                <div class="tab-pane">{{USER_SCORE.Withdraw.Visa.Title}}</div>
+            </div>
+        </header>
+        <!-- 这里是页面内容区 -->
+        <div class="content block withdraw-wrapper">
+            <div class="withdraw-content active paypal-page">
+                <div class="withdraw-item active">
+                    <p class="item-title">{{USER_SCORE.Withdraw.Paypal.Text}}</p>
+
+                    <form class="form-cards">
+                        <div class="form-group">
+                            <label class="form-label">{{PUBLIC.Froms.Paypal_Account.Title}}</label>
+                            <input type="tel" name="account" class="form-control" placeholder="{{PUBLIC.Froms.Paypal_Account.Placeholder}}">
+                        </div>
+                        <!-- /.form-group -->
+
+                        <button type="submit" class="button button-primary" data-ripple>{{PUBLIC.Buttons.Save}}</button>
+
+                    </form>
+                </div>
+                <div class="withdraw-item">
+                    <div class="list list-history">
+                        <div class="list-item" data-ripple>
+                            <span class="icon user-paypal list-item-graphic"></span>
+                            <span class="list-item-text">{{PUBLIC.Froms.Paypal_Account.Title}}
+                                <span class="list-item-secondary">11111111@gmail.com</span>
+                            </span>
+                            <span class="list-item-meta-txt">￥{{$value.title}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.withdraw-content paypal-page -->
+
+            <div class="withdraw-content visa-page">
+                <div class="withdraw-item active">
+                    <p class="item-title">{{USER_SCORE.Withdraw.Visa.Text}}</p>
+
+                    <form class="form-cards">
+                        <div class="form-group country">
+                            <label class="form-label">{{PUBLIC.Froms.Country.Title}}</label>
+                            <div class="form-control control-title countryName"></div>
+                            <i class="icon user-arrow-forward mete"></i>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group datatime">
+                            <label class="form-label">{{PUBLIC.Froms.Expiration_Data.Title}}</label>
+                            <div class="form-control control-title dataTimeValue"></div>
+                            <i class="icon user-arrow-forward mete"></i>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group">
+                            <label class="form-label">{{PUBLIC.Froms.Card_Number.Title}}</label>
+                            <input type="tel" name="account" class="form-control" placeholder="{{PUBLIC.Froms.Card_Number.Placeholder}}">
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group">
+                            <label class="form-label">{{PUBLIC.Froms.CSC.Title}}</label>
+                            <input type="tel" name="account" class="form-control" placeholder="{{PUBLIC.Froms.CSC.Placeholder}}">
+                        </div>
+                        <!-- /.form-group -->
+
+                        <button type="submit" class="button button-primary" data-ripple>{{PUBLIC.Buttons.Save}}</button>
+
+                    </form>
+                </div>
+                <div class="withdraw-item">
+                    4
+                </div>
+            </div>
+            <!-- /.withdraw-content visa-page -->
+        </div>
+    </div>
+</div>

@@ -66,6 +66,30 @@
     &.primary {
         color: $color-primary;
     }
+
+    &.nav-tabs {
+        @include spindle-center(center);
+
+        .tab-pane {
+            min-width: 4.9rem;
+            height: 1.4rem;
+            line-height: 1.4rem;
+            font-size: 0.75rem;
+            border: 0.05rem solid $tag-bg-color-active;
+
+            &:first-of-type {
+                border-radius: 0.1rem 0 0 0.1rem;
+            }
+
+            &:last-of-type {
+                border-radius: 0 0.1rem 0.1rem 0;
+            }
+
+            &.active {
+                background: $tag-bg-color-active;
+            }
+        }
+    }
 }
 
 // Retain specified title color

@@ -1586,3 +1586,22 @@ p.lives-remark{
 		margin-top: 0;
 	}
 }
+
+// withdraw-wrapper
+//--------------------------------
+.withdraw-wrapper {
+	.withdraw-content,
+	.withdraw-item {
+		display: none;
+
+		&.active {
+			display: block;
+		}
+	}
+	.item-title {
+		color: $color-text-gray-light;
+		font-size: 0.6rem;
+		padding-left: 0.7rem;
+		margin-bottom: 0.35rem;
+	}
+}

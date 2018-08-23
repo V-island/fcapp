@@ -175,7 +175,18 @@ const Lang = {
 		Live: 'Live',
 		Video: 'Video',
 		Secondary_Title: 'Exchange cash',
-		Score: 'score'
+		Score: 'score',
+		Withdraw: {
+			Title: 'Withdraw',
+			Paypal: {
+				Title: 'Paypal',
+				Text: 'Link your Papal account'
+			},
+			Visa: {
+				Title: 'Visa',
+				Text: 'Link your Visa account'
+			}
+		}
 	},
 	USER_INVITE: {
 		Title: 'Invite'
@@ -517,7 +528,25 @@ const Lang = {
 			Password: {
 				Title: 'Password',
 				Placeholder: '8-12 bit character'
+			},
+			Paypal_Account: {
+				Title: 'Paypal account',
+				Placeholder: 'Name or email'
+			},
+			Expiration_Data: {
+				Title: 'Expiration data'
+			},
+			Card_Number: {
+				Title: 'Card number',
+				Placeholder: 'Please enter the card number'
+			},
+			CSC: {
+				Title: 'CSC',
+				Placeholder: 'Security code'
 			}
+		},
+		Buttons: {
+			Save: 'Save'
 		},
 		ModalTitle: 'Prompt',
 		modalAlertButton: 'I know',

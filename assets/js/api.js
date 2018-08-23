@@ -251,14 +251,14 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 			return callback(response);
 		}
 		if (response.code === 2012) {
-			modal.toast(response.message);
+			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			clearLocalStorage();
 			return location.href = '#/login';
 		}
 		if (isFunction(callbackCancel)) {
 			return callbackCancel(response);
 		}
-		modal.alert(response.message, function(_modal) {
+		modal.alert(LANG.SYSTEM_CODE[response.code], function(_modal) {
 			modal.closeModal(_modal);
 		});
 	});
@@ -392,14 +392,18 @@ export function findAllCountry(id = 2, langId = 2) {
 
 		getPost('/findAllCountry', {
 			language_id: langId
-		}, (response) => {
-			setLocalStorage(COUNTRY_ID_NAME, {
-				id: id,
-				langId: langId,
-				gain: true
+		}, ({data}) => {
+			console.log(data);
+			data.forEach((_data, index) => {
+			    if (_data.id === id) {
+			    	_data.gain = true;
+			    	setLocalStorage(COUNTRY_ID_NAME, _data);
+    				setLocalStorage(COUNTRY_NAME, data);
+    				resolve(true);
+			    }else {
+			    	resolve(false);
+			    }
 			});
-			setLocalStorage(COUNTRY_NAME, response.data);
-			resolve(true);
 		});
 	});
 };
@@ -458,7 +462,7 @@ export function getLogin(params, callback) {
 	_params.loginMode = LoginMode;
 	_params.status = 1;
 	getPost('/appLogin', _params, (response) => {
-		modal.toast(response.message);
+		modal.toast(LANG.SYSTEM_CODE[response.code]);
 		const {token, userId, phoneCode, userPhone, praise_channel, comment_channel, gift_channel} = response.data;
 
 		setLocalStorage(TOKEN_NAME, token);
@@ -516,7 +520,7 @@ export function getUpdatePassword(params) {
 
 	return new Promise((resolve) => {
 		getPost('/updatePassword', _params, (response) => {
-			modal.toast(response.message);
+			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			resolve(true);
 		});
 	});
@@ -538,7 +542,7 @@ export function appLoginOut() {
 
 	return new Promise((resolve) => {
 		getPost('/appLoginOut', _params, (response) => {
-			modal.toast(response.message);
+			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			clearLocalStorage();
 			location.href = '#/login';
 			resolve(true);
@@ -1576,6 +1580,82 @@ export function payHistory(_page = 1, _number = 10) {
 
 	return new Promise((resolve) => {
 		getPost('/payHistory', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 积分提现界面接口
+ * @return {[type]} [description]
+ */
+export function extractScore() {
+	let {userId} = getUserInfo();
+	let _params = {
+		userId: userId
+	}
+
+	return new Promise((resolve) => {
+		getPost('/extractScore', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 申请积分提现
+ * @param  {[type]} money   体现金额（带上货币单位，如50￥，50$）
+ * @param  {[type]} account 提现账户
+ * @param  {Number} type    账户类型 1.paypal 2.visa
+ * @return {[type]}         [description]
+ */
+export function applyCash(money, account, type = 1) {
+	let {userId} = getUserInfo();
+	let _params = {
+		user_id: userId,
+		blank_account: account,
+		blank_type: type,
+		total_money: money
+	}
+
+	return new Promise((resolve) => {
+		getPost('/applyCash', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 绑定银行卡或paypal账号
+ * @param  {[type]} account 提现账户
+ * @param  {Number} type    账户类型 1.paypal 2.visa
+ * @param  {[type]} time    过期时间（paypal不需要，visa必传）
+ * @param  {[type]} csc     安全码（paypal不需要，visa必传）
+ * @return {[type]}         [description]
+ */
+export function bindBlank(account, type = 1, time, csc) {
+	let { userId } = getUserInfo();
+	let { id } = getLocalStorage(COUNTRY_ID_NAME);
+	let _params = {
+		user_id: userId,
+		blank_account: account,
+		blank_type: type,
+		country_id: id
+	}
+
+	if (type == 2) {
+		_params.expire_time = time;
+		_params.csc = csc;
+	}
+
+	return new Promise((resolve) => {
+		getPost('/bindBlank', _params, (response) => {
 			resolve(response.data);
 		}, (response) => {
 			resolve(false);

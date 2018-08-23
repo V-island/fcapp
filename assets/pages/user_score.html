@@ -11,20 +11,20 @@
         <!-- 这里是页面内容区 -->
         <div class="content block user-cover-wrapper">
             <div class="cover-header score-header">
-                <p class="score-amount">{{UserInfo.user_score}}</p>
+                <p class="score-amount">{{UserScore.user_score}}</p>
             </div>
             <!-- /.cover-header -->
             <div class="score-list">
                 <div class="score-item">
-                    <h3>{{UserInfo.user_score}}</h3>
+                    <h3>{{UserScore.total_score}}</h3>
                     <p>{{USER_SCORE.Total}}</p>
                 </div>
                 <div class="score-item">
-                    <h3>{{UserInfo.user_score}}</h3>
+                    <h3>{{UserScore.live_score}}</h3>
                     <p>{{USER_SCORE.Live}}</p>
                 </div>
                 <div class="score-item">
-                    <h3>{{UserInfo.user_score}}</h3>
+                    <h3>{{UserScore.video_score}}</h3>
                     <p>{{USER_SCORE.Video}}</p>
                 </div>
             </div>
@@ -33,34 +33,17 @@
                 <p class="header-title">{{USER_SCORE.Secondary_Title}}</p>
 
                 <div class="row box-cards box-cards-score">
-                    <div class="col-50 card card-score">
-                        <i class="icon user-purse"></i>
-                        <div class="score-info">
-                            <p class="score-info-amount">100<small>$</small></p>
-                            <p class="score-info-text">400 {{USER_SCORE.Score}}</p>
-                        </div>
-                    </div>
-                    <div class="col-50 card card-score">
-                        <i class="icon user-purse"></i>
-                        <div class="score-info">
-                            <p class="score-info-amount">500<small>$</small></p>
-                            <p class="score-info-text">2000 {{USER_SCORE.Score}}</p>
-                        </div>
-                    </div>
-                    <div class="col-50 card card-score">
-                        <i class="icon user-purse"></i>
-                        <div class="score-info">
-                            <p class="score-info-amount">1000<small>$</small></p>
-                            <p class="score-info-text">4000 {{USER_SCORE.Score}}</p>
-                        </div>
-                    </div>
-                    <div class="col-50 card card-score">
-                        <i class="icon user-purse"></i>
-                        <div class="score-info">
-                            <p class="score-info-amount">5000<small>$</small></p>
-                            <p class="score-info-text">200,00 {{USER_SCORE.Score}}</p>
-                        </div>
-                    </div>
+                    {{if UserScore.list}}
+                        {{each UserScore.list}}
+                            <div class="col-50 card card-score" data-money="{{$value.money}}">
+                                <i class="icon user-purse"></i>
+                                <div class="score-info">
+                                    <p class="score-info-amount">{{$value.money}}<small>{{CurrencyCode}}</small></p>
+                                    <p class="score-info-text">{{$value.score}} {{USER_SCORE.Score}}</p>
+                                </div>
+                            </div>
+                        {{/each}}
+                    {{/if}}
                 </div>
                 <!-- /.box-cards -->
             </div>

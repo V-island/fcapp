@@ -107,6 +107,39 @@ input, textarea, [contenteditable] {
     }
 }
 
+.form-cards {
+    .form-group {
+        background: $card-bg;
+        border-bottom-width: 0;
+        font-size: 0.6rem;
+        margin-bottom: 0.35rem;
+
+        .form-label {
+            flex: 0 0 6rem;
+            color: $color-text-remarks;
+            padding-left: 0.7rem;
+        }
+        .form-control {
+            height: 2.1rem;
+            flex: 1 0 0;
+
+            &.control-title {
+                line-height: 2.1rem;
+                text-align: right;
+            }
+        }
+        .mete {
+            width: 0.35rem;
+            flex: 0 0 0.35rem;
+            margin: 0 0.7rem 0 0.35rem;
+        }
+    }
+    >.button {
+        width: 10rem;
+        margin-top: 1.4rem;
+    }
+}
+
 // Form Button
 .form-button {
     border: none;
