@@ -2,6 +2,10 @@ import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
 
 import {
+	body
+} from '../intro';
+
+import {
     getLangConfig
 } from '../lang';
 
@@ -16,6 +20,7 @@ import {
     dateFormat,
     setData,
     getData,
+    createDivEl,
     isScrollBottom
 } from '../util';
 
@@ -31,8 +36,8 @@ export default class UserScoreHistory extends EventEmitter {
 	    this.data = {};
 	    this.options = {
 	    	contentClass: '.content',
-	    	listHistory: 'list-history',
-	    	listPageIndex: 'page'
+	    	listItemClass: 'list-item',
+	    	listIndex: 'status'
         };
 
 	    extend(this.options, options);
@@ -58,7 +63,7 @@ export default class UserScoreHistory extends EventEmitter {
 
 	_init() {
 		this.contentEl = this.UserScoreHistoryEl.querySelector(this.options.contentClass);
-		this.listEl = this.UserScoreHistoryEl.getElementsByClassName(this.options.listItemClass)[0];
+		this.listItemEl = this.UserScoreHistoryEl.getElementsByClassName(this.options.listItemClass);
 
 		this._bindEvent();
 	}
@@ -78,6 +83,16 @@ export default class UserScoreHistory extends EventEmitter {
 				});
 			}
 		});
+
+		Array.prototype.slice.call(this.listItemEl).forEach(ItemEl => {
+			addEvent(ItemEl, 'click', () => {
+				const status = parseInt(getData(ItemEl, this.options.listIndex));
+
+				if (status == 2 || status == 4) return false;
+
+				return this._createStatusElement(status);
+			});
+		});
 	}
 
 	_createElement(_Data) {
@@ -95,6 +110,42 @@ export default class UserScoreHistory extends EventEmitter {
 	    item.appendChild(lastMessageText);
 
 	    return item;
+	}
+
+	_createStatusElement(status) {
+		const Icon = status == 1 ? 'user-under-review' : 'user-audit-failure';
+		const Title = status == 1 ? LANG.USER_SCORE.Under_Review.Title : LANG.USER_SCORE.Very_Sorry.Title;
+		const Text = status == 1 ? LANG.USER_SCORE.Under_Review.Text : LANG.USER_SCORE.Very_Sorry.Text;
+
+		const groupEl = createDivEl({className: 'status-group'});
+		const headerEl = createDivEl({element: 'header', className: ['bar', 'bar-flex']});
+		const headerBtnIconEl = createDivEl({className: ['icon-btn', 'btn-close']});
+		const headerIconEl = createDivEl({element: 'i', className: ['icon', 'icon-arrow-back']});
+		headerBtnIconEl.appendChild(headerIconEl);
+
+		const headerTitleEl = createDivEl({element: 'h1', className: 'title', content: LANG.BAR.History});
+		headerEl.appendChild(headerBtnIconEl);
+		headerEl.appendChild(headerTitleEl);
+
+		const wrapperEl = createDivEl({className: ['content', 'block', 'withdraw-wrapper']});
+		const contentEl = createDivEl({className: ['upload-content', 'upload-status']});
+		const iconEl = createDivEl({element: 'i', className: ['icon', Icon]});
+		const titleEl = createDivEl({element: 'p', className: 'title', content: Title});
+		const textEl = createDivEl({element: 'p', className: 'text', content: Text});
+		contentEl.appendChild(iconEl);
+		contentEl.appendChild(titleEl);
+		contentEl.appendChild(textEl);
+		wrapperEl.appendChild(contentEl);
+		groupEl.appendChild(headerEl);
+		groupEl.appendChild(wrapperEl);
+
+		body.appendChild(groupEl);
+
+		let btnCloseEl = groupEl.getElementsByClassName('btn-close')[0];
+
+		addEvent(btnCloseEl, 'click', () => {
+			body.removeChild(groupEl);
+		});
 	}
 
 	static attachTo(element, options) {

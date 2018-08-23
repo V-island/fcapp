@@ -49,6 +49,7 @@ export default class UserScoreWithdraw extends EventEmitter {
 	    	btnModifyClass: 'btn-modify',
 	    	btnConfirmClass: 'btn-confirm',
 	    	btnCancelClass: 'btn-cancel',
+	    	listTypeIndex: 'type',
 	    	showClass: 'active'
         };
 
@@ -140,7 +141,7 @@ export default class UserScoreWithdraw extends EventEmitter {
 		// button Confirm
 		Array.prototype.slice.call(this.btnConfirmEl).forEach(btnEl => {
 			addEvent(btnEl, 'click', () => {
-				const type = getData(btnEl);
+				const type = getData(btnEl, this.options.listTypeIndex);
 				const { money } = getVariableFromUrl();
 				const account = type == '1' ? this.paypalAccount : this.visaAccount;
 

@@ -22,9 +22,11 @@ import {
     removeClass,
     toggleClass,
     setData,
-    getData
+    getData,
+    getLocalStorage
 } from './util';
 
+const COUNTRY_ID_NAME = 'COUNTRY_ID';
 // const LANG = getLangConfig();
 const modal = new Modal();
 
@@ -55,9 +57,10 @@ export default class Pay extends EventEmitter {
 
 
 	_init() {
+		const { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
 		this.payType = 1;
 		this.goodsId = 1;
-		this.currency = 'USD';
+		this.currency = currency_type;
 
 		let createPaypal = this._createScript();
 
@@ -85,7 +88,6 @@ export default class Pay extends EventEmitter {
 
 		return new Promise((resolve) => {
 			if(typeof(paypal) == 'undefined'){
-				console.log('加载paypal');
 				script.setAttribute("type", "text/javascript");
 				script.setAttribute("src", paypalConfig.paypalSDKAPI);
 				script.onload = script.onreadystatechange = function(e) {
@@ -162,8 +164,8 @@ export default class Pay extends EventEmitter {
 					let _data = {
 						keyword: 'pay',
 						order_id: order.order_id,
-						total: order.goods_price
-						// currency: ''
+						total: order.goods_price,
+						currency: this.currency
 					};
 
 					// Make a call to your server to set up the payment
@@ -191,7 +193,7 @@ export default class Pay extends EventEmitter {
 				// Make a call to your server to execute the payment
 				return paypal.request.post(EXECUTE_URL, _data)
 					.then((res) => {
-						modal.alert(res.message, (_modal) => {
+						modal.alert(LANG.SYSTEM_CODE[response.code], (_modal) => {
 							modal.closeModal(_modal);
 							this.trigger('picker.success');
 						});

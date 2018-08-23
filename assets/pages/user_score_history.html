@@ -12,17 +12,20 @@
             {{if HistoryList}}
                 <div class="list list-history">
                     {{each HistoryList}}
-                        <a href="#" class="list-item" data-ripple>
+                        <div class="list-item" data-status="{{$value.status}}" data-ripple>
                             <span class="icon user-paypal list-item-graphic"></span>
                             <span class="list-item-text">{{$value.blank_account}}
                                 <span class="list-item-secondary">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}
-                                    <span class="list-item-status color-review">{{PUBLIC.Review}}</span>
-                                    <span class="list-item-status color-refuse">{{PUBLIC.Refuse}}</span>
+                                    {{if $value.status == 1}}
+                                        <span class="list-item-status color-review">{{PUBLIC.Review}}</span>
+                                    {{else if $value.status == 3}}
+                                        <span class="list-item-status color-refuse">{{PUBLIC.Refuse}}</span>
+                                    {{/if}}
                                 </span>
                             </span>
-                            <span class="list-item-meta-txt">￥{{$value.title}}</span>
-                            <span class="icon user-arrow-forward list-item-meta"></span>
-                        </a>
+                            <span class="list-item-meta-txt">{{$value.total_money}}</span>
+                            <span class="icon {{if $value.status != 2 || $value.status != 4}} user-arrow-forward {{/if}} list-item-meta"></span>
+                        </div>
                     {{/each}}
                 </div>
             {{/if}}
