@@ -437,6 +437,10 @@ const Lang = {
 			Recharge: 'Recharge',
 			Send: 'Send'
 		},
+		Comment_Prompt: {
+			Is_Empty: 'Text cannot be empty',
+			Only_Once: 'The same user can only comment once'
+		},
 		Share: {
 			Facebook: 'Facebook',
 			Twitter: 'Twitter',

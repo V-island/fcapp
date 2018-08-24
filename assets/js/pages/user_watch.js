@@ -1,8 +1,10 @@
 import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
-
+import { Spinner } from '../components/Spinner';
+import VideoPreview from '../videoPreview';
 import {
+	body,
 	fcConfig
 } from '../intro';
 
@@ -79,22 +81,24 @@ export default class UserWatch extends EventEmitter {
 	}
 
 	_bindEvent() {
-		this.videoEl = this.UserWatchEl.getElementsByClassName(this.options.cardvideoClass);
+		this.cardVideoEl = this.UserWatchEl.getElementsByClassName(this.options.cardvideoClass);
 
-		// video list
-		for (let i = 0; i < this.videoEl.length; i++) {
-		    addEvent(this.videoEl[i], 'click', function() {
-		    	let info = JSON.parse(getData(this, 'userInfo'));
+		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
+			addEvent(cardVideoItemEl, 'click', () => {
+				let info = JSON.parse(getData(cardVideoItemEl, 'userInfo'));
+				info.id = info.user_id;
+				Spinner.start(body);
+				playVideo(info.id).then((data) => {
+					if (!data) return;
 
-		    	playVideo(info.video_id).then((data) => {
-		    		if (!data) return;
-
-		    		extend(info, data);
-		    		info.id = info.video_id;
-		    		let _videoPreview = new VideoPreview(info);
-		    	});
-		    });
-		}
+					extend(info, data);
+					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
+					_videoPreview.on('videoPreview.start', () => {
+	                    Spinner.remove();
+	                });
+				});
+			});
+		});
 	}
 
 	// Video 模块

@@ -1604,25 +1604,4 @@ p.lives-remark{
 		padding-left: 0.7rem;
 		margin-bottom: 0.35rem;
 	}
-	.list-history {
-		.btn-modify {
-			font-size: 0.5rem;
-		    font-weight: 300;
-		}
-		>.item-withdraw {
-			.list-item-text {
-				height: 1.2rem;
-				line-height: 1.2rem;
-			}
-			.list-item-meta-txt {
-				line-height: 1.2rem;
-			}
-		}
-		>.buttons{
-			margin-top: 1.2rem;
-			>.button {
-				min-width: 10rem;
-			}
-		}
-	}
 }

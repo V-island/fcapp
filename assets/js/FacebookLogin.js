@@ -125,12 +125,34 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	Login() {
+		if(typeof(FB) == 'undefined'){
+			return modal.toast(LANG.LOGIN.Madal.Error);
+		}
+
 		FB.login((response) => {
 			console.log(response);
 			this._statusChangeCallback(response);
 		}, {
 			scope: 'public_profile,user_location,user_hometown'
 		});
+	}
+
+	Share(URL) {
+		
+		FB.ui(
+		    {
+		        method: 'share',
+		        href: URL,
+		    },
+		    // callback
+		    function(response) {
+		        if (response && !response.error_message) {
+		        alert('Posting completed.');
+		        } else {
+		        alert('Error while posting.');
+		        }
+		    }
+		);
 	}
 
 	Logout() {

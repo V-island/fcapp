@@ -40,7 +40,7 @@ const LANG = getLangConfig();
 const modal = new Modal();
 
 export default class VideoPreview extends EventEmitter {
-    constructor(options) {
+    constructor(element, options) {
         super();
 
         this.data = {};
@@ -56,9 +56,12 @@ export default class VideoPreview extends EventEmitter {
             btnThumbsClass: 'btn-thumbs',
             btnShareClass: 'btn-share',
             btnGiftClass: 'btn-gift',
+            praiseCountClass: 'praise',
+            eyeCountClass: 'eye',
             showClass: 'active'
         };
 
+        this.element = element;
         this.localInfo = getUserInfo();
 
         extend(this.data, LANG);
@@ -66,6 +69,36 @@ export default class VideoPreview extends EventEmitter {
 
         this.videoPreviewFile = fcConfig.publicFile.client_rtc;
 
+        this.init();
+    }
+
+    init() {
+        this.CommentStart = false;
+        this.tpl = {};
+        this._page = 1;
+        this._number = 10;
+        this.SendBird = new SendBirdAction();
+        let getAllgifts = findAllgifts();
+        let getSelAllGoods = selAllGoods();
+        let getComment = selCommentById(this.options.id, this._page, this._number);
+        let SendBirdConnect = this.SendBird.connect(this.localInfo.userId);
+
+        Promise.all([getAllgifts, getComment, getSelAllGoods, SendBirdConnect]).then((data) => {
+            this.data.GiftList = data[0] ? data[0] : false;
+            this.data.CommentList = data[1] ? data[1] : false;
+            this.data.AllGoodsList = data[2] ? data[2] : false;
+            this.data.UserInfoList = this.localInfo;
+
+            importTemplate(this.videoPreviewFile, (id, _template) => {
+                this.tpl[id] = Template.render(_template, this.data);
+            });
+
+            this._init();
+            this.trigger('videoPreview.start');
+        });
+    }
+
+    _init() {
         this.previewModalEl = modal.popup(this._videoPreviewTemplate(this.options));
         // this.videoEl = this.previewModalEl.getElementsByClassName(this.options.videoClass)[0];
         this.btnLiveCloseEl = this.previewModalEl.getElementsByClassName(this.options.btnLiveCloseClass)[0];
@@ -78,35 +111,19 @@ export default class VideoPreview extends EventEmitter {
         this.commentAmountEl = this.previewModalEl.getElementsByClassName(this.options.commentAmountClass)[0];
         this.supportAmountEl = this.previewModalEl.getElementsByClassName(this.options.supportAmountClass)[0];
 
-        this._init();
-    }
+        // element
+        this.praiseCountEl = this.element.getElementsByClassName(this.options.praiseCountClass);
+        this.eyeCountEl = this.element.getElementsByClassName(this.options.eyeCountClass);
 
-    _init() {
-        this.tpl = {};
-        this._page = 1;
-        this._number = 10;
-        this.SendBird = new SendBirdAction();
-        let getAllgifts = findAllgifts();
-        let getSelAllGoods = selAllGoods();
-        let getComment = selCommentById(this.options.id, this._page, this._number);
-        let SendBirdConnect = this.SendBird.connect(this.localInfo.userId);
-
-        Promise.all([getAllgifts, getComment, getSelAllGoods, SendBirdConnect]).then((data) => {
-            console.log(data);
-            this.data.GiftList = data[0] ? data[0] : false;
-            this.data.CommentList = data[1] ? data[1] : false;
-            this.data.AllGoodsList = data[2] ? data[2] : false;
-            this.data.UserInfoList = this.localInfo;
-
-            importTemplate(this.videoPreviewFile, (id, _template) => {
-                this.tpl[id] = Template.render(_template, this.data);
-            });
-
-            this._bindEvent();
-        });
+        this._bindEvent();
     }
 
     _bindEvent() {
+        // 视频列表增加观看数目
+        if (this.eyeCountEl.length > 0) {
+            this.eyeCountEl[0].innerHTML = parseInt(this.eyeCountEl[0].innerHTML) + 1;
+        }
+
         // 关闭
         addEvent(this.btnLiveCloseEl, 'click', () => {
             this.SendBird.disconnect().then(() => {
@@ -145,9 +162,18 @@ export default class VideoPreview extends EventEmitter {
             addEvent(btnSendEl, 'click', () => {
                 let _val = textareaEl.value;
 
-                if (_val === null) {
-                    return;
+                if (this.CommentStart) {
+                    return modal.alert(LANG.LIVE_PREVIEW.Comment_Prompt.Only_Once, (_modal) => {
+                            modal.closeModal(_modal);
+                        });
                 }
+
+                if (_val == "") {
+                    return modal.alert(LANG.LIVE_PREVIEW.Comment_Prompt.Is_Empty, (_modal) => {
+                            modal.closeModal(_modal);
+                        });
+                }
+                this.CommentStart = true;
                 this.commentAmountEl.innerHTML = parseInt(this.commentAmountEl.innerHTML) + 1;
                 let getJoinGroupChannel = this._joinGroupChannel(this.options.comment_channel, _val);
                 let getCommentVideo = commentVideo(this.options.id, _val);
@@ -170,6 +196,10 @@ export default class VideoPreview extends EventEmitter {
             let getPraiseVideo = praiseVideo(this.options.id, 1);
 
             Promise.all([getJoinGroupChannel, getPraiseVideo]).then((data) => {
+                // 视频列表增加点赞数目
+                if (this.praiseCountEl.length > 0) {
+                    this.praiseCountEl[0].innerHTML = parseInt(this.praiseCountEl[0].innerHTML) + 1;
+                }
                 return;
             });
         });
@@ -340,3 +370,8 @@ export default class VideoPreview extends EventEmitter {
         return html;
     }
 }
+
+/**
+ * videoPreview.start
+ * 当页面加载完成的时候，会派发videoPreview.start事件。
+ */

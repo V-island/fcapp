@@ -1,9 +1,11 @@
 import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
+import { Spinner } from '../components/Spinner';
 import EventEmitter from '../eventEmitter';
 import Modal from '../modal';
 import VideoPreview from '../videoPreview';
 import {
+	body,
 	fcConfig
 } from '../intro';
 import {
@@ -176,12 +178,15 @@ export default class Home extends EventEmitter {
 		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
 			addEvent(cardVideoItemEl, 'click', () => {
 				let info = JSON.parse(getData(cardVideoItemEl, 'userInfo'));
-
+				Spinner.start(body);
 				playVideo(info.id).then((data) => {
 					if (!data) return;
 
 					extend(info, data);
-					let _videoPreview = new VideoPreview(info);
+					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
+					_videoPreview.on('videoPreview.start', () => {
+	                    Spinner.remove();
+	                });
 				});
 			});
 		});

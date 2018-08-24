@@ -255,12 +255,14 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 			clearLocalStorage();
 			return location.href = '#/login';
 		}
-		if (isFunction(callbackCancel)) {
-			return callbackCancel(response);
-		}
+
 		modal.alert(LANG.SYSTEM_CODE[response.code], function(_modal) {
 			modal.closeModal(_modal);
 		});
+
+		if (isFunction(callbackCancel)) {
+			return callbackCancel(response);
+		}
 	});
 	return post;
 }

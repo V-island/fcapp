@@ -163,7 +163,7 @@ export default class Modal extends EventEmitter {
         }
         if (isToast) {
             modal.css({
-                marginLeft: - Math.round(modal.outerWidth() / 2 / 1.185) + 'px' //1.185 是初始化时候的放大效果
+                marginLeft: - Math.round(modal.outerWidth() / 1.5) + 'px' //2*1.185 是初始化时候的放大效果
             });
         }
 
