@@ -1,5 +1,6 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
+import FacebookLogin from '../FacebookLogin';
 import Modal from '../modal';
 import Form from '../forms';
 import {
@@ -19,6 +20,7 @@ import {
 
 const LANG = getLangConfig();
 const modal = new Modal();
+const FB = new FacebookLogin();
 
 export default class LoginMobile extends EventEmitter {
 	constructor(element, options) {
@@ -58,8 +60,7 @@ export default class LoginMobile extends EventEmitter {
 
         // Facebook 登录
 		addEvent(this.btnFecebookEl, 'click', () => {
-			const Url = getData(labelEl, this.options.dataIndex);
-			return location.href = Url;
+			FB.Login();
         });
 
         // Twitter 登录

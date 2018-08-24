@@ -238,12 +238,20 @@ export const sendBirdConfig = {
     sendBirdAppURL: 'https://api.sendbird.com'
 };
 
-// 配置
+// paypal配置
 export const paypalConfig = {
     paypal: true, // 默认使用paypal DSK
     paypalSDKAPI: 'https://www.paypalobjects.com/api/checkout.js',
     sandboxClientID: '07F10EB7-6318-4B3C-887B-F69758A7C257', // 沙盒，用于测试，用添加的sandbox账号测试能否交易成功
     productionClientID: '***' // 生产环境，部署上线时使用的环境
+};
+
+// Facebook配置
+export const facebookConfig = {
+    facebook: true, // 默认使用paypal DSK
+    facebookSDKAPI: 'https://connect.facebook.net/en_US/sdk.js',
+    facebookAppId: '247717165811073',
+    facebookVersion: 'v3.1'
 };
 
 export const body = document.querySelector('body');

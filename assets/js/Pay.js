@@ -27,7 +27,7 @@ import {
 } from './util';
 
 const COUNTRY_ID_NAME = 'COUNTRY_ID';
-// const LANG = getLangConfig();
+const LANG = getLangConfig();
 const modal = new Modal();
 
 export default class Pay extends EventEmitter {

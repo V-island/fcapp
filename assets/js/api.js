@@ -439,7 +439,7 @@ export function getRegister(params, callback) {
 		getPost('/insRegister', _params, (response) => {
 			getLogin({
 				phoneCode: _params.phoneCode,
-				userPhone: _params.userPhone,
+				userPhone: _params.phoneCode + _params.userPhone,
 				userPassword: _params.userPassword
 			});
 			resolve(true);

@@ -271,6 +271,12 @@ const Lang = {
 			Forget_password: 'Forget  password?',
 			Register: 'Register'
 		},
+		Madal: {
+			Cancel: 'Operation canceled',
+			Failure: 'Login failed',
+			Success: 'login successful',
+			Error: 'Regional error'
+		},
 		Third_party: {
 			Title: 'or login',
 			Text: 'coming soon',
