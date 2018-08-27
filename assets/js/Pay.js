@@ -58,6 +58,7 @@ export default class Pay extends EventEmitter {
 
 	_init() {
 		const { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
+		this.goodsPrice = '';
 		this.payType = 1;
 		this.goodsId = 1;
 		this.currency = currency_type;
@@ -167,11 +168,11 @@ export default class Pay extends EventEmitter {
 						total: order.goods_price,
 						currency: this.currency
 					};
+					this.goodsPrice = order.goods_price;
 
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
 						.then((res) => {
-							console.log(res);
 							let token = res.payUrl.split('token=');
 							return token[1];
 						});
@@ -193,9 +194,9 @@ export default class Pay extends EventEmitter {
 				// Make a call to your server to execute the payment
 				return paypal.request.post(EXECUTE_URL, _data)
 					.then((res) => {
-						modal.alert(LANG.SYSTEM_CODE[response.code], (_modal) => {
+						modal.alert(LANG.SYSTEM_CODE[res.code], (_modal) => {
 							modal.closeModal(_modal);
-							this.trigger('picker.success');
+							this.trigger('pay.success', this.goodsPrice);
 						});
 					});
 			}
@@ -210,5 +211,5 @@ export default class Pay extends EventEmitter {
 
 /**
  * pay.success
- * 当支付结束后的时候，会派发 pay.success 事件
+ * 当支付结束后的时候，会派发 pay.success 事件, 同时会传递当前充值金额 goodsPrice
  */

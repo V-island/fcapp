@@ -67,9 +67,11 @@ export default class FacebookLogin extends EventEmitter {
 			//
 			// These three cases are handled in the callback function.
 
-			FB.getLoginStatus((response) => {
-				this._statusChangeCallback(response);
-			});
+			// FB.getLoginStatus((response) => {
+			// 	this._statusChangeCallback(response);
+			// });
+
+			this.trigger('FacebookLogin.start');
 		});
 	}
 
@@ -138,26 +140,31 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	Share(URL) {
-		
-		FB.ui(
-		    {
-		        method: 'share',
-		        href: URL,
-		    },
-		    // callback
-		    function(response) {
-		        if (response && !response.error_message) {
-		        alert('Posting completed.');
-		        } else {
-		        alert('Error while posting.');
-		        }
-		    }
-		);
+		return new Promise((resolve, reject) => {
+			FB.ui(
+			    {
+			        method: 'share',
+			        href: URL,
+			    },
+			    // callback
+			    (response) => {
+			        if (response && !response.error_message) {
+			        	modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Completed, (_modal) => {
+			        		resolve(response);
+			        	});
+			        } else {
+			        	modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
+			        		reject(response.error_message);
+			        	});
+			        }
+			    }
+			);
+		});
 	}
 
 	Logout() {
 		FB.logout((response) => {
-			this.trigger('picker.logout');
+			this.trigger('FacebookLogin.logout');
 		});
 	}
 
@@ -167,6 +174,12 @@ export default class FacebookLogin extends EventEmitter {
 }
 
 /**
- * pay.success
- * 当支付结束后的时候，会派发 pay.success 事件
+ * facebookLogin.start
+ * 当加载fackbook完成后的时候，会派发 facebookLogin.start 事件
+ */
+
+
+/**
+ * facebookLogin.logout
+ * 当退出fackbook后的时候，会派发 facebookLogin.logout 事件
  */

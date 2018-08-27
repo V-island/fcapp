@@ -1,13 +1,15 @@
 import Template from 'art-template/lib/template-web';
 import BScroll from 'better-scroll';
 import EventEmitter from './eventEmitter';
+import FacebookLogin from './FacebookLogin';
 import SendBirdAction from './SendBirdAction';
 import SignalingClient from './signalingClient';
 import Client from './client';
 import Modal from './modal';
 import Pay from './Pay';
 import {
-    fcConfig
+    fcConfig,
+    domainURL
 } from './intro';
 import {
     getUserInfo,
@@ -28,6 +30,8 @@ import {
     addEvent,
     createDom,
     importTemplate,
+    createDivEl,
+    replaceNote,
     isNumber,
     getData,
     hasClass,
@@ -38,6 +42,7 @@ import {
 
 const LANG = getLangConfig();
 const modal = new Modal();
+const FB = new FacebookLogin();
 
 export default class VideoPreview extends EventEmitter {
     constructor(element, options) {
@@ -52,12 +57,35 @@ export default class VideoPreview extends EventEmitter {
             iconAddAttentionClass: 'live-add-attention',
             commentAmountClass: 'countComment-amount',
             supportAmountClass: 'support-amount',
+
+            modalGroupClass: 'actions-modal-group',
+            listCommentsClass: 'list-comments',
+            newsInputClass: 'news-input',
+            newsPhizClass: 'news-phiz',
+
+            giftsWrapperClass: '.gift-wrapper',
+            giftsContentClass: 'gift-content',
+            giftsItemClass: 'gift-item',
+            giftsLabelClass: 'gift-label',
+            videoItemClass: 'video-item',
+            userPackageClass: 'user-package',
+
             btnNewsClass: 'btn-news',
             btnThumbsClass: 'btn-thumbs',
             btnShareClass: 'btn-share',
             btnGiftClass: 'btn-gift',
+            btnFecebookClass: 'btn-fecebook',
+            btnTwitterClass: 'btn-twitter',
+            btnTumblrClass: 'btn-tumblr',
+            btnRechargeClass: 'btn-recharge',
+            btnSendClass: 'btn-send',
+
             praiseCountClass: 'praise',
             eyeCountClass: 'eye',
+            dataUserPackage: 'userPackage',
+            dataID: 'id',
+            dataGiftUrl: 'giftUrl',
+            dataPrice: 'price',
             showClass: 'active'
         };
 
@@ -133,7 +161,7 @@ export default class VideoPreview extends EventEmitter {
 
         // 加关注
         addEvent(this.btnAddAttentionEl, 'click', () => {
-            let index = getData(this.btnAddAttentionEl, 'id'),
+            let index = getData(this.btnAddAttentionEl, this.options.dataID),
                 status;
 
             if (hasClass(this.btnAddAttentionEl, this.options.iconAttentionClass)) {
@@ -154,40 +182,47 @@ export default class VideoPreview extends EventEmitter {
                 title: LANG.LIVE_PREVIEW.Actions.Comment,
                 closeBtn: true
             });
-            let listCommentsEl = newsModalEl.getElementsByClassName('list-comments')[0];
-            let textareaEl = newsModalEl.getElementsByClassName('news-input')[0];
-            let btnNewsPhizEl = newsModalEl.getElementsByClassName('news-phiz')[0];
-            let btnSendEl = newsModalEl.getElementsByClassName('btn-send')[0];
+            let modalGroupEl = newsModalEl.getElementsByClassName(this.options.modalGroupClass);
+            let listCommentsEl = newsModalEl.getElementsByClassName(this.options.listCommentsClass)[0];
+            let textareaEl = newsModalEl.getElementsByClassName(this.options.newsInputClass)[0];
+            let btnNewsPhizEl = newsModalEl.getElementsByClassName(this.options.newsPhizClass)[0];
+            let btnSendEl = newsModalEl.getElementsByClassName(this.options.btnSendClass)[0];
 
             addEvent(btnSendEl, 'click', () => {
                 let _val = textareaEl.value;
-
-                if (this.CommentStart) {
-                    return modal.alert(LANG.LIVE_PREVIEW.Comment_Prompt.Only_Once, (_modal) => {
-                            modal.closeModal(_modal);
-                        });
-                }
 
                 if (_val == "") {
                     return modal.alert(LANG.LIVE_PREVIEW.Comment_Prompt.Is_Empty, (_modal) => {
                             modal.closeModal(_modal);
                         });
                 }
-                this.CommentStart = true;
-                this.commentAmountEl.innerHTML = parseInt(this.commentAmountEl.innerHTML) + 1;
-                let getJoinGroupChannel = this._joinGroupChannel(this.options.comment_channel, _val);
                 let getCommentVideo = commentVideo(this.options.id, _val);
+                getCommentVideo.then((data) => {
+                    if (!data) return false;
 
-                Promise.all([getJoinGroupChannel, getCommentVideo]).then((data) => {
+                    this.commentAmountEl.innerHTML = parseInt(this.commentAmountEl.innerHTML) + 1;
+                    this._joinGroupChannel(this.options.comment_channel, _val);
+
                     textareaEl.value = "";
                     let itemEl = createDom(this._itemCommentsTemplate(_val));
                     listCommentsEl.append(itemEl);
+
+                    this.tpl.live_comments = "";
+                    Array.prototype.slice.call(modalGroupEl).forEach(groupEl => {
+                        return this.tpl.live_comments += replaceNote(groupEl.outerHTML);
+                    });
                 });
+            });
+
+            // 发送表情图标
+            addEvent(btnNewsPhizEl, 'click', () => {
+                return modal.toast(LANG.LOGIN.Third_party.Text);
             });
         });
 
         // 点赞
         addEvent(this.btnThumbsEl, 'click', () => {
+            this._animateLike();
             if (hasClass(this.btnThumbsEl, this.options.showClass)) return false;
 
             this.supportAmountEl.innerHTML = parseInt(this.supportAmountEl.innerHTML) + 1;
@@ -211,10 +246,31 @@ export default class VideoPreview extends EventEmitter {
                 closeBtn: true,
                 cancelBtn: true
             });
-            let shareLabelEl = shareModalEl.getElementsByClassName('share-label');
+            let btnFecebookEl = shareModalEl.getElementsByClassName(this.options.btnFecebookClass);
+            let btnTwitterEl = shareModalEl.getElementsByClassName(this.options.btnTwitterClass);
+            let btnTumblrEl = shareModalEl.getElementsByClassName(this.options.btnTumblrClass);
+            console.log(btnFecebookEl);
+            console.log(btnTwitterEl);
+            console.log(btnTumblrEl);
+            // Facebook 分享
+            if (btnFecebookEl.length > 0) {
+                addEvent(btnFecebookEl[0], 'click', () => {
+                    FB.Share(domainURL);
+                });
+            }
 
-            for (let i = 0; i < shareLabelEl.length; i++) {
-                console.log(shareLabelEl[i]);
+            // Twitter 分享
+            if (btnTwitterEl.length > 0) {
+                addEvent(btnTwitterEl[0], 'click', () => {
+                    return modal.toast(LANG.LOGIN.Third_party.Text);
+                });
+            }
+
+            // Tumblr 分享
+            if (btnTumblrEl.length > 0) {
+                addEvent(btnTumblrEl[0], 'click', () => {
+                    return modal.toast(LANG.LOGIN.Third_party.Text);
+                });
             }
         });
 
@@ -224,21 +280,24 @@ export default class VideoPreview extends EventEmitter {
                 title: LANG.LIVE_PREVIEW.Actions.Gift,
                 closeBtn: true
             });
-            let giftWrapperEl = giftModalEl.querySelector('.gift-wrapper');
-            let giftContentEl = giftModalEl.getElementsByClassName('gift-content')[0];
-            let giftItemEl = giftModalEl.getElementsByClassName('gift-item');
-            addClass(giftContentEl, 'video-item');
+            let giftWrapperEl = giftModalEl.querySelector(this.options.giftsWrapperClass);
+            let giftContentEl = giftModalEl.getElementsByClassName(this.options.giftsContentClass)[0];
+            let giftItemEl = giftModalEl.getElementsByClassName(this.options.giftsItemClass);
+            addClass(giftContentEl, this.options.videoItemClass);
 
-            let giftLabelEl = giftModalEl.getElementsByClassName('gift-label');
-            let userPackageEl = giftModalEl.getElementsByClassName('user-package')[0];
-            let btnRechargeEl = giftModalEl.getElementsByClassName('btn-recharge')[0];
-            let btnSendEl = giftModalEl.getElementsByClassName('btn-send')[0];
+            let giftLabelEl = giftModalEl.getElementsByClassName(this.options.giftsLabelClass);
+            let userPackageEl = giftModalEl.getElementsByClassName(this.options.userPackageClass)[0];
+            let btnRechargeEl = giftModalEl.getElementsByClassName(this.options.btnRechargeClass)[0];
+            let btnSendEl = giftModalEl.getElementsByClassName(this.options.btnSendClass)[0];
             let giftWidth = giftWrapperEl.offsetWidth;
 
+            userPackageEl.innerHTML = getUserInfo(this.options.dataUserPackage);
+
             giftContentEl.style.width = giftWidth * 2 + 'px';
-            for (let i = 0; i < giftItemEl.length; i++) {
-                giftItemEl[i].style.width = giftWidth + 'px';
-            }
+
+            Array.prototype.slice.call(giftItemEl).forEach(itemEl => {
+                return itemEl.style.width = giftWidth + 'px';
+            });
 
             let giftWrapperScroll = new BScroll(giftWrapperEl, {
                 startX: 0,
@@ -254,54 +313,73 @@ export default class VideoPreview extends EventEmitter {
                 }
             });
 
-            for (let i = 0; i < giftLabelEl.length; i++) {
-                addEvent(giftLabelEl[i], 'tap', () => {
-                    if (hasClass(giftLabelEl[i], 'active')) {
-                        return;
-                    }
+            Array.prototype.slice.call(giftLabelEl).forEach(labelEl => {
+                addEvent(labelEl, 'tap', () => {
+                    if (hasClass(labelEl, this.options.showClass)) return;
 
-                    for (let j = 0; j < giftLabelEl.length; j++) {
-                        if (hasClass(giftLabelEl[j], 'active')) {
-                            removeClass(giftLabelEl[j], 'active');
-                        }
+                    let giftActiveEl = giftWrapperEl.getElementsByClassName(this.options.showClass);
+
+                    if (giftActiveEl.length > 0) {
+                        toggleClass(giftActiveEl[0], this.options.showClass);
                     }
-                    addClass(giftLabelEl[i], 'active');
+                    addClass(labelEl, this.options.showClass);
                 });
-            }
+            });
 
             addEvent(btnSendEl, 'click', () => {
-                let tagActiveEl = giftWrapperEl.getElementsByClassName('active')[0];
-                let giftId = getData(tagActiveEl, 'id');
-                let giftUrl = getData(tagActiveEl, 'giftUrl');
-                // let giftPrice = getData(tagActiveEl, 'price');
+                let tagActiveEl = giftWrapperEl.getElementsByClassName(this.options.showClass)[0];
+                let giftId = parseInt(getData(tagActiveEl, this.options.dataID));
+                let giftUrl = getData(tagActiveEl, this.options.dataGiftUrl);
+                let giftPrice = parseInt(getData(tagActiveEl, this.options.dataPrice));
 
                 const {id, vuser_id} = this.options;
 
-                videoGifts(vuser_id, id, parseInt(giftId), 1).then((data) =>{
+                videoGifts(vuser_id, id, giftId, 1, giftPrice).then((data) =>{
                     if (!data) return;
-                    modal.toast(LANG.MESSAGE.Gift.Text);
-                    setUserInfo('userPackage', data);
+
+                    setUserInfo(this.options.dataUserPackage, data);
                     userPackageEl.innerHTML = data;
                     this._joinGroupChannel(this.options.gift_channel, LANG.MESSAGE.Gift.Text, giftUrl);
                     // this._joinGroupChannel(this.options.gift_channel, LANG.MESSAGE.Gift.Text.replace('%S', giftPrice), giftUrl);
+
+                    modal.alert(LANG.LIVE_PREVIEW.Madal.SendSuccess.Text, (_modal) => {
+                        modal.closeModal(_modal);
+                    });
                 });
             });
 
             // 充值
             addEvent(btnRechargeEl, 'click', () => {
+                modal.closeModal(giftModalEl);
+
                 let rechargeModalEl = modal.actions(this.tpl.live_recharge, {
                     title: LANG.LIVE_PREVIEW.Actions.Recharge,
                     closeBtn: true
                 });
-
+                let userPackageEl = rechargeModalEl.getElementsByClassName(this.options.userPackageClass)[0];
                 let pay = new Pay(rechargeModalEl);
+                let { userPackage } = getUserInfo(this.options.dataUserPackage);
 
-                pay.on('pay.success', () => {
+                userPackageEl.innerHTML = userPackage;
+
+                pay.on('pay.success', (price) => {
+                    setUserInfo(this.options.dataUserPackage, userPackage + data);
+                    userPackageEl.innerHTML = _package + data;
                     modal.closeModal(rechargeModalEl);
                 });
             });
         });
 
+    }
+
+    // 点赞动画效果
+    _animateLike() {
+        const floatIcon = createDivEl({element: 'i', className: ['icon', 'live-thumbs-float', 'lives-float']});
+        this.btnThumbsEl.appendChild(floatIcon);
+
+        setTimeout(() => {
+            this.btnThumbsEl.removeChild(floatIcon);
+        }, 3000);
     }
 
     /**

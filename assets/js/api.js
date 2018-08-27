@@ -1043,10 +1043,11 @@ export function followList(_page = 1, _number = 10, _type) {
  * @param  {[type]} videoId     视频ID
  * @param  {[type]} giftsId     礼物ID
  * @param  {[type]} amount      礼物数量
+ * @param  {[type]} price       礼物价格
  * @return {[type]}             [description]
  */
-export function videoGifts(videoUserId, videoId, giftsId, amount = 1) {
-	let {userId} = getUserInfo();
+export function videoGifts(videoUserId, videoId, giftsId, amount = 1, price) {
+	let {userId, userPackage} = getUserInfo();
 	let _params = {
 		giftsId: giftsId,
 		videoId: videoId,
@@ -1059,6 +1060,8 @@ export function videoGifts(videoUserId, videoId, giftsId, amount = 1) {
 	}
 
 	return new Promise((resolve) => {
+		if (price == 0) resolve(userPackage);
+
 		getPost('/videoGifts', _params, (response) => {
 			resolve(response.data ? response.data : false);
 		}, (response) => {

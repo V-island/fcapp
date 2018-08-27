@@ -220,6 +220,9 @@ export const fcConfig = {
     }]
 };
 
+// 项目 地址
+export const domainURL = 'https://192.168.1.28:8080';
+
 // Server 地址配置
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate';
 

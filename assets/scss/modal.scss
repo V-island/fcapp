@@ -315,7 +315,7 @@ html.with-statusbar-overlay {
 
     .wheels {
         @include flex;
-        height: 3.15rem;
+        height: 3.5rem;
         overflow: hidden;
         font-size: 0.7rem;
     }
@@ -328,7 +328,8 @@ html.with-statusbar-overlay {
 
     .wheels-item {
         list-style: none;
-        height: 1.05rem;
+        height: 1.5rem;
+        line-height: 1.5rem;
         overflow: hidden;
         white-space: nowrap;
         color: $picker-text-color;

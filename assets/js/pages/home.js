@@ -178,10 +178,10 @@ export default class Home extends EventEmitter {
 		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
 			addEvent(cardVideoItemEl, 'click', () => {
 				let info = JSON.parse(getData(cardVideoItemEl, 'userInfo'));
-				Spinner.start(body);
+
 				playVideo(info.id).then((data) => {
 					if (!data) return;
-
+					Spinner.start(body);
 					extend(info, data);
 					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
 					_videoPreview.on('videoPreview.start', () => {

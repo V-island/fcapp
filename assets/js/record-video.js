@@ -15,6 +15,8 @@ import {
     replaceNote,
     dispatchEvent,
     createDom,
+    createDivEl,
+    secToTime,
     hasClass,
     addClass,
     removeClass,
@@ -51,8 +53,8 @@ export default class RecordVideo extends EventEmitter {
             }
         };
         this.options = {
-            minTimes: 60,
-            maxTimes: 600,
+            minTimes: 1,
+            maxTimes: 30,
             newDayVideo: false,
             notUpload: false,
             editVideoInfo: false,
@@ -67,6 +69,7 @@ export default class RecordVideo extends EventEmitter {
             confirmClass: 'live-confirm',
             localUploadClass: 'live-local-upload',
             livesRemarkClass:'lives-remark',
+            timesClass: 'lives-times',
             startClass: 'record-start',
             inUploadClass: 'upload-in',
             outUploadClass: 'upload-out',
@@ -88,17 +91,20 @@ export default class RecordVideo extends EventEmitter {
 
         extend(this.options, options);
 
-        this.recordVideoEl = createDom(this._tabsTemplate(this.options));
-
+        this.recordVideoEl = this._tabsTemplate(this.options);
         document.body.appendChild(this.recordVideoEl);
 
         this.videoEl = this.recordVideoEl.getElementsByClassName(this.options.videoClass)[0];
-        this.recordEl = this.recordVideoEl.getElementsByClassName(this.options.recordBtnClass)[0];
-        this.buttonsEl = this.recordVideoEl.getElementsByClassName(this.options.buttonsClass)[0];
+
         this.closeEl = this.recordVideoEl.getElementsByClassName(this.options.closeClass)[0];
         this.cutoverEl = this.recordVideoEl.getElementsByClassName(this.options.cutoverClass)[0];
+
+        this.buttonsEl = this.recordVideoEl.getElementsByClassName(this.options.buttonsClass)[0];
+        this.recordEl = this.recordVideoEl.getElementsByClassName(this.options.recordBtnClass)[0];
         this.cancelEl = this.recordVideoEl.getElementsByClassName(this.options.cancelClass)[0];
         this.confirmEl = this.recordVideoEl.getElementsByClassName(this.options.confirmClass)[0];
+
+        this.timesEl = this.recordVideoEl.getElementsByClassName(this.options.timesClass)[0];
         this.localUploadEl = this.recordVideoEl.getElementsByClassName(this.options.localUploadClass)[0];
         this.livesRemarkEl = this.recordVideoEl.getElementsByClassName(this.options.livesRemarkClass)[0];
         this._init();
@@ -135,7 +141,7 @@ export default class RecordVideo extends EventEmitter {
         // 开始录制/结束录制
         addEvent(this.recordEl, 'click', () => {
             if (this.consentEnd) {
-                return;
+                return modal.toast(RECORD_LANG.Prompt.Length);
             }
             this.consentEnd = true;
 
@@ -238,17 +244,43 @@ export default class RecordVideo extends EventEmitter {
     }
 
     _tabsTemplate(options) {
-        let html = '';
+        const wrapper = createDivEl({className: ['content', 'record-wrapper']});
+        const livesVideo = createDivEl({className: 'lives-video'});
+        const video = createDivEl({element: 'video', id: 'video', className: options.videoClass});
+        livesVideo.appendChild(video);
+        wrapper.appendChild(livesVideo);
 
-        html = '<div class="content record-wrapper">';
-        html += '<div class="lives-video"><video id="video" class="'+ options.videoClass +'"></video></div>';
-        html += '<div class="lives-header"><div class="icon '+ options.closeClass +'"></div><div class="icon '+ options.cutoverClass +'"></div></div>';
-        html += '<div class="lives-buttons record-buttons"><div class="icon '+ options.cancelClass +'"></div><div class="'+ options.recordBtnClass +'"></div><div class="icon '+ options.confirmClass +'"></div><div class="icon '+ options.localUploadClass +'"></div></div>';
-        html += options.newDayVideo ? '' :'<p class="'+ options.livesRemarkClass +'">'+ RECORD_LANG.Prompt +'</p>';
-        html += '</div>';
+        const livesHeader = createDivEl({className: 'lives-header'});
+        const closeIcon = createDivEl({element: 'i', className: ['icon', options.closeClass]});
+        const cutoverIcon = createDivEl({element: 'i', className: ['icon', options.cutoverClass]});
+        livesHeader.appendChild(closeIcon);
+        livesHeader.appendChild(cutoverIcon);
+        wrapper.appendChild(livesHeader);
 
-        return html;
+        const livesTimes = createDivEl({className: 'lives-times', content: '00:00:00'});
+        wrapper.appendChild(livesTimes);
+
+        const livesButtons = createDivEl({className: ['lives-buttons', 'record-buttons']});
+        const cancelIcon = createDivEl({element: 'i', className: ['icon', options.cancelClass]});
+        const recordBtn = createDivEl({className: options.recordBtnClass});
+        const confirmIcon = createDivEl({element: 'i', className: ['icon', options.confirmClass]});
+        livesButtons.appendChild(cancelIcon);
+        livesButtons.appendChild(recordBtn);
+        livesButtons.appendChild(confirmIcon);
+        wrapper.appendChild(livesButtons);
+
+        const uploadIcon = createDivEl({element: 'i', className: ['icon', 'lives-localUpload', options.localUploadClass]});
+        wrapper.appendChild(uploadIcon);
+
+        if (!options.newDayVideo) {
+            const livesRemark = createDivEl({element: 'p', className: options.livesRemarkClass, content: RECORD_LANG.Prompt.Checked});
+            wrapper.appendChild(livesRemark);
+        }
+
+        return wrapper;
     }
+
+
 
     _uploadTemplate() {
         let html = '';
@@ -292,13 +324,15 @@ export default class RecordVideo extends EventEmitter {
                     return;
                 }
 
+                const times = this.buffers.length;
+
                 // 计时器-最小
-                if (this.buffers.length == this.options.minTimes) {
+                if (times == this.options.minTimes) {
                     this.consentEnd = false;
                 }
 
                 // 计时器-结束
-                if (this.buffers.length > this.options.maxTimes) {
+                if (times > this.options.maxTimes) {
                     if (this.options.newDayVideo) {
                         this.consentEnd = false;
                         dispatchEvent(this.recordEl, 'click');
@@ -308,8 +342,9 @@ export default class RecordVideo extends EventEmitter {
                     return;
                 }
 
+                this.timesEl.innerHTML = secToTime(times);
                 this.buffers.push(event.data);
-                this.progress.show(this.buffers.length);
+                this.progress.show(times);
                 setTimeout(() => {
                     this._createIMG(this.videoEl);
                 }, this.options.minTimes / 2);

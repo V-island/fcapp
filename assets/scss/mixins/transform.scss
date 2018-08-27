@@ -1,13 +1,41 @@
+@mixin animation($an) {
+	animation: $an;
+	-moz-animation: $an;
+	-webkit-animation: $an;
+	-o-animation: $an;
+}
+
 @mixin transition($tra) {
     -webkit-transition: $tra;
+    -moz-transition: $tra;
+    -ms-transition: $tra;
     -o-transition: $tra;
     transition: $tra;
 }
 
+// 转换
 @mixin transform-translate($x, $y) {
   -webkit-transform: translate($x, $y);
   -moz-transform: translate($x, $y);
   -ms-transform: translate($x, $y);
   -o-transform: translate($x, $y);
   transform: translate($x, $y);
+}
+
+// 旋转
+@mixin transform-rotate($drg) {
+  -webkit-transform: rotate($drg);
+  -moz-transform: rotate($drg);
+  -ms-transform: rotate($drg);
+  -o-transform: rotate($drg);
+  transform: rotate($drg);
+}
+
+// 缩放
+@mixin transform-scale($drg) {
+  -webkit-transform: scale($drg);
+  -moz-transform: scale($drg);
+  -ms-transform: scale($drg);
+  -o-transform: scale($drg);
+  transform: scale($drg);
 }

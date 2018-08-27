@@ -68,7 +68,10 @@ const Lang = {
 			},
 			Buttons: 'CONFIRM'
 		},
-		Prompt: 'The video will be checked ，<br/> and only high quality video can earn money',
+		Prompt: {
+			Checked: 'The video will be checked ，<br/> and only high quality video can earn money',
+			Length: 'Video length is at least one minute'
+		},
 		EditVideoInfo: {
 			Title: 'Release',
 			Text: 'Video introduction...',
@@ -444,7 +447,11 @@ const Lang = {
 		Share: {
 			Facebook: 'Facebook',
 			Twitter: 'Twitter',
-			Tumblr: 'Tumblr'
+			Tumblr: 'Tumblr',
+			Prompt: {
+				Completed: 'Posting completed.',
+				Error: 'Error while posting.'
+			}
 		},
 		Recharge: {
 			Select_Amount: 'Select Amount',
@@ -499,6 +506,9 @@ const Lang = {
 			InsufficientAmount: {
 				Title: 'Insufficient Amount',
 				Text: 'Your gold coins will be used <span> after 1 minutes</span> please recharge in'
+			},
+			SendSuccess: {
+				Text: 'Send successful'
 			}
 		}
 	},
