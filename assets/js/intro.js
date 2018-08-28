@@ -19,17 +19,13 @@ import UserDetail from './pages/user_detail';
 import UserVideo from './pages/user_video';
 import UserWatch from './pages/user_watch';
 
-import UserPrice from './pages/user_price';
 import UserAccount from './pages/user_account';
 import UserAccountHistory from './pages/user_account_history';
 import UserAccountTerms from './pages/user_account_terms';
 import UserScore from './pages/user_score';
 import UserScoreHistory from './pages/user_score_history';
 import UserScoreWithdraw from './pages/user_score_withdraw';
-import UserProof from './pages/user_proof';
-import UserInvite from './pages/user_invite';
 
-import UserBlacklist from './pages/user_blacklist';
 import UserSetting from './pages/user_setting';
 import UserSettingSecurity from './pages/user_setting_security';
 import UserSettingHelp from './pages/user_setting_help';
@@ -153,10 +149,6 @@ export const fcConfig = {
             path: '../pages/user_watch.html',
             component: UserWatch
         }, {
-            name: 'price',
-            path: '../pages/user_price.html',
-            component: UserPrice
-        }, {
             name: 'account',
             path: '../pages/user_account.html',
             component: UserAccount,
@@ -183,18 +175,6 @@ export const fcConfig = {
                 path: '../pages/user_score_withdraw.html',
                 component: UserScoreWithdraw
             }]
-        }, {
-            name: 'proof',
-            path: '../pages/user_proof.html',
-            component: UserProof
-        }, {
-            name: 'invite',
-            path: '../pages/user_invite.html',
-            component: UserInvite
-        }, {
-            name: 'blacklist',
-            path: '../pages/user_blacklist.html',
-            component: UserBlacklist
         }, {
             name: 'setting',
             path: '../pages/user_setting.html',

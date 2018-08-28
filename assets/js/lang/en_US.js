@@ -70,11 +70,13 @@ const Lang = {
 		},
 		Prompt: {
 			Checked: 'The video will be checked ，<br/> and only high quality video can earn money',
-			Length: 'Video length is at least one minute'
+			Length: 'Video length is at least one minute',
+			Not_Description: 'Please enter your video description'
 		},
 		EditVideoInfo: {
 			Title: 'Release',
 			Text: 'Video introduction...',
+			Placeholder: 'Video title or description',
 			AddTag: 'Add tag',
 			Buttons: {
 				Release: 'RELEASE',

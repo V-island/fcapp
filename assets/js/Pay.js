@@ -1,5 +1,6 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from './eventEmitter';
+import { Spinner } from './components/Spinner';
 import Modal from './modal';
 import {
 	baseURL,
@@ -65,21 +66,23 @@ export default class Pay extends EventEmitter {
 
 		let createPaypal = this._createScript();
 
+		this.tagsEl = this.PayEl.querySelector(this.options.tagsClass);
+		this.tagLabelEl = this.tagsEl.getElementsByClassName(this.options.tagLabelClass);
+
+		// this.listEl = this.PayEl.querySelector(this.options.listClass);
+		// this.listItemEl = this.listEl.getElementsByClassName(this.options.listItemClass);
+
+		this.btnPaypalEl = this.PayEl.querySelector(this.options.btnPaypalId);
+		this.btnCreditEl = this.PayEl.querySelector(this.options.btnCreditId);
+		Spinner.start(this.PayEl);
 		Promise.all([createPaypal]).then((data) => {
-			this.tagsEl = this.PayEl.querySelector(this.options.tagsClass);
-			this.tagLabelEl = this.tagsEl.getElementsByClassName(this.options.tagLabelClass);
-
-			// this.listEl = this.PayEl.querySelector(this.options.listClass);
-			// this.listItemEl = this.listEl.getElementsByClassName(this.options.listItemClass);
-
-			this.btnPaypalEl = this.PayEl.querySelector(this.options.btnPaypalId);
-			this.btnCreditEl = this.PayEl.querySelector(this.options.btnCreditId);
-
 			toggleClass(this.btnPaypalEl, this.options.hideClassDOM);
 			toggleClass(this.btnCreditEl, this.options.hideClassDOM);
 
 			this._paypalServerEvent();
 			this._bindEvent();
+
+			Spinner.remove();
 		});
 	}
 

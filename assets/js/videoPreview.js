@@ -128,7 +128,7 @@ export default class VideoPreview extends EventEmitter {
 
     _init() {
         this.previewModalEl = modal.popup(this._videoPreviewTemplate(this.options));
-        // this.videoEl = this.previewModalEl.getElementsByClassName(this.options.videoClass)[0];
+        this.videoEl = this.previewModalEl.getElementsByClassName(this.options.videoClass);
         this.btnLiveCloseEl = this.previewModalEl.getElementsByClassName(this.options.btnLiveCloseClass)[0];
         this.btnAddAttentionEl = this.previewModalEl.getElementsByClassName(this.options.btnAddAttentionClass)[0];
         this.btnNewsEl = this.previewModalEl.getElementsByClassName(this.options.btnNewsClass)[0];
@@ -150,6 +150,19 @@ export default class VideoPreview extends EventEmitter {
         // 视频列表增加观看数目
         if (this.eyeCountEl.length > 0) {
             this.eyeCountEl[0].innerHTML = parseInt(this.eyeCountEl[0].innerHTML) + 1;
+        }
+
+        // 视频自动播放
+        if (this.videoEl.length > 0) {
+            this.videoEl[0].addEventListener('touchstart', () => {
+                this.videoEl[0].play();
+            });
+            this.videoEl[0].addEventListener('ended', (e)=>  {
+                this.videoEl[0].play();
+            });
+            setTimeout(() => {
+                this.videoEl[0].play();
+            }, 1000);
         }
 
         // 关闭
@@ -421,7 +434,7 @@ export default class VideoPreview extends EventEmitter {
         let html = '';
 
         html = '<div class="popup remove-on-close lives-wrapper"><div class="lives-video">';
-        html += '<video id="video" class="'+ options.videoClass +'" controls autoplay="autoplay" preload="auto" poster="'+ options.img_url +'"><source src="'+ options.video_url +'" type="video/mp4"></video>';
+        html += '<video id="video" class="'+ options.videoClass +'" autoplay="autoplay" preload="auto" webkit-playsinline playsinline="true" x-webkit-airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait" poster="'+ options.img_url +'"><source src="'+ options.video_url +'" type="video/mp4"></video>';
         html += '</div><div class="lives-header"><div class="lives-attention"><div class="user-info across"><div class="user-img avatar-female">';
         html += options.user_head ? '<img src="'+ options.user_head +'">' : '';
         html += '</div><div class="across-body"><p class="user-name">'+ options.user_name +'</p><p class="user-txt">'+ options.watch_number + ' ' + LANG.PUBLIC.Heat +'</p></div>';
