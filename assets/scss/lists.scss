@@ -345,8 +345,8 @@
             min-width: 2.8rem;
             height: 1.4rem;
             line-height: 1.4rem;
-            background: $color-primary;
-            color: $color-text-gray;
+            background: $card-bg;
+            color: $color-text;
             font-size: 0.5rem;
             text-align: center;
             border-radius: 0.1rem;
@@ -356,8 +356,8 @@
             top: 0.9rem;
 
             &.active{
-                background: $card-bg;
-                color: $color-text;
+                background: $color-primary;
+                color: $color-text-gray;
             }
         }
     }
@@ -406,6 +406,34 @@
 
         &.no-bg {
             border-bottom: 1px solid $list-user-border-color;
+        }
+    }
+
+    &.list-detail{
+        background: $list-user-bg-color;
+        margin-bottom: 0.35rem;
+        position: relative;
+
+        .list-item-graphic{
+            &.image{
+                @include size(2.1rem);
+                flex: 0 0 2.1rem;
+                background-size: cover;
+                border-radius: 50%;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-color: $list-message-text;
+            }
+        }
+
+        .list-item-text{
+            color: $color-text;
+            flex-grow: 1;
+        }
+
+        .list-item-meta{
+            width: 0.35rem;
+            height: 0.7rem;
         }
     }
 

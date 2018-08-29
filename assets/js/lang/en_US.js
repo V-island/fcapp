@@ -96,7 +96,11 @@ const Lang = {
 		You_May_Also_Like: 'You may also like',
 		Another_Batch: 'Another batch',
 		Follow: 'Follow +',
-		Followed: 'Followed'
+		Followed: 'Followed',
+		Other_Details: {
+			Information: 'Information',
+			Video: 'Video'
+		}
 	},
 	MESSAGE: {
 		Like: {

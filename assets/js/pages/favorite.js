@@ -86,25 +86,25 @@ export default class Favorite extends EventEmitter {
 	_bindEvent() {
 		this.btnFollwEl = this.FavoriteEl.getElementsByClassName(this.options.btnFollwClass);
 
-		for (let i = 0; i < this.btnFollwEl.length; i++) {
-			addEvent(this.btnFollwEl[i], 'click', () => {
-				let _id = getData(this.btnFollwEl[i], this.options.dataItemId),
-				    status;
+		Array.prototype.slice.call(this.btnFollwEl).forEach(follwEl => {
+			addEvent(follwEl, 'click', () => {
+	            let _id = getData(follwEl, this.options.dataItemId),
+	                status;
 
-				if (hasClass(this.btnFollwEl[i], this.options.showClass)) {
-				    status = 1;
-				}else {
-				    status = 2;
-				}
+	            if (hasClass(follwEl, this.options.showClass)) {
+	                status = 1;
+	            }else {
+	                status = 2;
+	            }
 
-				follow(_id, status).then((data) => {
-					if (!data) return;
+	            follow(_id, status).then((data) => {
+	            	if (!data) return;
 
-					this.btnFollwEl[i].innerHTML = LANG.FAVORITE.Followed;
-					toggleClass(this.btnFollwEl[i], this.options.showClass);
-				});
+	            	follwEl.innerHTML = status === 1 ? LANG.FAVORITE.Followed : LANG.FAVORITE.Follow;
+	            	toggleClass(follwEl, this.options.showClass);
+	            });
 	        });
-		}
+		});
 	}
 
 	// Video 模块

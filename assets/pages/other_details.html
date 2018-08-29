@@ -26,15 +26,15 @@
                         </p>
                     </div>
                 </div>
-                <i class="icon live-attention btn-add-attention" data-id="{{UserDetail.user_id}}"></i>
+                <i class="icon btn-add-attention {{if UserDetail.followStatus == 1}}live-add-attention{{else}}live-attention{{/if}}" data-id="{{UserDetail.user_id}}"></i>
             </div>
     	</header>
 
         <!-- 这里是页面内容区 -->
         <div class="content other-details-wrapper">
             <div class="tab">
-                <div class="tab-item active" data-ripple>Information</div>
-                <div class="tab-item" data-ripple>Video</div>
+                <div class="tab-item" data-ripple>{{FAVORITE.Other_Details.Information}}</div>
+                <div class="tab-item active" data-ripple>{{FAVORITE.Other_Details.Video}}</div>
             </div>
             <!-- /.tab -->
 

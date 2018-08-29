@@ -37,9 +37,6 @@ export const fcConfig = {
     autoInit: false, //自动初始化页面
     showPageLoadingIndicator: true, //push.js加载页面的时候显示一个加载提示
     router: true, //默认使用router
-    agora: true, //默认使用Agora DSK
-    agoraAppId: '130106827c954803a398814859761e19',
-    adminChannel: 'douliao',
     swipePanel: "left", //滑动打开侧栏
     swipePanelOnlyClose: true, //只允许滑动关闭，不允许滑动打开侧栏
     importJs: '@webcomponents/webcomponentsjs/webcomponents-lite',
@@ -201,7 +198,7 @@ export const fcConfig = {
 };
 
 // 项目 地址
-export const domainURL = 'https://192.168.1.28:8080';
+export const domainURL = location.origin;
 
 // Server 地址配置
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate';

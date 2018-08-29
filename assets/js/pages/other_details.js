@@ -1,9 +1,9 @@
 import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
+import { Spinner } from '../components/Spinner';
 import Modal from '../modal';
 import VideoPreview from '../videoPreview';
-
 
 import {
 	body,
@@ -127,13 +127,13 @@ export default class OtherDetails extends EventEmitter {
 		const Appid = agoraConfig.agoraAppId || '', Appcert = agoraConfig.agoraCertificateId || '';
 
 		// 切换
-  		for (let i = 0; i < this.tabsItemEl.length; i++) {
-			addEvent(this.tabsItemEl[i], 'click', () => {
-	            if (hasClass(this.tabsItemEl[i], this.options.showClass)) return;
+		Array.prototype.slice.call(this.tabsItemEl).forEach((itemEl, index) => {
+			addEvent(itemEl, 'click', () => {
+	            if (hasClass(itemEl, this.options.showClass)) return;
 
-	            this.slideSwiper.goToPage(i, 0);
+	            this.slideSwiper.goToPage(index, 0);
 	        });
-  		}
+		});
 
 		// 加关注
 		addEvent(this.btnAddAttentionEl, 'click', () => {
@@ -158,17 +158,21 @@ export default class OtherDetails extends EventEmitter {
 		this.cardVideoEl = this.OtherDetailsEl.querySelectorAll(this.options.cardVideoClass);
 
 		// video list
-		for (let i = 0; i < this.cardVideoEl.length; i++) {
-		    addEvent(this.cardVideoEl[i], 'click', function() {
-		    	let info = JSON.parse(getData(this, 'userInfo'));
+		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
+			addEvent(cardVideoItemEl, 'click', () => {
+				let info = JSON.parse(getData(cardVideoItemEl, 'userInfo'));
 
-		    	playVideo(info.id).then((data) => {
-		    		if (!data) return;
-
-		    		let _videoPreview = new VideoPreview(data);
-		    	});
-		    });
-		}
+				playVideo(info.id).then((data) => {
+					if (!data) return;
+					Spinner.start(body);
+					extend(info, data);
+					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
+					_videoPreview.on('videoPreview.start', () => {
+	                    Spinner.remove();
+	                });
+				});
+			});
+		});
 	}
 
 	// 滑块初始化
@@ -176,17 +180,17 @@ export default class OtherDetails extends EventEmitter {
 		let width = 0;
 		let slideWidth = this.slideWrapperEl.clientWidth;
 
-		for (let i = 0; i < this.slideItemEl.length; i++) {
-			this.slideItemEl[i].style.width = slideWidth + 'px';
+		Array.prototype.slice.call(this.slideItemEl).forEach(itemEl => {
+			itemEl.style.width = slideWidth + 'px';
 			width += slideWidth;
-		}
+		});
 		this.slideContentEl.style.width = width + 'px';
 	}
 
 	// Slide 滑块
 	_slideSwiper() {
 		this.slideSwiper = new BScroll(this.options.slideWrapper, {
-			startX: 2,
+			startX: 1,
 			scrollX: true,
 			scrollY: false,
 			momentum: false,
@@ -209,9 +213,9 @@ export default class OtherDetails extends EventEmitter {
 
 			if (hasClass(this.tabsItemEl[slideIndex], this.options.showClass)) return;
 
-			for (let i = 0; i < this.tabsItemEl.length; i++) {
-				toggleClass(this.tabsItemEl[i], this.options.showClass);
-			}
+			Array.prototype.slice.call(this.tabsItemEl).forEach(itemEl => {
+				toggleClass(itemEl, this.options.showClass);
+			});
 		});
 	}
 
@@ -221,7 +225,7 @@ export default class OtherDetails extends EventEmitter {
 			pullDownInitTop = -50;
 
 		this.pagesVideoSwiper = new BScroll(this.options.pagesVideoClass, {
-			startY: 0,
+			startY: 1,
 			scrollY: true,
 			scrollX: false,
 			probeType: 3,
@@ -248,6 +252,7 @@ export default class OtherDetails extends EventEmitter {
 
 				data.forEach((itemData, index) => {
 					this.data.VideosList = itemData;
+					this.data.HeaderVideos = true;
 					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
 				});
 
@@ -270,6 +275,7 @@ export default class OtherDetails extends EventEmitter {
 
 				data.forEach((itemData, index) => {
 					this.data.VideosList = itemData;
+					this.data.HeaderVideos = true;
 					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
 				});
 
