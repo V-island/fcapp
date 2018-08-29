@@ -170,7 +170,6 @@ export default class RecordVideo extends EventEmitter {
         if (this.options.newDayVideo) {
             showHideDom(this.localUploadEl, 'none');
         }
-        console.log(this.livesRemarkEl);
         this._bindEvent();
     }
 
@@ -339,7 +338,7 @@ export default class RecordVideo extends EventEmitter {
         wrapper.appendChild(img);
 
         const title = createDivEl({element: 'p', className: 'upload-title', content: RECORD_LANG.UploadTitle});
-        const progress = createDivEl({className: 'upload-progres'});
+        const progress = createDivEl({className: 'upload-progress'});
         wrapper.appendChild(title);
         wrapper.appendChild(progress);
 
@@ -365,12 +364,12 @@ export default class RecordVideo extends EventEmitter {
         const videoPlayIcon = createDivEl({element: 'i', className: ['icon', 'user-video-play']});
         editVideo.appendChild(videoPlayIcon);
         editBox.appendChild(editVideo);
-        content.appendChild(editBox);
 
         const textarea = createDivEl({element: 'textarea', className: ['form-control', this.options.editTextareaClass]});
         textarea.setAttribute('rows', '3');
         textarea.setAttribute('placeholder', RECORD_LANG.EditVideoInfo.Placeholder);
-        content.appendChild(textarea);
+        editBox.appendChild(textarea);
+        content.appendChild(editBox);
 
         const buttons = createDivEl({className: ['buttons', 'buttons-vertical']});
         const btnEditConfirm = createDivEl({className: ['button', 'button-primary', this.options.btnEditConfirmClass], content: RECORD_LANG.EditVideoInfo.Buttons.Release});
@@ -415,15 +414,16 @@ export default class RecordVideo extends EventEmitter {
         let constraints = this._createConstraints();
 
         this._getUserMedia(constraints, (stream) => {
+            window.stream = stream; // make stream available to console
+            this.videoEl.srcObject  = stream;
+            this.videoEl.autoplay = true;
+
             try {
                 this.mediaRecoder = new MediaRecorder(stream, options);
             } catch (e) {
                 console.error(`Exception while creating MediaRecorder: ${e}`);
                 return;
             }
-            window.stream = stream; // make stream available to console
-            this.videoEl.srcObject  = stream;
-            this.videoEl.autoplay = true;
 
             this.mediaRecoder.ondataavailable = (event) => {
 
@@ -433,6 +433,7 @@ export default class RecordVideo extends EventEmitter {
 
                 const times = this.buffers.length / 100;
 
+                console.log(times);
                 // 计时器-最小
                 if (times == this.options.minTimes) {
                     this.consentEnd = false;
@@ -450,8 +451,11 @@ export default class RecordVideo extends EventEmitter {
                 }
 
                 this.timesEl.innerHTML = secToTime(times);
-                this.buffers.push(event.data);
-                this.progress.show(times);
+                
+                if (event.data && event.data.size > 0) {
+                    this.buffers.push(event.data);
+                }
+                // this.progress.show(times);
                 setTimeout(() => {
                     this._createIMG(this.videoEl);
                 }, this.options.minTimes / 2);
@@ -661,7 +665,7 @@ export default class RecordVideo extends EventEmitter {
     _bindVideoInfoEvent() {
         // 播放视频
         addEvent(this.editVideoEl, 'click', () => {
-            modal.videoModal(this.imgURL);
+            modal.videoModal(URL.createObjectURL(this.videoFile));
         });
 
         // 关闭编辑视频详细
