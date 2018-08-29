@@ -9,7 +9,7 @@
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block user-wrapper">
-            <div class="user-content" data-page="1" style="min-height: 100%;">
+            <div class="user-content" style="min-height: 100%;">
                 {{if VideoType}}
                     <div class="tag tag-video">
                         {{each VideoType}}
@@ -20,7 +20,7 @@
                 {{/if}}
 
                 {{if VideoList}}
-                    <div class="row box-cards">
+                    <div class="row box-cards" data-page="1">
                     {{each VideoList}}
                         <div class="col-50 card card-video" data-user-info="{{$value}}">
                             <div class="card-content">

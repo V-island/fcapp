@@ -180,7 +180,7 @@ export default class FreeVideo extends EventEmitter {
 		this.pagesVideoSwiper.on('pullingDown', () => {
 			pullDownRefresh = true;
 
-			videoClips(this._page, this._number, this._type).then((data) => {
+			videoClips(this._page, this._number, this.tagId, this._type).then((data) => {
 				if (!data) return;
 
 				this.cardsVideoEl.innerHTML = '';
@@ -206,7 +206,7 @@ export default class FreeVideo extends EventEmitter {
 			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
 
-			videoClips(_page, this._number, this._type).then((data) => {
+			videoClips(_page, this._number, this.tagId, this._type).then((data) => {
 				if (!data) return;
 
 				data.forEach((itemData, index) => {

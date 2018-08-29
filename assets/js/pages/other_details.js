@@ -7,8 +7,7 @@ import VideoPreview from '../videoPreview';
 
 import {
 	body,
-    fcConfig,
-    agoraConfig
+    fcConfig
 } from '../intro';
 import {
     getLangConfig
@@ -124,7 +123,6 @@ export default class OtherDetails extends EventEmitter {
 	}
 
 	_bindEvent() {
-		const Appid = agoraConfig.agoraAppId || '', Appcert = agoraConfig.agoraCertificateId || '';
 
 		// 切换
 		Array.prototype.slice.call(this.tabsItemEl).forEach((itemEl, index) => {
@@ -217,6 +215,7 @@ export default class OtherDetails extends EventEmitter {
 				toggleClass(itemEl, this.options.showClass);
 			});
 		});
+		this.slideSwiper.goToPage(1, 0);
 	}
 
 	// Video 模块
@@ -225,7 +224,7 @@ export default class OtherDetails extends EventEmitter {
 			pullDownInitTop = -50;
 
 		this.pagesVideoSwiper = new BScroll(this.options.pagesVideoClass, {
-			startY: 1,
+			startY: 0,
 			scrollY: true,
 			scrollX: false,
 			probeType: 3,
