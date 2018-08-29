@@ -237,7 +237,7 @@ export const secToTime = (timestamp) => {
         if(min < 10){t += "0";}
         t += min + ":";
         if(sec < 10){t += "0";}
-        t += sec.toFixed(2);
+        t += sec.toFixed();
     }
     return t;
 }

@@ -15,6 +15,7 @@ import {
 import {
     extend,
     getData,
+    setData,
     addEvent,
     replaceNote,
     dispatchEvent,
@@ -80,7 +81,6 @@ export default class RecordVideo extends EventEmitter {
     constructor(options) {
         super();
 
-        this.constraints = {};
         this.options = {
             minTimes: 60,
             maxTimes: 1800,
@@ -115,11 +115,11 @@ export default class RecordVideo extends EventEmitter {
             btnEditCloseClass: 'btn-close',
             btnEditConfirmClass: 'btn-confirm',
             btnEditSaveLocalClass: 'btn-save-local',
+            deviceID: 'id',
             showClass: 'active'
         };
 
         extend(this.options, options);
-        extend(this.constraints, hdConstraints);
 
         this.recordVideoEl = this._tabsTemplate(this.options);
         document.body.appendChild(this.recordVideoEl);
@@ -143,8 +143,7 @@ export default class RecordVideo extends EventEmitter {
     _init() {
         this.buffers = [];
         this.photosBuffers = [];
-        this.videoDevices = [];
-        this.videoSource = '';
+        this.videoSource = false;
         this.consentEnd = false;
         this.localImportVideo = false;
 
@@ -156,21 +155,12 @@ export default class RecordVideo extends EventEmitter {
 
         if (navigator.mediaDevices.getUserMedia || navigator.mediaDevices.enumerateDevices || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia){
             // 列出摄像头
-            navigator.mediaDevices.enumerateDevices().then((devices) => {
-                devices.forEach((device) => {
-                    if (device.kind === 'videoinput') {
-                        this.videoDevices.push(device.deviceId);
-                    }
-                });
-                this.videoSource = this.videoDevices[0];
-                extend(this.constraints, {
-                    video: {deviceId: this.videoSource ? {exact: this.videoSource} : undefined}
-                });
+            navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
+                this.gotDevices(deviceInfos);
+                this._mediaRecorder();
             }).catch((error) => {
                 console.log(error);
             });
-
-            this._mediaRecorder();
         } else {
             console.log("你的浏览器不支持访问用户媒体设备");
         }
@@ -180,7 +170,7 @@ export default class RecordVideo extends EventEmitter {
         if (this.options.newDayVideo) {
             showHideDom(this.localUploadEl, 'none');
         }
-
+        console.log(this.livesRemarkEl);
         this._bindEvent();
     }
 
@@ -206,7 +196,7 @@ export default class RecordVideo extends EventEmitter {
                 showHideDom(this.cutoverEl, 'none');
                 showHideDom(this.localUploadEl, 'none');
 
-                if (this.options.newDayVideo && typeof this.livesRemarkEl !== 'undefined') {
+                if (!this.options.newDayVideo && typeof this.livesRemarkEl !== 'undefined') {
                     showHideDom(this.livesRemarkEl, 'none');
                 }
 
@@ -232,7 +222,7 @@ export default class RecordVideo extends EventEmitter {
                 showHideDom(this.cutoverEl, 'block');
                 showHideDom(this.localUploadEl, 'block');
 
-                if (this.options.newDayVideo && typeof this.livesRemarkEl !== 'undefined') {
+                if (!this.options.newDayVideo && typeof this.livesRemarkEl !== 'undefined') {
                     showHideDom(this.livesRemarkEl, 'block');
                 }
 
@@ -278,15 +268,12 @@ export default class RecordVideo extends EventEmitter {
 
         // 切换摄像头
         addEvent(this.cutoverEl, 'click', () => {
+            const _devicesID = getData(this.cutoverEl, this.options.deviceID);
             this.buffers = [];
-            console.log(this.videoSource);
             this.videoDevices.forEach((devicesID) => {
-                if (devicesID !== this.videoSource) {
+                if (devicesID !== _devicesID) {
                     this.videoSource = devicesID;
-                    extend(this.constraints, hdConstraints);
-                    extend(this.constraints, {
-                        video: {deviceId: devicesID ? {exact: devicesID} : undefined}
-                    });
+                    console.log(devicesID);
                     this._stopStreamedVideo();
                     this._mediaRecorder();
                 }
@@ -400,19 +387,41 @@ export default class RecordVideo extends EventEmitter {
         return new RecordVideo(options);
     }
 
+    // 获取摄像头
+    gotDevices(deviceInfos) {
+        this.videoDevices = [];
+        deviceInfos.forEach((device) => {
+            if (device.kind === 'videoinput') {
+                this.videoDevices.push(device.deviceId);
+            }
+        });
+    }
+
+    // 获取录制格式
+    _createConstraints() {
+        return {
+            audio: true,
+            video: {
+                deviceId: this.videoSource ? {exact: this.videoSource} : undefined,
+                width: {exact: 1280},
+                height: {exact: 720}
+            }
+        };
+    }
+
     // 获取媒体设备的媒体流
     _mediaRecorder(){
         let options = {mimeType: 'video/webm;codecs=vp9'};
+        let constraints = this._createConstraints();
 
-        this._getUserMedia(this.constraints, (stream) => {
+        this._getUserMedia(constraints, (stream) => {
             try {
                 this.mediaRecoder = new MediaRecorder(stream, options);
             } catch (e) {
                 console.error(`Exception while creating MediaRecorder: ${e}`);
                 return;
             }
-            console.log(this.mediaRecoder);
-
+            window.stream = stream; // make stream available to console
             this.videoEl.srcObject  = stream;
             this.videoEl.autoplay = true;
 
@@ -474,26 +483,28 @@ export default class RecordVideo extends EventEmitter {
                     }
                 });
             };
+
+            return navigator.mediaDevices.enumerateDevices();
         }, (error) => {
             console.log(error);
         });
     }
 
     // 访问用户媒体设备的兼容方法
-    _getUserMedia(constrains,success,error){
+    _getUserMedia(constrains, success, error){
 
         if(navigator.mediaDevices.getUserMedia){
             //最新标准API
-            navigator.mediaDevices.getUserMedia(constrains).then(success).catch(error);
+            navigator.mediaDevices.getUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
         } else if (navigator.webkitGetUserMedia){
             //webkit内核浏览器
-            navigator.webkitGetUserMedia(constrains).then(success).catch(error);
+            navigator.webkitGetUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
         } else if (navigator.mozGetUserMedia){
             //Firefox浏览器
-            navagator.mozGetUserMedia(constrains).then(success).catch(error);
+            navagator.mozGetUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
         } else if (navigator.getUserMedia){
             //旧版API
-            navigator.getUserMedia(constrains).then(success).catch(error);
+            navigator.getUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
         }
     }
 
@@ -527,13 +538,11 @@ export default class RecordVideo extends EventEmitter {
 
     // 关闭向Video DOM 推流
     _stopStreamedVideo() {
-        let stream = this.videoEl.srcObject;
-
-        if (typeof stream !== 'undefined') {
-            stream.getTracks().forEach((track) => {
+        console.log(window.stream);
+        if (window.stream) {
+            window.stream.getTracks().forEach((track) => {
                 track.stop();
             });
-            this.videoEl.srcObject = null;
         }
     }
 
