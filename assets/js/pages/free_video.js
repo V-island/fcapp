@@ -164,6 +164,7 @@ export default class FreeVideo extends EventEmitter {
 			scrollX: false,
 			probeType: 3,
 			click: true,
+			eventPassthrough: 'horizontal',
 			pullDownRefresh: {
 				threshold: 50,
 				stop: 20

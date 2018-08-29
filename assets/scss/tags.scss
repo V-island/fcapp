@@ -51,6 +51,12 @@
 			}
 		}
 	}
+	&.tag-video {
+		@include flex-werp(nowrap);
+		overflow-x: auto;
+		margin: auto -0.75rem;
+	    padding-left: 0.75rem;
+	}
 	label.tag-label {
 		background: $tag-bg-color;
 		border-radius: $tag-border-radius;
