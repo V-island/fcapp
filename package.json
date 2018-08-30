@@ -6,8 +6,8 @@
   "main": "src/js/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "star": "http-server dist",
-    "start": "http-server dist -S -c -k",
+    "start": "http-server dist",
+    "star": "http-server dist -S -c -k",
     "build": "webpack"
   },
   "repository": {

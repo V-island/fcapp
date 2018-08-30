@@ -303,8 +303,9 @@ export default class VideoPreview extends EventEmitter {
             let btnRechargeEl = giftModalEl.getElementsByClassName(this.options.btnRechargeClass)[0];
             let btnSendEl = giftModalEl.getElementsByClassName(this.options.btnSendClass)[0];
             let giftWidth = giftWrapperEl.offsetWidth;
+            let { userPackage } = getUserInfo(this.options.dataUserPackage);
 
-            userPackageEl.innerHTML = getUserInfo(this.options.dataUserPackage);
+            userPackageEl.innerHTML = userPackage;
 
             giftContentEl.style.width = giftWidth * 2 + 'px';
 

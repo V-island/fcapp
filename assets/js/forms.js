@@ -139,7 +139,6 @@ export default class Forms {
                 let _value = groupEl.getElementsByTagName(this.options.inputTagName)[0].value;
 
                 if (phonesRule[this.Country.language_code].test(_value)) {
-                    console.log(_value);
                     return sendVerificationCode(this.Country.phone_code + _value).then(() => {
 
                         addClass(this.btnVerificationEl[0], this.options.disabledClass);

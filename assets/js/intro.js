@@ -32,6 +32,7 @@ import UserSettingHelp from './pages/user_setting_help';
 import UserSettingSuggestion from './pages/user_setting_suggestion';
 import UserSettingAbout from './pages/user_setting_about';
 
+const adminBase = '/';
 // 全局变量
 export const fcConfig = {
     autoInit: false, //自动初始化页面
@@ -39,158 +40,158 @@ export const fcConfig = {
     router: true, //默认使用router
     swipePanel: "left", //滑动打开侧栏
     swipePanelOnlyClose: true, //只允许滑动关闭，不允许滑动打开侧栏
-    importJs: '@webcomponents/webcomponentsjs/webcomponents-lite',
+    importJs: 'webcomponentsLite.js',
     publicFile: {
         home_items: {
             name: 'home_items',
-            path: '../public/home_items.html'
+            path: adminBase + 'public/home_items.html'
         },
         favorite_items: {
             name: 'favorite_items',
-            path: '../public/favorite_items.html'
+            path: adminBase + 'public/favorite_items.html'
         },
         other_details_item: {
             name: 'other_details_item',
-            path: '../public/other_details_item.html'
+            path: adminBase + 'public/other_details_item.html'
         },
         bar_tabs: {
             name: 'bar_tabs',
-            path: '../public/bar_tabs.html'
+            path: adminBase + 'public/bar_tabs.html'
         },
         live_preview: {
             name: 'live_preview',
-            path: '../public/live_preview.html'
+            path: adminBase + 'public/live_preview.html'
         },
         client_rtc: {
             name: 'client_rtc',
-            path: '../public/client_rtc.html'
+            path: adminBase + 'public/client_rtc.html'
         },
         client_call: {
             name: 'client_call',
-            path: '../public/client_call.html'
+            path: adminBase + 'public/client_call.html'
         }
     },
     pagesFile: [{
         name: 'login',
-        path: '../pages/login.html',
+        path: adminBase + 'pages/login.html',
         component: Login,
         init: 1,
         children: [{
             name: 'mobile',
-            path: '../pages/login_mobile.html',
+            path: adminBase + 'pages/login_mobile.html',
             component: LoginMobile,
             init: 1
         }, {
             name: 'find',
-            path: '../pages/find_password.html',
+            path: adminBase + 'pages/find_password.html',
             component: FindPassword,
             init: 1
         }, {
             name: 'set',
-            path: '../pages/set_password.html',
+            path: adminBase + 'pages/set_password.html',
             component: SetPassword,
             init: 1
         }]
     }, {
         name: 'register',
-        path: '../pages/register.html',
+        path: adminBase + 'pages/register.html',
         component: Register,
         init: 1,
         children: [{
             name: 'terms',
-            path: '../pages/register_terms.html',
+            path: adminBase + 'pages/register_terms.html',
             component: RegisterTerms,
             init: 1
         }]
     }, {
         name: 'home',
-        path: '../pages/home.html',
+        path: adminBase + 'pages/home.html',
         component: Home,
         init: 1,
         navTabs: 1,
         children: [{
             name: 'freevideo',
-            path: '../pages/free_video.html',
+            path: adminBase + 'pages/free_video.html',
             component: FreeVideo,
             init: 1
         }]
     }, {
         name: 'favorite',
-        path: '../pages/favorite.html',
+        path: adminBase + 'pages/favorite.html',
         component: Favorite,
         navTabs: 1
     }, {
         name: 'message',
-        path: '../pages/message.html',
+        path: adminBase + 'pages/message.html',
         component: Message,
         navTabs: 1
     }, {
         name: 'details',
-        path: '../pages/other_details.html',
+        path: adminBase + 'pages/other_details.html',
         component: OtherDetails
     }, {
         name: 'user',
-        path: '../pages/user.html',
+        path: adminBase + 'pages/user.html',
         component: User,
         navTabs: 1,
         children: [{
             name: 'detail',
-            path: '../pages/user_detail.html',
+            path: adminBase + 'pages/user_detail.html',
             component: UserDetail
         }, {
             name: 'video',
-            path: '../pages/user_video.html',
+            path: adminBase + 'pages/user_video.html',
             component: UserVideo
         }, {
             name: 'watch',
-            path: '../pages/user_watch.html',
+            path: adminBase + 'pages/user_watch.html',
             component: UserWatch
         }, {
             name: 'account',
-            path: '../pages/user_account.html',
+            path: adminBase + 'pages/user_account.html',
             component: UserAccount,
             children: [{
                 name: 'history',
-                path: '../pages/user_account_history.html',
+                path: adminBase + 'pages/user_account_history.html',
                 component: UserAccountHistory
             }, {
                 name: 'terms',
-                path: '../pages/user_account_terms.html',
+                path: adminBase + 'pages/user_account_terms.html',
                 component: UserAccountTerms,
                 init: 1
             }]
         }, {
             name: 'score',
-            path: '../pages/user_score.html',
+            path: adminBase + 'pages/user_score.html',
             component: UserScore,
             children: [{
                 name: 'history',
-                path: '../pages/user_score_history.html',
+                path: adminBase + 'pages/user_score_history.html',
                 component: UserScoreHistory
             }, {
                 name: 'withdraw',
-                path: '../pages/user_score_withdraw.html',
+                path: adminBase + 'pages/user_score_withdraw.html',
                 component: UserScoreWithdraw
             }]
         }, {
             name: 'setting',
-            path: '../pages/user_setting.html',
+            path: adminBase + 'pages/user_setting.html',
             component: UserSetting,
             children: [{
                 name: 'security',
-                path: '../pages/user_setting_security.html',
+                path: adminBase + 'pages/user_setting_security.html',
                 component: UserSettingSecurity
             }, {
                 name: 'help',
-                path: '../pages/user_setting_help.html',
+                path: adminBase + 'pages/user_setting_help.html',
                 component: UserSettingHelp
             }, {
                 name: 'suggestion',
-                path: '../pages/user_setting_suggestion.html',
+                path: adminBase + 'pages/user_setting_suggestion.html',
                 component: UserSettingSuggestion
             }, {
                 name: 'about',
-                path: '../pages/user_setting_about.html',
+                path: adminBase + 'pages/user_setting_about.html',
                 component: UserSettingAbout
             }]
         }]
@@ -202,6 +203,7 @@ export const domainURL = location.origin;
 
 // Server 地址配置
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate';
+// export const baseURL = 'http://192.168.1.211:8080/live-app/open/gate';
 
 // 直播配置
 export const agoraConfig = {

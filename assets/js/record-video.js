@@ -272,8 +272,11 @@ export default class RecordVideo extends EventEmitter {
             this.videoDevices.forEach((devicesID) => {
                 if (devicesID !== _devicesID) {
                     this.videoSource = devicesID;
-                    console.log(devicesID);
-                    this._stopStreamedVideo();
+                    if (window.stream) {
+                        window.stream.getVideoTracks().forEach((track) => {
+                            track.stop();
+                        });
+                    }
                     this._mediaRecorder();
                 }
             });
@@ -418,44 +421,17 @@ export default class RecordVideo extends EventEmitter {
             this.videoEl.srcObject  = stream;
             this.videoEl.autoplay = true;
 
-            try {
-                this.mediaRecoder = new MediaRecorder(stream, options);
-            } catch (e) {
-                console.error(`Exception while creating MediaRecorder: ${e}`);
-                return;
-            }
+            this.mediaRecoder = new MediaRecorder(stream);
 
             this.mediaRecoder.ondataavailable = (event) => {
-
                 if(this.mediaRecoder.state == "inactive"){
                     return;
                 }
 
-                const times = this.buffers.length / 100;
-
-                console.log(times);
-                // 计时器-最小
-                if (times == this.options.minTimes) {
-                    this.consentEnd = false;
-                }
-
-                // 计时器-结束
-                if (times > this.options.maxTimes) {
-                    if (this.options.newDayVideo) {
-                        this.consentEnd = false;
-                        dispatchEvent(this.recordEl, 'click');
-                        return;
-                    }
-                    dispatchEvent(this.recordEl, 'click');
-                    return;
-                }
-
-                this.timesEl.innerHTML = secToTime(times);
-                
                 if (event.data && event.data.size > 0) {
                     this.buffers.push(event.data);
                 }
-                // this.progress.show(times);
+
                 setTimeout(() => {
                     this._createIMG(this.videoEl);
                 }, this.options.minTimes / 2);
@@ -463,11 +439,15 @@ export default class RecordVideo extends EventEmitter {
 
             this.mediaRecoder.onstart = () => {
                 this.trigger('recordVideo.start');
+
+                this._timedCount(0);
             };
 
             // 添加录制结束的事件监听，保存录制数据
             this.mediaRecoder.onstop = () => {
                 this.trigger('recordVideo.stop');
+                clearTimeout(this.Timer);
+
                 this.blob = new Blob(this.buffers, {
                     type: 'video/webm'
                 });
@@ -542,12 +522,38 @@ export default class RecordVideo extends EventEmitter {
 
     // 关闭向Video DOM 推流
     _stopStreamedVideo() {
-        console.log(window.stream);
         if (window.stream) {
             window.stream.getTracks().forEach((track) => {
                 track.stop();
             });
         }
+    }
+
+    // 计时器
+    _timedCount(times) {
+        this.Timer =  setTimeout(() => {
+            this.timesEl.innerHTML = secToTime(times);
+
+            // 计时器-最小
+            if (times == this.options.minTimes) {
+                this.consentEnd = false;
+            }
+
+            // 计时器-结束
+            if (times > this.options.maxTimes) {
+                if (this.options.newDayVideo) {
+                    this.consentEnd = false;
+                    dispatchEvent(this.recordEl, 'click');
+                    return;
+                }
+                dispatchEvent(this.recordEl, 'click');
+                return;
+            }
+
+            this.progress.show(times);
+
+            this._timedCount(times+1);
+        },1000);
     }
 
     // 图片创建

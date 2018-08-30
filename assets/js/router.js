@@ -1,4 +1,5 @@
 import Template from 'art-template/lib/template-web';
+// import webcomponentsLite from '@webcomponents/webcomponentsjs/webcomponents-lite';
 import Tabs from './tabs';
 import {
     fcConfig
@@ -82,7 +83,6 @@ import {
      */
     if (!('import' in document.createElement('link'))) {
         console.log(MSG.nosupport);
-        require(fcConfig.importJs);
     }
 
     let Util = {

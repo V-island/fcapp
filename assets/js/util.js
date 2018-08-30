@@ -87,10 +87,13 @@ export const importTemplate = (param, callback) => {
     link.onload = function(e) {
         console.log('Loaded import: ' + e.target.href);
         let _target = e.target.import;
-
         if (typeof(_target.head) != 'undefined' && _target.head != '') {
             for (let i = 0; i < _target.head.children.length; i++) {
                 callback(_target.head.children[i].id, replaceNote(_target.head.children[i].innerHTML));
+            }
+        }else {
+            for (var i = 0; i < _target.children.length; i++) {
+                callback(_target.children[i].id, replaceNote(_target.children[i].innerText));
             }
         }
 
@@ -106,6 +109,38 @@ export const importTemplate = (param, callback) => {
     };
     document.head.appendChild(link);
 };
+
+/**
+ * createScript 导入
+ * @param  {[type]}   param    [description]
+ * @param  {Function} callback [description]
+ * @return {[type]}            [description]
+ */
+export const createScript = (param, callback) => {
+    const heads = document.getElementsByTagName("head");
+    const script = document.createElement("script");
+
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("id", param.name);
+    script.setAttribute("src", param.path);
+    script.onload = script.onreadystatechange = function(e) {
+        console.log('Loaded import: ' + e.target);
+        // let _target = e.target.import;
+        console.log(e);
+
+        if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+
+            // Handle memory leak in IE
+            script.onload = script.onreadystatechange = null;
+        }
+    };
+    if (heads.length) {
+        heads[0].appendChild(script);
+    } else {
+        document.documentElement.appendChild(script);
+    }
+};
+
 
 /**
  * 解析FORM参数
