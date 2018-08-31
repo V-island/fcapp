@@ -1,7 +1,13 @@
 import BScroll from 'better-scroll';
+import { Spinner } from './Spinner';
+import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
+
+import {
+    playVideo
+} from '../api';
 
 import {
     addEvent,
@@ -18,6 +24,7 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
+const modal = new Modal();
 const MESSAGE_REQ_ID = 'reqId';
 
 class MessageItemSystem {
@@ -35,13 +42,7 @@ class MessageItemSystem {
 
     _messageItemElement(message) {
         const isOpenChannel = message.channelType !== "group" ? false : true;
-
         const {videoId, videoImg, giftUrl} = isOpenChannel ? JSON.parse(message.data) : {};
-        console.log(JSON.parse(message.data));
-        console.log(videoId);
-        console.log(videoImg);
-        console.log(giftUrl);
-
         const messageItem = createDivEl({id: message.messageId, className: ['message-chat-item', 'item-system']});
         const itemAvatar = createDivEl({className: 'item-avatar', background: message._sender.profileUrl});
         messageItem.appendChild(itemAvatar);
@@ -70,6 +71,19 @@ class MessageItemSystem {
         }else {
             const btnDetails = createDivEl({className: ['button', 'fill-success', 'btn-details'], content: LANG.MESSAGE.Details});
             messageItem.appendChild(btnDetails);
+        }
+
+        if (isOpenChannel) {
+            addEvent(itemMessageThumb, 'click', () => {
+                Spinner.start(body);
+                playVideo(videoId).then((data) => {
+                    if (!data) return Spinner.remove();
+
+                    let {video_url} = data;
+                    modal.videoModal(video_url);
+                    Spinner.remove();
+                });
+            });
         }
 
         return messageItem;

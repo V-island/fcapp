@@ -157,7 +157,6 @@ export default class RecordVideo extends EventEmitter {
             // 列出摄像头
             navigator.mediaDevices.enumerateDevices().then((deviceInfos) => {
                 this.gotDevices(deviceInfos);
-                this._mediaRecorder();
             }).catch((error) => {
                 console.log(error);
             });
@@ -267,19 +266,17 @@ export default class RecordVideo extends EventEmitter {
 
         // 切换摄像头
         addEvent(this.cutoverEl, 'click', () => {
-            const _devicesID = getData(this.cutoverEl, this.options.deviceID);
+            const _devicesID = parseInt(getData(this.cutoverEl, this.options.deviceID)) == 0 ? 1 : 0;
             this.buffers = [];
-            this.videoDevices.forEach((devicesID) => {
-                if (devicesID !== _devicesID) {
-                    this.videoSource = devicesID;
-                    if (window.stream) {
-                        window.stream.getVideoTracks().forEach((track) => {
-                            track.stop();
-                        });
-                    }
-                    this._mediaRecorder();
-                }
-            });
+            this.videoSource = this.videoDevices[_devicesID];
+
+            if (window.stream) {
+                window.stream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+            }
+            this._mediaRecorder();
+            setData(this.cutoverEl, this.options.deviceID, _devicesID);
         });
     }
 
@@ -397,6 +394,9 @@ export default class RecordVideo extends EventEmitter {
                 this.videoDevices.push(device.deviceId);
             }
         });
+        this.videoSource = this.videoDevices[0];
+        this._mediaRecorder();
+        setData(this.cutoverEl, this.options.deviceID, 0);
     }
 
     // 获取录制格式
@@ -431,16 +431,16 @@ export default class RecordVideo extends EventEmitter {
                 if (event.data && event.data.size > 0) {
                     this.buffers.push(event.data);
                 }
-
-                setTimeout(() => {
-                    this._createIMG(this.videoEl);
-                }, this.options.minTimes / 2);
             };
 
             this.mediaRecoder.onstart = () => {
                 this.trigger('recordVideo.start');
 
                 this._timedCount(0);
+
+                setTimeout(() => {
+                    this._createIMG(this.videoEl);
+                }, this.options.minTimes / 2);
             };
 
             // 添加录制结束的事件监听，保存录制数据
@@ -467,8 +467,6 @@ export default class RecordVideo extends EventEmitter {
                     }
                 });
             };
-
-            return navigator.mediaDevices.enumerateDevices();
         }, (error) => {
             console.log(error);
         });
@@ -479,16 +477,16 @@ export default class RecordVideo extends EventEmitter {
 
         if(navigator.mediaDevices.getUserMedia){
             //最新标准API
-            navigator.mediaDevices.getUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
+            navigator.mediaDevices.getUserMedia(constrains).then(success).catch(error);
         } else if (navigator.webkitGetUserMedia){
             //webkit内核浏览器
-            navigator.webkitGetUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
+            navigator.webkitGetUserMedia(constrains).then(success).catch(error);
         } else if (navigator.mozGetUserMedia){
             //Firefox浏览器
-            navagator.mozGetUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
+            navagator.mozGetUserMedia(constrains).then(success).catch(error);
         } else if (navigator.getUserMedia){
             //旧版API
-            navigator.getUserMedia(constrains).then(success).then(this.gotDevices).catch(error);
+            navigator.getUserMedia(constrains).then(success).catch(error);
         }
     }
 

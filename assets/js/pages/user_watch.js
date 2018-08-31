@@ -89,7 +89,7 @@ export default class UserWatch extends EventEmitter {
 				info.id = info.user_id;
 				Spinner.start(body);
 				playVideo(info.id).then((data) => {
-					if (!data) return;
+					if (!data) return Spinner.remove();
 
 					extend(info, data);
 					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
@@ -128,23 +128,23 @@ export default class UserWatch extends EventEmitter {
 			pullDownRefresh = true;
 
 			findWatchHistory(1, 10).then((data) => {
-				if (!data) return;
+				if (data) {
+					this.cardsVideoEl.innerHTML = '';
 
-				this.cardsVideoEl.innerHTML = '';
+					data.forEach((itemData, index) => {
+						this.data.VideosList = itemData;
+						this.data.HeaderVideos = false;
+						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
+					});
 
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.data.HeaderVideos = false;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
-				});
-
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+					this._bindEvent();
+				}
 
 				pullDownRefresh = false;
 				this.pullDownEl.style.top = '-1rem';
 				this.pagesVideoSwiper.finishPullDown();
 				this.pagesVideoSwiper.refresh();
-				this._bindEvent();
 			});
 		});
 
@@ -154,18 +154,19 @@ export default class UserWatch extends EventEmitter {
 			_page = parseInt(_page) + 1;
 
 			findWatchHistory(_page, 10).then((data) => {
-				if (!data) return;
+				if (data) {
+					data.forEach((itemData, index) => {
+						this.data.VideosList = itemData;
+						this.data.HeaderVideos = false;
+						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
+					});
 
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.data.HeaderVideos = false;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
-				});
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+					this._bindEvent();
+				}
 
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
 				this.pagesVideoSwiper.finishPullUp();
 				this.pagesVideoSwiper.refresh();
-				this._bindEvent();
 			});
 		});
 

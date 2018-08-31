@@ -80,6 +80,9 @@ export default class VideoPreview extends EventEmitter {
             btnRechargeClass: 'btn-recharge',
             btnSendClass: 'btn-send',
 
+            blurButtonTheme: 'fill-gray',
+            focusButtonTheme: 'button-primary',
+
             praiseCountClass: 'praise',
             eyeCountClass: 'eye',
             dataUserPackage: 'userPackage',
@@ -201,6 +204,12 @@ export default class VideoPreview extends EventEmitter {
             let btnNewsPhizEl = newsModalEl.getElementsByClassName(this.options.newsPhizClass)[0];
             let btnSendEl = newsModalEl.getElementsByClassName(this.options.btnSendClass)[0];
 
+            // 元素获得焦点
+            addEvent(textareaEl, 'focus', () => {
+                removeClass(btnSendEl, this.options.blurButtonTheme);
+                return addClass(btnSendEl, this.options.focusButtonTheme);
+            });
+
             addEvent(btnSendEl, 'click', () => {
                 let _val = textareaEl.value;
 
@@ -212,6 +221,9 @@ export default class VideoPreview extends EventEmitter {
                 let getCommentVideo = commentVideo(this.options.id, _val);
                 getCommentVideo.then((data) => {
                     if (!data) return false;
+
+                    removeClass(btnSendEl, this.options.focusButtonTheme);
+                    addClass(btnSendEl, this.options.blurButtonTheme);
 
                     this.commentAmountEl.innerHTML = parseInt(this.commentAmountEl.innerHTML) + 1;
                     this._joinGroupChannel(this.options.comment_channel, _val);

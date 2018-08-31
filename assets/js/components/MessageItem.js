@@ -87,7 +87,7 @@ class MessageItem {
             item.appendChild(itemGraphic);
         }
 
-        const itemText = createDivEl({element: 'span', className: 'list-item-text', content: this.title});
+        const itemText = createDivEl({element: 'span', className: 'list-item-text', content: this.title !== null ? this.title : LANG.MESSAGE.Anonymous });
         const itemSecondary = createDivEl({element: 'span', className: 'list-item-secondary', content: this.lastMessageText});
         itemText.appendChild(itemSecondary);
         item.appendChild(itemText);

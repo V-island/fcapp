@@ -47,6 +47,7 @@ export default class UserVideo extends EventEmitter {
 	    	cardsPageIndex: 'page',
 	    	videoAddClass: 'video-add-card',
 	    	videoCloseClass: 'btn-close-video',
+	    	mediaClass: 'media',
 	    	cardvideoClass: 'card-video'
         };
 
@@ -91,8 +92,8 @@ export default class UserVideo extends EventEmitter {
 	}
 
 	_bindEvent() {
+		this.videoMediaEl = this.UserVideoEl.getElementsByClassName(this.options.mediaClass);
 		this.videoCloseEl = this.UserVideoEl.getElementsByClassName(this.options.videoCloseClass);
-		this.videoEl = this.UserVideoEl.getElementsByClassName(this.options.cardvideoClass);
 
 		// 上传
 		addEvent(this.videoAddEl, 'click', () => {
@@ -104,28 +105,27 @@ export default class UserVideo extends EventEmitter {
         });
 
 		// 删除视频
-		for (let i = 0; i < this.videoCloseEl.length; i++) {
-			addEvent(this.videoCloseEl[i], 'click', () => {
-				let videoId = getData(this.videoEl[i+1], 'id');
+		Array.prototype.slice.call(this.videoCloseEl).forEach(closeEl => {
+			addEvent(closeEl, 'click', () => {
+				let videoEl = closeEl.parentNode.parentNode.parentNode;
+				let videoId = getData(videoEl, 'id');
 				let getDeleteVideo = deleteVideo(videoId);
 
 				getDeleteVideo.then((data) => {
 					if (!data) return;
 
-					showHideDom(this.videoEl[i+1], 'none');
+					showHideDom(videoEl, 'none');
 				});
 	        });
-		}
+		});
 
 		// 浏览视频
-		for (let i = 0; i < this.videoEl.length; i++) {
-			if (i > 0) {
-				addEvent(this.videoEl[i], 'click', () => {
-					let videoUrl = getData(this.videoEl[i], 'url');
-					modal.videoModal(videoUrl);
-		        });
-			}
-		}
+		Array.prototype.slice.call(this.videoMediaEl).forEach((mediaEl, index) => {
+			addEvent(mediaEl, 'click', () => {
+				let videoUrl = getData(mediaEl, 'url');
+				modal.videoModal(videoUrl);
+	        });
+		});
 	}
 
 	// Video 模块
@@ -155,23 +155,23 @@ export default class UserVideo extends EventEmitter {
 			pullDownRefresh = true;
 
 			findMyVideo(1, 10).then((data) => {
-				if (!data) return;
+				if (data) {
+					this.cardsVideoEl.innerHTML = '';
+					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_add_item, this.data)));
 
-				this.cardsVideoEl.innerHTML = '';
-				this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_add_item, this.data)));
+					data.forEach((itemData, index) => {
+						this.data.VideosList = itemData;
+						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
+					});
 
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
-				});
-
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+					this._bindEvent();
+				}
 
 				pullDownRefresh = false;
 				this.pullDownEl.style.top = '-1rem';
 				this.pagesVideoSwiper.finishPullDown();
 				this.pagesVideoSwiper.refresh();
-				this._bindEvent();
 			});
 		});
 
@@ -181,19 +181,18 @@ export default class UserVideo extends EventEmitter {
 			_page = parseInt(_page) + 1;
 
 			findMyVideo(_page, 10).then((data) => {
-				if (!data) return;
+				if (data) {
+					data.forEach((itemData, index) => {
+						this.data.VideosList = itemData;
+						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
+					});
 
-				this.cardsVideoEl.innerHTML = '';
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+					this._bindEvent();
+				}
 
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
-				});
-
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
 				this.pagesVideoSwiper.finishPullUp();
 				this.pagesVideoSwiper.refresh();
-				this._bindEvent();
 			});
 		});
 

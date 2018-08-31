@@ -22,7 +22,8 @@
 
                 {{if MyVideo}}
                     {{each MyVideo}}
-                        <div class="col-50 card card-video" data-id="{{$value.id}}" data-url="{{$value.video_url}}">
+                        {{if $value.status != 4}}
+                        <div class="col-50 card card-video" data-id="{{$value.id}}">
                             <div class="card-content">
                                 <div class="card-video-header">
                                     {{if $value.status == 1}}
@@ -38,7 +39,7 @@
                                     {{/if}}
                                     <i class="icon user-close-video btn-close-video"></i>
                                 </div>
-                                <div class="media" style="background-image: url({{$value.img_url}});"></div>
+                                <div class="media" data-url="{{$value.video_url}}" style="background-image: url({{$value.img_url}});"></div>
                                 <div class="showdom">
                                     <p class="summary-txt">{{$value.video_description}}</p>
                                     <div class="video-info">
@@ -63,6 +64,7 @@
                                 </div>
                             </div>
                         </div>
+                        {{/if}}
                     {{/each}}
                 {{/if}}
             </div>

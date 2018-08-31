@@ -15,7 +15,7 @@
                                     <span class="list-item-graphic image {{if !$value.user_head}} avatar-female {{/if}}" style="{{if $value.user_head}} background-image: url({{$value.user_head}}); {{/if}}"></span>
                                     <span class="list-item-text">{{$value.user_name}}</span>
                                 </a>
-                                <span class="btn-follow" data-id="{{$value.user_id}}" data-ripple>{{FAVORITE.Follow}}</span>
+                                <span class="btn-follow" data-id="{{$value.user_id}}" data-ripple>{{FAVORITE.Followed}}</span>
                             </li>
                         {{/each}}
                     </ul>

@@ -453,7 +453,15 @@ export default class Modal extends EventEmitter {
             ],
             onClick: function (modal, index) {
                 if (index === 0 && callbackCancel) callbackCancel($(modal).find('.modal-text-input').val());
-                if (index === 1 && callbackOk) callbackOk($(modal).find('.modal-text-input').val());
+                if (index === 1 && callbackOk) {
+                    const value = $(modal).find('.modal-text-input').val();
+
+                    if (value == '') {
+                        return false;
+                    }
+
+                    callbackOk(value);
+                };
             }
         });
     }

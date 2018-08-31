@@ -61,11 +61,6 @@
     <div class="col-50 card card-video" data-id="{{VideosList.id}}" data-url="{{VideosList.video_url}}">
         <div class="card-content">
             <div class="card-video-header">
-                {{if VideosList.type == 1}}
-                    <span class="status-label free">{{PUBLIC.Free}}</span>
-                {{else if VideosList.type == 2}}
-                    <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
-                {{/if}}
                 {{if VideosList.status == 1}}
                     <span class="status-label review">{{PUBLIC.Review}}</span>
                 {{else if VideosList.status == 2}}

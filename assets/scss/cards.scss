@@ -254,11 +254,15 @@ span.status-label {
 
         .card-video-header{
             @include spindle-center(space-between);
+            align-items: start;
             position: absolute;
-            top: 0.3rem;
-            right: 0.3rem;
-            left: 0.3rem;
+            top: 0;
+            right: 0;
+            left: 0;
             z-index: 2;
+            height: 3.5rem;
+            padding: 0.3rem;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
 
             span.tag-label {
                 font-size: 0.5rem;

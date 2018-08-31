@@ -118,6 +118,7 @@ const Lang = {
 			Pay: 'It takes 1 gold coins，be an anchor can get more free times',
 			Free: 'Free to send the message (10 per day)'
 		},
+		Anonymous: 'anonymous',
 		System_Message: 'System  message',
 		Customer_Service: 'Customer service',
 		Details: 'Details',
@@ -534,7 +535,7 @@ const Lang = {
 		Video_Chat:'Video chat'
 	},
 	PUBLIC: {
-		Billing: 'Gold/Min',
+		Billing: 'Gold',
 		Review: 'Review',
 		Refuse: 'Refuse',
 		Free: 'Free',
