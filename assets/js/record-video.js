@@ -42,18 +42,18 @@ config: {
       }
 },
 **/
-// QVGA
+// QVGA 320
 const qvgaConstraints = {
     audio: true,
     video: {width: {exact: 320}, height: {exact: 240}}
 };
-// VGA
+// VGA 640
 const vgaConstraints = {
     audio: true,
     video: {width: {exact: 640}, height: {exact: 480}}
 };
 
-// HD
+// HD 720
 const hdConstraints = {
     audio: true,
     video: {width: {exact: 1280}, height: {exact: 720}}
@@ -100,9 +100,7 @@ export default class RecordVideo extends EventEmitter {
             livesRemarkClass:'lives-remark',
             timesClass: 'lives-times',
             startClass: 'record-start',
-            inUploadClass: 'upload-in',
-            outUploadClass: 'upload-out',
-            uploadClass: 'upload-progress',
+            progressLineClass: 'progress-line',
 
             videoInfoWrapperClass: 'clipping-wrapper',
             inVideoInfoClass: 'clipping-in',
@@ -327,20 +325,6 @@ export default class RecordVideo extends EventEmitter {
             const livesRemark = createDivEl({element: 'p', className: options.livesRemarkClass, content: RECORD_LANG.Prompt.Checked});
             wrapper.appendChild(livesRemark);
         }
-
-        return wrapper;
-    }
-
-    _uploadTemplate() {
-        const wrapper = createDivEl({className: 'upload-wrapper'});
-        const img = createDivEl({element: 'img', className: 'upload-img'});
-        img.setAttribute('src', this.imgURL);
-        wrapper.appendChild(img);
-
-        const title = createDivEl({element: 'p', className: 'upload-title', content: RECORD_LANG.UploadTitle});
-        const progress = createDivEl({className: 'upload-progress'});
-        wrapper.appendChild(title);
-        wrapper.appendChild(progress);
 
         return wrapper;
     }
@@ -573,19 +557,13 @@ export default class RecordVideo extends EventEmitter {
         this.photosBuffers = new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
     }
 
-    // 显示上传进度
-    _uploadShow() {
-        window.setTimeout(() => {
-            addClass(this.progressEl, this.options.inUploadClass);
-        }, 0);
-    }
+    // 上传视频
+    _uploadVideo(_videoFile, _photosFile, _title) {
+        let _type = this.newDayVideo ? 2 : 1;
 
-    // 隐藏上传进度
-    _uploadHide() {
-        addClass(this.progressEl, this.options.outUploadClass);
-        window.setTimeout(() => {
-            document.body.removeChild(this.progressEl);
-        }, 500);
+        uploadVideo([_videoFile, _photosFile], _type, _title, this.imgURL).then((data) => {
+            this.trigger('recordVideo.upload.success');
+        });
     }
 
     // 本地上传视频
@@ -603,6 +581,7 @@ export default class RecordVideo extends EventEmitter {
 
         addEvent(inputEl, 'change', () => {
             let previewVideoEl = document.createElement('video');
+            previewVideoEl.setAttribute('muted', true);
             this.videoFile = inputEl.files[0];
 
             previewVideoEl.src = URL.createObjectURL(this.videoFile);
@@ -616,36 +595,6 @@ export default class RecordVideo extends EventEmitter {
                 Spinner.remove();
             }, 3000);
         });
-    }
-
-    // 上传视频
-    _uploadVideo(_videoFile, _photosFile, _title) {
-        let _uploadEl = this._uploadVideoDOM();
-        let _progress = new Progress(_uploadEl,{
-            width: _uploadEl.clientHeight,
-            height: _uploadEl.clientHeight,
-            background: '#fff',
-            itemBackground: '#1FC969',
-            lineWidth: 2,
-            showFont: true
-        });
-        let _type = this.newDayVideo ? 2 : 1;
-        uploadVideo([_videoFile, _photosFile], _type, _title, (data) => {
-            this._uploadHide();
-            this.trigger('recordVideo.upload.success');
-        }, (progress) => {
-            _progress.show(progress);
-        });
-    }
-
-    // 上传视频
-    _uploadVideoDOM() {
-        this.progressEl = this._uploadTemplate();
-
-        document.body.appendChild(this.progressEl);
-
-        this._uploadShow();
-        return this.progressEl.getElementsByClassName(this.options.uploadClass)[0];
     }
 
     // 编辑视频详细

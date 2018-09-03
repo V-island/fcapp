@@ -95,6 +95,10 @@ a {
     top: $bar-details-height;
 }
 
+.bar-progress~.content {
+    top: $bar-progress-height;
+}
+
 .bar-header-secondary~.content {
     top: ($bar-base-height*2);
 }

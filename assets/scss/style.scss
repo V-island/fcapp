@@ -850,50 +850,6 @@ p.lives-remark{
 	}
 }
 
-// upload-wrapper
-// ------------------------------
-.upload-wrapper {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 0.35rem 0.7rem;
-    height: 3.5rem;
-    z-index: 10400;
-    color: $color-text;
-    border-radius: 0 0 0.2rem 0.2rem;
-    background-color: $live-upload-bg-color;
-    box-sizing: border-box;
-    @include scrollable;
-    @include flex-center;
-    transition-property: transform;
-    transform: translate3d(0, -3.5rem, 0);
-    &.upload-in, &.upload-out {
-        transition-duration: $live-upload-duration;
-    }
-    &.upload-in {
-        transform: translate3d(0, 0, 0);
-    }
-    &.upload-out {
-        transform: translate3d(0, -3.5rem, 0);
-    }
-}
-.upload-img {
-	@include size(2.45rem);
-	border-radius: 0.1rem;
-	flex: 0 0 2.45rem;
-}
-.upload-title {
-	color: $color-text;
-	font-size: 0.6rem;
-	flex: 1 0 0;
-    padding: 0 0.7rem;
-}
-.upload-progress{
-	@include size(1.5rem);
-	flex: 0 0 1.5rem;
-}
-
 // login-wrapper
 // ------------------------------
 .login-wrapper{

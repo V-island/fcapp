@@ -1,5 +1,6 @@
 import SendBirdAction from './SendBirdAction';
 import Modal from './modal';
+import ProgressLine from './ProgressLine';
 import {
 	fcConfig,
 	baseURL
@@ -1311,14 +1312,12 @@ export function liveAgain() {
  * @param  {[type]}   _type      类型 1.上传15秒视频     2.上传每日打招呼小视频
  * @param  {[type]}   _title     标题/描述
  * @param  {[type]}   _tagID     标签
- * @param  {Function} callback   成功回调
- * @param  {[type]}   onProgress 进度回调
  * @return {[type]}              [description]
  */
-export function uploadVideo(_file, _type, _title, callback, onProgress) {
+export function uploadVideo(_file, _type, _title, _imgUrl) {
+	console.log(_imgUrl);
 	if (typeof _title === 'function') {
-	    callback = arguments[2];
-	    onProgress = arguments[3];
+	    _imgUrl = arguments[2];
 	    _title = false;
 	}
 	let {userId} = getUserInfo();
@@ -1343,10 +1342,18 @@ export function uploadVideo(_file, _type, _title, callback, onProgress) {
 		formData.append("description", _title);
 	}
 
-	getPost(formData, (response) => {
-		callback(response);
-	}, (progress) => {
-		onProgress(progress);
+	return new Promise((resolve) => {
+		location.hash = '#/home';
+
+		let progressLine = new ProgressLine(_imgUrl);
+		getPost(formData, (response) => {
+			progressLine.hide();
+			resolve(true);
+		}, (_speed) => {
+			progressLine.show(_speed);
+		}, (response) => {
+			resolve(false);
+		});
 	});
 };
 

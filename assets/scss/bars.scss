@@ -374,6 +374,35 @@
     }
 }
 
+// progress bar
+// --------------------------------------------------
+.bar-progress {
+    @include flex-center;
+    top: 2.2rem;
+    padding: 0.35rem 0.7rem;
+    color: $color-text;
+    border-bottom: 0.1rem solid $bar-gradient-color-right;
+
+    .progress-img {
+        @include size(1.4rem);
+        border-radius: 0.1rem;
+        flex: 0 0 1.4rem;
+    }
+    .progress-title {
+        color: $color-text;
+        font-size: 0.6rem;
+        flex: 1 0 0;
+        padding: 0 0 0 1.57rem;
+    }
+    .progress-line{
+        position: absolute;
+        bottom: -0.1rem;
+        left: 0;
+        height: 0.1rem;
+        background: $color-primary;
+    }
+}
+
 // OtherDetails nav
 // --------------------------------------------------
 .nav-details{
