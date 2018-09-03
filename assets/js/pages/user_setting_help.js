@@ -8,7 +8,8 @@ import {
 import {
     extend,
     createDom,
-    addEvent
+    addEvent,
+    toggleClass
 } from '../util';
 
 const LANG = getLangConfig();
@@ -19,14 +20,14 @@ export default class UserSettingHelp extends EventEmitter {
 
 	    this.data = {};
 	    this.options = {
-	    	listItemClass: 'list-info-item'
+	    	listItemClass: 'list-item',
+	    	showClass: 'active'
         };
 
 	    extend(this.options, options);
 	    extend(this.data, LANG);
 
 	    this.init(element);
-
 	}
 
 	init(element) {
@@ -45,12 +46,12 @@ export default class UserSettingHelp extends EventEmitter {
 	}
 
 	_bindEvent() {
-
-		for (let i = 0; i < this.listItemsEl.length; i++) {
-			addEvent(this.listItemsEl[i], 'click', () => {
-				console.log(i);
+		Array.prototype.slice.call(this.listItemsEl).forEach(itemEl => {
+			addEvent(itemEl, 'click', () => {
+				let infoEl = itemEl.nextSibling;
+				toggleClass(infoEl, this.options.showClass);
 	        });
-		}
+		});
 	}
 
 	static attachTo(element, options) {

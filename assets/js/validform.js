@@ -11,8 +11,6 @@ export default class Validform extends EventEmitter {
 	}
 
 	_init() {
-		
-
 		this._bindEvent();
 	}
 

@@ -217,7 +217,7 @@ const Lang = {
 		Account_Security: 'Account security',
 		Message_Notification: {
 			Title: 'Message notification',
-			Text: 'After opening, the  text message or video invitation can only be received for the first time. <br/>Please open it in the settings - notification function to ensure normal function.'
+			Text: 'After opening, the  text message or video invitation can only be received for the first time. Please open it in the settings - notification function to ensure normal function.'
 		},
 		Message_Sound: 'Message sound',
 		Message_Shock: 'Message shock',
@@ -234,7 +234,9 @@ const Lang = {
 		Title: 'Help',
 		Content: [{
 			Title: "Security of mobile phone registration",
-			Text: "Mobile phones can be used to get passwords back at any time to ensure account safety."
+			Text: [
+				"Mobile phones can be used to get passwords back at any time to ensure account safety."
+			]
 		}, {
 			Title: "How to get the camera permissions",
 			Text: [
@@ -244,7 +246,9 @@ const Lang = {
 		},
 		// {
 		// 	Title: "How to be a anchor",
-		// 	Text: "You must improve your live information, upload a beautiful picture or upload a charming video, so that you can become a anchor immediately."
+		// 	Text: [
+		// 		"You must improve your live information, upload a beautiful picture or upload a charming video, so that you can become a anchor immediately."
+		// 	]
 		// }, {
 		// 	Title: "How can the anchors get more invitations",
 		// 	Text: [
@@ -261,7 +265,9 @@ const Lang = {
 			]
 		}, {
 			Title: "How do I get the benefits ?",
-			Text: "Users need paying gold coins to watch your video. These coins will be converted into scores and entered into your account.  Finally you can withdraw your money."
+			Text: [
+				"Users need paying gold coins to watch your video. These coins will be converted into scores and entered into your account.  Finally you can withdraw your money."
+			]
 		}]
 	},
 	USER_SETTING_SUGGESTION: {

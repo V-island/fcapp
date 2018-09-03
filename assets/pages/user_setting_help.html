@@ -17,7 +17,11 @@
                                 <span class="list-item-text">{{$value.Title}}</span>
                                 <span class="icon user-arrow-forward list-item-meta"></span>
                             </p>
-                            <p class="list-info-text">{{$value.Text}}</p>
+                            <div class="list-info-text">
+                                {{each $value.Text}}
+                                    <p>{{$value}}</p>
+                                {{/each}}
+                            </div>
                         </li>
                     {{/each}}
                 {{/if}}
