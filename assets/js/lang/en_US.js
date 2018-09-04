@@ -217,7 +217,11 @@ const Lang = {
 		Account_Security: 'Account security',
 		Message_Notification: {
 			Title: 'Message notification',
-			Text: 'After opening, the  text message or video invitation can only be received for the first time. Please open it in the settings - notification function to ensure normal function.'
+			Text: 'After opening, the  text message or video invitation can only be received for the first time. Please open it in the settings - notification function to ensure normal function.',
+			Buttons: {
+				Open: 'Open',
+				Not_Open: 'Not open'
+			}
 		},
 		Message_Sound: 'Message sound',
 		Message_Shock: 'Message shock',
@@ -609,6 +613,7 @@ const Lang = {
 	    '1007': 'The balance is not enough, please recharge first',
 	    '1008': 'Failed, this data already exists',
 	    '1009': 'This user has been frozen',
+	    "1010":	"Sorry，We are unable to provide services in your area. ",
 	    '2000': 'Request frequency is too high, invalid request',
 	    '2001': 'Failed to send verification code',
 	    '2002': 'The incoming mobile number is empty',

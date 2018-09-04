@@ -12,7 +12,7 @@
             <ul class="list list-user list-info">
                 <a class="list-item item-security" href="#/user/setting/security" data-ripple>
                     <span class="list-item-text">{{USER_SETTING.Account_Security}}</span>
-                    <span class="list-item-meta-txt">12345678911</span>
+                    <span class="list-item-meta-txt">{{userPhone}}</span>
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </a>
             </ul>
@@ -22,7 +22,7 @@
                 <li class="list-item list-item-two item-notification" data-ripple>
                     <div class="list-item-content">
                         <span class="list-item-text">{{USER_SETTING.Message_Notification.Title}}</span>
-                        <span class="list-item-meta-txt">Not open</span>
+                        <span class="list-item-meta-txt">{{USER_SETTING.Message_Notification.Buttons.Open}}</span>
                         <span class="icon user-arrow-forward list-item-meta"></span>
                     </div>
                     <span class="list-item-secondary">{{USER_SETTING.Message_Notification.Text}}</span>
@@ -31,13 +31,15 @@
             <!-- /.list list-user -->
 
             <ul class="list list-user list-info">
-                <li class="list-item item-sound" data-ripple>
+                <li class="list-item">
                     <span class="list-item-text">{{USER_SETTING.Message_Sound}}</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
+                    <input type="checkbox" id="checkbox_c1" class="list-item-meta item-sound checkbox" checked />
+                    <label for="checkbox_c1"></label>
                 </li>
-                <li class="list-item item-shock" data-ripple>
+                <li class="list-item">
                     <span class="list-item-text">{{USER_SETTING.Message_Shock}}</span>
-                    <span class="icon user-arrow-forward list-item-meta"></span>
+                    <input type="checkbox" id="checkbox_c2" class="list-item-meta item-shock checkbox" checked />
+                    <label for="checkbox_c2"></label>
                 </li>
             </ul>
             <!-- /.list list-user -->
