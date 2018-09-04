@@ -1596,6 +1596,14 @@ p.lives-remark{
 		&.active {
 			display: block;
 		}
+
+		.buttons{
+			margin-top: 1.4rem;
+
+			>.button{
+				width: 10rem;
+			}
+		}
 	}
 	.item-title {
 		color: $color-text-gray-light;

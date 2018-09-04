@@ -269,6 +269,16 @@
             height: auto;
         }
 
+        .item-withdraw{
+            min-height: auto;
+            .list-item-text{
+                height: 1rem;
+            }
+            .list-item-meta-txt{
+                line-height: 1rem;
+            }
+        }
+
         .list-item-graphic{
             @include size(2.1rem);
             flex: 0 0 2.1rem;

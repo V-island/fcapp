@@ -185,6 +185,7 @@ const Lang = {
 		Live: 'Live',
 		Video: 'Video',
 		Secondary_Title: 'Exchange cash',
+		Insufficient_points: 'Insufficient points',
 		Score: 'score',
 		Withdraw: {
 			Title: 'Withdraw',
@@ -613,7 +614,7 @@ const Lang = {
 	    '1007': 'The balance is not enough, please recharge first',
 	    '1008': 'Failed, this data already exists',
 	    '1009': 'This user has been frozen',
-	    "1010":	"Sorry，We are unable to provide services in your area. ",
+	    '1010': 'Sorry，We are unable to provide services in your area. ',
 	    '2000': 'Request frequency is too high, invalid request',
 	    '2001': 'Failed to send verification code',
 	    '2002': 'The incoming mobile number is empty',

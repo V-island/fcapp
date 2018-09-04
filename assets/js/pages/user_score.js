@@ -47,6 +47,7 @@ export default class UserScore extends EventEmitter {
 		let getextractScore = extractScore();
 
 		getextractScore.then((data) => {
+			this.userScore = data.user_score ? data.user_score : 0;
 			this.data.UserScore = data ? data : false;
 			this.data.CurrencyCode = currency_code;
 			this.UserScoreEl = createDom(Template.render(element, this.data));
@@ -65,6 +66,11 @@ export default class UserScore extends EventEmitter {
 		Array.prototype.slice.call(this.cardScoreEl).forEach(scoreEl => {
 		    addEvent(scoreEl, 'click', () => {
 		    	const money = getData(scoreEl, this.options.dataMoney);
+		    	if (this.userScore <= money) {
+		    		return modal.alert(LANG.USER_SCORE.Insufficient_points, (_modal) => {
+						modal.closeModal(_modal);
+					});
+		    	}
 		    	return location.href = `#/user/score/withdraw?money=${money}`;
 		    });
 		});

@@ -265,39 +265,40 @@ export default class VideoPreview extends EventEmitter {
         });
 
         // 分享
-        addEvent(this.btnShareEl, 'click', () => {
-            let shareModalEl = modal.actions(this.tpl.live_share, {
-                title: LANG.LIVE_PREVIEW.Actions.ShareTo,
-                closeBtn: true,
-                cancelBtn: true
-            });
-            let btnFecebookEl = shareModalEl.getElementsByClassName(this.options.btnFecebookClass);
-            let btnTwitterEl = shareModalEl.getElementsByClassName(this.options.btnTwitterClass);
-            let btnTumblrEl = shareModalEl.getElementsByClassName(this.options.btnTumblrClass);
-            console.log(btnFecebookEl);
-            console.log(btnTwitterEl);
-            console.log(btnTumblrEl);
-            // Facebook 分享
-            if (btnFecebookEl.length > 0) {
-                addEvent(btnFecebookEl[0], 'click', () => {
-                    FB.Share(domainURL);
-                });
-            }
+        // addEvent(this.btnShareEl, 'click', () => {
+        //     let shareModalEl = modal.actions(this.tpl.live_share, {
+        //         title: LANG.LIVE_PREVIEW.Actions.ShareTo,
+        //         closeBtn: true,
+        //         cancelBtn: true
+        //     });
+        //     let btnFecebookEl = shareModalEl.getElementsByClassName(this.options.btnFecebookClass);
+        //     let btnTwitterEl = shareModalEl.getElementsByClassName(this.options.btnTwitterClass);
+        //     let btnTumblrEl = shareModalEl.getElementsByClassName(this.options.btnTumblrClass);
+        //     console.log(btnFecebookEl);
+        //     console.log(btnTwitterEl);
+        //     console.log(btnTumblrEl);
+        //     // Facebook 分享
+        //     if (btnFecebookEl.length > 0) {
+        //         addEvent(btnFecebookEl[0], 'click', () => {
+        //             FB.Share(domainURL);
+        //         });
+        //     }
 
-            // Twitter 分享
-            if (btnTwitterEl.length > 0) {
-                addEvent(btnTwitterEl[0], 'click', () => {
-                    return modal.toast(LANG.LOGIN.Third_party.Text);
-                });
-            }
+        //     // Twitter 分享
+        //     if (btnTwitterEl.length > 0) {
+        //         addEvent(btnTwitterEl[0], 'click', () => {
+        //             return modal.toast(LANG.LOGIN.Third_party.Text);
+        //         });
+        //     }
 
-            // Tumblr 分享
-            if (btnTumblrEl.length > 0) {
-                addEvent(btnTumblrEl[0], 'click', () => {
-                    return modal.toast(LANG.LOGIN.Third_party.Text);
-                });
-            }
-        });
+        //     // Tumblr 分享
+        //     if (btnTumblrEl.length > 0) {
+        //         addEvent(btnTumblrEl[0], 'click', () => {
+        //             return modal.toast(LANG.LOGIN.Third_party.Text);
+        //         });
+        //     }
+        // });
+        this.btnShareEl.style.opacity = 0;
 
         // 礼物
         addEvent(this.btnGiftEl, 'click', () => {
