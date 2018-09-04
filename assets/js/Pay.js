@@ -81,8 +81,6 @@ export default class Pay extends EventEmitter {
 
 			this._paypalServerEvent();
 			this._bindEvent();
-
-			Spinner.remove();
 		});
 	}
 
@@ -205,6 +203,7 @@ export default class Pay extends EventEmitter {
 			}
 
 		}, this.options.btnPaypalId);
+		Spinner.remove();
 	}
 
 	static attachTo(element, options) {

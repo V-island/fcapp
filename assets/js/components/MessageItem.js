@@ -61,7 +61,7 @@ class MessageItem {
 
     get lastMessageText() {
         if (this.channel.isOpenChannel() || !this.channel.lastMessage) {
-            return '';
+            return this.channel.isOpenChannel() ? LANG.MESSAGE.System_Default : '';
         } else {
             return this.channel.lastMessage.isFileMessage() ?
                 protectFromXSS(this.channel.lastMessage.name) :
@@ -111,19 +111,45 @@ class MessageItem {
             if (Delete) Delete(itemBox);
         });
 
+        // 手指触碰屏幕
         addEvent(itemBox, 'touchstart', (e) => {
             startX = e.changedTouches[0].pageX;
         });
 
+        // 手指在屏幕上滑动
+        addEvent(itemBox, 'touchmove', (e) => {
+            console.log(e);
+            // 如果有多个地方滑动，我们就不发生这个事件
+            if(e.targetTouches.length > 1) return;
+            const btnWidth = btnDelete.clientWidth;
+            let moveX = (e.targetTouches[0].pageX - startX);
+            console.log(btnWidth);
+            console.log(moveX);
+
+            if (moveX < 0 && -moveX <= btnWidth) {
+                btnDelete.style.transform = `translateX(${btnWidth + moveX}px)`;
+                item.style.transform = `translateX(${moveX}px)`;
+            }
+
+            if (moveX > 0 && moveX <= btnWidth) {
+                btnDelete.style.transform = `translateX(${btnWidth - moveX}px)`;
+                item.style.transform = `translateX(${-moveX}px)`;
+            }
+        });
+
+        // 手指离开屏幕
         addEvent(itemBox, 'touchend', (e) => {
-            let moveX = e.changedTouches[0].pageX;
+            const btnWidth = btnDelete.clientWidth;
+            let endX = e.changedTouches[0].pageX;
 
-            if (startX === moveX) return false;
+            if (startX === endX) return false;
 
-            if (startX > moveX) {
-                addClass(itemBox, 'active');
+            if (startX > endX) {
+                btnDelete.style.transform = `translateX(0px)`;
+                item.style.transform = `translateX(${-btnWidth}px)`;
             }else {
-                removeClass(itemBox, 'active');
+                btnDelete.style.transform = `translateX(${btnWidth}px)`;
+                item.style.transform = `translateX(0px)`;
             }
         });
 

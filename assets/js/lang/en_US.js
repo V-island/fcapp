@@ -120,7 +120,9 @@ const Lang = {
 		},
 		Anonymous: 'anonymous',
 		System_Message: 'System  message',
+		System_Default: 'Welcome to shine live, we will provide you with the best video and live broadcast service, we hope you can have fun here.',
 		Customer_Service: 'Customer service',
+		Customer_Default: 'Hi，I am your assistant.  If you have any questions, please let me know.',
 		Details: 'Details',
 		Delete: 'Delete'
 	},

@@ -116,21 +116,21 @@ module.exports = {
 		// 	skipWaiting: true
 		// }),
 		new HtmlWebpackPlugin({
-			title: 'Fun Chat',
+			title: 'Shine Live',
 			filename: 'index.html',
 			template: './assets/index.html',
 			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',
-				keywords: 'chat,fun chat',
-				description: 'fun chat',
+				keywords: 'chat,Shine Live',
+				description: 'Shine Live',
 				auther: 'douliao@outlook.com',
-				robots: 'index,fun chat',
+				robots: 'index,Shine Live',
 				copyright: 'Copyright 友语 版权所有',
 				'apple-touch-fullscreen': 'yes',
 				'apple-mobile-web-app-capable': 'yes', //网站开启对web app程序的支持
 				'apple-mobile-web-app-status-bar-style': 'black-translucent', //在web app应用下状态条（屏幕顶部条）的颜色
-				'apple-mobile-web-app-title': 'fun chat', //添加到桌面时标题
+				'apple-mobile-web-app-title': 'Shine Live', //添加到桌面时标题
 				'format-detection': 'telephone=no', //是否将网页内容中的手机号码显示为拨号的超链接
 				'revisit-after': '1 days',
 				'theme-color': '#313443'
