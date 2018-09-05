@@ -9,7 +9,7 @@ import {
 } from './lang';
 
 import {
-    createOrder
+    getLogin
 } from './api';
 
 import {
@@ -104,19 +104,20 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	_statusChangeCallback(response) {
-		console.log('statusChangeCallback');
-		console.log(response);
+		// console.log('statusChangeCallback');
 		// The response object is returned with a status field that lets the
 		// app know the current login status of the person.
 		// Full docs on the response object can be found in the documentation
 		// for FB.getLoginStatus().
 		if (response.status === 'connected') {
 			// Logged into your app and Facebook.
-			console.log('Welcome!  Fetching your information.... ');
-
 			FB.api('/me?fields=id,name,location,hometown', (response) => {
-				console.log(response);
-				console.log('Successful login for: ' + response.name);
+				const {id} = response;
+				getLogin({
+					userAccount: id,
+					account_type: 1,
+					country_id: 2
+				});
 			});
 		} else {
 			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
@@ -132,7 +133,7 @@ export default class FacebookLogin extends EventEmitter {
 		}
 
 		FB.login((response) => {
-			console.log(response);
+			// console.log(response);
 			this._statusChangeCallback(response);
 		}, {
 			scope: 'public_profile,user_location,user_hometown'

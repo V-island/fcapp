@@ -14,7 +14,9 @@ import {
 } from './api';
 
 import {
-    replaceNote
+    jumpURL,
+    replaceNote,
+    getUrlFragment
 } from './util';
 
 +function($) {
@@ -152,7 +154,6 @@ import {
          * @returns {UrlObject}
          */
         toUrlObject: function(url) {
-            console.log(url);
             let fullUrl = this.getAbsoluteUrl(url),
                 baseUrl = this.getBaseUrl(fullUrl),
                 hashUrl = this.getHashpage(url),
@@ -242,8 +243,8 @@ import {
         // 表示是当前 nav 的 class
         barTabClass: '.bar-tab',
         // 根目录
-        rootUrl: 'home',
-        notloginUrl: 'login'
+        rootUrl: '#/home',
+        notloginUrl: '#/login'
     }
 
     let DIRECTION = {
@@ -286,7 +287,7 @@ import {
             // 用来保存 document 的 map
             this.cache = {};
             let $pages = $('.' + routerConfig.pageClass);
-            let currentUrl = location.href;
+            let currentUrl = jumpURL();
 
             if (!$pages.length) {
                 this._switchToDocument(currentUrl);
@@ -365,11 +366,11 @@ import {
 
             if (location.hash == '' || location.hash == '#/' || location.hash === undefined) {
                 if (checkLogin()) {
-                    return location.href = '#/' + routerConfig.notloginUrl;
+                    return location.href = jumpURL(routerConfig.notloginUrl);
                 }
-                return location.href = '#/' + routerConfig.rootUrl;
+                return location.href = jumpURL(routerConfig.rootUrl);
             }
-            console.log(url);
+
             if (ignoreCache) {
                 delete this.cache[url];
             }
@@ -410,7 +411,7 @@ import {
         _doSwitchDocument(url, direction) {
             // 判断是否登录
             if (checkLogin() && this.cache[url].init !== 1) {
-                return location.href = '#/login';
+                return location.href = jumpURL(routerConfig.notloginUrl);
             }
             // if (this.cache[url].init !== 1) {
             //     return location.href = '#/login';
@@ -499,11 +500,23 @@ import {
             callback = callback || {};
 
             link.onload = function(e) {
-                console.log('Loaded import: ' + e.target.href);
+                // console.log('Loaded import: ' + e.target.href);
                 let _target = e.target.import;
                 let bodyHTML = typeof(_target.body) == 'undefined' ? _target.innerHTML : _target.body.innerHTML;
-                let doc = replaceNote(bodyHTML);
 
+                if (typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML == '') {
+                    bodyHTML = _target.head.innerHTML;
+                }else if(typeof(_target.head) != 'undefined' && _target.head != '' && bodyHTML != ''){
+                    bodyHTML = _target.head.innerHTML + bodyHTML;
+                }
+                //MAC safari bug
+                if (bodyHTML == '') {
+                    for (var i = 0; i < _target.children.length; i++) {
+                        bodyHTML = bodyHTML + _target.children[i].outerHTML;
+                    }
+                }
+
+                let doc = replaceNote(bodyHTML);
                 callback.success && callback.success.call(null, doc, param);
 
                 //加载完成后清除头部引用
@@ -601,10 +614,12 @@ import {
          *
          */
         _onHashchange(e) {
-            console.log('hashchange');
+            // console.log('hashchange');
             let _self = this;
             let oldURL = e.oldURL;
-            let newURL = e.newURL;
+            // let newURL = e.newURL;
+            let newHash = getUrlFragment(e.newURL);
+            let newURL = jumpURL(`#${newHash}`);
 
             // if (oldURL.indexOf('#') == -1) {
             //     return;

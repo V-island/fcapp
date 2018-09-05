@@ -205,6 +205,7 @@ class MessageChat {
         // 关闭聊天
         addEvent(iconsBack, 'click', () => {
             this.hide();
+            Spinner.remove();
         });
     }
 
@@ -265,7 +266,6 @@ class MessageChat {
                 sendbirdAction
                     .getMessageList(this.channel, true)
                     .then(messageList => {
-                        console.log(messageList);
                         this.main.renderMessages(messageList);
 
                         if (this.channel.isGroupChannel()) {

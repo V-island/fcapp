@@ -123,8 +123,6 @@ class MessageItem {
             if(e.targetTouches.length > 1) return;
             const btnWidth = btnDelete.clientWidth;
             let moveX = (e.targetTouches[0].pageX - startX);
-            console.log(btnWidth);
-            console.log(moveX);
 
             if (moveX < 0 && -moveX <= btnWidth) {
                 btnDelete.style.transform = `translateX(${btnWidth + moveX}px)`;

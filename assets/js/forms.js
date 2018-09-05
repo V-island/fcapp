@@ -174,7 +174,6 @@ export default class Forms {
 
         // Submit
         addEvent(this.formEl, 'submit', (evt) => {
-            console.log(evt);
             evt.preventDefault();
             let _params = this.serialize(this.formEl);
             if (this.onsubmit) {

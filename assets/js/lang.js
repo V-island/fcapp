@@ -2,6 +2,11 @@
 import CN from './lang/zh_CN';
 import US from './lang/en_US';
 import JP from './lang/ja_JP';
+import BRL from './lang/pt_BR';
+import GBP from './lang/en_UK';
+import EUR from './lang/de_DE';
+import INR from './lang/id_IN';
+import THB from './lang/th_TH';
 
 const LANG_NAME = 'LANG';
 const DEFAULT = {
@@ -11,6 +16,11 @@ const LANG = {
     'zh_CN': CN,
 	'en_US': US,
 	'ja_JP': JP,
+    'pt_BR': BRL,
+    'en_UK': GBP,
+    'de_DE': EUR,
+    'id_IN': INR,
+    'th_TH': THB
 };
 
 /**

@@ -116,17 +116,17 @@ module.exports = {
 		// 	skipWaiting: true
 		// }),
 		new HtmlWebpackPlugin({
-			title: 'Shine Live',
+			title: 'SHINE LIVE- live video stream and chat',
 			filename: 'index.html',
 			template: './assets/index.html',
 			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',
-				keywords: 'chat,Shine Live',
-				description: 'Shine Live',
+				keywords: 'shine live ,shine,live,live video stream',
+				description: 'SHINE LIVE is a live video streaming social network. specially designed for adults who know what it means to chat with strangers,in SHINE LIVE You Can:Create  your free profile; Upload your own great video stream; Get your video profit; View other users profile and video;Add a favorite stranger to a friend.Thanks for using SHINE LIVE !',
 				auther: 'douliao@outlook.com',
 				robots: 'index,Shine Live',
-				copyright: 'Copyright 友语 版权所有',
+				copyright: 'Copyright SHINE LIVE 版权所有',
 				'apple-touch-fullscreen': 'yes',
 				'apple-mobile-web-app-capable': 'yes', //网站开启对web app程序的支持
 				'apple-mobile-web-app-status-bar-style': 'black-translucent', //在web app应用下状态条（屏幕顶部条）的颜色

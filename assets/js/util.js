@@ -16,6 +16,32 @@ export const refreshURL = () => {
     return window.location.reload();
 };
 
+// 跳转页面
+export const jumpURL = (router) => {
+    const origin = `${window.location.origin}/`;
+    const search = window.location.search;
+    router = typeof router === 'undefined' ? window.location.hash : router;
+
+    if (search == "") {
+        return origin + router;
+    }
+    return origin + router + search;
+};
+
+/**
+ * 获取 url 的 fragment（即 hash 中去掉 # 的剩余部分）
+ *
+ * 如果没有则返回空字符串
+ * 如: http://example.com/path/?query=d#123 => 123
+ *
+ * @param {String} url url
+ * @returns {String}
+ */
+export const getUrlFragment = (url) => {
+    let hashIndex = url.indexOf('#');
+    return hashIndex === -1 ? '' : url.slice(hashIndex + 1);
+};
+
 export const errorAlert = (message, reload = true) => {
     console.log(message);
     // if (reload) {
@@ -85,7 +111,7 @@ export const importTemplate = (param, callback) => {
     link.href = param.path;
 
     link.onload = function(e) {
-        console.log('Loaded import: ' + e.target.href);
+        // console.log('Loaded import: ' + e.target.href);
         let _target = e.target.import;
         if (typeof(_target.head) != 'undefined' && _target.head != '') {
             for (let i = 0; i < _target.head.children.length; i++) {

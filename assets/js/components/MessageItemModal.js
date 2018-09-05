@@ -40,8 +40,28 @@ class MessageItemSystem {
         this.element.scrollTop = this.element.scrollHeight - this.element.offsetHeight;
     }
 
+    _defaultItemElement() {
+        const isOpenChannel = this.channel.channelType == 'open' ? true : false;
+        const messageItem = createDivEl({className: ['message-chat-item', 'item-system']});
+        const itemAvatar = createDivEl({className: 'item-avatar', background: this.channel.coverUrl});
+        messageItem.appendChild(itemAvatar);
+
+        const itemMessageContent = createDivEl({className: 'item-message-content'});
+        const itemTitle = createDivEl({className: 'user-title', content: this.channel.name});
+        const itemText = createDivEl({className: 'message-text', content: isOpenChannel?LANG.MESSAGE.System_Default:LANG.MESSAGE.Customer_Default});
+
+
+        const itemTime = createDivEl({className: 'message-time', content: timestampFromNow(this.channel.createdAt)});
+        itemMessageContent.appendChild(itemTitle);
+        itemMessageContent.appendChild(itemText);
+        itemMessageContent.appendChild(itemTime);
+        messageItem.appendChild(itemMessageContent);
+
+        return this.messageContent.appendChild(messageItem);;
+    }
+
     _messageItemElement(message) {
-        const isOpenChannel = message.channelType !== "group" ? false : true;
+        const isOpenChannel = message.channelType != 'group' ? false : true;
         const {videoId, videoImg, giftUrl} = isOpenChannel ? JSON.parse(message.data) : {};
         const messageItem = createDivEl({id: message.messageId, className: ['message-chat-item', 'item-system']});
         const itemAvatar = createDivEl({className: 'item-avatar', background: message._sender.profileUrl});
@@ -90,6 +110,8 @@ class MessageItemSystem {
     }
 
     renderMessages(messageList, goToBottom = true, isPastMessage = false) {
+        if (messageList.length == 0) return this._defaultItemElement();
+
         messageList.forEach(message => {
             const messageItem = this._messageItemElement(message);
             this.messageContent.appendChild(messageItem);

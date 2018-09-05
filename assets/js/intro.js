@@ -202,8 +202,8 @@ export const fcConfig = {
 export const domainURL = location.origin;
 
 // Server 地址配置
-export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate';
-// export const baseURL = 'http://192.168.1.211:8080/live-app/open/gate';
+export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
+// export const baseURL = 'http://192.168.1.211:8080/live-app/open/gate.do';
 
 // 直播配置
 export const agoraConfig = {
