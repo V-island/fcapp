@@ -1,4 +1,8 @@
 import {
+    body
+} from './intro';
+
+import {
     getLangConfig
 } from './lang';
 
@@ -27,14 +31,14 @@ export default class ProgressLine {
     // 隐藏上传进度
     hide() {
         window.setTimeout(() => {
-            document.body.removeChild(this.element);
+            body.removeChild(this.element);
         }, 500);
     }
 
     show(speed) {
-        this.barEl = document.getElementsByClassName(this.options.barProgressClass);
+        this.barEl = body.getElementsByClassName(this.options.barProgressClass);
         if (this.barEl.length == 0) {
-            this.pagesEl = document.querySelector(this.options.pageClass);
+            this.pagesEl = body.querySelector(this.options.pageClass);
             appendToFirst(this.pagesEl, this.element);
         }
 

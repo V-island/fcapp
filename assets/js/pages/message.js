@@ -14,7 +14,8 @@ import {
     getUserInfo
 } from '../api';
 import {
-    body
+    body,
+    sendBirdConfig
 } from '../intro';
 import {
 	extend,
@@ -76,6 +77,7 @@ export default class Message extends EventEmitter {
 		this.listMessageEl = this.MessageEl.getElementsByClassName(this.options.listMessageClass)[0];
 
 		this._bindEvent();
+		this.createCustomerChannel();
 	}
 
 	_bindEvent() {
@@ -84,6 +86,33 @@ export default class Message extends EventEmitter {
 				this.getGroupChannelList();
 			}
 		});
+	}
+
+	// 链接客服频道号
+	createCustomerChannel() {
+		const customerIds = 'CS_01';
+		SendBirdAction.getInstance()
+			.createChannelWithUserIds(customerIds, sendBirdConfig.customerName, sendBirdConfig.customerType)
+			.then(channel => {
+				const _item = this.getItem(channel.url);
+				if (_item) return false;
+
+				const handler = () => {
+					MessageChat.getInstance().render(channel.url, false);
+				};
+				const Delete = (itemBox) => {
+					this.listMessageEl.removeChild(itemBox);
+				};
+				const item = new MessageItem({
+					channel,
+					handler,
+					Delete
+				});
+				this.listMessageEl.appendChild(item.element);
+			})
+			.catch(error => {
+				errorAlert(error.message);
+			});
 	}
 
 	// 获取开放频道列表
@@ -114,6 +143,9 @@ export default class Message extends EventEmitter {
 			.getGroupChannelList(isInit)
 			.then(groupChannelList => {
 				groupChannelList.forEach(channel => {
+					const _item = this.getItem(channel.url);
+					if (_item) return false;
+
 					const handler = () => {
 						MessageChat.getInstance().render(channel.url, false);
 					};
@@ -236,7 +268,7 @@ export default class Message extends EventEmitter {
 		channelEvent.onUserEntered = (openChannel, user) => {
 			if (SendBirdAction.getInstance().isCurrentUser(user)) {
 				const handler = () => {
-					MessageChat.getInstance().render(channel.url, false);
+					MessageChat.getInstance().render(openChannel.url, false);
 				};
 				const item = new MessageItem({
 					channel: openChannel,
@@ -248,8 +280,11 @@ export default class Message extends EventEmitter {
 		};
 
 		channelEvent.onUserJoined = (groupChannel, user) => {
+			const _item = this.getItem(groupChannel.url);
+			if (_item) return false;
+
 			const handler = () => {
-				MessageChat.getInstance().render(channel.url, false);
+				MessageChat.getInstance().render(groupChannel.url, false);
 			};
 			const Delete = (itemBox) => {
 				this.listMessageEl.removeChild(itemBox);

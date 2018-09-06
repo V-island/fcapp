@@ -1,5 +1,6 @@
 import {
-    body
+    body,
+    sendBirdConfig
 } from '../intro';
 
 import {
@@ -17,6 +18,8 @@ import {
     addClass,
     removeClass
 } from '../util';
+
+import customerImg from '../../img/messages/icon-service@2x.png';
 
 const LANG = getLangConfig();
 const KEY_MESSAGE_LAST_TIME = 'origin';
@@ -36,11 +39,14 @@ class MessageItem {
     }
 
     get profileUrl() {
-        return this.channel.isOpenChannel() || this.channel.isPublic ? `${this.channel.coverUrl}` : protectFromXSS(this.channel.members[0].profileUrl);
+        if (this.channel.customType == sendBirdConfig.customerType) {
+            return `${customerImg}`;
+        }
+        return this.channel.isOpenChannel() || this.channel.isPublic || this.channel.customType == sendBirdConfig.customerType ? `${this.channel.coverUrl}` : protectFromXSS(this.channel.members[0].profileUrl);
     }
 
     get title() {
-        return this.channel.isOpenChannel() || this.channel.isPublic ? `${this.channel.name}` : protectFromXSS(this.channel.members[0].nickname);
+        return this.channel.isOpenChannel() || this.channel.isPublic || this.channel.customType == sendBirdConfig.customerType ? `${this.channel.name}` : protectFromXSS(this.channel.members[0].nickname);
     }
 
     get lastMessagetime() {
@@ -53,7 +59,7 @@ class MessageItem {
 
     get lastMessageTimeText() {
         if (this.channel.isOpenChannel() || !this.channel.lastMessage) {
-            return 0;
+            return this.channel.isOpenChannel() || this.channel.customType == sendBirdConfig.customerType ? timestampFromNow(this.channel.createdAt) : 0;
         } else {
             return timestampFromNow(this.channel.lastMessage.createdAt);
         }
@@ -61,7 +67,7 @@ class MessageItem {
 
     get lastMessageText() {
         if (this.channel.isOpenChannel() || !this.channel.lastMessage) {
-            return this.channel.isOpenChannel() ? LANG.MESSAGE.System_Default : '';
+            return this.channel.isOpenChannel() || this.channel.customType == sendBirdConfig.customerType ? (this.channel.isOpenChannel() ? LANG.MESSAGE.System_Default : LANG.MESSAGE.Customer_Default) : '';
         } else {
             return this.channel.lastMessage.isFileMessage() ?
                 protectFromXSS(this.channel.lastMessage.name) :
@@ -118,7 +124,6 @@ class MessageItem {
 
         // 手指在屏幕上滑动
         addEvent(itemBox, 'touchmove', (e) => {
-            console.log(e);
             // 如果有多个地方滑动，我们就不发生这个事件
             if(e.targetTouches.length > 1) return;
             const btnWidth = btnDelete.clientWidth;

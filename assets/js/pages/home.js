@@ -78,7 +78,7 @@ export default class Home extends EventEmitter {
 	init(element) {
 		this._page = 1;
 		this._number = 10;
-		this.tagId = 0;
+		this.tagId = 1;
 
 		let getFreeVideoClips = videoClips(this._page, this._number, this.tagId, 1);
 		let getVideoClips = videoClips(this._page, this._number, this.tagId, 2);
@@ -133,10 +133,10 @@ export default class Home extends EventEmitter {
 
 		    		toggleClass(this.tagsLabelEl[i], this.options.showClass);
 		    	}
-
+		    	Spinner.start(body);
 		    	videoClips(1, 10, this.tagId, 1).then((data) => {
 		    		videoClips(1, 10, this.tagId, 2).then((_data) => {
-		    			if (!data && !_data) return;
+		    			if (!data && !_data) return Spinner.remove();
 
 		    			this.cardsVideoEl.innerHTML = '';
 
@@ -162,6 +162,7 @@ export default class Home extends EventEmitter {
 		    			}
 		    			setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
 		    			this._listEvent();
+		    			Spinner.remove();
 		    		});
 		    	});
 		    });

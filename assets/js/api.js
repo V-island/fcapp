@@ -1195,7 +1195,7 @@ export function hotVideo(_page = 1, _number = 10) {
  * @param  {[String]} _type 	   类别 1.免费 2.收费
  * @return {[type]} [description]
  */
-export function videoClips(_page = 1, _number = 10, _tag = 0, _type) {
+export function videoClips(_page = 1, _number = 10, _tag = 1, _type) {
 	let {userId} = getUserInfo();
 	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
 	return new Promise((resolve) => {
@@ -1324,7 +1324,6 @@ export function liveAgain() {
  * @return {[type]}              [description]
  */
 export function uploadVideo(_file, _type, _title, _imgUrl) {
-	console.log(_imgUrl);
 	if (typeof _title === 'function') {
 	    _imgUrl = arguments[2];
 	    _title = false;

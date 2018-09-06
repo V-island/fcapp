@@ -217,7 +217,9 @@ export const agoraConfig = {
 export const sendBirdConfig = {
     sendBird: true, // 默认使用SendBird DSK
     sendBirdAppID: '07F10EB7-6318-4B3C-887B-F69758A7C257',
-    sendBirdAppURL: 'https://api.sendbird.com'
+    sendBirdAppURL: 'https://api.sendbird.com',
+    customerName: 'Customer service',
+    customerType: 'customer'
 };
 
 // paypal配置

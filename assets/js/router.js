@@ -459,7 +459,7 @@ import {
                     // 判断Nav Tabs
                     if (this.cache[url].navTabs === 1) {
                         let tabs = new Tabs($visibleSection[0]);
-                        // console.log(tabs);
+                        direction = true;
                     }
 
                     $visibleSection.addClass(routerConfig.curPageClass);
@@ -576,6 +576,11 @@ import {
             $visibleSectionInFrom.addClass(routerConfig.visiblePageClass).removeClass(routerConfig.curPageClass);
 
             $visibleSection.trigger(EVENTS.pageAnimationStart, [sectionId, $visibleSection]);
+
+            if (direction) {
+                $visibleSectionInFrom.removeClass(routerConfig.visiblePageClass);
+                return $from.remove();
+            }
 
             this._animateElement($from, $to, direction);
             $from.animationEnd(function() {

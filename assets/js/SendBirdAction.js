@@ -234,13 +234,18 @@ export default class SendBirdAction {
 
     /**
      * 创建一对一聊天
-     * @param  {[type]} userIds [description]
-     * @return {[type]}         [description]
+     * @param  {[type]} userIds    [description]
+     * @param  {[type]} name       [description]
+     * @param  {[type]} customType [description]
+     * @return {[type]}            [description]
      */
-    createChannelWithUserIds(userIds) {
+    createChannelWithUserIds(userIds, name, customType) {
         userIds = isNumber(userIds) ? userIds + '' : userIds;
+        name = typeof name === 'undefined' ? null : name;
+        customType = typeof customType === 'undefined' ? null : customType;
+
         return new Promise((resolve, reject) => {
-            this.sb.GroupChannel.createChannelWithUserIds([userIds], true, (createdChannel, error) => {
+            this.sb.GroupChannel.createChannelWithUserIds([userIds], true, name, null, null, customType, (createdChannel, error) => {
                 error ? reject(error) : resolve(createdChannel);
             });
         });

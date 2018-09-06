@@ -1,6 +1,11 @@
 import BScroll from 'better-scroll';
 import { Spinner } from './Spinner';
 import Modal from '../modal';
+
+import {
+    sendBirdConfig
+} from '../intro';
+
 import {
     getLangConfig
 } from '../lang';
@@ -22,6 +27,7 @@ import {
     appendToFirst,
     isScrollBottom
 } from '../util';
+import customerImg from '../../img/messages/icon-service@2x.png';
 
 const LANG = getLangConfig();
 const modal = new Modal();
@@ -48,7 +54,7 @@ class MessageItemSystem {
 
         const itemMessageContent = createDivEl({className: 'item-message-content'});
         const itemTitle = createDivEl({className: 'user-title', content: this.channel.name});
-        const itemText = createDivEl({className: 'message-text', content: isOpenChannel?LANG.MESSAGE.System_Default:LANG.MESSAGE.Customer_Default});
+        const itemText = createDivEl({className: 'message-text', content: isOpenChannel ? LANG.MESSAGE.System_Default : LANG.MESSAGE.Customer_Default});
 
 
         const itemTime = createDivEl({className: 'message-time', content: timestampFromNow(this.channel.createdAt)});
@@ -57,7 +63,7 @@ class MessageItemSystem {
         itemMessageContent.appendChild(itemTime);
         messageItem.appendChild(itemMessageContent);
 
-        return this.messageContent.appendChild(messageItem);;
+        return this.messageContent.appendChild(messageItem);
     }
 
     _messageItemElement(message) {
@@ -141,6 +147,17 @@ class MessageItemModal {
         this.element.scrollTop = this.element.scrollHeight - this.element.offsetHeight;
     }
 
+    _defaultItemElement() {
+        const messageItem = createDivEl({className: 'message-chat-item'});
+        const itemAvatar = createDivEl({className: 'item-avatar', background: customerImg});
+        const itemMessage = createDivEl({className: 'item-message-box', content: LANG.MESSAGE.Customer_Default});
+
+        messageItem.appendChild(itemAvatar);
+        messageItem.appendChild(itemMessage);
+
+        return this.messageContent.appendChild(messageItem);
+    }
+
     _messageItemElement(message) {
         const messageItem = createDivEl({id: message.messageId, className: 'message-chat-item'});
         const itemAvatar = createDivEl({className: 'item-avatar', background: message._sender.profileUrl});
@@ -169,8 +186,9 @@ class MessageItemModal {
     }
 
     renderMessages(messageList, goToBottom = true, isPastMessage = false) {
+        if (messageList.length == 0 && this.channel.customType == sendBirdConfig.customerType) return this._defaultItemElement();
+
         messageList.forEach(message => {
-            console.log(message);
             const messageItem = this._messageItemElement(message);
             const requestId = getData(messageItem, MESSAGE_REQ_ID)
               ? getData(messageItem, MESSAGE_REQ_ID)
