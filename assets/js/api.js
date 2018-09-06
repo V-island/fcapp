@@ -1139,6 +1139,7 @@ export function playVideo(videoID) {
 	}
 
 	return new Promise((resolve) => {
+		if (checkLogin()) return resolve(false);
 		getPost('/playVideo', _params, (response) => {
 			resolve(response.data ? response.data : false);
 		}, (response) => {
@@ -1196,7 +1197,6 @@ export function hotVideo(_page = 1, _number = 10) {
  * @return {[type]} [description]
  */
 export function videoClips(_page = 1, _number = 10, _tag = 1, _type) {
-	let {userId} = getUserInfo();
 	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
 	return new Promise((resolve) => {
 		getPost('/videoClips', {
@@ -1204,11 +1204,7 @@ export function videoClips(_page = 1, _number = 10, _tag = 1, _type) {
 			number: _number,
 			type: _type,
 			video_tag: _tag,
-			country_id: id,
-			userId: userId,
-			token: getLocalStorage(TOKEN_NAME),
-			loginMode: LoginMode,
-			mac: getMac()
+			country_id: id
 		}, (response) => {
 			resolve(response.data ? response.data : false);
 		}, (response) => {
