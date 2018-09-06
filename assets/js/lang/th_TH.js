@@ -532,6 +532,11 @@ const Lang = {
 			}
 		}
 	},
+	Error: {
+		Title: 'Page not found',
+		Text: 'Return to the previous page after %S seconds',
+		Buttons: 'Refresh'
+	},
 	BAR: {
 		Home: 'Home',
 		Favorite: 'Favorite',

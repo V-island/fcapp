@@ -26,6 +26,11 @@ import {
 const LANG = getLangConfig();
 const modal = new Modal();
 
+const CONFIG = {
+    rootUrl: '#/home',
+    notloginUrl: '#/login/mobile'
+}
+
 // const baseURL = 'http://10.30.11.112:8080/live-app/open/gate';
 // const baseURL = 'https://10.30.11.112:8443/live-app/open/gate';
 // const baseURL = 'https://10.30.11.112:8443/live-app/register';
@@ -66,11 +71,11 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 		cache: false,
 	    statusCode: {
 	        // 200: function() {console.log(200)},
-	        400: function() {toastr.error('400 你已经在其它设备登入，请重新登入');clearLocalStorage();location.href = '#/login';},
-	        401: function() {toastr.error('401');removeLocalStorage(TOKEN_NAME);session.jumpPage('session/#/login');},
+	        400: function() {toastr.error('400 你已经在其它设备登入，请重新登入');clearLocalStorage();location.href = CONFIG.notloginUrl;},
+	        401: function() {toastr.error('401');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);},
 	        403: function() {toastr.error('403 用户没有对应操作权限')},
 	        404: function() {toastr.error('404')},
-	        405: function() {toastr.error('405');removeLocalStorage(TOKEN_NAME);session.jumpPage('session/#/login');}
+	        405: function() {toastr.error('405');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);}
 	    }
 	};
 
@@ -110,7 +115,7 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 		if (response.code === 2012) {
 			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			clearLocalStorage();
-			return location.href = '#/login';
+			return location.href = CONFIG.notloginUrl;
 		}
 
 		modal.alert(LANG.SYSTEM_CODE[response.code], function(_modal) {
@@ -140,7 +145,7 @@ export function getUserInfo() {
 
 	if (_info === null) {
 		clearLocalStorage();
-		return location.href = '#/login';
+		return location.href = CONFIG.notloginUrl;
 	}
 
 	return _info;
@@ -402,7 +407,7 @@ export function appLoginOut() {
 		getPost('/appLoginOut', _params, (response) => {
 			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			clearLocalStorage();
-			location.href = '#/login';
+			location.href = CONFIG.notloginUrl;
 			resolve(true);
 		});
 	});

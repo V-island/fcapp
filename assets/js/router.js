@@ -244,7 +244,7 @@ import {
         barTabClass: '.bar-tab',
         // 根目录
         rootUrl: '#/home',
-        notloginUrl: '#/login'
+        notloginUrl: '#/login/mobile'
     }
 
     let DIRECTION = {
@@ -365,9 +365,9 @@ import {
             }
 
             if (location.hash == '' || location.hash == '#/' || location.hash === undefined) {
-                if (checkLogin()) {
-                    return location.href = jumpURL(routerConfig.notloginUrl);
-                }
+                // if (checkLogin()) {
+                //     return location.href = jumpURL(routerConfig.notloginUrl);
+                // }
                 return location.href = jumpURL(routerConfig.rootUrl);
             }
 
@@ -611,7 +611,7 @@ import {
                 let name = child.name !== undefined ? child.name : routerConfig.rootUrl;
                 if (Href == name) template = child;
             });
-            return template;
+            return template ? template : this._createTemplate('#/404');
         }
 
         /**

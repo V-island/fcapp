@@ -1,4 +1,5 @@
 // gages
+import ErrorJS from './pages/404';
 import Login from './pages/login';
 import LoginMobile from './pages/login_mobile';
 import Register from './pages/register';
@@ -72,6 +73,11 @@ export const fcConfig = {
         }
     },
     pagesFile: [{
+        name: '404',
+        path: adminBase + 'pages/404.html',
+        component: ErrorJS,
+        init: 1
+    }, {
         name: 'login',
         path: adminBase + 'pages/login.html',
         component: Login,

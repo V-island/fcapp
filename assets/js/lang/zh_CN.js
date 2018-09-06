@@ -1,4 +1,4 @@
-const Lang = {
+﻿const Lang = {
 	HOME: {
 		New: {
 			Title: '最新'
@@ -541,6 +541,11 @@ const Lang = {
 				Text: '发送成功'
 			}
 		}
+	},
+	Error: {
+		Title: '找不到页面',
+		Text: '%S 秒后返回上一页',
+		Buttons: '刷新'
 	},
 	BAR: {
 		Home: '首页',
