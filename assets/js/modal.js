@@ -700,8 +700,6 @@ export default class Modal extends EventEmitter {
                         gain: false
                     });
                     refreshURL();
-                }).catch((reason) => {
-                    refreshURL();
                 });
             });
         });
@@ -720,9 +718,12 @@ export default class Modal extends EventEmitter {
         modalHTML += '<div class="lives-video"><video id="video" class="video" controls autoplay="autoplay" preload="auto" webkit-playsinline playsinline="true" x-webkit-airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait"><source src="'+ videoUrl +'" type="video/mp4"></video></div>';
         modalHTML += '<div class="lives-header"><div class="icon live-close btn-close"></div></div></div>';
 
-        return self.popup(modalHTML, function(modal) {
-            modal.find('.btn-close').on('click', function() {
-                self.closeModal(modal);
+        return new Promise((resolve) => {
+            self.popup(modalHTML, function(modal) {
+                modal.find('.btn-close').on('click', function() {
+                    self.closeModal(modal);
+                });
+                resolve(modal);
             });
         });
     }

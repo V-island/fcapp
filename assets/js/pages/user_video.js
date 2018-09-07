@@ -1,10 +1,12 @@
 import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
+import { Spinner } from '../components/Spinner';
 import RecordVideo from '../record-video';
 import Modal from '../modal';
-// import VideoPreview from '../videoPreview';
+
 import {
+	body,
 	fcConfig
 } from '../intro';
 
@@ -120,10 +122,13 @@ export default class UserVideo extends EventEmitter {
 		});
 
 		// 浏览视频
-		Array.prototype.slice.call(this.videoMediaEl).forEach((mediaEl, index) => {
+		Array.prototype.slice.call(this.videoMediaEl).forEach(mediaEl => {
 			addEvent(mediaEl, 'click', () => {
 				let videoUrl = getData(mediaEl, 'url');
-				modal.videoModal(videoUrl);
+				Spinner.start(body);
+				modal.videoModal(videoUrl).then((_modal) => {
+					Spinner.remove();
+				});
 	        });
 		});
 	}

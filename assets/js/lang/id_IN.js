@@ -1,4 +1,4 @@
-const Lang = {
+﻿const Lang = {
 	HOME: {
 		New: {
 			Title: 'New'

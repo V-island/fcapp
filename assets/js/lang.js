@@ -7,6 +7,8 @@ import GBP from './lang/en_UK';
 import EUR from './lang/de_DE';
 import INR from './lang/id_IN';
 import THB from './lang/th_TH';
+import KRW from './lang/ko_KR';
+import CAD from './lang/cd_CA';
 
 const LANG_NAME = 'LANG';
 const DEFAULT = {
@@ -20,7 +22,9 @@ const LANG = {
     'en_UK': GBP,
     'de_DE': EUR,
     'id_IN': INR,
-    'th_TH': THB
+    'th_TH': THB,
+    'ko_KR': KRW,
+    'cd_CA': CAD
 };
 
 /**
@@ -43,12 +47,8 @@ export function getLangConfig() {
  * @return {[type]} [description]
  */
 export function setLangConfig(lang) {
-    return new Promise((resolve, reject) => {
-        if (LANG[lang]) {
-            localStorage.setItem(LANG_NAME, JSON.stringify(LANG[lang]));
-            resolve(true);
-        }else {
-            reject(false);
-        }
+    return new Promise((resolve) => {
+        localStorage.setItem(LANG_NAME, JSON.stringify(LANG[lang] ? LANG[lang] : DEFAULT.lang));
+        resolve(true);
     });
 };

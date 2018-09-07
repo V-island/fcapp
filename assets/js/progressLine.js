@@ -31,7 +31,7 @@ export default class ProgressLine {
     // 隐藏上传进度
     hide() {
         window.setTimeout(() => {
-            body.removeChild(this.element);
+            return this.pagesEl.removeChild(this.element);
         }, 500);
     }
 

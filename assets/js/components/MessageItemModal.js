@@ -106,8 +106,9 @@ class MessageItemSystem {
                     if (!data) return Spinner.remove();
 
                     let {video_url} = data;
-                    modal.videoModal(video_url);
-                    Spinner.remove();
+                    modal.videoModal(video_url).then((_modal) => {
+                        Spinner.remove();
+                    });
                 });
             });
         }

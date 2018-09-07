@@ -581,10 +581,10 @@ export default class RecordVideo extends EventEmitter {
 
         addEvent(inputEl, 'change', () => {
             let previewVideoEl = document.createElement('video');
-            previewVideoEl.setAttribute('muted', true);
             this.videoFile = inputEl.files[0];
 
             previewVideoEl.src = URL.createObjectURL(this.videoFile);
+            previewVideoEl.muted = true;
             previewVideoEl.play();
             Spinner.start(body);
             setTimeout(() => {
@@ -618,7 +618,10 @@ export default class RecordVideo extends EventEmitter {
     _bindVideoInfoEvent() {
         // 播放视频
         addEvent(this.editVideoEl, 'click', () => {
-            modal.videoModal(URL.createObjectURL(this.videoFile));
+            Spinner.start(body);
+            modal.videoModal(URL.createObjectURL(this.videoFile)).then((_modal) => {
+                Spinner.remove();
+            });
         });
 
         // 关闭编辑视频详细
