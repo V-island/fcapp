@@ -1201,7 +1201,7 @@ export function hotVideo(_page = 1, _number = 10) {
  * @param  {[String]} _type 	   类别 1.免费 2.收费
  * @return {[type]} [description]
  */
-export function videoClips(_page = 1, _number = 10, _tag = 1, _type) {
+export function videoClips(_page = 1, _number = 10, _tag = 0, _type) {
 	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
 	return new Promise((resolve) => {
 		getPost('/videoClips', {
