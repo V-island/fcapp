@@ -153,6 +153,14 @@ a {
     display: block !important;
 }
 
+.hidden{
+    opacity: 0;
+}
+
+.display{
+    opacity: 1;
+}
+
 .no-bg {
     background: none !important;
 }

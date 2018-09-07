@@ -100,7 +100,12 @@ class MessageChat {
         chatWrapper.appendChild(barHeader);
 
         const chatFooter = createDivEl({className: 'message-chat-footer'});
-        const channelPrompt = createDivEl({element: 'p', className: 'channel-prompt', content: channel.customType == sendBirdConfig.customerType ? '' : LANG.MESSAGE.Prompt.Free});
+        const channelPrompt = createDivEl({element: 'p', className: 'channel-prompt', content: LANG.MESSAGE.Prompt.Free});
+
+        if (channel.customType == sendBirdConfig.customerType) {
+            addClass(channelPrompt, 'hidden');
+        }
+
         chatFooter.appendChild(channelPrompt);
 
         const chatForm = createDivEl({className: 'message-chat-form'});
