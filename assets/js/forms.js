@@ -138,6 +138,12 @@ export default class Forms {
                 let groupEl = this.btnVerificationEl[0].parentNode;
                 let _value = groupEl.getElementsByTagName(this.options.inputTagName)[0].value;
 
+                if (!phonesRule[this.Country.language_code]) {
+                    return modal.alert(LANG.PUBLIC.Froms.Telephone.Text, (_modal) => {
+                        modal.closeModal(_modal);
+                    });
+                }
+
                 if (phonesRule[this.Country.language_code].test(_value)) {
                     return sendVerificationCode(this.Country.phone_code + _value).then(() => {
 

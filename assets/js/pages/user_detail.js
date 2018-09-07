@@ -201,7 +201,7 @@ export default class UserDetail extends EventEmitter {
 
 			modal.prompt(DETAIL.Body_Weight.Madal.Placeholder, DETAIL.Body_Weight.Madal.Title,
 				(value) => {
-					this.itemWeightTxtEl.innerText = value + DETAIL.Height.Unit;
+					this.itemWeightTxtEl.innerText = value + DETAIL.Body_Weight.Unit;
 					updateUserInfo({
 						weight: value
 					});
