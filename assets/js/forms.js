@@ -33,7 +33,10 @@ const phonesRule = {
     'en_US': /^[2-9]\d{2}[2-9](?!11)\d{6}$/,
     'ja_JP': /^0[7-9]0\d{8}$/,
     'zh_CN': /^1[345789]\d{9}$/,
-    'en_UK': /^7\d{9}$/
+    'en_UK': /^7\d{9}$/,
+    'id_IN': /^\d{10}$/,
+    'ko_KR': /^\d{11}$/,
+    'cd_CA': /^\d{10}$/
 };
 
 export default class Forms {
@@ -137,12 +140,6 @@ export default class Forms {
 
                 let groupEl = this.btnVerificationEl[0].parentNode;
                 let _value = groupEl.getElementsByTagName(this.options.inputTagName)[0].value;
-
-                if (!phonesRule[this.Country.language_code]) {
-                    return modal.alert(LANG.PUBLIC.Froms.Telephone.Text, (_modal) => {
-                        modal.closeModal(_modal);
-                    });
-                }
 
                 if (phonesRule[this.Country.language_code].test(_value)) {
                     return sendVerificationCode(this.Country.phone_code + _value).then(() => {
