@@ -144,6 +144,9 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	Share(URL) {
+		if (typeof(FB) == 'undefined') {
+			return modal.toast(LANG.LOGIN.Madal.Error);
+		}
 		return new Promise((resolve, reject) => {
 			FB.ui(
 			    {
@@ -167,6 +170,9 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	Logout() {
+		if (typeof(FB) == 'undefined') {
+			return modal.toast(LANG.LOGIN.Madal.Error);
+		}
 		FB.logout((response) => {
 			this.trigger('FacebookLogin.logout');
 		});
