@@ -7,6 +7,7 @@
     "description": "逗聊APP 交友软件",
     "orientation": "portrait-primary",
     "theme_color": "#FFDD33",
+    "gcm_sender_id": "324702741926",
     "icons": [{
         "src": "assets/img/32.png",
         "sizes": "32x32",

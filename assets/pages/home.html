@@ -14,7 +14,7 @@
                 {{if VideoType}}
                     <div class="tag tag-video">
                         {{each VideoType}}
-                            <label class="tag-label {{if $value.id == 1}}active{{/if}}" data-id="{{if $value.id == 1}} 0 {{else}} {{$value.id}} {{/if}}" ><span>#</span>{{$value.video_type}}</label>
+                            <label class="tag-label {{if $value.id == 1}}active{{/if}}" data-id="{{if $value.id == 1}}0{{else}}{{$value.id}}{{/if}}" ><span>#</span>{{$value.video_type}}</label>
                         {{/each}}
                     </div>
                     <!-- /.tag -->

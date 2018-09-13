@@ -31,7 +31,8 @@ module.exports = {
 			'./assets/scss/fc.scss'
 		],
 		'fc-extend': [
-			'jquery-ripple'
+			'jquery-ripple',
+			'video.js'
 		]
 	},
 	devtool: 'inline-source-map',

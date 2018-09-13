@@ -61,6 +61,7 @@
     "sendbird": "^3.0.69",
     "swiper": "^4.2.6",
     "uglify-es": "^3.2.2",
+    "video.js": "^7.2.2",
     "webpack-encoding-plugin": "^0.2.1",
     "wolfy87-eventemitter": "^5.2.5"
   }

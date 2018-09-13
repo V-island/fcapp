@@ -6,7 +6,7 @@ import SendBirdAction from '../SendBirdAction';
 import SendBirdChatEvent from '../SendBirdChatEvent';
 // import SendBirdConnection from '../SendBirdConnection';
 // import SendBirdEvent from '../SendBirdEvent';
-
+import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
@@ -30,6 +30,7 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
+const modal = new Modal();
 
 let instance = null;
 
@@ -164,27 +165,27 @@ class MessageChat {
 
         // 开启表情包
         addEvent(chatPhiz, 'click', () => {
-            
+            return modal.toast(LANG.LOGIN.Third_party.Text);
         });
 
         // 发送语音
         addEvent(chatMediaVoice, 'click', () => {
-            
+            return modal.toast(LANG.LOGIN.Third_party.Text);
         });
 
         // 发送图片
         addEvent(chatMediaAlbum, 'click', () => {
-            
+            return modal.toast(LANG.LOGIN.Third_party.Text);
         });
 
         // 发送视频
         addEvent(chatMediaVideo, 'click', () => {
-            
+            return modal.toast(LANG.LOGIN.Third_party.Text);
         });
 
         // 发送礼物
-        addEvent(chatMediaVideo, 'click', () => {
-            
+        addEvent(chatMediaGiving, 'click', () => {
+            return modal.toast(LANG.LOGIN.Third_party.Text);
         });
     }
 
