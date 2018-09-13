@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" >
+  <title>Geolocation</title>
+  <link rel="stylesheet" href="css/geo-html5.css" >
+</head>
+
+<body onload="loadDemo()">
+
+  <header>
+    <h1>HTML5 计步器</h1>
+  </header>
+
+  <div id="container">
+
+  <section>
+    <article>
+      <header>
+        <h1>当前位置：</h1>
+      </header>
+
+        <p class="info" id="status">Geolocation is not supported in your browser.</p>
+
+      <div class="geostatus">
+        <p id="latitude">纬度: </p>
+        <p id="longitude">经度: </p>
+        <p id="accuracy">精确值: </p>
+        <p id="timestamp">时间戳: </p>
+        <p id="currDist">当前行走距离: </p>
+        <p id="totalDist">总共行走距离: </p>
+      </div>
+
+    </article>
+  </section>
+
+
+  <footer>
+    <h2>管住嘴，迈开腿，你不瘦谁瘦！Come on!</h2>
+  </footer>
+
+  </div>
+
+  <script>
+
+    var totalDistance = 0.0;
+    var lastLat;
+    var lastLong;
+
+    Number.prototype.toRadians = function() {
+      return this * Math.PI / 180;
+    }
+
+    function distance(latitude1, longitude1, latitude2, longitude2) {
+      // R is the radius of the earth in kilometers
+      var R = 6371;
+
+      var deltaLatitude = (latitude2-latitude1).toRadians();
+      var deltaLongitude = (longitude2-longitude1).toRadians();
+      latitude1 = latitude1.toRadians(), latitude2 = latitude2.toRadians();
+
+      var a = Math.sin(deltaLatitude/2) *
+              Math.sin(deltaLatitude/2) +
+              Math.cos(latitude1) *
+              Math.cos(latitude2) *
+              Math.sin(deltaLongitude/2) *
+              Math.sin(deltaLongitude/2);
+
+      var c = 2 * Math.atan2(Math.sqrt(a),
+                             Math.sqrt(1-a));
+      var d = R * c;
+      return d;
+    }
+
+    function updateErrorStatus(message) {
+      document.getElementById("status").style.background = "papayaWhip";
+      document.getElementById("status").innerHTML = "<strong>Error</strong>: " + message;
+    }
+
+    function updateStatus(message) {
+      document.getElementById("status").style.background = "paleGreen";
+      document.getElementById("status").innerHTML = message;
+    }
+
+    function loadDemo() {
+
+    if(navigator.geolocation) {
+        document.getElementById("status").innerHTML = "HTML5 Geolocation is supported in your browser.";
+        navigator.geolocation.watchPosition(updateLocation, handleLocationError,
+                                                {timeout:10000});
+        // updateStatus("Requesting Geolocation data")
+      }
+	}
+
+    function updateLocation(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      var accuracy = position.coords.accuracy;
+      var timestamp = position.timestamp;
+
+      document.getElementById("latitude").innerHTML = "纬度: " + latitude;
+      document.getElementById("longitude").innerHTML = "精度: " +  longitude;
+      document.getElementById("accuracy").innerHTML = "精确值: " + accuracy + " meters";
+      document.getElementById("timestamp").innerHTML = "时间戳: " + timestamp;
+
+      // sanity test... don't calculate distance if accuracy
+      // value too large
+      if (accuracy >= 30000) {
+        updateStatus("Need more accurate values to calculate distance.");
+        return;
+      }
+
+      // calculate distance
+      if ((lastLat != null) && (lastLong != null)) {
+        var currentDistance = distance(latitude, longitude, lastLat, lastLong);
+
+        document.getElementById("currDist").innerHTML =
+                 "Current distance traveled: " + currentDistance.toFixed(2) + " km";
+
+        totalDistance += currentDistance;
+        document.getElementById("totalDist").innerHTML =
+                 "Total distance traveled: " + currentDistance.toFixed(2) + " km";
+        updateStatus("Location successfully updated.");
+
+      }
+
+      lastLat = latitude;
+      lastLong = longitude;
+
+    }
+
+    function handleLocationError(error) {
+      switch(error.code)
+      {
+      case 0:
+        updateErrorStatus("There was an error while retrieving your location. Additional details: " + error.message);
+        break;
+      case 1:
+        updateErrorStatus("The user opted not to share his or her location.");
+        break;
+      case 2:
+        updateErrorStatus("The browser was unable to determine your location. Additional details: " + error.message);
+        break;
+      case 3:
+        updateErrorStatus("The browser timed out before retrieving the location.");
+        break;
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>

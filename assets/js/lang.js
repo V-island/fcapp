@@ -31,7 +31,7 @@ const LANG = {
  * 获取localStorage语言包
  * @return {[type]} [description]
  */
-export function getLangConfig() {
+export const getLangConfig = () => {
     let lang = localStorage.getItem(LANG_NAME);
 
     if (lang) {
@@ -46,7 +46,7 @@ export function getLangConfig() {
  * 切换localStorage语言包
  * @return {[type]} [description]
  */
-export function setLangConfig(lang) {
+export const setLangConfig = (lang) => {
     return new Promise((resolve) => {
         localStorage.setItem(LANG_NAME, JSON.stringify(LANG[lang] ? LANG[lang] : DEFAULT.lang));
         resolve(true);

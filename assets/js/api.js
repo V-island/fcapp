@@ -31,9 +31,6 @@ const CONFIG = {
     notloginUrl: '#/login/mobile'
 }
 
-// const baseURL = 'http://10.30.11.112:8080/live-app/open/gate';
-// const baseURL = 'https://10.30.11.112:8443/live-app/open/gate';
-// const baseURL = 'https://10.30.11.112:8443/live-app/register';
 const Type = 'POST';
 const MacType = 1; // 设备类型 1.手机 2.PC
 const PhoneType = null;
@@ -46,7 +43,7 @@ const UUID = 'UUID';
 const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const COUNTRY_NAME = 'COUNTRY';
 
-function getPost(_url, param, callback, callbackCancel, onProgress, _type, _header, async) {
+const getPost = (_url, param, callback, callbackCancel, onProgress, _type, _header, async) => {
 	if (isObject(_url)) {
 		onProgress = arguments[2];
 	    callback = arguments[1];
@@ -70,12 +67,12 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 		url: baseURL,
 		cache: false,
 	    statusCode: {
-	        // 200: function() {console.log(200)},
-	        400: function() {toastr.error('400 你已经在其它设备登入，请重新登入');clearLocalStorage();location.href = CONFIG.notloginUrl;},
-	        401: function() {toastr.error('401');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);},
-	        403: function() {toastr.error('403 用户没有对应操作权限')},
-	        404: function() {toastr.error('404')},
-	        405: function() {toastr.error('405');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);}
+	        // 200: () => {console.log(200)},
+	        400: () => {toastr.error('400 你已经在其它设备登入，请重新登入');clearLocalStorage();location.href = CONFIG.notloginUrl;},
+	        401: () => {toastr.error('401');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);},
+	        403: () => {toastr.error('403 用户没有对应操作权限')},
+	        404: () => {toastr.error('404')},
+	        405: () => {toastr.error('405');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);}
 	    }
 	};
 
@@ -83,10 +80,10 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 		ajaxOpt.processData = false;
 		ajaxOpt.contentType = false;
 		ajaxOpt.mimeType = "multipart/form-data";
-		ajaxOpt.xhr = function() {
+		ajaxOpt.xhr = () => {
 			var xhr = $.ajaxSettings.xhr();
 			if (xhr.upload) {
-				xhr.upload.onprogress = function(progress) {
+				xhr.upload.onprogress = (progress) => {
 					if (progress.lengthComputable) {
 						onProgress(progress.loaded / progress.total * 100);
 					}
@@ -103,7 +100,7 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 	}
 
 	// console.log(ajaxOpt);
-	let post = Promise.resolve($.ajax(ajaxOpt)).then(function(response) {
+	let post = Promise.resolve($.ajax(ajaxOpt)).then((response) => {
 		// console.log(response);
 		if (!isObject(response)) {
 			response = JSON.parse(response);
@@ -118,7 +115,7 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 			return location.href = CONFIG.notloginUrl;
 		}
 
-		modal.alert(LANG.SYSTEM_CODE[response.code], function(_modal) {
+		modal.alert(LANG.SYSTEM_CODE[response.code], (_modal) => {
 			modal.closeModal(_modal);
 		});
 
@@ -129,7 +126,92 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 	return post;
 }
 
-function getMac() {
+const _getXMLHttpRequest = (url, param, type) => {
+	url = url.indexOf('https')>-1 ? url : baseURL;
+	param = typeof param !== 'undefined' ? param : null;
+	type = typeof type !== 'undefined' ? type : Type;
+
+	return new Promise((resolve, reject) => {
+		var xhr = new XMLHttpRequest();
+		xhr.withCredentials = true;
+		xhr.onreadystatechange = function() {
+			console.log(xhr);
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				console.log(xhr.responseText);
+			} else {
+				console.log(xhr.statusText);
+			}
+		}
+
+		// xhr.addEventListener("readystatechange", function() {
+		// 	console.log(this);
+		// 	if (this.readyState === 4) {
+		// 		resolve(this.responseText);
+		// 	}
+		// });
+
+		xhr.open(type, url);
+		xhr.setRequestHeader("cache-control", "no-cache");
+		xhr.send(param);
+	});
+}
+
+const getXMLHttpRequest = (url, param, type) => {
+	url = url.indexOf('https')>-1 ? url : baseURL;
+	param = typeof param !== 'undefined' ? param : null;
+	type = typeof type !== 'undefined' ? type : Type;
+
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: type,
+			url: url,
+			data: param,
+			cache: false,
+		}).then((response) => {
+			resolve(response);
+		});
+	});
+}
+
+// 通过经纬度获取国家编号
+const getCountryName = (lat, lag) => {
+	const url = `https://maps.google.cn/maps/api/geocode/json?latlng=${lat},${lag}&sensor=true`;
+	return new Promise((resolve, reject) => {
+		getXMLHttpRequest(url, null, 'GET').then((json) => {
+			if (json.status == 'OK') {
+				Array.prototype.slice.call(json.results).forEach((items, indexs) => {
+					if (indexs == 0) {
+						const length = items['address_components'].length - 1;
+						Array.prototype.slice.call(items['address_components']).forEach((item, index) => {
+							if (index == length) {
+								let data = checkCountryType(item.short_name);
+								return resolve(data);
+							}
+						});
+					}
+				});
+			}
+			return reject(json.error_message);
+		}).catch(() => {
+			return reject();
+		});
+	});
+}
+
+// 通过国家编号获取语言包
+const checkCountryType = (type) => {
+	const country = JSON.parse(getLocalStorage(COUNTRY_NAME));
+
+	country.forEach( _country => {
+	    if (_country.language_code.indexOf(type) > 0) {
+			return _country;
+	    }else {
+	    	return false;
+	    }
+	});
+}
+
+const getMac = () => {
 	let uuid = getLocalStorage(UUID);
 	if (uuid) {
 		return uuid;
@@ -140,7 +222,7 @@ function getMac() {
 }
 
 // 获取用户信息
-export function getUserInfo() {
+export const getUserInfo = () => {
 	let _info = getLocalStorage(UER_NAME);
 
 	if (_info === null) {
@@ -152,15 +234,34 @@ export function getUserInfo() {
 }
 
 // 更新用户信息
-export function setUserInfo(name, value) {
+export const setUserInfo = (name, value) => {
 	let _info = getUserInfo();
 	_info[name] = value;
 
 	return setLocalStorage(UER_NAME, _info);
 }
 
+// 获取用户信息
+export const getCountry = () => {
+	let Country = getLocalStorage(COUNTRY_ID_NAME);
+
+	if (Country === null) {
+		return {
+			country_name: 'America',
+			currency_code: '$',
+			currency_type: 'USD',
+			id: 2,
+			language_code: 'en_US',
+			language_id: 2,
+			phone_code: '1'
+		};
+	}
+
+	return Country;
+}
+
 // 判断是否是主播
-export function checkAuth() {
+export const checkAuth = () => {
 	let {userAuth} = getUserInfo();
 
 	return userAuth === 2 ? true : false;
@@ -168,20 +269,33 @@ export function checkAuth() {
 }
 
 // 验证登录状态
-export function checkLogin() {
+export const checkLogin = () => {
 	return getLocalStorage(UER_NAME) === null ? true : false;
 }
 
 // 验证是否保存国家信息
-export function checkCountry() {
+export const checkCountry = () =>{
 	let country = getLocalStorage(COUNTRY_ID_NAME);
 
 	return new Promise((resolve) => {
 
 		if (country === null) {
-			let _country = findAllCountry();
-			_country.then((data) => {
-	            resolve(true);
+			findAllCountry().then((data) => {
+            	geolocation().then((coords) => {
+            		getCountryName(coords.latitude, coords.longitude).then((code) => {
+            			if (!code) return resolve(true);
+
+    					let _country = findAllCountry(code.id, code.language_id);
+    					_country.then((data) => {
+    			            resolve(true);
+    			        });
+            		}).catch(() => {
+            			resolve(true);
+            		});
+            	}).catch((error) => {
+            		console.log(error);
+            		resolve(true);
+            	});
 	        });
 		}else if (!country.gain) {
 			let _country = findAllCountry(country.id, country.langId);
@@ -194,7 +308,36 @@ export function checkCountry() {
 	});
 }
 
-export function createGroupChannel(SendBird, userID, URL, Type) {
+// 调用定位 API
+export const geolocation = () => {
+	return new Promise((resolve, reject) => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition((position) => {
+				resolve(position.coords);
+			}, (error) => {
+				switch (error.code) {
+					case error.PERMISSION_DENIED:
+						reject("定位失败,用户拒绝请求地理定位");
+						break;
+					case error.POSITION_UNAVAILABLE:
+						reject("定位失败,位置信息是不可用");
+						break;
+					case error.TIMEOUT:
+						reject("定位失败,请求获取用户位置超时");
+						break;
+					case error.UNKNOWN_ERROR:
+						reject("定位失败,定位系统失效");
+						break;
+				}
+			});
+		} else {
+			reject("浏览器不支持地理定位。");
+		}
+	});
+}
+
+// 创建IM频道
+export const createGroupChannel = (SendBird, userID, URL, Type) => {
 	return new Promise((resolve) => {
 		if (URL != null) resolve(URL);
 
@@ -212,7 +355,7 @@ export function createGroupChannel(SendBird, userID, URL, Type) {
  * @param  {[type]} giftURL    礼物频道
  * @return {[type]}            [description]
  */
-export function checkIMChannel(userID, praiseURL, commentURL, giftURL) {
+export const checkIMChannel = (userID, praiseURL, commentURL, giftURL) => {
 
 	return new Promise((resolve, reject) => {
 		if (praiseURL != null && commentURL != null && giftURL != null) {
@@ -248,7 +391,7 @@ export function checkIMChannel(userID, praiseURL, commentURL, giftURL) {
  * 获取所有国家和号码编号
  * @return {[type]} [description]
  */
-export function findAllCountry(id = 2, langId = 2) {
+export const findAllCountry = (id = 2, langId = 2) => {
 
 	return new Promise((resolve) => {
 
@@ -274,7 +417,7 @@ export function findAllCountry(id = 2, langId = 2) {
  * @param  {[string]} _phone 	   手机号
  * @return {[type]} [description]
  */
-export function sendVerificationCode(_phone) {
+export const sendVerificationCode = (_phone) => {
 
 	return new Promise((resolve) => {
 
@@ -292,9 +435,14 @@ export function sendVerificationCode(_phone) {
  * @param  {[type]} callback     回调事件
  * @return {[type]} [description]
  */
-export function getRegister(params, callback) {
+export const getRegister = (params, callback) => {
 	let _params = isObject(params) ? params : urlParse(params);
 
+	if (typeof _params.userPassword === 'undefined') {
+		return modal.alert(LANG.PUBLIC.Froms.Password.Text, (_modal) => {
+			modal.closeModal(_modal);
+		});
+	}
 	return new Promise((resolve) => {
 
 		getPost('/insRegister', _params, (response) => {
@@ -314,7 +462,7 @@ export function getRegister(params, callback) {
  * @param  {[type]} callback     回调事件
  * @return {[type]} [description]
  */
-export function getLogin(params, callback) {
+export const getLogin = (params, callback) => {
 	let _params = isObject(params) ? params : urlParse(params);
 	let _mac = getMac();
 	_params.mac = _mac;
@@ -356,7 +504,7 @@ export function getLogin(params, callback) {
  * @param  {[object]} params 	   [description]
  * @return {[type]} [description]
  */
-export function getFindPassword(params) {
+export const getFindPassword = (params) => {
 	let {phoneCode, userPhone} = isObject(params) ? params : urlParse(params);
 
 	return new Promise((resolve) => {
@@ -375,7 +523,7 @@ export function getFindPassword(params) {
  * @param  {[object]} params 	   [description]
  * @return {[type]} [description]
  */
-export function getUpdatePassword(params) {
+export const getUpdatePassword = (params) => {
 	let _params = isObject(params) ? params : urlParse(params);
 	let {phoneCode, userPhone} = getUserInfo();
 	_params.phoneCode = phoneCode;
@@ -393,7 +541,7 @@ export function getUpdatePassword(params) {
  * 登出
  * @return {[type]} [description]
  */
-export function appLoginOut() {
+export const appLoginOut = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		status: 2,
@@ -420,7 +568,7 @@ export function appLoginOut() {
  * @param {[type]} commentId 评论频道
  * @param {[type]} giftsID   礼物频道
  */
-export function CreateIMChannel(userId, praiseId, commentId, giftsID) {
+export const CreateIMChannel = (userId, praiseId, commentId, giftsID) => {
 	let _params = {
 		userId: userId,
 		praise_channel: praiseId,
@@ -445,7 +593,7 @@ export function CreateIMChannel(userId, praiseId, commentId, giftsID) {
  * 个人中心/个人信息
  * @return {[type]} [description]
  */
-export function personCenter(params, token, mac, _checkLogin = false) {
+export const personCenter = (params, token, mac, _checkLogin = false) => {
 	let _info = isObject(params) ? params : getUserInfo();
 		token = typeof token !== 'undefined' ? token : getLocalStorage(TOKEN_NAME);
 		mac = typeof mac !== 'undefined' ? mac : getMac();;
@@ -479,7 +627,7 @@ export function personCenter(params, token, mac, _checkLogin = false) {
  * 所有兴趣爱好列表
  * @return {[type]} [description]
  */
-export function findAllUserHobby() {
+export const findAllUserHobby = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -502,7 +650,7 @@ export function findAllUserHobby() {
  * @param  {[type]} Id 用户ID
  * @return {[type]}    [description]
  */
-export function findHobbyByUserId(userID) {
+export const findHobbyByUserId = (userID) => {
 	let _params = {
 		userId: userID
 	}
@@ -520,7 +668,7 @@ export function findHobbyByUserId(userID) {
  * 获取所有性格特点列表
  * @return {[type]} [description]
  */
-export function findAllCharacterType() {
+export const findAllCharacterType = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -542,7 +690,7 @@ export function findAllCharacterType() {
  * 查询某个用户的性格类型
  * @return {[type]} [description]
  */
-export function findCharacterTypeByUserId(userID, id = 1) {
+export const findCharacterTypeByUserId = (userID, id = 1) => {
 	let _params = {
 		belongId: id,
 		userId: userID
@@ -562,7 +710,7 @@ export function findCharacterTypeByUserId(userID, id = 1) {
  * @param  {[type]} id 兴趣爱好ID，数组字符串，如 String[] hobby_id.tostring()
  * @return {[type]}    [description]
  */
-export function saveInterest(id) {
+export const saveInterest = (id) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		hobby_id: id,
@@ -587,7 +735,7 @@ export function saveInterest(id) {
  * @param  {Number} id     属于关系(1.自身类型 2.喜欢类型)
  * @return {[type]}        [description]
  */
-export function saveMyType(typeId, id = 1) {
+export const saveMyType = (typeId, id = 1) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		type_id: typeId,
@@ -611,7 +759,7 @@ export function saveMyType(typeId, id = 1) {
  * 个人详情
  * @return {[type]} [description]
  */
-export function personInfo() {
+export const personInfo = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -634,7 +782,7 @@ export function personInfo() {
  * @param  {[type]} params [description]
  * @return {[type]}        [description]
  */
-export function updateUserInfo(params) {
+export const updateUserInfo = (params) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -676,7 +824,7 @@ export function updateUserInfo(params) {
  * @param  {Number} _number 每页条数
  * @return {[type]}         [description]
  */
-export function findMyVideo(_page = 1, _number = 10) {
+export const findMyVideo = (_page = 1, _number = 10) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		page: _page,
@@ -702,7 +850,7 @@ export function findMyVideo(_page = 1, _number = 10) {
  * @param  {Number} _number 每页条数
  * @return {[type]}         [description]
  */
-export function findWatchHistory(_page = 1, _number = 10) {
+export const findWatchHistory = (_page = 1, _number = 10) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		page: _page,
@@ -728,7 +876,7 @@ export function findWatchHistory(_page = 1, _number = 10) {
  * @param  {[type]} _status 状态 1. 关注 2.取消关注
  * @return {[type]}         [description]
  */
-export function follow(_id, _status) {
+export const follow = (_id, _status) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		fans_user_id: userId,
@@ -748,16 +896,18 @@ export function follow(_id, _status) {
 
 /**
  * 根据用户ID查找用户上传视频
- * @param  {[type]} userId  用户ID
+ * @param  {[type]} Id  用户ID
  * @param  {Number} _page   当前页
  * @param  {Number} _number 数量
  * @return {[type]}         [description]
  */
-export function selVideoByUserId(userId, _page = 1, _number = 10) {
+export const selVideoByUserId = (Id, _page = 1, _number = 10) => {
+	let {userId} = getUserInfo();
 	let _params = {
-		userId: userId,
+		userId: Id,
 		page: _page,
-		number: _number
+		number: _number,
+		login_user_id: userId
 	}
 
 	return new Promise((resolve) => {
@@ -776,7 +926,7 @@ export function selVideoByUserId(userId, _page = 1, _number = 10) {
  * @param  {Number} _number 条数
  * @return {[type]}         [description]
  */
-export function selCommentById(videoId, _page = 1, _number = 10) {
+export const selCommentById = (videoId, _page = 1, _number = 10) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		videoId: videoId,
@@ -803,7 +953,7 @@ export function selCommentById(videoId, _page = 1, _number = 10) {
  * @param  {[type]} content 评论内容
  * @return {[type]}         [description]
  */
-export function commentVideo(videoId, content) {
+export const commentVideo = (videoId, content) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		videoId: videoId,
@@ -829,7 +979,7 @@ export function commentVideo(videoId, content) {
  * @param  {[type]} status  状态
  * @return {[type]}         [description]
  */
-export function praiseVideo(videoId, status = 1) {
+export const praiseVideo = (videoId, status = 1) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		videoId: videoId,
@@ -854,7 +1004,7 @@ export function praiseVideo(videoId, status = 1) {
  * @param  {[type]} userId 	用户ID
  * @return {[type]}         [description]
  */
-export function searchUserInfo(_userID) {
+export const searchUserInfo = (_userID) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: _userID,
@@ -877,7 +1027,7 @@ export function searchUserInfo(_userID) {
  * @param  {[type]} _type   类型：1.我关注的人  2.关注我的人
  * @return {[type]}         [description]
  */
-export function followList(_page = 1, _number = 10, _type) {
+export const followList = (_page = 1, _number = 10, _type) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		type: _type,
@@ -907,7 +1057,7 @@ export function followList(_page = 1, _number = 10, _type) {
  * @param  {[type]} price       礼物价格
  * @return {[type]}             [description]
  */
-export function videoGifts(videoUserId, videoId, giftsId, amount = 1, price) {
+export const videoGifts = (videoUserId, videoId, giftsId, amount = 1, price) => {
 	let {userId, userPackage} = getUserInfo();
 	let _params = {
 		giftsId: giftsId,
@@ -939,7 +1089,7 @@ export function videoGifts(videoUserId, videoId, giftsId, amount = 1, price) {
  * @param  {[type]}   onProgress [description]
  * @return {[type]}              [description]
  */
-export function uploadHead(_file, callback, onProgress) {
+export const uploadHead = (_file, callback, onProgress) => {
 	let {userId} = getUserInfo();
 	let formData = new FormData();
 
@@ -967,7 +1117,7 @@ export function uploadHead(_file, callback, onProgress) {
  * 礼物数据字典
  * @return {[type]} [description]
  */
-export function findAllgifts() {
+export const findAllgifts = () => {
 
 	return new Promise((resolve) => {
 
@@ -983,7 +1133,7 @@ export function findAllgifts() {
  * 主播创建直播间并加入
  * @return {[type]} [description]
  */
-export function createChannel() {
+export const createChannel = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1007,7 +1157,7 @@ export function createChannel() {
  * @param  {[int]}  _status 	   状态 1.上播（直播等待中） 2.下播 3.直播中 4.禁播
  * @return {[type]} [description]
  */
-export function liveStatus(_status) {
+export const liveStatus = (_status) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1028,7 +1178,7 @@ export function liveStatus(_status) {
  * @param  {[type]} channel   频道ID
  * @return {[type]}           [description]
  */
-export function loginChannel(channel) {
+export const loginChannel = (channel) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1049,7 +1199,7 @@ export function loginChannel(channel) {
  * @param  {[type]} channel 频道ID
  * @return {[type]}         [description]
  */
-export function closeChannel(channel) {
+export const closeChannel = (channel) => {
 	let _params = {
 		channel: channel
 	}
@@ -1070,7 +1220,7 @@ export function closeChannel(channel) {
  * @param  {[type]} stars      评价星级
  * @return {[type]}            [description]
  */
-export function userEvaluate(channel, liveUserId, stars) {
+export const userEvaluate = (channel, liveUserId, stars) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1095,7 +1245,7 @@ export function userEvaluate(channel, liveUserId, stars) {
  * 每日一录--开播前查询是否需要重新录制小视频
  * @return {[type]} [description]
  */
-export function newDayRecord() {
+export const newDayRecord = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1117,7 +1267,7 @@ export function newDayRecord() {
  * 获取广告
  * @return {[type]} [description]
  */
-export function getAdvertisement() {
+export const getAdvertisement = () => {
 
 	return new Promise((resolve) => {
 		getPost('/getAdvertisement', {}, (response) => {
@@ -1133,7 +1283,7 @@ export function getAdvertisement() {
  * @param  {[type]} videoID [description]
  * @return {[type]}         [description]
  */
-export function playVideo(videoID) {
+export const playVideo = (videoID) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		id: videoID,
@@ -1160,7 +1310,7 @@ export function playVideo(videoID) {
  * @param  {[String]} _number 	   条数
  * @return {[type]} [description]
  */
-export function newVideo(_page = 1, _number = 10) {
+export const newVideo = (_page = 1, _number = 10) => {
 
 	return new Promise((resolve) => {
 		getPost('/newVideo', {
@@ -1180,7 +1330,7 @@ export function newVideo(_page = 1, _number = 10) {
  * @param  {[String]} _number 	   条数
  * @return {[type]} [description]
  */
-export function hotVideo(_page = 1, _number = 10) {
+export const hotVideo = (_page = 1, _number = 10) => {
 
 	return new Promise((resolve) => {
 		getPost('/hotVideo', {
@@ -1201,7 +1351,7 @@ export function hotVideo(_page = 1, _number = 10) {
  * @param  {[String]} _type 	   类别 1.免费 2.收费
  * @return {[type]} [description]
  */
-export function videoClips(_page = 1, _number = 10, _tag = 0, _type) {
+export const videoClips = (_page = 1, _number = 10, _tag = 0, _type) => {
 	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
 	return new Promise((resolve) => {
 		getPost('/videoClips', {
@@ -1222,7 +1372,7 @@ export function videoClips(_page = 1, _number = 10, _tag = 0, _type) {
  * 获取视频类别
  * @return {[type]} [description]
  */
-export function videoType() {
+export const videoType = () => {
 	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
 	return new Promise((resolve) => {
 		getPost('/getVideoType', {
@@ -1243,7 +1393,7 @@ export function videoType() {
  * @param  {Number} amount    礼物数量
  * @return {[type]}           [description]
  */
-export function reward(liveID, channelID, giftsID, amount = 1) {
+export const reward = (liveID, channelID, giftsID, amount = 1) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1270,7 +1420,7 @@ export function reward(liveID, channelID, giftsID, amount = 1) {
  * @param  {[type]} channelID 直播间ID
  * @return {[type]}           [description]
  */
-export function roomProfit(channelID) {
+export const roomProfit = (channelID) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1293,7 +1443,7 @@ export function roomProfit(channelID) {
  * 直播结束切换主播状态
  * @return {[type]} [description]
  */
-export function liveAgain() {
+export const liveAgain = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1324,7 +1474,7 @@ export function liveAgain() {
  * @param  {[type]}   _tagID     标签
  * @return {[type]}              [description]
  */
-export function uploadVideo(_file, _type, _title, _imgUrl) {
+export const uploadVideo = (_file, _type, _title, _imgUrl) => {
 	if (typeof _title === 'function') {
 	    _imgUrl = arguments[2];
 	    _title = false;
@@ -1372,7 +1522,7 @@ export function uploadVideo(_file, _type, _title, _imgUrl) {
  * 查询是否有在审核中的打招呼视频
  * @return {[type]} [description]
  */
-export function hasAudit() {
+export const hasAudit = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1395,7 +1545,7 @@ export function hasAudit() {
  * @param  {[type]} _id 视频ID
  * @return {[type]}     [description]
  */
-export function deleteVideo(_id) {
+export const deleteVideo = (_id) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		id: _id,
@@ -1423,7 +1573,7 @@ export function deleteVideo(_id) {
  * @param  {[type]} type    支付类型
  * @return {[type]}         [description]
  */
-export function createOrder(goodsId, type) {
+export const createOrder = (goodsId, type) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		goods_id: goodsId,
@@ -1449,7 +1599,7 @@ export function createOrder(goodsId, type) {
  * @param  {Number} _number 条数
  * @return {[type]}         [description]
  */
-export function payHistory(_page = 1, _number = 10) {
+export const payHistory = (_page = 1, _number = 10) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId,
@@ -1470,7 +1620,7 @@ export function payHistory(_page = 1, _number = 10) {
  * 积分提现界面接口
  * @return {[type]} [description]
  */
-export function extractScore() {
+export const extractScore = () => {
 	let {userId} = getUserInfo();
 	let _params = {
 		userId: userId
@@ -1492,7 +1642,7 @@ export function extractScore() {
  * @param  {Number} type    账户类型 1.paypal 2.visa
  * @return {[type]}         [description]
  */
-export function applyCash(money, account, type = 1) {
+export const applyCash = (money, account, type = 1) => {
 	let {userId} = getUserInfo();
 	let { currency_code } = getLocalStorage(COUNTRY_ID_NAME);
 	let _params = {
@@ -1519,7 +1669,7 @@ export function applyCash(money, account, type = 1) {
  * @param  {[type]} csc     安全码（paypal不需要，visa必传）
  * @return {[type]}         [description]
  */
-export function bindBlank(account, type = 1, time, csc) {
+export const bindBlank = (account, type = 1, time, csc) => {
 	let { userId } = getUserInfo();
 	let { id } = getLocalStorage(COUNTRY_ID_NAME);
 	let _params = {
@@ -1548,7 +1698,7 @@ export function bindBlank(account, type = 1, time, csc) {
  * @param  {Number}  type 账户类型 1.paypal 2.visa
  * @return {Boolean}      [description]
  */
-export function hasBindBlank(type = 1) {
+export const hasBindBlank = (type = 1) => {
 	let { userId } = getUserInfo();
 	let _params = {
 		user_id: userId,
@@ -1565,7 +1715,7 @@ export function hasBindBlank(type = 1) {
 };
 
 
-export function applyCashHistory(_page = 1, _number = 10) {
+export const applyCashHistory = (_page = 1, _number = 10) => {
 	let {userId} = getUserInfo();
 	let _params = {
 		user_id: userId,
@@ -1590,7 +1740,7 @@ export function applyCashHistory(_page = 1, _number = 10) {
  * 获取这个区域的所有商品
  * @return {[type]} [description]
  */
-export function selAllGoods() {
+export const selAllGoods = () => {
 	let { id } = getLocalStorage(COUNTRY_ID_NAME);
 
 	return new Promise((resolve) => {

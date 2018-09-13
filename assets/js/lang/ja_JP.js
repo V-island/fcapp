@@ -1,4 +1,4 @@
-﻿const Lang = {
+const Lang = {
 	HOME: {
 		New: {
 			Title: 'New'
@@ -580,6 +580,7 @@
 			},
 			Password: {
 				Title: 'Password',
+				Text: 'password can not be blank',
 				Placeholder: '8-12 bit character'
 			},
 			Paypal_Account: {

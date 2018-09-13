@@ -83,7 +83,6 @@ export default class FreeVideo extends EventEmitter {
 		this.cardsVideoEl = this.FreeVideoEl.querySelector(this.options.boxCardsClass);
 
 		this.tagsEl = this.FreeVideoEl.querySelector(this.options.tagsClass);
-		this.tagsLabelEl = this.tagsEl.getElementsByClassName(this.options.tagsLabelClass);
 
 		this.pullDownEl = this.FreeVideoEl.querySelector(this.options.pulldownClass);
 		this.pullUpEl = this.FreeVideoEl.querySelector(this.options.pullupClass);
@@ -95,37 +94,42 @@ export default class FreeVideo extends EventEmitter {
 
 	_bindEvent() {
 		// tags
-		for (let i = 0; i < this.tagsLabelEl.length; i++) {
-		    addEvent(this.tagsLabelEl[i], 'click', () => {
-		    	if (hasClass(this.tagsLabelEl[i], this.options.showClass)) {
-		    		this.tagId = 0;
-		    		toggleClass(this.tagsLabelEl[i], this.options.showClass);
-		    	}else {
-		    		this.tagId = getData(this.tagsLabelEl[i], this.options.tagsIndex);
+		if (this.tagsEl) {
+			this.tagsLabelEl = this.tagsEl.getElementsByClassName(this.options.tagsLabelClass);
 
-		    		let tagsLabelActiveEl = this.tagsEl.getElementsByClassName(this.options.showClass)[0];
-		    		if (tagsLabelActiveEl) {
-		    			toggleClass(tagsLabelActiveEl, this.options.showClass);
-		    		}
+			Array.prototype.slice.call(this.tagsLabelEl).forEach(tagsLabelEl => {
+				addEvent(tagsLabelEl, 'click', () => {
+					if (hasClass(tagsLabelEl, this.options.showClass)) {
+						this.tagId = 0;
+						toggleClass(tagsLabelEl, this.options.showClass);
+					}else {
+						this.tagId = getData(tagsLabelEl, this.options.tagsIndex);
 
-		    		toggleClass(this.tagsLabelEl[i], this.options.showClass);
-		    	}
+						let tagsLabelActiveEl = this.tagsEl.getElementsByClassName(this.options.showClass)[0];
+						if (tagsLabelActiveEl) {
+							toggleClass(tagsLabelActiveEl, this.options.showClass);
+						}
 
-		    	videoClips(this._page, this._number, this.tagId, this._type).then((data) => {
-		    		if (!data) return;
+						toggleClass(tagsLabelEl, this.options.showClass);
+					}
+					Spinner.start(body);
+					videoClips(this._page, this._number, this.tagId, this._type).then((data) => {
+						if (!data) return Spinner.remove();
 
-		    		this.cardsVideoEl.innerHTML = '';
+						this.cardsVideoEl.innerHTML = '';
 
-		    		data.forEach((itemData, index) => {
-		    			this.data.VideosList = itemData;
-		    			this.data.NotFreeVideos = false;
-		    			this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
-		    		});
+						data.forEach((itemData, index) => {
+							this.data.VideosList = itemData;
+							this.data.NotFreeVideos = false;
+							this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+						});
 
-		    		setData(this.cardsVideoEl, this.options.cardsPageIndex, this._page);
-		    		this._listEvent();
-		    	});
-		    });
+						setData(this.cardsVideoEl, this.options.cardsPageIndex, this._page);
+						this._listEvent();
+						Spinner.remove();
+					});
+				});
+			});
 		}
 	}
 

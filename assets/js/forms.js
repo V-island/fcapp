@@ -1,4 +1,8 @@
+import { Spinner } from './components/Spinner';
 import Modal from './modal';
+import {
+    body
+} from './intro';
 
 import {
     getLangConfig
@@ -125,8 +129,9 @@ export default class Forms {
             addEvent(inputEl, 'focus', () => {
                 addClass(groupEl, this.options.showClass);
 
-                if (this.btnVerificationEl.length > 0) {
-                    removeClass(this.btnVerificationEl[0], this.options.disabledClass);
+                let btnVerificationEl = groupEl.getElementsByClassName(this.options.btnVerificationClass);
+                if (btnVerificationEl.length > 0) {
+                    removeClass(btnVerificationEl[0], this.options.disabledClass);
                 }
             });
         });
@@ -137,19 +142,22 @@ export default class Forms {
                 if (hasClass(this.btnVerificationEl[0], this.options.disabledClass)) {
                     return false;
                 }
-
+                Spinner.start(body);
                 let groupEl = this.btnVerificationEl[0].parentNode;
-                let _value = groupEl.getElementsByTagName(this.options.inputTagName)[0].value;
+                let inputEl = groupEl.getElementsByTagName(this.options.inputTagName)[0];
+                let _value = inputEl.value;
 
                 if (phonesRule[this.Country.language_code].test(_value)) {
                     return sendVerificationCode(this.Country.phone_code + _value).then(() => {
-
+                        inputEl.setAttribute(this.options.disabledClass, this.options.disabledClass);
                         addClass(this.btnVerificationEl[0], this.options.disabledClass);
-                        addCountdown(this.btnVerificationEl[0], 60);
+                        addCountdown(this.btnVerificationEl[0], inputEl, this.options.disabledClass, 60);
+                        Spinner.remove();
                     });
                 } else {
                     return modal.alert(LANG.PUBLIC.Froms.Telephone.Text, (_modal) => {
                         modal.closeModal(_modal);
+                        Spinner.remove();
                     });
                 }
             });

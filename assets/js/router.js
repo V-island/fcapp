@@ -1,18 +1,17 @@
 import Template from 'art-template/lib/template-web';
-// import webcomponentsLite from '@webcomponents/webcomponentsjs/webcomponents-lite';
+import { Spinner } from './components/Spinner';
 import Tabs from './tabs';
 import {
+    body,
     fcConfig
 } from './intro';
 import {
     getLangConfig
 } from './lang';
-
 import {
     checkLogin,
     checkCountry
 } from './api';
-
 import {
     jumpURL,
     replaceNote,
@@ -430,6 +429,7 @@ import {
 
             // 判读国家列表
             let _country = checkCountry();
+            Spinner.start(body);
             _country.then(() => {
                 let classDoc = this.cache[url].component.attachTo(this.cache[url].content);
                 classDoc.on('pageLoadStart', (newDoc)  => {
@@ -467,6 +467,7 @@ import {
                     // 其里面的默认展示的(.page-current) 的页面直接就覆盖了原显示的页面（因为都是 absolute）
                     this.$view.prepend($newDoc);
                     $('[data-ripple]').ripple();
+                    Spinner.remove();
                     if ($currentSection.length) this._animateDocument($currentDoc, $newDoc, $visibleSection, direction);
                 });
             });

@@ -4,7 +4,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 // const MinifyPlugin = require('babel-minify-webpack-plugin');
 // const WorkboxPlugin = require('workbox-webpack-plugin');
-
+const EncodingPlugin = require('webpack-encoding-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
@@ -112,7 +112,6 @@ module.exports = {
 	plugins: [
 		new CleanWebpackPlugin(['dist']),
 		new UglifyJsPlugin({
-			sourceMap: true,
 			uglifyOptions: {
 				compress: {
 					warnings: false
@@ -120,7 +119,9 @@ module.exports = {
 				mangle: {
 					safari10: true
 				}
-			}
+			},
+			sourceMap: true,
+			parallel: true
 		}),
 		// new MinifyPlugin({}, {
 		// 	sourceMap: false
@@ -131,6 +132,9 @@ module.exports = {
 		// 	clientsClaim: true,
 		// 	skipWaiting: true
 		// }),
+		new EncodingPlugin({
+			encoding: 'utf-8'
+		}),
 		new HtmlWebpackPlugin({
 			title: 'SHINE LIVE- live video stream and chat',
 			filename: 'index.html',

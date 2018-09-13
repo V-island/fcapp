@@ -106,7 +106,6 @@ export default class Home extends EventEmitter {
 		this.cardsVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxCardsClass)[0];
 
 		this.tagsEl = this.HomeEl.querySelector(this.options.tagsClass);
-		this.tagsLabelEl = this.tagsEl.getElementsByClassName(this.options.tagsLabelClass);
 
 		this.pullDownEl = this.HomeEl.querySelector(this.options.pulldownClass);
 		this.pullUpEl = this.HomeEl.querySelector(this.options.pullupClass);
@@ -118,54 +117,58 @@ export default class Home extends EventEmitter {
 
 	_bindEvent() {
 		// tags
-		for (let i = 0; i < this.tagsLabelEl.length; i++) {
-		    addEvent(this.tagsLabelEl[i], 'click', () => {
-		    	if (hasClass(this.tagsLabelEl[i], this.options.showClass)) {
-		    		this.tagId = 0;
-		    		toggleClass(this.tagsLabelEl[i], this.options.showClass);
-		    	}else {
-		    		this.tagId = getData(this.tagsLabelEl[i], this.options.tagsIndex);
+		if (this.tagsEl) {
+			this.tagsLabelEl = this.tagsEl.getElementsByClassName(this.options.tagsLabelClass);
 
-		    		let tagsLabelActiveEl = this.tagsEl.getElementsByClassName(this.options.showClass)[0];
-		    		if (tagsLabelActiveEl) {
-		    			toggleClass(tagsLabelActiveEl, this.options.showClass);
-		    		}
+			Array.prototype.slice.call(this.tagsLabelEl).forEach(tagsLabelEl => {
+				addEvent(tagsLabelEl, 'click', () => {
+					if (hasClass(tagsLabelEl, this.options.showClass)) {
+						this.tagId = 0;
+						toggleClass(tagsLabelEl, this.options.showClass);
+					}else {
+						this.tagId = getData(tagsLabelEl, this.options.tagsIndex);
 
-		    		toggleClass(this.tagsLabelEl[i], this.options.showClass);
-		    	}
-		    	Spinner.start(body);
-		    	videoClips(1, 10, this.tagId, 1).then((data) => {
-		    		videoClips(1, 10, this.tagId, 2).then((_data) => {
-		    			if (!data && !_data) return Spinner.remove();
+						let tagsLabelActiveEl = this.tagsEl.getElementsByClassName(this.options.showClass)[0];
+						if (tagsLabelActiveEl) {
+							toggleClass(tagsLabelActiveEl, this.options.showClass);
+						}
 
-		    			this.cardsVideoEl.innerHTML = '';
+						toggleClass(tagsLabelEl, this.options.showClass);
+					}
+					Spinner.start(body);
+					videoClips(1, 10, this.tagId, 1).then((data) => {
+						videoClips(1, 10, this.tagId, 2).then((_data) => {
+							if (!data && !_data) return Spinner.remove();
 
-		    			// free
-		    			if (data) {
-		    				this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-		    				data = data.length > 2 ? data.slice(0, 2) : data;
-		    				data.forEach((itemData, index) => {
-		    					this.data.VideosList = itemData;
-		    					this.data.NotFreeVideos = false;
-		    					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
-		    				});
-		    			}
+							this.cardsVideoEl.innerHTML = '';
 
-		    			if (_data) {
-		    				this.cardsVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+							// free
+							if (data) {
+								this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
+								data = data.length > 2 ? data.slice(0, 2) : data;
+								data.forEach((itemData, index) => {
+									this.data.VideosList = itemData;
+									this.data.NotFreeVideos = false;
+									this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+								});
+							}
 
-		    				_data.forEach((itemData, index) => {
-		    					this.data.VideosList = itemData;
-		    					this.data.NotFreeVideos = true;
-		    					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
-		    				});
-		    			}
-		    			setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
-		    			this._listEvent();
-		    			Spinner.remove();
-		    		});
-		    	});
-		    });
+							if (_data) {
+								this.cardsVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+
+								_data.forEach((itemData, index) => {
+									this.data.VideosList = itemData;
+									this.data.NotFreeVideos = true;
+									this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+								});
+							}
+							setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+							this._listEvent();
+							Spinner.remove();
+						});
+					});
+				});
+			});
 		}
 	}
 

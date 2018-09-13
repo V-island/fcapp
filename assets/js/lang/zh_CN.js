@@ -1,4 +1,4 @@
-﻿const Lang = {
+const Lang = {
 	HOME: {
 		New: {
 			Title: '最新'
@@ -580,21 +580,22 @@
 				Title: '国家'
 			},
 			Telephone: {
-				Placeholder: '密码',
+				Placeholder: '请输入手机号',
 				Text: '8-12 位',
 				Verification: '发送'
 			},
 			Verification: {
-				Title: '验证',
-				Placeholder: '4-6 位'
+				Title: '验证码',
+				Placeholder: '请输入4-6位验证码'
 			},
 			Password: {
 				Title: '密码',
-				Placeholder: '8-12 位'
+				Text: '密码不能为空',
+				Placeholder: '请输入8-12位密码'
 			},
 			Paypal_Account: {
 				Title: 'Paypal帐户',
-				Placeholder: '姓名或电子邮件'
+				Placeholder: '请输入姓名或电子邮件'
 			},
 			Expiration_Data: {
 				Title: '到期时间'
@@ -605,7 +606,7 @@
 			},
 			CSC: {
 				Title: 'CSC',
-				Placeholder: '安全码'
+				Placeholder: '请输入安全码'
 			}
 		},
 		Buttons: {

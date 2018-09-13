@@ -9,7 +9,8 @@ import {
 } from './lang';
 
 import {
-    getLogin
+    getLogin,
+    getCountry
 } from './api';
 
 import {
@@ -112,11 +113,13 @@ export default class FacebookLogin extends EventEmitter {
 		if (response.status === 'connected') {
 			// Logged into your app and Facebook.
 			FB.api('/me?fields=id,name,location,hometown', (response) => {
-				const {id} = response;
+				let {id} = getCountry();
+				let userId = response.id;
+
 				getLogin({
-					userAccount: id,
+					userAccount: userId,
 					account_type: 1,
-					country_id: 2
+					country_id: id
 				});
 			});
 		} else {
@@ -136,7 +139,7 @@ export default class FacebookLogin extends EventEmitter {
 			// console.log(response);
 			this._statusChangeCallback(response);
 		}, {
-			scope: 'public_profile,user_location,user_hometown'
+			scope: 'public_profile'
 		});
 	}
 
@@ -155,7 +158,7 @@ export default class FacebookLogin extends EventEmitter {
 			        	});
 			        } else {
 			        	modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
-			        		reject(response.error_message);
+			        		reject(response);
 			        	});
 			        }
 			    }
@@ -179,6 +182,10 @@ export default class FacebookLogin extends EventEmitter {
  * 当加载fackbook完成后的时候，会派发 facebookLogin.start 事件
  */
 
+/**
+ * facebookLogin.cancel
+ * 当加载fackbook取消后的时候，会派发 facebookLogin.cancel 事件
+ */
 
 /**
  * facebookLogin.logout

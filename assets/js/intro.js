@@ -222,7 +222,7 @@ export const agoraConfig = {
 // IM配置
 export const sendBirdConfig = {
     sendBird: true, // 默认使用SendBird DSK
-    sendBirdAppID: '07F10EB7-6318-4B3C-887B-F69758A7C257',
+    sendBirdAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
     sendBirdAppURL: 'https://api.sendbird.com',
     customerName: 'Customer service',
     customerType: 'customer'
@@ -242,6 +242,14 @@ export const facebookConfig = {
     facebookSDKAPI: 'https://connect.facebook.net/en_US/sdk.js',
     facebookAppId: '247717165811073',
     facebookVersion: 'v3.1'
+};
+
+// Twitter配置
+export const twitterConfig = {
+    twitter: true, // 默认使用paypal DSK
+    twitterSDKAPI: 'https://platform.twitter.com/widgets.js',
+    twitterAPIKey: 'tsDbsfweUhFLcOoNFr2RFo5DO',
+    twitterAPISecretKey: 'MeVPBkseBSK5qfgKw1iIuNANukvMEJsJAVefvDhnLy9zonvHiQ'
 };
 
 export const body = document.querySelector('body');

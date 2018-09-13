@@ -43,7 +43,7 @@ $ionicons-version: "4.1.0" !default;
 
 @mixin iconImage($name, $file) {
     background-image: url("#{$imgBaseUrl}/#{$file}-#{$name}.png");
-    background: image-set(url("#{$imgBaseUrl}/#{$file}-#{$name}.png") 1x, url("#{$imgBaseUrl}/#{$file}-#{$name}@2x.png") 2x) center;
+    background-image: image-set(url("#{$imgBaseUrl}/#{$file}-#{$name}.png") 1x, url("#{$imgBaseUrl}/#{$file}-#{$name}@2x.png") 2x);
 }
 
 @mixin iconActive($name, $file) {

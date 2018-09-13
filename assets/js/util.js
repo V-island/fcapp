@@ -50,16 +50,17 @@ export const errorAlert = (message, reload = true) => {
 };
 
 // 倒计时60s
-export const addCountdown = (element, val) => {
+export const addCountdown = (element, inputEl, disabledClass, val) => {
     if (val == 0) {
-        removeClass(element, 'disabled');
+        removeClass(element, disabledClass);
+        inputEl.removeAttribute(disabledClass);
         element.innerText = LANG.PUBLIC.Froms.Telephone.Verification;
         return false;
     } else {
         element.innerText = `${val}s`;
         val--;
         setTimeout(function() {
-            addCountdown(element, val)
+            addCountdown(element, inputEl, disabledClass, val);
         }, 1000)
     }
 };

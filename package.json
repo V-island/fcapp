@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "star": "http-server dist",
     "start": "http-server dist -S -c -k",
+    "dev": "webpack --inline --progress --mode development --config webpack.config.js",
     "build": "webpack"
   },
   "repository": {
@@ -59,6 +60,8 @@
     "pickerjs": "^0.2.0",
     "sendbird": "^3.0.69",
     "swiper": "^4.2.6",
+    "uglify-es": "^3.2.2",
+    "webpack-encoding-plugin": "^0.2.1",
     "wolfy87-eventemitter": "^5.2.5"
   }
 }
