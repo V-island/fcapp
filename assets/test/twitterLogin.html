@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
+    <meta property="og:title" content="Shine live">
+    <meta property="og:url" content="https://www.echathub.com">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="www.echathub.com/assets/img/bg_logo.png">
+    <meta property="og:description" content="What you want can always be found">
+    <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@TwitterDev" />
+  <meta name="twitter:title" content="Shine live" />
+  <meta name="twitter:description" content="What you want can always be found" />
+  <meta name="twitter:image" content="www.echathub.com/assets/img/bg_logo.png" />
+    <link rel="canonical" href="https://www.echathub.com/"/>
+    <link rel="manifest" href="./manifest.json">
+    <title>SHINE LIVE- live video stream and chat</title>
+    <!-- <script src="//console.re/connector.js" data-channel="shinelive" id="consolerescript"></script> -->
+    <script src="https://adodson.com/hello.js/dist/hello.all.js"></script>
+    <script>
+    window.twttr = (function(d, s, id) {
+         var js, fjs = d.getElementsByTagName(s)[0],
+          t = window.twttr || {};
+          if (d.getElementById(id)) return t;
+          js = d.createElement(s);
+          js.id = id;
+          js.src = "https://platform.twitter.com/widgets.js";
+          fjs.parentNode.insertBefore(js, fjs);
+
+          t._e = [];
+          t.ready = function(f) {
+              t._e.push(f);
+          };
+
+          return t;
+    }(document, "script", "twitter-wjs"));
+     var log = console.log;
+    　hello.init({
+         'twitter' : 'tsDbsfweUhFLcOoNFr2RFo5DO'
+         },
+         {
+            oauth_proxy: 'https://auth-server.herokuapp.com/proxy' //这里使用默认的代理
+         });
+
+     function login_twitter(network){  //登录方法，并将twitter 作为参数传入
+         // Twitter instance
+         var twitter = hello(network);
+         // Login
+         twitter.login().then( function(r){
+            console.log(r);
+             // Get Profile
+             return twitter.api('/me');
+         }, log ) .then( function(p){
+              console.log("Connected to "+ network+" as " + p.name);
+              var res = JSON.stringify(p);//因为得不到token，但是这步已经得到用户所有信息，所以将用户信息转成JSON字符串给后台
+              alert(JSON.stringify(res));
+              console.log(res);
+              // self.location= '/home/login.twLogin.do?result='+res;
+         }, log );
+     }
+    </script>
+</head>
+<body>
+    <button class="twBtn" onclick="login_twitter('twitter')">twitter</button>
+    <!--button class="twBtn" onclick="hello('twitter').login()">twitter</button-->
+</body>
+</html>

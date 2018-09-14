@@ -59,7 +59,7 @@ export const addCountdown = (element, inputEl, disabledClass, val) => {
     } else {
         element.innerText = `${val}s`;
         val--;
-        setTimeout(function() {
+        return setTimeout(function() {
             addCountdown(element, inputEl, disabledClass, val);
         }, 1000)
     }

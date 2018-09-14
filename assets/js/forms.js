@@ -120,6 +120,7 @@ export default class Forms {
             if(inputEl.type == "hidden") return false;
 
             let groupEl = inputEl.parentNode;
+
             // 元素失去焦点
             addEvent(inputEl, 'blur', () => {
                 return removeClass(groupEl, this.options.showClass);
@@ -185,6 +186,10 @@ export default class Forms {
 
         // Submit
         addEvent(this.formEl, 'submit', (evt) => {
+            Array.prototype.slice.call(this.inputTagEl).forEach(inputEl => {
+                if(inputEl.type == "hidden") return false;
+                inputEl.removeAttribute(this.options.disabledClass);
+            });
             evt.preventDefault();
             let _params = this.serialize(this.formEl);
             if (this.onsubmit) {

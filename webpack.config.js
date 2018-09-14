@@ -14,7 +14,7 @@ const PRODUCTION = 'production';
 module.exports = {
 	entry: {
 		webcomponentsLite: '@webcomponents/webcomponentsjs/webcomponents-lite',
-		fc: [
+		sl: [
 			// 'es5-shim',
 			// 'es6-shim',
 			'./assets/js/components/webcomponents-bundle',
@@ -30,10 +30,12 @@ module.exports = {
 			'./assets/js/navigator',
 			'./assets/scss/fc.scss'
 		],
-		'fc-extend': [
+		slComponents: [
 			'jquery-ripple',
 			'video.js'
-		]
+		],
+		redirect: './assets/js/pages/redirect'
+
 	},
 	devtool: 'inline-source-map',
 	output: {
@@ -140,6 +142,29 @@ module.exports = {
 			title: 'SHINE LIVE- live video stream and chat',
 			filename: 'index.html',
 			template: './assets/index.html',
+			chunks: ['webcomponentsLite', 'sl', 'slComponents'],
+			favicon: './assets/img/favicon.ico',
+			meta: {
+				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',
+				keywords: 'shine live ,shine,live,live video stream',
+				description: 'SHINE LIVE is a live video streaming social network. specially designed for adults who know what it means to chat with strangers,in SHINE LIVE You Can:Create  your free profile; Upload your own great video stream; Get your video profit; View other users profile and video;Add a favorite stranger to a friend.Thanks for using SHINE LIVE !',
+				auther: 'douliao@outlook.com',
+				robots: 'index,Shine Live',
+				copyright: 'Copyright SHINE LIVE 版权所有',
+				'apple-touch-fullscreen': 'yes',
+				'apple-mobile-web-app-capable': 'yes', //网站开启对web app程序的支持
+				'apple-mobile-web-app-status-bar-style': 'black-translucent', //在web app应用下状态条（屏幕顶部条）的颜色
+				'apple-mobile-web-app-title': 'Shine Live', //添加到桌面时标题
+				'format-detection': 'telephone=no', //是否将网页内容中的手机号码显示为拨号的超链接
+				'revisit-after': '1 days',
+				'theme-color': '#313443'
+			}
+		}),
+		new HtmlWebpackPlugin({
+			title: 'SHINE LIVE- live video stream and chat',
+			filename: 'redirect.html',
+			template: './assets/index.html',
+			chunks: ['redirect'],
 			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',

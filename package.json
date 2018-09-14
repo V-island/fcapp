@@ -52,6 +52,7 @@
     "axios": "^0.18.0",
     "better-scroll": "^1.12.4",
     "cropperjs": "^1.4.1",
+    "hellojs": "^1.17.1",
     "ionicons": "^4.1.1",
     "jquery": "^3.3.1",
     "jquery-ripple": "^0.2.4",

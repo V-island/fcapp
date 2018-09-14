@@ -81,7 +81,7 @@ self.addEventListener('fetch', (event) => {
     var cacheRequestUrls = [
         '/live-app/open/gate.do'
     ];
-    // console.log('现在正在请求：' + event.request.url);
+    console.log('现在正在请求：' + event.request.url);
 
     // 判断当前请求是否需要缓存
     var needCache = cacheRequestUrls.some((url) => {
