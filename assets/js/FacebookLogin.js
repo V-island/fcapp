@@ -150,24 +150,29 @@ export default class FacebookLogin extends EventEmitter {
 		if (typeof(FB) == 'undefined') {
 			return modal.toast(LANG.LOGIN.Madal.Error);
 		}
-		return FB.ui({
-				method: 'share',
-				href: URL,
-			},
-			// callback
-			(response) => {
-				if (response && !response.error_message) {
-					let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
-					modal.alert(title, (_modal) => {
-						modal.closeModal(_modal);
-					});
-				} else {
-					modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
-						modal.closeModal(_modal);
-					});
+
+		new Promise((resolve) => {
+			FB.ui({
+					method: 'share',
+					href: URL,
+				},
+				// callback
+				(response) => {
+					if (response && !response.error_message) {
+						let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
+						modal.alert(title, (_modal) => {
+							modal.closeModal(_modal);
+							resolve();
+						});
+					} else {
+						modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
+							modal.closeModal(_modal);
+							resolve();
+						});
+					}
 				}
-			}
-		);
+			);
+		});
 	}
 
 	Logout() {

@@ -118,9 +118,18 @@ export default class TwitterLogin extends EventEmitter {
 		let shareUrl = `${URL}&text=${shareText}&url=${URL}`;
 		let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
 
-		window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
-		modal.alert(title, (_modal) => {
-			modal.closeModal(_modal);
+		return new Promise((resolve) => {
+			let winObj = window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
+
+			var loop = setInterval(function() {
+			      if(winObj.closed) {
+			         clearInterval(loop);
+			         modal.alert(title, (_modal) => {
+			         	modal.closeModal(_modal);
+			         	resolve();
+			         });
+			      }
+			}, 1000);
 		});
 	}
 

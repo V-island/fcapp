@@ -278,15 +278,18 @@ export default class VideoPreview extends EventEmitter {
             // Facebook 分享
             if (btnFecebookEl.length > 0) {
                 addEvent(btnFecebookEl[0], 'click', () => {
-                    this.FB.Share(domainURL);
-
+                    this.FB.Share(domainURL).then(() => {
+                        modal.closeModal(shareModalEl);
+                    });
                 });
             }
 
             // Twitter 分享
             if (btnTwitterEl.length > 0) {
                 addEvent(btnTwitterEl[0], 'click', () => {
-                    this.Twitter.Share(domainURL);
+                    this.Twitter.Share(domainURL).then(() => {
+                        modal.closeModal(shareModalEl);
+                    });
                 });
             }
 
