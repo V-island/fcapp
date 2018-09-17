@@ -2,6 +2,7 @@
 import EventEmitter from './eventEmitter';
 import Modal from './modal';
 import {
+	domainURL,
 	twitterConfig
 } from './intro';
 
@@ -52,7 +53,7 @@ export default class TwitterLogin extends EventEmitter {
 			hello.init({
 				'twitter': twitterConfig.twitterAPIKey
 			}, {
-				redirect_uri: 'https://localhost:8080/redirect', //代理后的重定向路径，可不填
+				redirect_uri: `${domainURL}/redirect.html`, //代理后的重定向路径，可不填
 				oauth_proxy: 'https://auth-server.herokuapp.com/proxy' //这里使用默认的代理
 			});
 			this.trigger('twitterLogin.start');
@@ -109,33 +110,6 @@ export default class TwitterLogin extends EventEmitter {
 				this.trigger('twitterLogin.cancel');
 			});
 		});
-	}
-
-	_Login(network) {
-		if (typeof(twttr) == 'undefined') {
-			return modal.toast(LANG.LOGIN.Madal.Error);
-		}
-
-		// Twitter instance
-		var log = console.log;
-		// Twitter instance
-		var twitter = hello(network);
-		// Login
-		twitter.login().then( function(r){
-		    // Get Profile
-		    return twitter.api('/me');
-		}, log ) .then( function(p){
-		     var res = JSON.stringify(p);//因为得不到token，但是这步已经得到用户所有信息，所以将用户信息转成JSON字符串给后台
-		     console.log(res);
-		     let {id} = getCountry();
-		     let userId = res.id;
-
-		     getLogin({
-		     	userAccount: userId,
-		     	account_type: 1,
-		     	country_id: id
-		     });
-		}, log );
 	}
 
 	Share(URL) {
