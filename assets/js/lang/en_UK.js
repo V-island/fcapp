@@ -454,7 +454,7 @@ const Lang = {
 		Actions: {
 			Account: 'account:',
 			Coins: 'coins',
-			ShareTo: 'Share to',
+			ShareTo: 'Share this video to get rewards',
 			Comment: 'Comment',
 			Gift: 'Gift',
 			Recharge: 'Recharge',
@@ -469,7 +469,8 @@ const Lang = {
 			Twitter: 'Twitter',
 			Tumblr: 'Tumblr',
 			Prompt: {
-				Completed: 'Posting completed.',
+				Completed_Once: 'You will receive <span class="color-primary">5</span> gold conins reward <br/> (once a day)',
+				Completed: 'The wonderful thing is to share with friends',
 				Error: 'Error while posting.'
 			}
 		},

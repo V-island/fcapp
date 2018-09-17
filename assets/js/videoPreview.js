@@ -105,7 +105,6 @@ export default class VideoPreview extends EventEmitter {
     }
 
     init() {
-        this.CommentStart = false;
         this.tpl = {};
         this._page = 1;
         this._number = 10;
@@ -280,12 +279,12 @@ export default class VideoPreview extends EventEmitter {
             if (btnFecebookEl.length > 0) {
                 addEvent(btnFecebookEl[0], 'click', () => {
                     this.FB.Share(domainURL);
+
                 });
             }
 
             // Twitter 分享
             if (btnTwitterEl.length > 0) {
-                // this.Twitter.Share(btnTwitterEl[0], domainURL);
                 addEvent(btnTwitterEl[0], 'click', () => {
                     this.Twitter.Share(domainURL);
                 });

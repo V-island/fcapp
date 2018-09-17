@@ -464,7 +464,7 @@ const Lang = {
 		Actions: {
 			Account: '帐号:',
 			Coins: '金币',
-			ShareTo: '分享',
+			ShareTo: '分享此视频以获得奖励',
 			Comment: '评论',
 			Gift: '礼物',
 			Recharge: '充值',
@@ -479,7 +479,8 @@ const Lang = {
 			Twitter: 'Twitter',
 			Tumblr: 'Tumblr',
 			Prompt: {
-				Completed: '发布完成。',
+				Completed_Once: '您将获得<span class="color-primary">5</span>金币奖励(每天一次)',
+				Completed: '美妙的事情是与朋友分享',
 				Error: '发布时出错。'
 			}
 		},

@@ -12,6 +12,7 @@ import {
 
 import {
 	getLogin,
+	getShare,
 	getCountry
 } from './api';
 
@@ -115,7 +116,12 @@ export default class TwitterLogin extends EventEmitter {
 	Share(URL) {
 		let shareText = 'What you want can always be found'; //假设你要在标题中分享用户名，需要先定义好userName
 		let shareUrl = `${URL}&text=${shareText}&url=${URL}`;
+		let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
+
 		window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
+		modal.alert(title, (_modal) => {
+			modal.closeModal(_modal);
+		});
 	}
 
 	static attachTo(options) {
@@ -132,6 +138,11 @@ export default class TwitterLogin extends EventEmitter {
  * twitterLogin.cancel
  * 当加载twitter取消后的时候，会派发 twitterLogin.cancel 事件
  */
+
+ /**
+  * twitterLogin.share
+  * 当加载twitter分享后的时候，会派发 twitterLogin.share 事件
+  */
 
 /**
  * twitterLogin.logout

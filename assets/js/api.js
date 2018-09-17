@@ -42,6 +42,7 @@ const UER_NAME = 'USE_INFO';
 const UUID = 'UUID';
 const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const COUNTRY_NAME = 'COUNTRY';
+const SHARE_NAME = 'SHARE';
 
 const getPost = (_url, param, callback, callbackCancel, onProgress, _type, _header, async) => {
 	if (isObject(_url)) {
@@ -219,6 +220,13 @@ const getMac = () => {
 	uuid = getUuid();
 	setLocalStorage(UUID, uuid);
 	return uuid;
+}
+
+// 获取分享信息
+export const getShare = () => {
+	let _Share = getLocalStorage(SHARE_NAME);
+
+	return _Share === null || _Share ? false : true;
 }
 
 // 获取用户信息

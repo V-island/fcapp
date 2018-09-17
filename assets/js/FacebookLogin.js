@@ -5,24 +5,25 @@ import {
 } from './intro';
 
 import {
-    getLangConfig
+	getLangConfig
 } from './lang';
 
 import {
-    getLogin,
-    getCountry
+	getLogin,
+	getShare,
+	getCountry
 } from './api';
 
 import {
-    extend,
-    addEvent,
-    hasClass,
-    addClass,
-    removeClass,
-    toggleClass,
-    setData,
-    getData,
-    getLocalStorage
+	extend,
+	addEvent,
+	hasClass,
+	addClass,
+	removeClass,
+	toggleClass,
+	setData,
+	getData,
+	getLocalStorage
 } from './util';
 
 const LANG = getLangConfig();
@@ -31,15 +32,15 @@ const modal = new Modal();
 
 export default class FacebookLogin extends EventEmitter {
 	constructor(options) {
-	    super();
+		super();
 
-	    this.options = {
-	    	tagsClass: '.tag'
-        };
+		this.options = {
+			tagsClass: '.tag'
+		};
 
-	    extend(this.options, options);
+		extend(this.options, options);
 
-	    this._init();
+		this._init();
 
 	}
 
@@ -81,7 +82,7 @@ export default class FacebookLogin extends EventEmitter {
 		const script = document.createElement("script");
 
 		return new Promise((resolve) => {
-			if(typeof(FB) == 'undefined'){
+			if (typeof(FB) == 'undefined') {
 				script.setAttribute("type", "text/javascript");
 				script.setAttribute("id", "facebook-jssdk");
 				script.setAttribute("src", "https://connect.facebook.net/en_US/sdk.js");
@@ -98,7 +99,7 @@ export default class FacebookLogin extends EventEmitter {
 				} else {
 					document.documentElement.appendChild(script);
 				}
-			}else {
+			} else {
 				resolve(true);
 			}
 		});
@@ -113,7 +114,9 @@ export default class FacebookLogin extends EventEmitter {
 		if (response.status === 'connected') {
 			// Logged into your app and Facebook.
 			FB.api('/me?fields=id,name,location,hometown', (response) => {
-				let {id} = getCountry();
+				let {
+					id
+				} = getCountry();
 				let userId = response.id;
 
 				getLogin({
@@ -131,7 +134,7 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	Login() {
-		if(typeof(FB) == 'undefined'){
+		if (typeof(FB) == 'undefined') {
 			return modal.toast(LANG.LOGIN.Madal.Error);
 		}
 
@@ -147,26 +150,24 @@ export default class FacebookLogin extends EventEmitter {
 		if (typeof(FB) == 'undefined') {
 			return modal.toast(LANG.LOGIN.Madal.Error);
 		}
-		return new Promise((resolve, reject) => {
-			FB.ui(
-			    {
-			        method: 'share',
-			        href: URL,
-			    },
-			    // callback
-			    (response) => {
-			        if (response && !response.error_message) {
-			        	modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Completed, (_modal) => {
-			        		resolve(response);
-			        	});
-			        } else {
-			        	modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
-			        		reject(response);
-			        	});
-			        }
-			    }
-			);
-		});
+		return FB.ui({
+				method: 'share',
+				href: URL,
+			},
+			// callback
+			(response) => {
+				if (response && !response.error_message) {
+					let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
+					modal.alert(title, (_modal) => {
+						modal.closeModal(_modal);
+					});
+				} else {
+					modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
+						modal.closeModal(_modal);
+					});
+				}
+			}
+		);
 	}
 
 	Logout() {
@@ -179,7 +180,7 @@ export default class FacebookLogin extends EventEmitter {
 	}
 
 	static attachTo(options) {
-	    return new FacebookLogin(options);
+		return new FacebookLogin(options);
 	}
 }
 
@@ -191,6 +192,11 @@ export default class FacebookLogin extends EventEmitter {
 /**
  * facebookLogin.cancel
  * 当加载fackbook取消后的时候，会派发 facebookLogin.cancel 事件
+ */
+
+/**
+ * twitterLogin.share
+ * 当加载twitter分享后的时候，会派发 twitterLogin.share 事件
  */
 
 /**
