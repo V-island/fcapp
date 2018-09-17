@@ -122,13 +122,13 @@ export default class TwitterLogin extends EventEmitter {
 			let winObj = window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
 
 			var loop = setInterval(() => {
-			      if(winObj.closed) {
-			         clearInterval(loop);
-			         modal.alert(title, (_modal) => {
-			         	modal.closeModal(_modal);
-			         	resolve();
-			         });
-			      }
+				if(winObj.closed) {
+					clearInterval(loop);
+					modal.alert(title, (_modal) => {
+					 	modal.closeModal(_modal);
+					 	resolve();
+					});
+				}
 			}, 1000);
 		});
 	}
