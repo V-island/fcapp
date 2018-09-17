@@ -121,7 +121,7 @@ export default class TwitterLogin extends EventEmitter {
 		return new Promise((resolve) => {
 			let winObj = window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
 
-			var loop = setInterval(function() {
+			var loop = setInterval(() => {
 			      if(winObj.closed) {
 			         clearInterval(loop);
 			         modal.alert(title, (_modal) => {
@@ -152,6 +152,7 @@ export default class TwitterLogin extends EventEmitter {
   * twitterLogin.share
   * 当加载twitter分享后的时候，会派发 twitterLogin.share 事件
   */
+
 
 /**
  * twitterLogin.logout
