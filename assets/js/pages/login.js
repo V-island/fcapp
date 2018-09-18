@@ -8,6 +8,10 @@ import {
 } from '../lang';
 
 import {
+	allLogin
+} from '../api';
+
+import {
     extend,
     createDom,
     addEvent,

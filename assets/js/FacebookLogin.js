@@ -1,7 +1,8 @@
 import EventEmitter from './eventEmitter';
 import Modal from './modal';
 import {
-	facebookConfig
+	facebookConfig,
+	thirdPartyType
 } from './intro';
 
 import {
@@ -10,7 +11,7 @@ import {
 
 import {
 	getLogin,
-	getShare,
+	shareInfo,
 	getCountry
 } from './api';
 
@@ -113,16 +114,17 @@ export default class FacebookLogin extends EventEmitter {
 		// for FB.getLoginStatus().
 		if (response.status === 'connected') {
 			// Logged into your app and Facebook.
-			FB.api('/me?fields=id,name,location,hometown', (response) => {
-				let {
-					id
-				} = getCountry();
+			FB.api('/me?fields=id,name,picture{url}', (response) => {
+				let {id} = getCountry();
 				let userId = response.id;
-
+				let userName = response.name ? response.name : '';
+				let userHead = response.picture.data.url ? response.picture.data.url : '';
 				getLogin({
 					userAccount: userId,
-					account_type: 1,
-					country_id: id
+					account_type: thirdPartyType.facebook,
+					country_id: id,
+					user_name: userName,
+					user_head: userHead
 				});
 			});
 		} else {
@@ -159,7 +161,7 @@ export default class FacebookLogin extends EventEmitter {
 				// callback
 				(response) => {
 					if (response && !response.error_message) {
-						let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
+						let title = shareInfo(thirdPartyType.facebook) ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
 						modal.alert(title, (_modal) => {
 							modal.closeModal(_modal);
 							resolve();

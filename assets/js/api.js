@@ -107,7 +107,7 @@ const getPost = (_url, param, callback, callbackCancel, onProgress, _type, _head
 			response = JSON.parse(response);
 			// console.log(response);
 		}
-		if (response.code === 1000 || response.code === 1001) {
+		if (response.code === 1000 || response.code === 1001 || response.code === 1011) {
 			return callback(response);
 		}
 		if (response.code === 2012) {
@@ -220,13 +220,6 @@ const getMac = () => {
 	uuid = getUuid();
 	setLocalStorage(UUID, uuid);
 	return uuid;
-}
-
-// 获取分享信息
-export const getShare = () => {
-	let _Share = getLocalStorage(SHARE_NAME);
-
-	return _Share === null || _Share ? false : true;
 }
 
 // 获取用户信息
@@ -451,6 +444,8 @@ export const getRegister = (params, callback) => {
 			modal.closeModal(_modal);
 		});
 	}
+	_params.regiserWay = LoginMode;
+
 	return new Promise((resolve) => {
 
 		getPost('/insRegister', _params, (response) => {
@@ -587,6 +582,24 @@ export const CreateIMChannel = (userId, praiseId, commentId, giftsID) => {
 	return new Promise((resolve) => {
 		getPost('/CreateIMChannel', _params, (response) => {
 			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 新增根据国家获取所有的第三方登入接口
+ * @return {[type]} [description]
+ */
+export const allLogin = () => {
+	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
+
+	return new Promise((resolve) => {
+		getPost('/allLogin', {
+			country_id: id
+		}, (response) => {
+			resolve(response.data ? response.data : false);
 		}, (response) => {
 			resolve(false);
 		});
@@ -1572,6 +1585,25 @@ export const deleteVideo = (_id) => {
 	});
 };
 
+/**
+ * 新增分享成功赠送5金币接口
+ * @param  {[type]} id 第三方编号ID
+ * @return {[type]}    [description]
+ */
+export const shareInfo = (id) => {
+	let {userId} = getUserInfo();
+	let _params = {
+		userId: userId,
+		share_way_id: id
+	}
+
+	return new Promise((resolve) => {
+		getPost('/shareInfo', _params, (response) => {
+			resolve(response.code === 1000 ? true : false);
+		});
+	});
+};
+
 //------------------------------------------------------------------------------------------------------
 //-----支付模块
 //------------------------------------------------------------------------------------------------------
@@ -1722,7 +1754,12 @@ export const hasBindBlank = (type = 1) => {
 	});
 };
 
-
+/**
+ * 查看积分提现历史记录
+ * @param  {Number} _page   当前页
+ * @param  {Number} _number 条数
+ * @return {[type]}         [description]
+ */
 export const applyCashHistory = (_page = 1, _number = 10) => {
 	let {userId} = getUserInfo();
 	let _params = {
@@ -1734,6 +1771,24 @@ export const applyCashHistory = (_page = 1, _number = 10) => {
 	return new Promise((resolve) => {
 		getPost('/applyCashHistory', _params, (response) => {
 			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 新增根据国家和渠道ID获取所有支付方式接口
+ * @return {[type]} [description]
+ */
+export const payWay = () => {
+	let { id } = getLocalStorage(COUNTRY_ID_NAME);
+
+	return new Promise((resolve) => {
+		getPost('/payWay', {
+			country_id: id
+		}, (response) => {
+			resolve(response.data ? response.data : false);
 		}, (response) => {
 			resolve(false);
 		});

@@ -9,6 +9,7 @@ import {
 } from '../lang';
 
 import {
+	allLogin,
     getLogin
 } from '../api';
 

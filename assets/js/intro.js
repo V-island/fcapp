@@ -236,6 +236,15 @@ export const paypalConfig = {
     productionClientID: '***' // 生产环境，部署上线时使用的环境
 };
 
+// 第三方配置
+export const thirdPartyType = {
+    facebook: 1,
+    twitter: 2,
+    line: 3,
+    kakoo: 4,
+    snapchat: 5
+};
+
 // Facebook配置
 export const facebookConfig = {
     facebook: true, // 默认使用paypal DSK
@@ -251,5 +260,7 @@ export const twitterConfig = {
     twitterAPIKey: 'tsDbsfweUhFLcOoNFr2RFo5DO',
     twitterAPISecretKey: 'MeVPBkseBSK5qfgKw1iIuNANukvMEJsJAVefvDhnLy9zonvHiQ'
 };
+
+
 
 export const body = document.querySelector('body');

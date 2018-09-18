@@ -147,7 +147,7 @@ export default class Pay extends EventEmitter {
 	_paypalServerEvent() {
 		paypal.Button.render({
 
-			env: 'sandbox', // sandbox | production
+			env: 'production', // sandbox | production
 
 			// Show the buyer a 'Pay Now' button in the checkout flow
 			commit: true,
@@ -170,10 +170,12 @@ export default class Pay extends EventEmitter {
 						currency: this.currency
 					};
 					this.goodsPrice = order.goods_price;
-
+					console.log(order);
+					console.log(baseURL);
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
 						.then((res) => {
+							console.log(res);
 							let token = res.payUrl.split('token=');
 							return token[1];
 						});

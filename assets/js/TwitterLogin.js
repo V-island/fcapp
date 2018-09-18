@@ -3,7 +3,8 @@ import EventEmitter from './eventEmitter';
 import Modal from './modal';
 import {
 	domainURL,
-	twitterConfig
+	twitterConfig,
+	thirdPartyType
 } from './intro';
 
 import {
@@ -12,7 +13,7 @@ import {
 
 import {
 	getLogin,
-	getShare,
+	shareInfo,
 	getCountry
 } from './api';
 
@@ -98,11 +99,15 @@ export default class TwitterLogin extends EventEmitter {
 			hello(auth.network).api('me').then((response) => {
 				let {id} = getCountry();
 				let userId = response.id;
+				let userName = response.name ? response.name : '';
+				let userHead = response.thumbnail ? response.thumbnail : '';
 
 				getLogin({
 					userAccount: userId,
-					account_type: 2,
-					country_id: id
+					account_type: thirdPartyType.twitter,
+					country_id: id,
+					user_name: userName,
+					user_head: userHead
 				});
 			});
 		}, (e) => {
@@ -116,7 +121,7 @@ export default class TwitterLogin extends EventEmitter {
 	Share(URL) {
 		let shareText = 'What you want can always be found'; //假设你要在标题中分享用户名，需要先定义好userName
 		let shareUrl = `${URL}&text=${shareText}&url=${URL}`;
-		let title = getShare() ? LANG.LIVE_PREVIEW.Share.Prompt.Completed : LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once;
+		let title = shareInfo(thirdPartyType.twitter) ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
 
 		return new Promise((resolve) => {
 			let winObj = window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
