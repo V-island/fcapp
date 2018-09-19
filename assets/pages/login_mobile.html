@@ -43,14 +43,21 @@
             <div class="login-footer">
                 <p>{{LOGIN.Third_party.Title}}</p>
                 <div class="tag tag-share">
-                    <label class="share-label btn-fecebook">
-                        <i class="icon modals-fecebook" data-ripple></i>
-                        <span>{{LOGIN.Third_party.Facebook}}</span>
-                    </label>
-                    <label class="share-label btn-twitter">
-                        <i class="icon modals-Twitter" data-ripple></i>
-                        <span>{{LOGIN.Third_party.Twitter}}</span>
-                    </label>
+                    {{if ThirdPartyList}}
+                        {{each ThirdPartyList}}
+                            {{if $value.id == 1}}
+                                <label class="share-label btn-fecebook">
+                                    <i class="icon modals-fecebook" data-ripple></i>
+                                    <span>{{LOGIN.Third_party.Facebook}}</span>
+                                </label>
+                            {{else if $value.id == 2}}
+                                <label class="share-label btn-twitter">
+                                    <i class="icon modals-Twitter" data-ripple></i>
+                                    <span>{{LOGIN.Third_party.Twitter}}</span>
+                                </label>
+                            {{/if}}
+                        {{/each}}
+                    {{/if}}
                 </div>
             </div>
             <!-- /.login-footer -->

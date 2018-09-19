@@ -121,20 +121,22 @@ export default class TwitterLogin extends EventEmitter {
 	Share(URL) {
 		let shareText = 'What you want can always be found'; //假设你要在标题中分享用户名，需要先定义好userName
 		let shareUrl = `${URL}&text=${shareText}&url=${URL}`;
-		let title = shareInfo(thirdPartyType.twitter) ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
+		let winObj = window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
 
 		return new Promise((resolve) => {
-			let winObj = window.open(`https://twitter.com/intent/tweet?original_referer=${shareUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
+			shareInfo(thirdPartyType.twitter).then((data) => {
+				let title = data ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
 
-			var loop = setInterval(() => {
-				if(winObj.closed) {
-					clearInterval(loop);
-					modal.alert(title, (_modal) => {
-					 	modal.closeModal(_modal);
-					 	resolve();
-					});
-				}
-			}, 1000);
+				var loop = setInterval(() => {
+					if(winObj.closed) {
+						clearInterval(loop);
+						modal.alert(title, (_modal) => {
+						 	modal.closeModal(_modal);
+						 	resolve();
+						});
+					}
+				}, 1000);
+			});
 		});
 	}
 

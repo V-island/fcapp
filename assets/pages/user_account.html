@@ -14,7 +14,7 @@
                 <div class="banner">
                     <div class="banner-box">
                         <a href="#" class="banner-item">
-                            <img src="http://13.57.137.240:8080/imges/backimges/banner-chongzhi@2x.png">
+                            <img src="https://www.echathub.com/imges/backimges/banner-chongzhi@2x.png">
                         </a>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
                 <div class="tag tag-recharge">
                     {{if AllGoodsList}}
                         {{each AllGoodsList}}
-                            <label class="recharge-label {{if $index == 0}}active{{/if}}" data-id="{{$value.id}}" data-currency="USD" data-ripple>
+                            <label class="recharge-label {{if $index == 0}}active{{/if}}" data-id="{{$value.id}}" data-price="{{$value.total_price}}" data-ripple>
                                 <p class="cost">{{$value.title}} {{LIVE_PREVIEW.Actions.Coins}}</p>
                                 <p>{{$value.total_price}}</p>
                             </label>

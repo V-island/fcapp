@@ -17,7 +17,8 @@ import {
     extend,
     createDom,
     addEvent,
-    getData
+    getData,
+    getLocalStorage
 } from '../util';
 
 const LANG = getLangConfig();
@@ -27,6 +28,7 @@ export default class LoginMobile extends EventEmitter {
 	constructor(element, options) {
 	    super();
 
+	    this.data = {};
 	    this.options = {
 	    	formClass: '.form-login',
     		btnFecebookClass: 'btn-fecebook',
@@ -35,6 +37,7 @@ export default class LoginMobile extends EventEmitter {
         };
 
 	    extend(this.options, options);
+	    extend(this.data, LANG);
 
 	    this.FB = new FacebookLogin();
 		this.Twitter = new TwitterLogin();
@@ -42,12 +45,14 @@ export default class LoginMobile extends EventEmitter {
 	}
 
 	_init(element) {
-		this.LoginMobileEl = createDom(Template.render(element, LANG));
+		let getAllLogin = allLogin();
 
-		setTimeout(() => {
+		getAllLogin.then((data) => {
+			this.data.ThirdPartyList = data;
+			this.LoginMobileEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.LoginMobileEl);
 			this._bindEvent();
-		}, 0);
+		});
 	}
 
 	_bindEvent() {
@@ -58,19 +63,22 @@ export default class LoginMobile extends EventEmitter {
 			getLogin(params);
 		};
 
-		this.btnFecebookEl = this.LoginMobileEl.getElementsByClassName(this.options.btnFecebookClass)[0];
-		this.btnTwitterEl = this.LoginMobileEl.getElementsByClassName(this.options.btnTwitterClass)[0];
+		this.btnFecebookEl = this.LoginMobileEl.getElementsByClassName(this.options.btnFecebookClass);
+		this.btnTwitterEl = this.LoginMobileEl.getElementsByClassName(this.options.btnTwitterClass);
 
         // Facebook 登录
-		addEvent(this.btnFecebookEl, 'click', () => {
-			this.FB.Login();
-        });
+        if (this.btnFecebookEl.length > 0) {
+    		addEvent(this.btnFecebookEl[0], 'click', () => {
+    			this.FB.Login();
+            });
+        }
 
         // Twitter 登录
-		addEvent(this.btnTwitterEl, 'click', () => {
-			this.Twitter.Login('twitter');
-			// return modal.toast(LANG.LOGIN.Third_party.Text);
-        });
+        if (this.btnTwitterEl.length > 0) {
+    		addEvent(this.btnTwitterEl[0], 'click', () => {
+    			this.Twitter.Login('twitter');
+            });
+        }
 	}
 
 	static attachTo(element, options) {

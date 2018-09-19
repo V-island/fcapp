@@ -1593,7 +1593,7 @@ export const deleteVideo = (_id) => {
 export const shareInfo = (id) => {
 	let {userId} = getUserInfo();
 	let _params = {
-		userId: userId,
+		user_id: userId,
 		share_way_id: id
 	}
 

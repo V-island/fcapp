@@ -147,7 +147,7 @@ export default class Modal extends EventEmitter {
         let isModal = modal.hasClass('modal'),
             isNotToast = !modal.hasClass('toast');
         if ($('.modal.modal-in:not(.modal-out)').length && self.defaults.modalStack && isModal && isNotToast) {
-            $.modalStack.push(function () {
+            self.modalStack.push(function () {
                 self.openModal(modal, cb);
             });
             return;

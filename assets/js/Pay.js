@@ -170,12 +170,9 @@ export default class Pay extends EventEmitter {
 						currency: this.currency
 					};
 					this.goodsPrice = order.goods_price;
-					console.log(order);
-					console.log(baseURL);
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
 						.then((res) => {
-							console.log(res);
 							let token = res.payUrl.split('token=');
 							return token[1];
 						});
@@ -202,6 +199,16 @@ export default class Pay extends EventEmitter {
 							this.trigger('pay.success', this.goodsPrice);
 						});
 					});
+			},
+
+			// Buyer cancelled the payment
+			onCancel: function(data, actions) {
+			    console.log(data);
+			},
+
+			// An error occurred during the transaction
+			onError: function(err) {
+			   console.log(err);
 			}
 
 		}, this.options.btnPaypalId);
