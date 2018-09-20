@@ -21,7 +21,7 @@ const modal = new Modal();
         var $content = $page.hasClass('content') ?
                        $page :
                        $page.find('.content');
-        $content.scroller();  //注意滚动条一定要最先初始化
+        // $content.scroller();  //注意滚动条一定要最先初始化
 
         if ($.initPullToRefresh) $.initPullToRefresh($content);
         if ($.initInfiniteScroll) $.initInfiniteScroll($content);
@@ -54,7 +54,6 @@ const modal = new Modal();
     $(window).on('pageAnimationStart', function(event,id,page) {
         // 在路由切换页面动画开始前,为了把位于 .page 之外的 popup 等隐藏,此处做些处理
         modal.closeModal();
-        $.closePanel();
         // 如果 panel 的 effect 是 reveal 时,似乎是 page 的动画或别的样式原因导致了 transitionEnd 时间不会触发
         // 这里暂且处理一下
         $('body').removeClass('panel-closing');
@@ -63,11 +62,6 @@ const modal = new Modal();
 
     $(window).on('pageInit', function() {
         modal.hideIndicator();
-        $.lastPosition({
-            needMemoryClass: [
-                '.content'
-            ]
-        });
     });
     // safari 在后退的时候会使用缓存技术，但实现上似乎存在些问题，
     // 导致路由中绑定的点击事件不会正常如期的运行（log 和 debugger 都没法调试），

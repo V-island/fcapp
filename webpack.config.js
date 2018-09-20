@@ -13,27 +13,40 @@ const PRODUCTION = 'production';
 
 module.exports = {
 	entry: {
-		webcomponentsLite: '@webcomponents/webcomponentsjs/webcomponents-lite',
-		sl: [
-			// 'es5-shim',
-			// 'es6-shim',
-			'./assets/js/components/webcomponents-bundle',
-			'./assets/js/zepto-adapter',
+		// sl: [
+		// 	// 'es5-shim',
+		// 	// 'es6-shim',
+		// 	'./assets/js/components/webcomponents-bundle',
+		// 	'./assets/js/zepto-adapter',
+		// 	'./assets/js/lang',
+		// 	'./assets/js/device',
+		// 	'./assets/js/fastclick',
+		// 	'./assets/js/scroller',
+		// 	'./assets/js/panels',
+		// 	'./assets/js/init',
+		// 	'./assets/js/router',
+		// 	'./assets/js/last-position',
+		// 	'./assets/js/navigator',
+		// 	'./assets/scss/fc.scss'
+		// ],
+		webcomponentsLite: [
+			'@webcomponents/webcomponentsjs/webcomponents-lite',
+			'./assets/js/components/webcomponents-bundle'
+		],
+		slScript: [
+			// './assets/js/zepto-adapter',
 			'./assets/js/lang',
-			'./assets/js/device',
+			// './assets/js/device',
 			'./assets/js/fastclick',
-			'./assets/js/scroller',
-			'./assets/js/panels',
 			'./assets/js/init',
 			'./assets/js/router',
-			'./assets/js/last-position',
-			'./assets/js/navigator',
-			'./assets/scss/fc.scss'
+			'./assets/js/navigator'
 		],
 		slComponents: [
 			'jquery-ripple',
 			'video.js'
 		],
+		slStyle: './assets/scss/sl.scss',
 		redirect: './assets/js/pages/redirect'
 
 	},
@@ -142,7 +155,7 @@ module.exports = {
 			title: 'SHINE LIVE- live video stream and chat',
 			filename: 'index.html',
 			template: './assets/index.html',
-			chunks: ['webcomponentsLite', 'sl', 'slComponents'],
+			chunks: ['webcomponentsLite', 'slScript', 'slStyle', 'slComponents'],
 			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',

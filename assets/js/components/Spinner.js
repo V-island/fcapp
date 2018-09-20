@@ -1,4 +1,3 @@
-import styles from '../../scss/spinner.scss';
 import {
     createDivEl
 } from '../util';
@@ -15,12 +14,8 @@ class Spinner {
     }
 
     _createSpinner() {
-        const item = createDivEl({
-            className: styles['spinner-wapper']
-        });
-        const bubble = createDivEl({
-            className: styles['spinner-bubble']
-        });
+        const item = createDivEl({ className: 'spinner-wapper' });
+        const bubble = createDivEl({ className: 'spinner-bubble' });
         item.appendChild(bubble);
         return item;
     }

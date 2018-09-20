@@ -59,6 +59,7 @@ export default class Pay extends EventEmitter {
 
 	_init() {
 		const { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
+		this.totalPrice = '50.00$';
 		this.goodsPrice = '';
 		this.payType = 1;
 		this.goodsId = 1;
@@ -121,8 +122,14 @@ export default class Pay extends EventEmitter {
 					removeClass(activeLabelEl, this.options.showClass);
 				}
 				this.goodsId = parseInt(getData(labelEl, this.options.dataIndex));
-				this.currency = getData(labelEl, this.options.dataCurrency);
+				this.totalPrice = getData(labelEl, this.options.dataPrice);
 				addClass(labelEl, this.options.showClass);
+
+				gtag('event', 'click', {
+				    'event_label': `${this.totalPrice} commodity`,
+				    'event_category': 'Pay',
+				    'non_interaction': true
+				});
 	        });
 		});
 
@@ -197,18 +204,32 @@ export default class Pay extends EventEmitter {
 						modal.alert(LANG.SYSTEM_CODE[res.code], (_modal) => {
 							modal.closeModal(_modal);
 							this.trigger('pay.success', this.goodsPrice);
+
+							gtag('event', 'success', {
+							    'event_label': `${this.totalPrice} commodity`,
+							    'event_category': 'Pay',
+							    'non_interaction': true
+							});
 						});
 					});
 			},
 
 			// Buyer cancelled the payment
-			onCancel: function(data, actions) {
-			    console.log(data);
+			onCancel: (data, actions) => {
+			    gtag('event', 'cancel', {
+				    'event_label': `${this.totalPrice} commodity`,
+				    'event_category': 'Pay',
+				    'non_interaction': true
+				});
 			},
 
 			// An error occurred during the transaction
-			onError: function(err) {
-			   console.log(err);
+			onError: (err) => {
+			    gtag('event', 'error', {
+				    'event_label': `${this.totalPrice} commodity`,
+				    'event_category': 'Pay',
+				    'non_interaction': true
+				});
 			}
 
 		}, this.options.btnPaypalId);

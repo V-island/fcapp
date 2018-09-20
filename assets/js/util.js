@@ -587,6 +587,29 @@ export const empty = element => {
     }
 };
 
+// 动画过渡事件
+const __dealCssEvent = (element, eventNameArr, callback) =>{
+    let fireCallBack = () => {
+        callback.call(element);
+        eventNameArr.forEach(event => {
+            removeEvent(element, event, fireCallBack);
+        });
+    }
+    eventNameArr.forEach(event => {
+        addEvent(element, event, fireCallBack);
+    });
+}
+export const animationEnd = (element, callback) => {
+    let events = ['webkitAnimationEnd', 'animationend'];
+
+    return __dealCssEvent(element, events, callback);
+};
+export const transitionEnd = (element, callback) => {
+    let events = ['webkitTransitionEnd', 'transitionend'];
+
+    return __dealCssEvent(element, events, callback);
+};
+
 
 // datetime-picker
 export const getDaysInMonth = (year, month) => {

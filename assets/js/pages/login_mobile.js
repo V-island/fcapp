@@ -60,7 +60,24 @@ export default class LoginMobile extends EventEmitter {
 
 		// 表单提交
 		FormEvent.onsubmit = (params) => {
-			getLogin(params);
+			gtag('event', 'click', {
+			    'event_label': 'Mobile',
+			    'event_category': 'Login',
+			    'non_interaction': true
+			});
+			getLogin(params).then((result) => {
+			    gtag('event', 'success', {
+			        'event_label': 'Mobile',
+			        'event_category': 'Login',
+			        'non_interaction': true
+			    });
+			}).catch((reason) => {
+			    gtag('event', 'error', {
+			        'event_label': 'Mobile',
+			        'event_category': 'Login',
+			        'non_interaction': true
+			    });
+			});
 		};
 
 		this.btnFecebookEl = this.LoginMobileEl.getElementsByClassName(this.options.btnFecebookClass);

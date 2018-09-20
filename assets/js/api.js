@@ -446,7 +446,7 @@ export const getRegister = (params, callback) => {
 	}
 	_params.regiserWay = LoginMode;
 
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 
 		getPost('/insRegister', _params, (response) => {
 			getLogin({
@@ -455,6 +455,8 @@ export const getRegister = (params, callback) => {
 				userPassword: _params.userPassword
 			});
 			resolve(true);
+		}, (response) => {
+			reject(false);
 		});
 	});
 };
@@ -473,17 +475,27 @@ export const getLogin = (params, callback) => {
 	_params.phoneType = PhoneType;
 	_params.loginMode = LoginMode;
 	_params.status = 1;
-	getPost('/appLogin', _params, (response) => {
-		modal.toast(LANG.SYSTEM_CODE[response.code]);
-		const {token, userId, phoneCode, userPhone, praise_channel, comment_channel, gift_channel} = response.data;
 
-		setLocalStorage(TOKEN_NAME, token);
-		Spinner.start(body);
-		checkIMChannel(userId, praise_channel, comment_channel, gift_channel).then(({praiseURL, commentURL, giftURL}) => {
-			SendBirdAction.getInstance().disconnect();
-			CreateIMChannel(userId, praiseURL, commentURL, giftURL).then((data) => {
-				if (!data) getLogin(_params);
+	return new Promise((resolve, reject) => {
+		getPost('/appLogin', _params, (response) => {
+			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			const {token, userId, phoneCode, userPhone, praise_channel, comment_channel, gift_channel} = response.data;
 
+			setLocalStorage(TOKEN_NAME, token);
+			Spinner.start(body);
+			checkIMChannel(userId, praise_channel, comment_channel, gift_channel).then(({praiseURL, commentURL, giftURL}) => {
+				SendBirdAction.getInstance().disconnect();
+				CreateIMChannel(userId, praiseURL, commentURL, giftURL).then((data) => {
+					if (!data) getLogin(_params);
+
+					personCenter({
+						userId: userId,
+						phoneCode: phoneCode,
+						userPhone: userPhone
+					}, token, _mac, true);
+					Spinner.remove();
+				});
+			}).catch(() => {
 				personCenter({
 					userId: userId,
 					phoneCode: phoneCode,
@@ -491,13 +503,10 @@ export const getLogin = (params, callback) => {
 				}, token, _mac, true);
 				Spinner.remove();
 			});
-		}).catch(() => {
-			personCenter({
-				userId: userId,
-				phoneCode: phoneCode,
-				userPhone: userPhone
-			}, token, _mac, true);
-			Spinner.remove();
+
+			resolve(true);
+		}, (response) => {
+			reject(false);
 		});
 	});
 };

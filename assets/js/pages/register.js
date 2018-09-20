@@ -43,7 +43,24 @@ export default class Register extends EventEmitter {
 
 		// 表单提交
 		FormEvent.onsubmit = (params) => {
-			getRegister(params);
+			gtag('event', 'click', {
+			    'event_label': 'Mobile',
+			    'event_category': 'Register',
+			    'non_interaction': true
+			});
+			getRegister(params).then((result) => {
+			    gtag('event', 'success', {
+			        'event_label': 'Mobile',
+			        'event_category': 'Register',
+			        'non_interaction': true
+			    });
+			}).catch((reason) => {
+			    gtag('event', 'error', {
+			        'event_label': 'Mobile',
+			        'event_category': 'Register',
+			        'non_interaction': true
+			    });
+			});
 		};
 	}
 

@@ -112,6 +112,12 @@ export default class Forms {
         if (this.countryEl.length > 0) {
             addEvent(this.countryEl[0], 'click', () => {
                 modal.countryModal(this.Country.id);
+
+                gtag('event', 'click', {
+                    'event_label': 'Country selection button',
+                    'event_category': 'Login',
+                    'non_interaction': true
+                });
             });
         }
 
@@ -161,6 +167,12 @@ export default class Forms {
                         Spinner.remove();
                     });
                 }
+
+                gtag('event', 'click', {
+                    'event_label': 'Verification code button',
+                    'event_category': 'Register',
+                    'non_interaction': true
+                });
             });
         }
 

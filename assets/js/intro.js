@@ -45,159 +45,159 @@ export const fcConfig = {
     publicFile: {
         home_items: {
             name: 'home_items',
-            path: adminBase + 'public/home_items.html'
+            path: `${adminBase}public/home_items.html`
         },
         favorite_items: {
             name: 'favorite_items',
-            path: adminBase + 'public/favorite_items.html'
+            path: `${adminBase}public/favorite_items.html`
         },
         other_details_item: {
             name: 'other_details_item',
-            path: adminBase + 'public/other_details_item.html'
+            path: `${adminBase}public/other_details_item.html`
         },
         bar_tabs: {
             name: 'bar_tabs',
-            path: adminBase + 'public/bar_tabs.html'
+            path: `${adminBase}public/bar_tabs.html`
         },
         live_preview: {
             name: 'live_preview',
-            path: adminBase + 'public/live_preview.html'
+            path: `${adminBase}public/live_preview.html`
         },
         client_rtc: {
             name: 'client_rtc',
-            path: adminBase + 'public/client_rtc.html'
+            path: `${adminBase}public/client_rtc.html`
         },
         client_call: {
             name: 'client_call',
-            path: adminBase + 'public/client_call.html'
+            path: `${adminBase}public/client_call.html`
         }
     },
     pagesFile: [{
         name: '404',
-        path: adminBase + 'pages/404.html',
+        path: `${adminBase}pages/404.html`,
         component: ErrorJS,
         init: 1
     }, {
         name: 'login',
-        path: adminBase + 'pages/login.html',
+        path: `${adminBase}pages/login.html`,
         component: Login,
         init: 1,
         children: [{
             name: 'mobile',
-            path: adminBase + 'pages/login_mobile.html',
+            path: `${adminBase}pages/login_mobile.html`,
             component: LoginMobile,
             init: 1
         }, {
             name: 'find',
-            path: adminBase + 'pages/find_password.html',
+            path: `${adminBase}pages/find_password.html`,
             component: FindPassword,
             init: 1
         }, {
             name: 'set',
-            path: adminBase + 'pages/set_password.html',
+            path: `${adminBase}pages/set_password.html`,
             component: SetPassword,
             init: 1
         }]
     }, {
         name: 'register',
-        path: adminBase + 'pages/register.html',
+        path: `${adminBase}pages/register.html`,
         component: Register,
         init: 1,
         children: [{
             name: 'terms',
-            path: adminBase + 'pages/register_terms.html',
+            path: `${adminBase}pages/register_terms.html`,
             component: RegisterTerms,
             init: 1
         }]
     }, {
         name: 'home',
-        path: adminBase + 'pages/home.html',
+        path: `${adminBase}pages/home.html`,
         component: Home,
         init: 1,
         navTabs: 1,
         children: [{
             name: 'freevideo',
-            path: adminBase + 'pages/free_video.html',
+            path: `${adminBase}pages/free_video.html`,
             component: FreeVideo,
             init: 1
         }]
     }, {
         name: 'favorite',
-        path: adminBase + 'pages/favorite.html',
+        path: `${adminBase}pages/favorite.html`,
         component: Favorite,
         navTabs: 1
     }, {
         name: 'message',
-        path: adminBase + 'pages/message.html',
+        path: `${adminBase}pages/message.html`,
         component: Message,
         navTabs: 1
     }, {
         name: 'details',
-        path: adminBase + 'pages/other_details.html',
+        path: `${adminBase}pages/other_details.html`,
         component: OtherDetails
     }, {
         name: 'user',
-        path: adminBase + 'pages/user.html',
+        path: `${adminBase}pages/user.html`,
         component: User,
         navTabs: 1,
         children: [{
             name: 'detail',
-            path: adminBase + 'pages/user_detail.html',
+            path: `${adminBase}pages/user_detail.html`,
             component: UserDetail
         }, {
             name: 'video',
-            path: adminBase + 'pages/user_video.html',
+            path: `${adminBase}pages/user_video.html`,
             component: UserVideo
         }, {
             name: 'watch',
-            path: adminBase + 'pages/user_watch.html',
+            path: `${adminBase}pages/user_watch.html`,
             component: UserWatch
         }, {
             name: 'account',
-            path: adminBase + 'pages/user_account.html',
+            path: `${adminBase}pages/user_account.html`,
             component: UserAccount,
             children: [{
                 name: 'history',
-                path: adminBase + 'pages/user_account_history.html',
+                path: `${adminBase}pages/user_account_history.html`,
                 component: UserAccountHistory
             }, {
                 name: 'terms',
-                path: adminBase + 'pages/user_account_terms.html',
+                path: `${adminBase}pages/user_account_terms.html`,
                 component: UserAccountTerms,
                 init: 1
             }]
         }, {
             name: 'score',
-            path: adminBase + 'pages/user_score.html',
+            path: `${adminBase}pages/user_score.html`,
             component: UserScore,
             children: [{
                 name: 'history',
-                path: adminBase + 'pages/user_score_history.html',
+                path: `${adminBase}pages/user_score_history.html`,
                 component: UserScoreHistory
             }, {
                 name: 'withdraw',
-                path: adminBase + 'pages/user_score_withdraw.html',
+                path: `${adminBase}pages/user_score_withdraw.html`,
                 component: UserScoreWithdraw
             }]
         }, {
             name: 'setting',
-            path: adminBase + 'pages/user_setting.html',
+            path: `${adminBase}pages/user_setting.html`,
             component: UserSetting,
             children: [{
                 name: 'security',
-                path: adminBase + 'pages/user_setting_security.html',
+                path: `${adminBase}pages/user_setting_security.html`,
                 component: UserSettingSecurity
             }, {
                 name: 'help',
-                path: adminBase + 'pages/user_setting_help.html',
+                path: `${adminBase}pages/user_setting_help.html`,
                 component: UserSettingHelp
             }, {
                 name: 'suggestion',
-                path: adminBase + 'pages/user_setting_suggestion.html',
+                path: `${adminBase}pages/user_setting_suggestion.html`,
                 component: UserSettingSuggestion
             }, {
                 name: 'about',
-                path: adminBase + 'pages/user_setting_about.html',
+                path: `${adminBase}pages/user_setting_about.html`,
                 component: UserSettingAbout
             }]
         }]

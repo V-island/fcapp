@@ -15,6 +15,7 @@ import {
 import {
     jumpURL,
     replaceNote,
+    animationEnd,
     getUrlFragment
 } from './util';
 
@@ -536,6 +537,29 @@ import {
             document.head.appendChild(link);
         }
 
+
+        _createScript(url) {
+            return new Promise((resolve, reject) => {
+                const heads = document.getElementsByTagName("head");
+                const script = document.createElement("script");
+
+                script.setAttribute("type", "text/javascript");
+                script.setAttribute("src", url);
+                script.onload = script.onreadystatechange = function(e) {
+                    if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+                        resolve(true);
+                        // Handle memory leak in IE
+                        script.onload = script.onreadystatechange = null;
+                    }
+                };
+                if (heads.length) {
+                    heads[0].appendChild(script);
+                } else {
+                    document.documentElement.appendChild(script);
+                }
+            });
+        }
+
         /**
          * 把一个页面的相关信息保存到 this.cache 中
          *
@@ -584,7 +608,7 @@ import {
             }
 
             this._animateElement($from, $to, direction);
-            $from.animationEnd(function() {
+            animationEnd($from[0], () => {
                 $visibleSectionInFrom.removeClass(routerConfig.visiblePageClass);
                 // 移除 document 前后，发送 beforePageRemove 和 pageRemoved 事件
                 $(window).trigger(EVENTS.beforePageRemove, [$from]);
@@ -592,7 +616,7 @@ import {
                 $(window).trigger(EVENTS.pageRemoved);
             });
 
-            $to.animationEnd(function() {
+            animationEnd($to[0], () => {
                 $visibleSection.trigger(EVENTS.pageAnimationEnd, [sectionId, $visibleSection]);
                 // 外层（init.js）中会绑定 pageInitInternal 事件，然后对页面进行初始化
                 $visibleSection.trigger(EVENTS.pageInit, [sectionId, $visibleSection]);
@@ -679,10 +703,10 @@ import {
             $from.removeClass(animPageClasses).addClass(classForFrom);
             $to.removeClass(animPageClasses).addClass(classForTo);
 
-            $from.animationEnd(function() {
+            animationEnd($from[0], () => {
                 $from.removeClass(animPageClasses);
             });
-            $to.animationEnd(function() {
+            animationEnd($to[0], () => {
                 $to.removeClass(animPageClasses);
             });
         }
