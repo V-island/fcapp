@@ -34,13 +34,18 @@ const modal = new Modal();
 日语(日本)          ja-jp
  */
 const phonesRule = {
-    'en_US': /^[2-9]\d{2}[2-9](?!11)\d{6}$/,
-    'ja_JP': /^0[7-9]0\d{8}$/,
     'zh_CN': /^1[345789]\d{9}$/,
-    'en_UK': /^7\d{9}$/,
-    'id_IN': /^\d{10}$/,
-    'ko_KR': /^\d{11}$/,
-    'cd_CA': /^\d{10}$/
+    'en_US': /^[2-9]\d{2}[2-9](?!11)\d{6}$/,
+    'id_IN': /^9\d{9}$/,
+    'ko_KR': /^01\d{9}$/,
+    'cd_CA': /^\d{7}$/,
+    'ms_MY': /^(\+?6?01){1}(([145]{1}(\-|\s)?\d{7,8})|([236789]{1}(\s|\-)?\d{7}))$/,
+    'id_ID': /^[2-7]\d{6,9}$/,
+    'en_PH': /^91\d{8}$/,
+    'zh_SG': /^[89]\d{7}$/,
+    'ms_BN': /^\d{7}$/,
+    'ja_JP': /^0[7-9]0\d{8}$/,
+    'en_GB': /^7\d{9}$/
 };
 
 export default class Forms {
@@ -154,6 +159,12 @@ export default class Forms {
                 let inputEl = groupEl.getElementsByTagName(this.options.inputTagName)[0];
                 let _value = inputEl.value;
 
+                gtag('event', 'click', {
+                    'event_label': 'Verification code button',
+                    'event_category': 'Register',
+                    'non_interaction': true
+                });
+
                 if (phonesRule[this.Country.language_code].test(_value)) {
                     return sendVerificationCode(this.Country.phone_code + _value).then(() => {
                         inputEl.setAttribute(this.options.disabledClass, this.options.disabledClass);
@@ -167,12 +178,6 @@ export default class Forms {
                         Spinner.remove();
                     });
                 }
-
-                gtag('event', 'click', {
-                    'event_label': 'Verification code button',
-                    'event_category': 'Register',
-                    'non_interaction': true
-                });
             });
         }
 
