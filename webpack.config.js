@@ -13,22 +13,6 @@ const PRODUCTION = 'production';
 
 module.exports = {
 	entry: {
-		// sl: [
-		// 	// 'es5-shim',
-		// 	// 'es6-shim',
-		// 	'./assets/js/components/webcomponents-bundle',
-		// 	'./assets/js/zepto-adapter',
-		// 	'./assets/js/lang',
-		// 	'./assets/js/device',
-		// 	'./assets/js/fastclick',
-		// 	'./assets/js/scroller',
-		// 	'./assets/js/panels',
-		// 	'./assets/js/init',
-		// 	'./assets/js/router',
-		// 	'./assets/js/last-position',
-		// 	'./assets/js/navigator',
-		// 	'./assets/scss/fc.scss'
-		// ],
 		webcomponentsLite: [
 			'@webcomponents/webcomponentsjs/webcomponents-lite',
 			'./assets/js/components/webcomponents-bundle'
@@ -81,7 +65,7 @@ module.exports = {
 					name: '[hash].[ext]',
 					outputPath: '/assets/img',
 					// publicPath: '/dist/',
-					limit: 8192
+					limit: 81920
 				}
 			}]
 		}, {
@@ -201,6 +185,9 @@ module.exports = {
 		}, {
 			from: path.resolve(__dirname, 'assets/public'),
 			to: './public'
+		}, {
+			from: path.resolve(__dirname, 'assets/lang'),
+			to: './assets/lang'
 		}, {
 			from: path.resolve(__dirname, 'assets/img/logos'),
 			to: './assets/img'

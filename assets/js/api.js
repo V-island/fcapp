@@ -444,7 +444,7 @@ export const getRegister = (params, callback) => {
 			modal.closeModal(_modal);
 		});
 	}
-	_params.regiserWay = LoginMode;
+	_params.registerWay = LoginMode;
 
 	return new Promise((resolve, reject) => {
 
