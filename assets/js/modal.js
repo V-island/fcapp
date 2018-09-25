@@ -7,6 +7,9 @@ import {
 } from './lang';
 
 import {
+    setData,
+    getData,
+    dataSet,
     createDom,
     refreshURL,
     transitionEnd,
@@ -57,7 +60,7 @@ export default class Modal extends EventEmitter {
             let clicked = $(this);
             let url = clicked.attr('href');
             //Collect Clicked data- attributes
-            let clickedData = clicked.dataset();
+            let clickedData = dataSet(clicked);
 
             // Popup
             let popup;

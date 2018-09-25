@@ -492,6 +492,19 @@ export const removeData = (target, key) => {
   delete target.dataset[`${key}`];
 };
 
+export const dataSet = (target) => {
+    var dataset = {},
+        ds = target.dataset;
+    for (var key in ds) { // jshint ignore:line
+        var item = (dataset[key] = ds[key]);
+        if (item === 'false') dataset[key] = false;
+        else if (item === 'true') dataset[key] = true;
+        else if (parseFloat(item) === item * 1) dataset[key] = item * 1;
+    }
+    // mixin dataset and __eleData
+    return extend({}, dataset, target.__eleData);
+};
+
 // DOM 监听器 操作
 export const extend = (obj, ...args) => {
     const deep = obj === true;
