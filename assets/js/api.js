@@ -30,11 +30,13 @@ const CONFIG = {
     rootUrl: '#/home',
     notloginUrl: '#/login/mobile'
 }
+const DistGreen = true;
 
 const Type = 'POST';
 const MacType = 1; // 设备类型 1.手机 2.PC
 const PhoneType = null;
 const LoginMode = 2; // 登入方式 1.APP 2.web 3.PC
+
 
 // localStorage KEY
 const TOKEN_NAME = 'TOKEN';
@@ -456,7 +458,7 @@ export const getRegister = (params, callback) => {
 			});
 			resolve(true);
 		}, (response) => {
-			reject(false);
+			reject(response.message);
 		});
 	});
 };
@@ -475,6 +477,10 @@ export const getLogin = (params, callback) => {
 	_params.phoneType = PhoneType;
 	_params.loginMode = LoginMode;
 	_params.status = 1;
+
+	if (DistGreen) {
+		_params.channel_id = 1;
+	}
 
 	return new Promise((resolve, reject) => {
 		getPost('/appLogin', _params, (response) => {
@@ -506,7 +512,7 @@ export const getLogin = (params, callback) => {
 
 			resolve(true);
 		}, (response) => {
-			reject(false);
+			reject(response.message);
 		});
 	});
 };
@@ -938,6 +944,10 @@ export const selVideoByUserId = (Id, _page = 1, _number = 10) => {
 		page: _page,
 		number: _number,
 		login_user_id: userId
+	}
+
+	if (DistGreen) {
+		_params.channel_id = 1;
 	}
 
 	return new Promise((resolve) => {
@@ -1383,14 +1393,20 @@ export const hotVideo = (_page = 1, _number = 10) => {
  */
 export const videoClips = (_page = 1, _number = 10, _tag = 0, _type) => {
 	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
+	let _params = {
+		page: _page,
+		number: _number,
+		type: _type,
+		video_tag: _tag,
+		country_id: id
+	};
+
+	if (DistGreen) {
+		_params.channel_id = 1;
+	}
+
 	return new Promise((resolve) => {
-		getPost('/videoClips', {
-			page: _page,
-			number: _number,
-			type: _type,
-			video_tag: _tag,
-			country_id: id
-		}, (response) => {
+		getPost('/videoClips', _params, (response) => {
 			resolve(response.data ? response.data : false);
 		}, (response) => {
 			resolve(false);
@@ -1633,6 +1649,10 @@ export const createOrder = (goodsId, type) => {
 		mac: getMac()
 	}
 
+	if (DistGreen) {
+		_params.channel_id = 1;
+	}
+
 	return new Promise((resolve) => {
 		getPost('/createOrder', _params, (response) => {
 			resolve(response.data);
@@ -1792,11 +1812,15 @@ export const applyCashHistory = (_page = 1, _number = 10) => {
  */
 export const payWay = () => {
 	let { id } = getLocalStorage(COUNTRY_ID_NAME);
+	let _params = {
+		country_id: id
+	}
+	if (DistGreen) {
+		_params.channel_id = 1;
+	}
 
 	return new Promise((resolve) => {
-		getPost('/payWay', {
-			country_id: id
-		}, (response) => {
+		getPost('/payWay', _params, (response) => {
 			resolve(response.data ? response.data : false);
 		}, (response) => {
 			resolve(false);

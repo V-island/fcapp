@@ -112,11 +112,11 @@ export default class RecordPhoto extends EventEmitter {
 
     _initInput() {
         let inputEl = document.createElement('input');
-        let userAgent = navigator.userAgent.toLowerCase();
+        // let userAgent = navigator.userAgent.toLowerCase();
         //判断是否是苹果手机，是则是true
-        if ((userAgent.indexOf('iphone') != -1) || (userAgent.indexOf('ipad') != -1)) {
-            inputEl.setAttribute("capture", "camera");
-        };
+        // if ((userAgent.indexOf('iphone') != -1) || (userAgent.indexOf('ipad') != -1)) {
+        //     inputEl.setAttribute("capture", "camera");
+        // };
 
         inputEl.setAttribute("type", "file");
         inputEl.setAttribute("accept", "image/*");

@@ -61,11 +61,13 @@ export default class Message extends EventEmitter {
 		// SendBird SDK 初始化
 		Spinner.start(this.contentEl);
 		SendBird.connect(userId).then(user => {
+			console.log(user);
 			this.createConnectionHandler();
 			this.createChannelEvent();
 			this.updateGroupChannelTime();
 			this.getOpenChannelList(true);
 			this.getGroupChannelList(true);
+			this.createCustomerChannel(userId);
 			this._init();
 			Spinner.remove();
 		}).catch(() => {
@@ -77,7 +79,6 @@ export default class Message extends EventEmitter {
 		this.listMessageEl = this.MessageEl.getElementsByClassName(this.options.listMessageClass)[0];
 
 		this._bindEvent();
-		this.createCustomerChannel();
 	}
 
 	_bindEvent() {
@@ -90,9 +91,12 @@ export default class Message extends EventEmitter {
 
 	// 链接客服频道号
 	createCustomerChannel() {
-		const customerIds = 'CS_01';
+		if (userId == sendBirdConfig.customerUserId) {
+			return false;
+		}
+
 		SendBirdAction.getInstance()
-			.createChannelWithUserIds(customerIds, sendBirdConfig.customerName, sendBirdConfig.customerType)
+			.createChannelWithUserIds(sendBirdConfig.customerIds, sendBirdConfig.customerName, sendBirdConfig.customerType)
 			.then(channel => {
 				const _item = this.getItem(channel.url);
 				if (_item) return false;

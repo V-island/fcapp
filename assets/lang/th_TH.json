@@ -19,24 +19,6 @@
         "FreeVideo": {
             "Title": "Freevideo"
         },
-        "VideoType": [
-            {
-                "Id": 1,
-                "Title": "Dance"
-            },
-            {
-                "Id": 2,
-                "Title": "Singing"
-            },
-            {
-                "Id": 3,
-                "Title": "Emotion"
-            },
-            {
-                "Id": 4,
-                "Title": "Art"
-            }
-        ],
         "Madal": {
             "NotCoins": {
                 "Title": "Not enough coins",

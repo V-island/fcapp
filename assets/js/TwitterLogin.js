@@ -1,4 +1,4 @@
-// import hello from 'hellojs/dist/hello.all.js';
+﻿// import hello from 'hellojs/dist/hello.all.js';
 import EventEmitter from './eventEmitter';
 import Modal from './modal';
 import {
@@ -109,17 +109,7 @@ export default class TwitterLogin extends EventEmitter {
 					user_name: userName,
 					user_head: userHead
 				}).then((result) => {
-				    gtag('event', 'success', {
-				        'event_label': 'Twitter',
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
 				}).catch((reason) => {
-				    gtag('event', 'error', {
-				        'event_label': 'Twitter',
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
 				});
 			});
 		}, (e) => {
@@ -127,18 +117,6 @@ export default class TwitterLogin extends EventEmitter {
 				modal.closeModal(_modal);
 				this.trigger('twitterLogin.cancel');
 			});
-
-			gtag('event', 'cancel', {
-			    'event_label': 'Twitter',
-			    'event_category': 'Login',
-			    'non_interaction': true
-			});
-		});
-
-		gtag('event', 'click', {
-		    'event_label': 'Twitter',
-		    'event_category': 'Login',
-		    'non_interaction': true
 		});
 	}
 

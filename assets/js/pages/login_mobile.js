@@ -73,7 +73,7 @@ export default class LoginMobile extends EventEmitter {
 			    });
 			}).catch((reason) => {
 			    gtag('event', 'error', {
-			        'event_label': 'Mobile',
+			        'event_label': `Mobile-${reason}`,
 			        'event_category': 'Login',
 			        'non_interaction': true
 			    });

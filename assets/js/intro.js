@@ -222,8 +222,10 @@ export const agoraConfig = {
 // IM配置
 export const sendBirdConfig = {
     sendBird: true, // 默认使用SendBird DSK
-    sendBirdAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
+    sendBirdAppID: '07F10EB7-6318-4B3C-887B-F69758A7C257',
     sendBirdAppURL: 'https://api.sendbird.com',
+    customerUserId: 339,
+    customerIds: 'CS_01',
     customerName: 'Customer service',
     customerType: 'customer'
 };

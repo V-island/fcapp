@@ -30,6 +30,7 @@ export default class SendBirdAction {
     connect(userId) {
         return new Promise((resolve, reject) => {
             const sb = SendBird.getInstance();
+            userId = userId != sendBirdConfig.customerUserId ? userId : sendBirdConfig.customerIds;
             sb.connect(userId, (user, error) => {
                 error ? reject(error) : resolve(user);
             });
@@ -265,7 +266,7 @@ export default class SendBirdAction {
             params.customType = type;
             params.channelUrl = `${userIds}_${type}_channel`;
             params.isPublic = true;
-            console.log(params);
+
             this.sb.GroupChannel.createChannel(params, (groupChannel, error) => {
                 error ? reject(error) : resolve(groupChannel);
             });
@@ -281,7 +282,6 @@ export default class SendBirdAction {
     inviteGroupChannel(channelUrl, userIds) {
         return new Promise((resolve, reject) => {
             this.sb.GroupChannel.getChannel(channelUrl, (groupChannel, error) => {
-                console.log(groupChannel);
                 if (error) {
                     reject(error);
                 } else {

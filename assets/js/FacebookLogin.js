@@ -1,4 +1,4 @@
-import EventEmitter from './eventEmitter';
+﻿import EventEmitter from './eventEmitter';
 import Modal from './modal';
 import {
 	facebookConfig,
@@ -127,29 +127,15 @@ export default class FacebookLogin extends EventEmitter {
 					user_name: userName,
 					user_head: userHead
 				}).then((result) => {
-				    gtag('event', 'success', {
-				        'event_label': 'Facebook',
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
+				    
 				}).catch((reason) => {
-				    gtag('event', 'error', {
-				        'event_label': 'Facebook',
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
+				    
 				});
 			});
 		} else {
 			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
 				modal.closeModal(_modal);
 				this.trigger('FacebookLogin.cancel');
-			});
-
-			gtag('event', 'cancel', {
-			    'event_label': 'Facebook',
-			    'event_category': 'Login',
-			    'non_interaction': true
 			});
 		}
 	}
@@ -165,12 +151,6 @@ export default class FacebookLogin extends EventEmitter {
 		}, {
 			scope: 'public_profile'
 		});
-
-		gtag('event', 'click', {
-		    'event_label': 'Facebook',
-		    'event_category': 'Login',
-		    'non_interaction': true
-		});
 	}
 
 	Share(URL) {
@@ -179,29 +159,29 @@ export default class FacebookLogin extends EventEmitter {
 		}
 
 		return new Promise((resolve) => {
-			shareInfo(thirdPartyType.facebook).then((data) => {
-				let title = data ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
+			FB.ui({
+					method: 'share',
+					href: URL,
+				},
+				// callback
+				(response) => {
+					if (response && !response.error_message) {
+						shareInfo(thirdPartyType.facebook).then((data) => {
+							let title = data ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
 
-				FB.ui({
-						method: 'share',
-						href: URL,
-					},
-					// callback
-					(response) => {
-						if (response && !response.error_message) {
 							modal.alert(title, (_modal) => {
 								modal.closeModal(_modal);
 								resolve();
 							});
-						} else {
-							modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
-								modal.closeModal(_modal);
-								resolve();
-							});
-						}
+						});
+					} else {
+						modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
+							modal.closeModal(_modal);
+							resolve();
+						});
 					}
-				);
-			});
+				}
+			);
 		});
 	}
 
