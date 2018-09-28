@@ -30,7 +30,7 @@ const CONFIG = {
     rootUrl: '#/home',
     notloginUrl: '#/login/mobile'
 }
-const DistGreen = true;
+const DistGreen = false;
 
 const Type = 'POST';
 const MacType = 1; // 设备类型 1.手机 2.PC

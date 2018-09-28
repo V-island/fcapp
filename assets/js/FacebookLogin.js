@@ -1,4 +1,4 @@
-﻿import EventEmitter from './eventEmitter';
+import EventEmitter from './eventEmitter';
 import Modal from './modal';
 import {
 	facebookConfig,
@@ -124,18 +124,32 @@ export default class FacebookLogin extends EventEmitter {
 					userAccount: userId,
 					account_type: 1,
 					country_id: id,
-					user_name: userName,
+					// user_name: userName,
 					user_head: userHead
 				}).then((result) => {
-				    
+				    gtag('event', 'success', {
+				        'event_label': 'Facebook',
+				        'event_category': 'Login',
+				        'non_interaction': true
+				    });
 				}).catch((reason) => {
-				    
+				    gtag('event', 'error', {
+				        'event_label': `Facebook-${reason}`,
+				        'event_category': 'Login',
+				        'non_interaction': true
+				    });
 				});
 			});
 		} else {
 			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
 				modal.closeModal(_modal);
 				this.trigger('FacebookLogin.cancel');
+			});
+
+			gtag('event', 'cancel', {
+			    'event_label': 'Facebook',
+			    'event_category': 'Login',
+			    'non_interaction': true
 			});
 		}
 	}
@@ -150,6 +164,12 @@ export default class FacebookLogin extends EventEmitter {
 			this._statusChangeCallback(response);
 		}, {
 			scope: 'public_profile'
+		});
+
+		gtag('event', 'click', {
+		    'event_label': 'Facebook',
+		    'event_category': 'Login',
+		    'non_interaction': true
 		});
 	}
 

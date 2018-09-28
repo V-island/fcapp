@@ -59,7 +59,7 @@ export default class Pay extends EventEmitter {
 
 	_init() {
 		const { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
-		this.totalPrice = '50.00$';
+		this.totalPrice = '5.00$';
 		this.goodsPrice = '';
 		this.payType = 1;
 		this.goodsId = 1;
@@ -124,12 +124,6 @@ export default class Pay extends EventEmitter {
 				this.goodsId = parseInt(getData(labelEl, this.options.dataIndex));
 				this.totalPrice = getData(labelEl, this.options.dataPrice);
 				addClass(labelEl, this.options.showClass);
-
-				gtag('event', 'click', {
-				    'event_label': `${this.totalPrice} commodity`,
-				    'event_category': 'Pay',
-				    'non_interaction': true
-				});
 	        });
 		});
 
@@ -169,6 +163,12 @@ export default class Pay extends EventEmitter {
 
 			// payment() is called when the button is clicked
 			payment: (data, actions) => {
+				gtag('event', 'click', {
+				    'event_label': `${this.totalPrice} commodity`,
+				    'event_category': 'Pay',
+				    'non_interaction': true
+				});
+
 				return createOrder(this.goodsId, this.payType).then((order) => {
 					let _data = {
 						keyword: 'pay',
@@ -189,17 +189,18 @@ export default class Pay extends EventEmitter {
 
 			// onAuthorize() is called when the buyer approves the payment
 			onAuthorize: (data, actions) => {
-				// Set up a url on your server to execute the payment
-				var EXECUTE_URL = data.returnUrl.split("?")[0];
+				// Set up a url on your server to execute the payment bn
+				// var EXECUTE_URL = data.returnUrl.split("?")[0];
 
 				// Set up the data you need to pass to your server
 				let _data = {
+					keyword: 'success',
 					paymentId: data.paymentID,
 					payerId: data.payerID
 				};
 
 				// Make a call to your server to execute the payment
-				return paypal.request.post(EXECUTE_URL, _data)
+				return paypal.request.post(baseURL, _data)
 					.then((res) => {
 						modal.alert(LANG.SYSTEM_CODE[res.code], (_modal) => {
 							modal.closeModal(_modal);
