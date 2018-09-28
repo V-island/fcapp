@@ -26,8 +26,6 @@ export default class FindPassWord extends EventEmitter {
 
 	    extend(this.options, options);
 
-	    this.FindPassWordEl = createDom(this._Template(element));
-
 	    this._init(element);
 	}
 

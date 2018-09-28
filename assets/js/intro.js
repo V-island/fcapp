@@ -205,7 +205,7 @@ export const fcConfig = {
 };
 
 // 项目 地址
-export const domainURL = location.origin;
+export const domainURL = location.pathname == '/' ? location.origin : location.origin + location.pathname;
 
 // Server 地址配置
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';

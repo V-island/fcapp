@@ -35,7 +35,6 @@ export default class EditLangPack {
 
 	init() {
 		document.body.append(this.template);
-
 		this._bindEvent();
 	}
 

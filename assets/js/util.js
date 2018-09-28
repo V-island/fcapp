@@ -18,7 +18,8 @@ export const refreshURL = () => {
 
 // 跳转页面
 export const jumpURL = (router) => {
-    const origin = `${window.location.origin}/`;
+    const pathname = window.location.pathname;
+    const origin = pathname !== '/' ? `${window.location.origin + pathname}` : `${window.location.origin}/`;
     const search = window.location.search;
     router = typeof router === 'undefined' ? window.location.hash : router;
 
