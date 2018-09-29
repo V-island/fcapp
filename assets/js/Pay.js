@@ -59,10 +59,10 @@ export default class Pay extends EventEmitter {
 
 	_init() {
 		const { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
-		this.totalPrice = '5.00$';
-		this.goodsPrice = '';
 		this.payType = 1;
-		this.goodsId = 1;
+		this.totalPrice = '';
+		this.goodsPrice = '';
+		this.goodsId = '';
 		this.currency = currency_type;
 
 		let createPaypal = this._createScript();
@@ -77,9 +77,6 @@ export default class Pay extends EventEmitter {
 		this.btnCreditEl = this.PayEl.querySelector(this.options.btnCreditId);
 		Spinner.start(this.PayEl);
 		Promise.all([createPaypal]).then((data) => {
-			toggleClass(this.btnPaypalEl, this.options.hideClassDOM);
-			toggleClass(this.btnCreditEl, this.options.hideClassDOM);
-
 			this._paypalServerEvent();
 			this._bindEvent();
 		});
@@ -124,6 +121,8 @@ export default class Pay extends EventEmitter {
 				this.goodsId = parseInt(getData(labelEl, this.options.dataIndex));
 				this.totalPrice = getData(labelEl, this.options.dataPrice);
 				addClass(labelEl, this.options.showClass);
+				removeClass(this.btnPaypalEl, this.options.hideClassDOM);
+				addClass(this.btnCreditEl, this.options.hideClassDOM);
 	        });
 		});
 
