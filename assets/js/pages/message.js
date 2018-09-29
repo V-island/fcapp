@@ -61,7 +61,6 @@ export default class Message extends EventEmitter {
 		// SendBird SDK 初始化
 		Spinner.start(this.contentEl);
 		SendBird.connect(userId).then(user => {
-			console.log(user);
 			this.createConnectionHandler();
 			this.createChannelEvent();
 			this.updateGroupChannelTime();
@@ -90,7 +89,7 @@ export default class Message extends EventEmitter {
 	}
 
 	// 链接客服频道号
-	createCustomerChannel() {
+	createCustomerChannel(userId) {
 		if (userId == sendBirdConfig.customerUserId) {
 			return false;
 		}
@@ -148,6 +147,7 @@ export default class Message extends EventEmitter {
 			.then(groupChannelList => {
 				groupChannelList.forEach(channel => {
 					const _item = this.getItem(channel.url);
+					const {userId} = getUserInfo();
 					if (_item) return false;
 
 					const handler = () => {
@@ -159,7 +159,8 @@ export default class Message extends EventEmitter {
 					const item = new MessageItem({
 						channel,
 						handler,
-						Delete
+						Delete,
+						userId
 					});
 
 					if (channel.unreadMessageCount > 0) {

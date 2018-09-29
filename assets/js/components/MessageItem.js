@@ -25,7 +25,8 @@ const LANG = getLangConfig();
 const KEY_MESSAGE_LAST_TIME = 'origin';
 
 class MessageItem {
-    constructor({channel, handler, Delete}) {
+    constructor({channel, handler, Delete, userId}) {
+        this.userId = userId;
         this.channel = channel;
         this.element = this._createElement(handler, Delete);
     }
@@ -40,12 +41,18 @@ class MessageItem {
 
     get profileUrl() {
         if (this.channel.customType == sendBirdConfig.customerType) {
+            if (this.userId == sendBirdConfig.customerUserId) {
+                return protectFromXSS(this.channel.inviter.profileUrl);
+            }
             return `${customerImg}`;
         }
         return this.channel.isOpenChannel() || this.channel.isPublic || this.channel.customType == sendBirdConfig.customerType ? `${this.channel.coverUrl}` : protectFromXSS(this.channel.members[0].profileUrl);
     }
 
     get title() {
+        if (this.channel.customType == sendBirdConfig.customerType && this.userId == sendBirdConfig.customerUserId) {
+            return this.channel.inviter.nickname != '' ? `${this.channel.inviter.nickname}` : LANG.MESSAGE.Anonymous;
+        }
         return this.channel.isOpenChannel() || this.channel.isPublic || this.channel.customType == sendBirdConfig.customerType ? `${this.channel.name}` : protectFromXSS(this.channel.members[0].nickname);
     }
 
