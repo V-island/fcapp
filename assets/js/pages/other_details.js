@@ -52,6 +52,7 @@ export default class OtherDetails extends EventEmitter {
             slideItem: 'slide-item',
 	    	tabsItemClass: 'tab-item',
 	    	pagesVideoClass: '.pages-video',
+	    	pagesContentClass: '.pages-contents',
 	    	cardVideoClass: '.card-video',
 	    	boxCardsClass: 'box-cards',
 	    	btnPrivateLetterClass: 'btn-private-letter',
@@ -113,7 +114,10 @@ export default class OtherDetails extends EventEmitter {
 		this.pullDownEl = this.OtherDetailsEl.querySelector(this.options.pulldownClass);
 		this.pullUpEl = this.OtherDetailsEl.querySelector(this.options.pullupClass);
 
-		this.cardsVideoEl = this.OtherDetailsEl.getElementsByClassName(this.options.boxCardsClass)[0];
+		this.pagesVideoEl = this.OtherDetailsEl.querySelector(this.options.pagesVideoClass);
+		this.contentsVideoEl = this.pagesVideoEl.querySelector(this.options.pagesContentClass);
+		this.cardsVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxCardsClass)[0];
+		this.contentsVideoEl.style.minHeight = `${this.pagesVideoEl.offsetHeight + 1}px`;
 
 		this._setSlideWidth();
 		this._slideSwiper();
@@ -123,7 +127,6 @@ export default class OtherDetails extends EventEmitter {
 	}
 
 	_bindEvent() {
-
 		// 切换
 		Array.prototype.slice.call(this.tabsItemEl).forEach((itemEl, index) => {
 			addEvent(itemEl, 'click', () => {
@@ -152,22 +155,25 @@ export default class OtherDetails extends EventEmitter {
 	}
 
 	_listEvent() {
-		let self = this;
 		this.cardVideoEl = this.OtherDetailsEl.querySelectorAll(this.options.cardVideoClass);
 
 		// video list
 		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
-			addEvent(cardVideoItemEl, 'click', () => {
-				let info = JSON.parse(getData(cardVideoItemEl, 'userInfo'));
-				Spinner.start(body);
-				playVideo(info.id).then((data) => {
-					if (!data) return Spinner.remove();
-					extend(info, data);
-					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
-					_videoPreview.on('videoPreview.start', () => {
-	                    Spinner.remove();
-	                });
-				});
+			this._cardVideoEvent(cardVideoItemEl);
+		});
+	}
+
+	_cardVideoEvent(ItemEl) {
+		addEvent(ItemEl, 'tap', () => {
+			let info = JSON.parse(getData(ItemEl, 'userInfo'));
+			Spinner.start(body);
+			playVideo(info.id).then((data) => {
+				if (!data) return Spinner.remove();
+				extend(info, data);
+				let _videoPreview = new VideoPreview(ItemEl, info);
+				_videoPreview.on('videoPreview.start', () => {
+                    Spinner.remove();
+                });
 			});
 		});
 	}
@@ -223,20 +229,20 @@ export default class OtherDetails extends EventEmitter {
 			pullDownInitTop = -50;
 
 		this.pagesVideoSwiper = new BScroll(this.options.pagesVideoClass, {
+			probeType: 1,
 			startY: 0,
 			scrollY: true,
 			scrollX: false,
-			probeType: 3,
 			click: true,
+			tap: true,
+			bounce: true,
 			pullDownRefresh: {
 				threshold: 50,
 				stop: 20
 			},
 			pullUpLoad: {
-				threshold: -20
-			},
-			mouseWheel: true,
-			bounce: true
+				threshold: 0
+			}
 		});
 
 		// 下拉刷新
@@ -269,18 +275,21 @@ export default class OtherDetails extends EventEmitter {
 			_page = parseInt(_page) + 1;
 
 			selVideoByUserId(this.info.user_id, _page, 10).then((data) => {
-				if (!data) return;
+				if (data) {
+					data.forEach((itemData, index) => {
+						this.data.VideosList = itemData;
+						this.data.HeaderVideos = true;
 
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.data.HeaderVideos = true;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
-				});
+						let element = createDom(Template.render(this.tpl.list_videos_item, this.data));
+						this._cardVideoEvent(element);
+						this.cardsVideoEl.append(element);
+					});
 
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+				}
+
 				this.pagesVideoSwiper.finishPullUp();
 				this.pagesVideoSwiper.refresh();
-				this._listEvent();
 			});
 		});
 

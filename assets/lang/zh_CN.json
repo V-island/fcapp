@@ -611,7 +611,8 @@
                 "Placeholder": "请输入姓名或电子邮件"
             },
             "Expiration_Data": {
-                "Title": "到期时间"
+                "Title": "到期时间",
+                "Placeholder": "MM/YY"
             },
             "Card_Number": {
                 "Title": "卡号",

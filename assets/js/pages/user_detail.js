@@ -32,7 +32,8 @@ import {
     setData,
     dataAges,
     addEvent,
-    createDom
+    createDom,
+    createDivEl
 } from '../util';
 
 const LANG = getLangConfig();
@@ -73,10 +74,17 @@ export default class UserDetail extends EventEmitter {
 		let getPersonInfo = personInfo();
 		let connectSendBird = SendBird.connect(userId);
 
+		let getHobby = findHobbyByUserId(userId);
+		let getCharacterType = findCharacterTypeByUserId(userId, 1);
+		let getCharacterLove = findCharacterTypeByUserId(userId, 2);
+
 		Spinner.start(body);
-		Promise.all([getPersonInfo, connectSendBird]).then((data) => {
+		Promise.all([getPersonInfo, getHobby, getCharacterType, getCharacterLove, connectSendBird]).then((data) => {
 			this.data.UserDetail = data[0];
-			this.UserId = userId;
+			this.data.HobbyList = data[1] ? data[1] : false;
+			this.data.CharacterType = data[2] ? data[2] : false;
+			this.data.CharacterLove = data[3] ? data[3] : false;
+			this.userId = userId;
 
 			this.UserDetailEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.UserDetailEl);
@@ -104,9 +112,9 @@ export default class UserDetail extends EventEmitter {
 		this.itemHeightTxtEl = this.itemHeightEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
 		this.itemWeightTxtEl = this.itemWeightEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
 		this.itemFriendsTxtEl = this.itemFriendsEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
-		// this.itemInterestTxtEl = this.itemInterestEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
-		// this.itemTypeTxtEl = this.itemTypeEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
-		// this.itemLoveTxtEl = this.itemLoveEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
+		this.itemInterestTxtEl = this.itemInterestEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
+		this.itemTypeTxtEl = this.itemTypeEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
+		this.itemLoveTxtEl = this.itemLoveEl.getElementsByClassName(this.options.itemMetaTxtClass)[0];
 
 		this._bindEvent();
 	}
@@ -225,7 +233,7 @@ export default class UserDetail extends EventEmitter {
 		// 兴趣
 		addEvent(this.itemInterestEl, 'click', () => {
 			let getAllUserHobby = findAllUserHobby();
-			let getHobby = findHobbyByUserId(this.UserId)
+			let getHobby = findHobbyByUserId(this.userId);
 
 			Promise.all([getAllUserHobby, getHobby]).then((data) => {
 				modal.checkboxModal({
@@ -238,6 +246,12 @@ export default class UserDetail extends EventEmitter {
 					closeBtn: true,
 					selected: 3,
 				}, (value, text) => {
+					this.itemInterestTxtEl.innerText = '';
+
+					text.forEach((itemData, index) => {
+						let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
+				        this.itemInterestTxtEl.appendChild(tagLabel);
+					});
 					saveInterest(value.toString());
 				});
 			});
@@ -247,7 +261,7 @@ export default class UserDetail extends EventEmitter {
 		addEvent(this.itemTypeEl, 'click', () => {
 			let sexIndex = getData(this.itemGenderTxtEl, this.options.dataSexIndex);
 			let getAllCharacterType = findAllCharacterType();
-			let getCharacterType = findCharacterTypeByUserId(this.UserId, 1);
+			let getCharacterType = findCharacterTypeByUserId(this.userId, 1);
 
 			Promise.all([getAllCharacterType, getCharacterType]).then((data) => {
 				modal.checkboxModal({
@@ -262,6 +276,12 @@ export default class UserDetail extends EventEmitter {
 					closeBtn: true,
 					selected: 3,
 				}, (value, text) => {
+					this.itemTypeTxtEl.innerText = '';
+
+					text.forEach((itemData, index) => {
+						let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
+				        this.itemTypeTxtEl.appendChild(tagLabel);
+					});
 					saveMyType(value.toString(), 1);
 				});
 			});
@@ -271,9 +291,9 @@ export default class UserDetail extends EventEmitter {
 		addEvent(this.itemLoveEl, 'click', () => {
 			let sexIndex = getData(this.itemGenderTxtEl, this.options.dataSexIndex);
 			let getAllCharacterType = findAllCharacterType();
-			let getCharacterType = findCharacterTypeByUserId(this.UserId, 2);
+			let getCharacterLove = findCharacterTypeByUserId(this.userId, 2);
 
-			Promise.all([getAllCharacterType, getCharacterType]).then((data) => {
+			Promise.all([getAllCharacterType, getCharacterLove]).then((data) => {
 				modal.checkboxModal({
 					text: DETAIL.Love.Madal.Text,
 					title: DETAIL.Love.Madal.Title,
@@ -286,6 +306,12 @@ export default class UserDetail extends EventEmitter {
 					closeBtn: true,
 					selected: 3,
 				}, (value, text) => {
+					this.itemLoveTxtEl.innerText = '';
+
+					text.forEach((itemData, index) => {
+						let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
+				        this.itemLoveTxtEl.appendChild(tagLabel);
+					});
 					saveMyType(value.toString(), 2);
 				});
 			});

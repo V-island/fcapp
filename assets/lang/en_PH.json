@@ -593,7 +593,8 @@
                 "Placeholder": "Name or email"
             },
             "Expiration_Data": {
-                "Title": "Expiration data"
+                "Title": "Expiration data",
+                "Placeholder": "MM/YY"
             },
             "Card_Number": {
                 "Title": "Card number",

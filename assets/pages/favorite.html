@@ -5,26 +5,40 @@
             <h1 class="title primary">{{BAR.Favorite}}</h1>
         </header>
         <!-- 这里是页面内容区 -->
-        <div class="content block favorite-wrapper">
+        <div class="content block favorite-wrapper" ref="wrapper">
             <div class="favorite-content">
-                {{if FollowList}}
-                    <ul class="list list-user list-favorite" data-page="1">
-                        {{each FollowList}}
-                            <li>
-                                <a href="#/details?userid={{$value.user_id}}" class="list-item" data-ripple>
-                                    <span class="list-item-graphic image {{if !$value.user_head}} avatar-female {{/if}}" style="{{if $value.user_head}} background-image: url({{$value.user_head}}); {{/if}}"></span>
-                                    <span class="list-item-text">{{$value.user_name}}</span>
-                                </a>
-                                <span class="btn-follow" data-id="{{$value.user_id}}" data-ripple>{{FAVORITE.Followed}}</span>
-                            </li>
-                        {{/each}}
-                    </ul>
-                    <!-- /.list list-user -->
-                {{else}}
-                    <div class="favorite-empty">
-                        <p>You haven't Followed at anyone yet~</p>
+                <div class="favorite-contents" ref="listWrapper">
+                    {{if FollowList}}
+                        <ul class="list list-user list-favorite" data-page="1">
+                            {{each FollowList}}
+                                <li>
+                                    <a href="#/details?userid={{$value.user_id}}" class="list-item" data-ripple>
+                                        <span class="list-item-graphic image {{if !$value.user_head}} avatar-female {{/if}}" style="{{if $value.user_head}} background-image: url({{$value.user_head}}); {{/if}}"></span>
+                                        <span class="list-item-text">{{$value.user_name}}</span>
+                                    </a>
+                                    <span class="btn-follow" data-id="{{$value.user_id}}" data-ripple>{{FAVORITE.Followed}}</span>
+                                </li>
+                            {{/each}}
+                        </ul>
+                        <!-- /.list list-user -->
+                    {{else}}
+                        <div class="favorite-empty">
+                            <p>You haven't Followed at anyone yet~</p>
+                        </div>
+                    {{/if}}
+                </div>
+                <!-- /.contents-video -->
+
+                <div class="pullup-wrapper">
+                    <div class="loading-down">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
-                {{/if}}
+                </div>
+                <!-- /.pullup-wrapper -->
             </div>
             <div class="pulldown-wrapper">
                 <div class="loading-down">
@@ -36,16 +50,6 @@
                 </div>
             </div>
             <!-- /.pulldown-wrapper -->
-            <div class="pullup-wrapper">
-                <div class="loading-down">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <!-- /.pullup-wrapper -->
         </div>
     </div>
 </div>

@@ -443,13 +443,20 @@
         }
     }
 
-    &.list-detail{
+    &.list-detail {
         background: $list-user-bg-color;
         margin-bottom: 0.35rem;
         position: relative;
 
-        .list-item-graphic{
-            &.image{
+        .list-item {
+            padding: 0.3rem 0.8rem;
+        }
+
+        .list-item-graphic {
+            flex: 1 0 0;
+            flex-direction: row-reverse;
+
+            &.image {
                 @include size(2.1rem);
                 flex: 0 0 2.1rem;
                 background-size: cover;
@@ -460,14 +467,29 @@
             }
         }
 
-        .list-item-text{
+        .list-item-text {
             color: $color-text;
-            flex-grow: 1;
+            flex: 0 0 6rem;
         }
 
-        .list-item-meta{
+        .list-item-meta-txt {
+            flex: 1 0 0;
+            flex-direction: row-reverse;
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        .list-item-meta {
             width: 0.35rem;
             height: 0.7rem;
+            flex: 0 0 0.35rem;
+        }
+
+        .tags-label {
+            >.tag-label {
+                background: $list-detail-label-bg-color;
+                color: $list-detail-label-color;
+            }
         }
     }
 

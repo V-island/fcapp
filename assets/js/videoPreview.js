@@ -125,7 +125,6 @@ export default class VideoPreview extends EventEmitter {
             });
 
             this._init();
-            this.trigger('videoPreview.start');
         });
     }
 
@@ -157,15 +156,12 @@ export default class VideoPreview extends EventEmitter {
 
         // 视频自动播放
         if (this.videoEl.length > 0) {
-            this.videoEl[0].addEventListener('touchstart', () => {
-                this.videoEl[0].play();
+            this.videoEl[0].addEventListener('canplaythrough', (e)=>  {
+                this.trigger('videoPreview.start');
             });
             this.videoEl[0].addEventListener('ended', (e)=>  {
                 this.videoEl[0].play();
             });
-            setTimeout(() => {
-                this.videoEl[0].play();
-            }, 1000);
         }
 
         // 关闭
@@ -450,7 +446,7 @@ export default class VideoPreview extends EventEmitter {
         let html = '';
 
         html = '<div class="popup remove-on-close lives-wrapper"><div class="lives-video">';
-        html += '<video id="video" class="'+ options.videoClass +'" autoplay="autoplay" preload="auto" webkit-playsinline playsinline="true" x-webkit-airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait" poster="'+ options.img_url +'"><source src="'+ options.video_url +'" type="video/mp4"></video>';
+        html += '<video id="video" class="'+ options.videoClass +'" controls="controls" autoplay="autoplay" preload="auto" webkit-playsinline playsinline="true" x-webkit-airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait" poster="'+ options.img_url +'"><source src="'+ options.video_url +'" type="video/mp4"></video>';
         html += '</div><div class="lives-header"><div class="lives-attention"><div class="user-info across"><div class="user-img avatar-female">';
         html += options.user_head ? '<img src="'+ options.user_head +'">' : '';
         html += '</div><div class="across-body"><p class="user-name">'+ options.user_name +'</p><p class="user-txt">'+ options.watch_number + ' ' + LANG.PUBLIC.Heat +'</p></div>';

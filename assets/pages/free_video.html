@@ -8,58 +8,71 @@
             <h1 class="title">{{HOME.FreeVideo.Title}}</h1>
         </header>
         <!-- 这里是页面内容区 -->
-        <div class="content block user-wrapper">
+        <div class="content block user-wrapper" ref="wrapper">
             <div class="user-content" style="min-height: 100%;">
-                {{if VideoType}}
-                    <div class="tag tag-video">
-                        {{each VideoType}}
-                            <label class="tag-label {{if $value.id == 1}}active{{/if}}" data-id="{{if $value.id == 1}}0{{else}}{{$value.id}}{{/if}}" ><span>#</span>{{$value.video_type}}</label>
-                        {{/each}}
-                    </div>
-                    <!-- /.tag -->
-                {{/if}}
+                <div class="users-contents" ref="listWrapper">
+                    {{if VideoType}}
+                        <div class="tag tag-video">
+                            {{each VideoType}}
+                                <label class="tag-label {{if $value.id == 1}}active{{/if}}" data-id="{{if $value.id == 1}}0{{else}}{{$value.id}}{{/if}}" ><span>#</span>{{$value.video_type}}</label>
+                            {{/each}}
+                        </div>
+                        <!-- /.tag -->
+                    {{/if}}
 
-                {{if VideoList}}
-                    <div class="row box-cards" data-page="1">
-                    {{each VideoList}}
-                        <div class="col-50 card card-video" data-user-info="{{$value}}">
-                            <div class="card-content">
-                                <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                <div class="showdom">
-                                    <p class="summary-txt">{{$value.video_description}}</p>
-                                    <div class="video-info">
-                                        <div class="user-info">
-                                            <div class="user-img avatar-female">
-                                                <img src="{{$value.user_head}}">
+                    {{if VideoList}}
+                        <div class="row box-cards" data-page="1">
+                        {{each VideoList}}
+                            <div class="col-50 card card-video" data-user-info="{{$value}}">
+                                <div class="card-content">
+                                    <div class="media" style="background-image: url({{$value.img_url}});"></div>
+                                    <div class="showdom">
+                                        <p class="summary-txt">{{$value.video_description}}</p>
+                                        <div class="video-info">
+                                            <div class="user-info">
+                                                <div class="user-img avatar-female">
+                                                    <img src="{{$value.user_head}}">
+                                                </div>
+                                                <p class="user-name">{{$value.user_name}}</p>
                                             </div>
-                                            <p class="user-name">{{$value.user_name}}</p>
-                                        </div>
-                                        <div class="user-follow">
-                                            <span class="tag-label praise">
-                                                {{if $value.support > 999}}
-                                                    999+
-                                                {{else}}
-                                                    {{$value.support}}
-                                                {{/if}}
-                                            </span>
-                                            <span class="tag-label eye">
-                                                {{if $value.watch_number > 999}}
-                                                    999+
-                                                {{else}}
-                                                    {{$value.watch_number}}
-                                                {{/if}}
-                                            </span>
+                                            <div class="user-follow">
+                                                <span class="tag-label praise">
+                                                    {{if $value.support > 999}}
+                                                        999+
+                                                    {{else}}
+                                                        {{$value.support}}
+                                                    {{/if}}
+                                                </span>
+                                                <span class="tag-label eye">
+                                                    {{if $value.watch_number > 999}}
+                                                        999+
+                                                    {{else}}
+                                                        {{$value.watch_number}}
+                                                    {{/if}}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        {{/each}}
                         </div>
-                    {{/each}}
+                        <!-- /.box-cards -->
+                    {{else}}
+                        <p class="no-more">{{USER_WATCH.No_More}}</p>
+                    {{/if}}
+                </div>
+                <!-- /.contents-video -->
+                <div class="pullup-wrapper">
+                    <div class="loading-down">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
-                    <!-- /.box-cards -->
-                {{else}}
-                    <p class="no-more">{{USER_WATCH.No_More}}</p>
-                {{/if}}
+                </div>
+                <!-- /.pullup-wrapper -->
             </div>
             <div class="pulldown-wrapper">
                 <div class="loading-down">
@@ -71,16 +84,6 @@
                 </div>
             </div>
             <!-- /.pulldown-wrapper -->
-            <div class="pullup-wrapper">
-                <div class="loading-down">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <!-- /.pullup-wrapper -->
         </div>
     </div>
 </div>

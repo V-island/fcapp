@@ -583,7 +583,8 @@
 }
 .video-preview-content{
 	position: absolute;
-	bottom: 5rem;
+	// bottom: 5rem;
+	bottom: 6.75rem;
 	left: 0.75rem;
 	right: 0.75rem;
 	z-index: 2;
@@ -598,7 +599,8 @@
 	@include  spindle-center(space-between);
 	align-items: start;
 	position: absolute;
-	bottom: 0.75rem;
+	// bottom: 0.75rem;
+	bottom: 2.5rem;
 	left: 0.75rem;
 	right: 0.75rem;
 	z-index: 2;
@@ -1607,7 +1609,7 @@ p.lives-remark{
 		height: calc(100% - 2.15rem);
 
 		.slide-item {
-			padding: 0 0.7rem;
+			// padding: 0 0.7rem;
 			position: relative;
 		}
 	}

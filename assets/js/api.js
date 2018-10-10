@@ -16,6 +16,7 @@ import {
 	isObject,
 	isFunction,
 	getUuid,
+	jumpURL,
 	urlParse,
 	getLocalStorage,
 	setLocalStorage,
@@ -46,11 +47,11 @@ const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const COUNTRY_NAME = 'COUNTRY';
 const SHARE_NAME = 'SHARE';
 
-const getPost = (_url, param, callback, callbackCancel, onProgress, _type, _header, async) => {
+function getPost(_url, param, callback, callbackCancel, onProgress, _type, _header, async) {
 	if (isObject(_url)) {
-		onProgress = arguments[2];
+	    onProgress = arguments[2];
 	    callback = arguments[1];
-	    param = _url;
+	    param = arguments[0];
 	}
 
 	let token = localStorage.getItem('token');
@@ -71,7 +72,7 @@ const getPost = (_url, param, callback, callbackCancel, onProgress, _type, _head
 		cache: false,
 	    statusCode: {
 	        // 200: () => {console.log(200)},
-	        400: () => {toastr.error('400 你已经在其它设备登入，请重新登入');clearLocalStorage();location.href = CONFIG.notloginUrl;},
+	        400: () => {toastr.error('400 你已经在其它设备登入，请重新登入');clearLocalStorage();location.href = jumpURL(CONFIG.notloginUrl);},
 	        401: () => {toastr.error('401');removeLocalStorage(TOKEN_NAME);session.jumpPage(CONFIG.notloginUrl);},
 	        403: () => {toastr.error('403 用户没有对应操作权限')},
 	        404: () => {toastr.error('404')},
@@ -115,7 +116,7 @@ const getPost = (_url, param, callback, callbackCancel, onProgress, _type, _head
 		if (response.code === 2012) {
 			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			clearLocalStorage();
-			return location.href = CONFIG.notloginUrl;
+			return location.href = jumpURL(CONFIG.notloginUrl);
 		}
 
 		modal.alert(LANG.SYSTEM_CODE[response.code], (_modal) => {
@@ -230,7 +231,7 @@ export const getUserInfo = () => {
 
 	if (_info === null) {
 		clearLocalStorage();
-		return location.href = CONFIG.notloginUrl;
+		return location.href = jumpURL(CONFIG.notloginUrl);
 	}
 
 	return _info;
@@ -573,7 +574,7 @@ export const appLoginOut = () => {
 		getPost('/appLoginOut', _params, (response) => {
 			modal.toast(LANG.SYSTEM_CODE[response.code]);
 			clearLocalStorage();
-			location.href = CONFIG.notloginUrl;
+			location.href = jumpURL(CONFIG.notloginUrl);
 			resolve(true);
 		});
 	});
@@ -652,7 +653,7 @@ export const personCenter = (params, token, mac, _checkLogin = false) => {
 			setLocalStorage(UER_NAME, _info);
 
 			if (_checkLogin) {
-				return location.href = '#/home';
+				return location.href = jumpURL(CONFIG.rootUrl);
 			}
 			resolve(response.data ? response.data : USER_INFO);
 		});
@@ -1550,7 +1551,7 @@ export const uploadVideo = (_file, _type, _title, _imgUrl) => {
 	}
 
 	return new Promise((resolve) => {
-		location.hash = '#/home';
+		location.href = jumpURL(CONFIG.rootUrl);
 
 		let progressLine = new ProgressLine(_imgUrl);
 		getPost(formData, (response) => {

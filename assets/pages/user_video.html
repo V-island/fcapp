@@ -8,67 +8,84 @@
             <h1 class="title">{{USER_VIDEO.Title}}</h1>
         </header>
         <!-- 这里是页面内容区 -->
-        <div class="content block user-wrapper">
-            <div class="row box-cards" data-page="1" style="min-height: 100%;">
-                <div class="col-50 card card-video video-add-card">
-                    <div class="card-content">
-                        <div class="icon-box">
-                            <i class="icon user-add-video"></i>
-                        </div>
-                        <p class="add-title">{{USER_VIDEO.Add_Title}}</p>
-                        <p class="text">{{USER_VIDEO.Add_Text}}</p>
-                    </div>
-                </div>
-
-                {{if MyVideo}}
-                    {{each MyVideo}}
-                        {{if $value.status != 4}}
-                        <div class="col-50 card card-video" data-id="{{$value.id}}">
+        <div class="content block user-wrapper" ref="wrapper">
+            <div class="contents-wrapper">
+                <div class="user-contents" ref="listWrapper">
+                    <div class="row box-cards" data-page="1" style="min-height: 100%;">
+                        <div class="col-50 card card-video video-add-card">
                             <div class="card-content">
-                                <div class="card-video-header">
-                                    {{if $value.status == 1}}
-                                        <span class="status-label review">{{PUBLIC.Review}}</span>
-                                    {{else if $value.status == 2}}
-                                        {{if $value.type == 1}}
-                                            <span class="status-label free">{{PUBLIC.Free}}</span>
-                                        {{else if $value.type == 2}}
-                                            <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
-                                        {{/if}}
-                                    {{else if $value.status == 3}}
-                                        <span class="status-label refuse">{{PUBLIC.Refuse}}</span>
-                                    {{/if}}
-                                    <i class="icon user-close-video btn-close-video"></i>
+                                <div class="icon-box">
+                                    <i class="icon user-add-video"></i>
                                 </div>
-                                <div class="media" data-url="{{$value.video_url}}" style="background-image: url({{$value.img_url}});"></div>
-                                <div class="showdom">
-                                    <p class="summary-txt">{{$value.video_description}}</p>
-                                    <div class="video-info">
-                                        <p class="video-time">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}</p>
-                                        <div class="user-follow">
-                                            <span class="tag-label praise">
-                                                {{if $value.support > 999}}
-                                                    999+
-                                                {{else}}
-                                                    {{$value.support}}
+                                <p class="add-title">{{USER_VIDEO.Add_Title}}</p>
+                                <p class="text">{{USER_VIDEO.Add_Text}}</p>
+                            </div>
+                        </div>
+
+                        {{if MyVideo}}
+                            {{each MyVideo}}
+                                {{if $value.status != 4}}
+                                <div class="col-50 card card-video" data-id="{{$value.id}}">
+                                    <div class="card-content">
+                                        <div class="card-video-header">
+                                            {{if $value.status == 1}}
+                                                <span class="status-label review">{{PUBLIC.Review}}</span>
+                                            {{else if $value.status == 2}}
+                                                {{if $value.type == 1}}
+                                                    <span class="status-label free">{{PUBLIC.Free}}</span>
+                                                {{else if $value.type == 2}}
+                                                    <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
                                                 {{/if}}
-                                            </span>
-                                            <span class="tag-label eye">
-                                                {{if $value.watch_number > 999}}
-                                                    999+
-                                                {{else}}
-                                                    {{$value.watch_number}}
-                                                {{/if}}
-                                            </span>
+                                            {{else if $value.status == 3}}
+                                                <span class="status-label refuse">{{PUBLIC.Refuse}}</span>
+                                            {{/if}}
+                                            <i class="icon user-close-video btn-close-video"></i>
+                                        </div>
+                                        <div class="media" data-url="{{$value.video_url}}" style="background-image: url({{$value.img_url}});"></div>
+                                        <div class="showdom">
+                                            <p class="summary-txt">{{$value.video_description}}</p>
+                                            <div class="video-info">
+                                                <p class="video-time">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}</p>
+                                                <div class="user-follow">
+                                                    <span class="tag-label praise">
+                                                        {{if $value.support > 999}}
+                                                            999+
+                                                        {{else}}
+                                                            {{$value.support}}
+                                                        {{/if}}
+                                                    </span>
+                                                    <span class="tag-label eye">
+                                                        {{if $value.watch_number > 999}}
+                                                            999+
+                                                        {{else}}
+                                                            {{$value.watch_number}}
+                                                        {{/if}}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                                {{/if}}
+                            {{/each}}
                         {{/if}}
-                    {{/each}}
-                {{/if}}
+                    </div>
+                    <!-- /.box-cards -->
+                </div>
+                <!-- /.contents-video -->
+
+                <div class="pullup-wrapper">
+                    <div class="loading-down">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <!-- /.pullup-wrapper -->
             </div>
-            <!-- /.box-cards -->
+
             <div class="pulldown-wrapper">
                 <div class="loading-down">
                     <span></span>
@@ -79,16 +96,6 @@
                 </div>
             </div>
             <!-- /.pulldown-wrapper -->
-            <div class="pullup-wrapper">
-                <div class="loading-down">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <!-- /.pullup-wrapper -->
         </div>
     </div>
 </div>

@@ -16,6 +16,7 @@ import {
 } from './lang';
 import {
     extend,
+    jumpURL,
     addEvent,
     importTemplate,
     getData,
@@ -126,7 +127,7 @@ export default class LivePreview extends EventEmitter {
 
             if (parseInt(localInfo.userPackage / this.info.live_price) < 1) {
                 return modal.alert(LANG.HOME.Madal.NotCoins.Text, LANG.HOME.Madal.NotCoins.Title, () => {
-                    location.href = '#/user';
+                    return location.href = jumpURL('#/user');
                 }, LANG.HOME.Madal.NotCoins.ButtonsText);
             }
 

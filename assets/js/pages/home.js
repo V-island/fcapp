@@ -15,11 +15,14 @@ import {
 import {
     videoClips,
     videoType,
-    playVideo
+    playVideo,
+    getUserInfo,
+    setUserInfo
 } from '../api';
 
 import {
     extend,
+    jumpURL,
     addEvent,
     createDom,
     getData,
@@ -58,11 +61,13 @@ export default class Home extends EventEmitter {
             pagesNewClass: '.pages-new',
             pagesHotClass: '.pages-hot',
             pagesVideoClass: '.pages-video',
+            pagesContentClass: '.pages-contents',
             boxCardsClass: 'box-cards',
             tagsClass: '.tag',
             tagsLabelClass: 'tag-label',
             pulldownClass: '.pulldown-wrapper',
             pullupClass: '.pullup-wrapper',
+            dataUserPackage: 'userPackage',
             cardsPageIndex: 'page',
             tagsIndex: 'id',
             showClass: 'active'
@@ -103,7 +108,9 @@ export default class Home extends EventEmitter {
 	_init() {
 		// pages
 		this.pagesVideoEl = this.HomeEl.querySelector(this.options.pagesVideoClass);
+		this.contentsVideoEl = this.pagesVideoEl.querySelector(this.options.pagesContentClass);
 		this.cardsVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxCardsClass)[0];
+		this.contentsVideoEl.style.minHeight = `${this.pagesVideoEl.offsetHeight + 1}px`;
 
 		this.tagsEl = this.HomeEl.querySelector(this.options.tagsClass);
 
@@ -113,6 +120,12 @@ export default class Home extends EventEmitter {
 		this._pagesVideo();
 		this._bindEvent();
 		this._listEvent();
+
+		gtag('event', 'look', {
+		    'event_label': 'HOME',
+		    'event_category': 'Browse',
+		    'non_interaction': true
+		});
 	}
 
 	_bindEvent() {
@@ -180,17 +193,30 @@ export default class Home extends EventEmitter {
 		this.cardVideoEl = this.HomeEl.querySelectorAll('.card-video');
 
 		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
-			addEvent(cardVideoItemEl, 'click', () => {
-				let info = JSON.parse(getData(cardVideoItemEl, 'userInfo'));
-				Spinner.start(body);
-				playVideo(info.id).then((data) => {
-					if (!data) return Spinner.remove();
-					extend(info, data);
-					let _videoPreview = new VideoPreview(cardVideoItemEl, info);
-					_videoPreview.on('videoPreview.start', () => {
-	                    Spinner.remove();
-	                });
-				});
+			this._cardVideoEvent(cardVideoItemEl);
+		});
+	}
+
+	_cardVideoEvent(ItemEl) {
+		addEvent(ItemEl, 'tap', () => {
+			let info = JSON.parse(getData(ItemEl, 'userInfo'));
+			let { userPackage } = getUserInfo(this.options.dataUserPackage);
+
+			if (parseInt(userPackage / info.price) < 1) {
+			    return modal.alert(MADAL.NotCoins.Text, MADAL.NotCoins.Title, () => {
+			        return location.href = jumpURL('#/user');
+			    }, MADAL.NotCoins.ButtonsText);
+			}
+
+			Spinner.start(body);
+			playVideo(info.id).then((data) => {
+				if (!data) return Spinner.remove();
+				extend(info, data);
+				setUserInfo(this.options.dataUserPackage, userPackage - info.price);
+				let _videoPreview = new VideoPreview(ItemEl, info);
+				_videoPreview.on('videoPreview.start', () => {
+                    Spinner.remove();
+                });
 			});
 		});
 	}
@@ -201,21 +227,20 @@ export default class Home extends EventEmitter {
 			pullDownInitTop = -50;
 
 		this.pagesVideoSwiper = new BScroll(this.options.pagesVideoClass, {
+			probeType: 1,
 			startY: 0,
 			scrollY: true,
 			scrollX: false,
-			probeType: 3,
 			click: true,
-			eventPassthrough: 'horizontal',
+			tap: true,
+			bounce: true,
 			pullDownRefresh: {
 				threshold: 50,
 				stop: 20
 			},
 			pullUpLoad: {
-				threshold: -20
-			},
-			mouseWheel: true,
-			bounce: true
+				threshold: 0
+			}
 		});
 
 		// 下拉刷新
@@ -262,16 +287,18 @@ export default class Home extends EventEmitter {
 			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
 			videoClips(_page, this._number, this.tagId, 2).then((data) => {
-				if (!data) return;
+				if (data) {
+					data.forEach((itemData, index) => {
+						this.data.VideosList = itemData;
 
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
-				});
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+						let element = createDom(Template.render(this.tpl.list_videos, this.data));
+						this._cardVideoEvent(element);
+						this.cardsVideoEl.append(element);
+					});
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+				}
 				this.pagesVideoSwiper.finishPullUp();
 				this.pagesVideoSwiper.refresh();
-				this._listEvent();
 			});
 		});
 
@@ -280,6 +307,6 @@ export default class Home extends EventEmitter {
 				return;
 			}
 			this.pullDownEl.style.top = Math.min(pos.y + pullDownInitTop, 10)+ 'px';
-		})
+		});
 	}
 }

@@ -43,6 +43,7 @@ export default class UserVideo extends EventEmitter {
 	    this.data = {};
 	    this.options = {
 	    	userWrapper: '.user-wrapper',
+	    	pagesContentClass: '.user-contents',
 	    	boxCardsClass: '.box-cards',
 	    	pulldownClass: '.pulldown-wrapper',
 	    	pullupClass: '.pullup-wrapper',
@@ -82,20 +83,21 @@ export default class UserVideo extends EventEmitter {
 	}
 
 	_init() {
-		this.cardsVideoEl = this.UserVideoEl.querySelector(this.options.boxCardsClass);
+		this.pagesVideoEl = this.UserVideoEl.querySelector(this.options.userWrapper);
+		this.contentsVideoEl = this.pagesVideoEl.querySelector(this.options.pagesContentClass);
+		this.cardsVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
+		this.VideoEl = this.pagesVideoEl.getElementsByClassName(this.options.cardvideoClass);
+		this.videoAddEl = this.pagesVideoEl.getElementsByClassName(this.options.videoAddClass)[0];
+		this.contentsVideoEl.style.minHeight = `${this.pagesVideoEl.offsetHeight + 1}px`;
 
 		this.pullDownEl = this.UserVideoEl.querySelector(this.options.pulldownClass);
 		this.pullUpEl = this.UserVideoEl.querySelector(this.options.pullupClass);
-
-		this.videoAddEl = this.UserVideoEl.getElementsByClassName(this.options.videoAddClass)[0];
 
 		this._pagesVideo();
 		this._bindEvent();
 	}
 
 	_bindEvent() {
-		this.videoMediaEl = this.UserVideoEl.getElementsByClassName(this.options.mediaClass);
-		this.videoCloseEl = this.UserVideoEl.getElementsByClassName(this.options.videoCloseClass);
 
 		// 上传
 		addEvent(this.videoAddEl, 'click', () => {
@@ -106,31 +108,39 @@ export default class UserVideo extends EventEmitter {
 			record.show();
         });
 
-		// 删除视频
-		Array.prototype.slice.call(this.videoCloseEl).forEach(closeEl => {
-			addEvent(closeEl, 'click', () => {
-				let videoEl = closeEl.parentNode.parentNode.parentNode;
-				let videoId = getData(videoEl, 'id');
-				let getDeleteVideo = deleteVideo(videoId);
-
-				getDeleteVideo.then((data) => {
-					if (!data) return;
-
-					showHideDom(videoEl, 'none');
-				});
-	        });
+		Array.prototype.slice.call(this.VideoEl).forEach(ItemEl => {
+			this._cardVideoEvent(ItemEl);
 		});
+	}
+
+	_cardVideoEvent(ItemEl) {
+		let videoMediaEl = ItemEl.getElementsByClassName(this.options.mediaClass);
+		let videoCloseEl = ItemEl.getElementsByClassName(this.options.videoCloseClass);
 
 		// 浏览视频
-		Array.prototype.slice.call(this.videoMediaEl).forEach(mediaEl => {
-			addEvent(mediaEl, 'click', () => {
-				let videoUrl = getData(mediaEl, 'url');
+		if (videoMediaEl.length > 0) {
+			addEvent(videoMediaEl[0], 'click', () => {
+				let videoUrl = getData(videoMediaEl[0], 'url');
 				Spinner.start(body);
 				modal.videoModal(videoUrl).then((_modal) => {
 					Spinner.remove();
 				});
 	        });
-		});
+		}
+
+		// 删除视频
+		if (videoCloseEl.length > 0) {
+			addEvent(videoCloseEl[0], 'click', () => {
+				let videoId = getData(ItemEl, 'id');
+				let getDeleteVideo = deleteVideo(videoId);
+
+				getDeleteVideo.then((data) => {
+					if (!data) return;
+
+					showHideDom(ItemEl, 'none');
+				});
+	        });
+		}
 	}
 
 	// Video 模块
@@ -139,20 +149,20 @@ export default class UserVideo extends EventEmitter {
 			pullDownInitTop = -50;
 
 		this.pagesVideoSwiper = new BScroll(this.options.userWrapper, {
+			probeType: 1,
 			startY: 0,
 			scrollY: true,
 			scrollX: false,
-			probeType: 3,
 			click: true,
+			tap: true,
+			bounce: true,
 			pullDownRefresh: {
 				threshold: 50,
 				stop: 20
 			},
 			pullUpLoad: {
-				threshold: -20
-			},
-			mouseWheel: true,
-			bounce: true
+				threshold: 0
+			}
 		});
 
 		// 下拉刷新
@@ -189,7 +199,10 @@ export default class UserVideo extends EventEmitter {
 				if (data) {
 					data.forEach((itemData, index) => {
 						this.data.VideosList = itemData;
-						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
+
+						let element = createDom(Template.render(this.tpl.list_my_videos_item, this.data));
+						this._cardVideoEvent(element);
+						this.cardsVideoEl.append(element);
 					});
 
 					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);

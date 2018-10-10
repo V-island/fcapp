@@ -61,6 +61,7 @@ export default class Forms {
             countryIdClass: 'countryId',
             countryNameClass: 'countryName',
             countryClass: 'country',
+            dataTimeClass: 'dataTime',
             phoneCodeLabelClass: 'phoneCodeLabel',
             btnBrightClass: 'btn-bright',
             btnVerificationClass: 'btn-verification',
@@ -88,6 +89,8 @@ export default class Forms {
         this.phoneCodeLabelEl = this.formEl.getElementsByClassName(this.options.phoneCodeLabelClass);
         // 选择国家
         this.countryEl = this.formEl.getElementsByClassName(this.options.countryClass);
+        // 选择时间
+        this.dataTimeEl = this.formEl.getElementsByClassName(this.options.dataTimeClass);
         // 按钮
         this.btnVerificationEl = this.formEl.getElementsByClassName(this.options.btnVerificationClass);
         this.btnBrightEl = this.formEl.getElementsByClassName(this.options.btnBrightClass);
@@ -127,6 +130,22 @@ export default class Forms {
                     'non_interaction': true
                 });
             });
+        }
+
+        // 选择时间
+        if (this.dataTimeEl.length > 0) {
+            addEvent(this.dataTimeEl[0], 'change', () => {
+                let valueLength = this.dataTimeEl[0].value.length;
+
+                if (valueLength == 2) {
+                    this.dataTimeEl[0].value = `${this.dataTimeEl[0].value}/`;
+                }
+            });
+        }
+
+        // 显示号码归属地
+        if (this.phoneCodeLabelEl.length > 0) {
+            this.phoneCodeLabelEl[0].innerHTML = `+${this.Country.phone_code}`;
         }
 
         // Input

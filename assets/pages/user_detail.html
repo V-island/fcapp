@@ -47,14 +47,35 @@
             <ul class="list list-detail list-info">
                 <li class="list-item item-interest" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Interest.Title}}</span>
+                    {{if HobbyList}}
+                        <div class="tag tags-label list-item-meta-txt">
+                            {{each HobbyList}}
+                                <label class="tag-label">{{$value.hobby_name}}</label>
+                            {{/each}}
+                        </div>
+                    {{/if}}
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
                 <li class="list-item item-type" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Your_Type.Title}}</span>
+                    {{if CharacterType}}
+                        <div class="tag tags-label list-item-meta-txt">
+                            {{each CharacterType}}
+                                <label class="tag-label">{{$value.type_name}}</label>
+                            {{/each}}
+                        </div>
+                    {{/if}}
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
                 <li class="list-item item-love" data-ripple>
                     <span class="list-item-text">{{PERSONAL_DETAIL.Love.Title}}</span>
+                    {{if CharacterLove}}
+                        <div class="tag tags-label list-item-meta-txt">
+                            {{each CharacterLove}}
+                                <label class="tag-label">{{$value.type_name}}</label>
+                            {{/each}}
+                        </div>
+                    {{/if}}
                     <span class="icon user-arrow-forward list-item-meta"></span>
                 </li>
                 <li class="list-item item-friends" data-ripple>

@@ -35,7 +35,7 @@ export default class Favorite extends EventEmitter {
 	    this.data = {};
 	    this.options = {
 	    	favoriteWrapper: '.favorite-wrapper',
-            favoriteContent: 'favorite-content',
+            favoriteContent: '.favorite-contents',
             pulldownClass: '.pulldown-wrapper',
             pullupClass: '.pullup-wrapper',
 	    	listFavoriteClass: 'list-favorite',
@@ -74,7 +74,10 @@ export default class Favorite extends EventEmitter {
 	}
 
 	_init() {
-		this.listFavoriteEl = this.FavoriteEl.getElementsByClassName(this.options.listFavoriteClass)[0];
+		this.pagesFavoriteEl = this.FavoriteEl.querySelector(this.options.favoriteWrapper);
+		this.contentsFavoriteEl = this.pagesFavoriteEl.querySelector(this.options.favoriteContent);
+		this.listFavoriteEl = this.pagesFavoriteEl.getElementsByClassName(this.options.listFavoriteClass)[0];
+		this.contentsFavoriteEl.style.minHeight = `${this.pagesFavoriteEl.offsetHeight + 1}px`;
 
 		this.pullDownEl = this.FavoriteEl.querySelector(this.options.pulldownClass);
 		this.pullUpEl = this.FavoriteEl.querySelector(this.options.pullupClass);
@@ -87,24 +90,28 @@ export default class Favorite extends EventEmitter {
 		this.btnFollwEl = this.FavoriteEl.getElementsByClassName(this.options.btnFollwClass);
 
 		Array.prototype.slice.call(this.btnFollwEl).forEach(follwEl => {
-			addEvent(follwEl, 'click', () => {
-	            let _id = getData(follwEl, this.options.dataItemId),
-	                status;
-
-	            if (hasClass(follwEl, this.options.showClass)) {
-	                status = 1;
-	            }else {
-	                status = 2;
-	            }
-
-	            follow(_id, status).then((data) => {
-	            	if (!data) return;
-
-	            	follwEl.innerHTML = status === 1 ? LANG.FAVORITE.Followed : LANG.FAVORITE.Follow;
-	            	toggleClass(follwEl, this.options.showClass);
-	            });
-	        });
+			this._cardVideoEvent(follwEl);
 		});
+	}
+
+	_cardFollwEvent(follwEl) {
+		addEvent(follwEl, 'click', () => {
+            let _id = getData(follwEl, this.options.dataItemId),
+                status;
+
+            if (hasClass(follwEl, this.options.showClass)) {
+                status = 1;
+            }else {
+                status = 2;
+            }
+
+            follow(_id, status).then((data) => {
+            	if (!data) return;
+
+            	follwEl.innerHTML = status === 1 ? LANG.FAVORITE.Followed : LANG.FAVORITE.Follow;
+            	toggleClass(follwEl, this.options.showClass);
+            });
+        });
 	}
 
 	// Video 模块
@@ -160,18 +167,20 @@ export default class Favorite extends EventEmitter {
 			_page = parseInt(_page) + 1;
 
 			followList(_page, 10, 1).then((data) => {
-				if (!data) return;
+				if (data) {
+					data.forEach((itemData, index) => {
+						this.data.FollowList = itemData;
+						this.data.HeaderVideos = true;
 
-				data.forEach((itemData, index) => {
-					this.data.FollowList = itemData;
-					this.data.HeaderVideos = true;
-					this.listFavoriteEl.append(createDom(Template.render(this.tpl.list_favorite_items, this.data)));
-				});
+						let element = createDom(Template.render(this.tpl.list_favorite_items, this.data));
+						this._cardVideoEvent(element);
+						this.listFavoriteEl.append(element);
+					});
 
-				setData(this.listFavoriteEl, this.options.listsPageIndex, _page);
+					setData(this.listFavoriteEl, this.options.listsPageIndex, _page);
+				}
 				this.favoriteSwiper.finishPullUp();
 				this.favoriteSwiper.refresh();
-				this._bindEvent();
 			});
 		});
 

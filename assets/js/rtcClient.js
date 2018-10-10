@@ -183,7 +183,7 @@ export default class RtcClient extends EventEmitter {
                 if (_val === null) {
                     return;
                 }
-                console.log(_val);
+
                 this.trigger('rtcClient.onChatMsg', _val);
                 modal.closeModal(newsModalEl);
             });
