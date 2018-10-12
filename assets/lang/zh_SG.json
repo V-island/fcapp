@@ -244,7 +244,18 @@
     },
     "USER_SETTING_SECURITY": {
         "Title": "帐户安全",
-        "Text": "手机号码已注册"
+        "Text": "手机号码已注册",
+        "Not_Text": "未绑定手机号码",
+        "Binding": {
+            "Mobile": {
+                "Title": "电话号码已注册",
+                "Text": "您下次可以使用电话号码和密码登录"
+            },
+            "Third_party": {
+                "Title": "帐户已注册",
+                "Text": "您可以在下次使用此帐户登录"
+            }
+        }
     },
     "USER_SETTING_HELP": {
         "Title": "帮助",
@@ -318,6 +329,7 @@
             "Title": "第三方",
             "Text": "即将推出",
             "Mobile": "Mobile",
+            "QuickLogin": "快速注册",
             "Facebook": "Facebook",
             "Snapchat": "Snapchat",
             "Twitter": "Twitter",
@@ -337,11 +349,27 @@
     "REGISTER": {
         "Title": "注册",
         "Buttons": {
-            "Title": "确认注册"
+            "Title": "确认注册",
+            "Title_Bind": "确认绑定"
+        },
+        "Safeguard": {
+            "Title": "账号绑定"
         },
         "Terms": {
             "Text": "注册表示您同意",
             "Title": "服务条款"
+        },
+        "Madal": {
+            "Account_Not_Safe": {
+                "Title": "帐户不安全",
+                "Text": "你的ID%S还不安全。请尽快绑定它以方便您的登录",
+                "Buttons": "GO"
+            },
+            "Binding_Failed": {
+                "Title": "绑定失败",
+                "Text": "移动电话号码已经注册。请尝试另一个号码。",
+                "Buttons": "好的"
+            }
         }
     },
     "PERSONAL_DETAIL": {

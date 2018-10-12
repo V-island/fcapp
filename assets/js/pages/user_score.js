@@ -11,6 +11,7 @@ import {
 
 import {
     extend,
+    jumpURL,
     createDom,
     createDivEl,
     addEvent,
@@ -71,7 +72,7 @@ export default class UserScore extends EventEmitter {
 						modal.closeModal(_modal);
 					});
 		    	}
-		    	return location.href = `#/user/score/withdraw?money=${money}`;
+		    	return location.href = jumpURL(`#/user/score/withdraw?money=${money}`);
 		    });
 		});
 	}

@@ -4,7 +4,8 @@ import { Spinner } from './components/Spinner';
 import Modal from './modal';
 import {
 	baseURL,
-	paypalConfig
+	paypalConfig,
+	codapayConfig
 } from './intro';
 
 import {
@@ -65,7 +66,8 @@ export default class Pay extends EventEmitter {
 		this.goodsId = '';
 		this.currency = currency_type;
 
-		let createPaypal = this._createScript();
+		let createPaypal = this._createPaypalScript();
+		let createCodapay = this._createCodapayScript();
 
 		this.tagsEl = this.PayEl.querySelector(this.options.tagsClass);
 		this.tagLabelEl = this.tagsEl.getElementsByClassName(this.options.tagLabelClass);
@@ -76,13 +78,13 @@ export default class Pay extends EventEmitter {
 		this.btnPaypalEl = this.PayEl.querySelector(this.options.btnPaypalId);
 		this.btnCreditEl = this.PayEl.querySelector(this.options.btnCreditId);
 		Spinner.start(this.PayEl);
-		Promise.all([createPaypal]).then((data) => {
+		Promise.all([createPaypal, createCodapay]).then((data) => {
 			this._paypalServerEvent();
 			this._bindEvent();
 		});
 	}
 
-	_createScript() {
+	_createPaypalScript() {
 		const heads = document.getElementsByTagName("head");
 		const script = document.createElement("script");
 
@@ -90,6 +92,32 @@ export default class Pay extends EventEmitter {
 			if(typeof(paypal) == 'undefined'){
 				script.setAttribute("type", "text/javascript");
 				script.setAttribute("src", paypalConfig.paypalSDKAPI);
+				script.onload = script.onreadystatechange = function(e) {
+					if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+						resolve(true);
+						// Handle memory leak in IE
+						script.onload = script.onreadystatechange = null;
+					}
+				};
+				if (heads.length) {
+					heads[0].appendChild(script);
+				} else {
+					document.documentElement.appendChild(script);
+				}
+			}else {
+				resolve(true);
+			}
+		});
+	}
+
+	_createCodapayScript() {
+		const heads = document.getElementsByTagName("head");
+		const script = document.createElement("script");
+
+		return new Promise((resolve) => {
+			if(typeof(paypal) == 'undefined'){
+				script.setAttribute("type", "text/javascript");
+				script.setAttribute("src", codapayConfig.codapaySDKAPI);
 				script.onload = script.onreadystatechange = function(e) {
 					if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
 						resolve(true);
@@ -234,6 +262,26 @@ export default class Pay extends EventEmitter {
 
 		}, this.options.btnPaypalId);
 		Spinner.remove();
+	}
+
+	_codapayServerEvent() {
+		let winObj = window.open(`${codapayConfig.codapaySandboxUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
+
+		return new Promise((resolve) => {
+			shareInfo(thirdPartyType.twitter).then((data) => {
+				let title = data ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
+
+				var loop = setInterval(() => {
+					if(winObj.closed) {
+						clearInterval(loop);
+						modal.alert(title, (_modal) => {
+						 	modal.closeModal(_modal);
+						 	resolve();
+						});
+					}
+				}, 1000);
+			});
+		});
 	}
 
 	static attachTo(element, options) {

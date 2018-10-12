@@ -41,6 +41,9 @@ export default class FacebookLogin extends EventEmitter {
 
 		extend(this.options, options);
 
+		this.onLogin = null;
+		this.onClickEvent = null;
+		this.onCancelEvent = null;
 		this._init();
 
 	}
@@ -116,29 +119,13 @@ export default class FacebookLogin extends EventEmitter {
 			// Logged into your app and Facebook.
 			FB.api('/me?fields=id,name,picture{url}', (response) => {
 				let {id} = getCountry();
-				let userId = response.id;
+				let accountId = response.id;
 				let userName = response.name ? response.name : '';
 				let userHead = response.picture.data.url ? response.picture.data.url : '';
 
-				getLogin({
-					userAccount: userId,
-					account_type: 1,
-					country_id: id,
-					// user_name: userName,
-					user_head: userHead
-				}).then((result) => {
-				    gtag('event', 'success', {
-				        'event_label': 'Facebook',
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
-				}).catch((reason) => {
-				    gtag('event', 'error', {
-				        'event_label': `Facebook-${reason}`,
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
-				});
+				if (this.onLogin) {
+				    this.onLogin(accountId, thirdPartyType.facebook, id, userHead, userName);
+				}
 			});
 		} else {
 			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
@@ -146,11 +133,9 @@ export default class FacebookLogin extends EventEmitter {
 				this.trigger('FacebookLogin.cancel');
 			});
 
-			gtag('event', 'cancel', {
-			    'event_label': 'Facebook',
-			    'event_category': 'Login',
-			    'non_interaction': true
-			});
+			if (this.onCancelEvent) {
+			    this.onCancelEvent();
+			}
 		}
 	}
 
@@ -160,17 +145,14 @@ export default class FacebookLogin extends EventEmitter {
 		}
 
 		FB.login((response) => {
-			// console.log(response);
 			this._statusChangeCallback(response);
 		}, {
 			scope: 'public_profile'
 		});
 
-		gtag('event', 'click', {
-		    'event_label': 'Facebook',
-		    'event_category': 'Login',
-		    'non_interaction': true
-		});
+		if (this.onClickEvent) {
+		    this.onClickEvent();
+		}
 	}
 
 	Share(URL) {

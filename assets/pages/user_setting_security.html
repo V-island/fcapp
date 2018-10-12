@@ -2,17 +2,70 @@
     <div class="page">
         <!-- 标题栏 -->
         <header class="bar bar-flex">
-            <a class="icon-btn back" data-ripple>
-                <i class="icon icon-arrow-back"></i>
-            </a>
+            {{if BindType}}
+                <a class="icon-btn" href="#/home" data-ripple>
+                    <i class="icon icon-arrow-back"></i>
+                </a>
+            {{else}}
+                <a class="icon-btn back" data-ripple>
+                    <i class="icon icon-arrow-back"></i>
+                </a>
+            {{/if}}
             <h1 class="title">{{USER_SETTING_SECURITY.Title}}</h1>
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block">
             <div class="user-setting-wrapper">
-                <i class="icon user-phone-binding setting-security"></i>
-                <p class="setting-title">{{USER_SETTING_SECURITY.Text}}</p>
-                <p class="setting-name">{{UserInfo.userPhone}}</p>
+                {{if BindType}}
+                    {{if BindType == "mobile"}}
+                        <i class="icon modals-mobile setting-security icons-two">
+                            <i class="icon modals-bind-pass setting-sub-security"></i>
+                        </i>
+                    {{else if BindType == "fecebook"}}
+                        <i class="icon modals-fecebook setting-security icons-two">
+                            <i class="icon modals-bind-pass setting-sub-security"></i>
+                        </i>
+                    {{else if BindType == "twitter"}}
+                        <i class="icon modals-Twitter setting-security icons-two">
+                            <i class="icon modals-bind-pass setting-sub-security"></i>
+                        </i>
+                    {{else if BindType == "tumblr"}}
+                        <i class="icon modals-tumblr setting-security icons-two">
+                            <i class="icon modals-bind-pass setting-sub-security"></i>
+                        </i>
+                    {{else if BindType == "snapchat"}}
+                        <i class="icon modals-snapchat setting-security icons-two">
+                            <i class="icon modals-bind-pass setting-sub-security"></i>
+                        </i>
+                    {{/if}}
+
+                    {{if BindType == "mobile"}}
+                        <p class="setting-title">{{USER_SETTING_SECURITY.Binding.Mobile.Title}}</p>
+                        <p class="setting-name">
+                            {{if UserPhone}}
+                                {{UserPhone}}
+                            {{/if}}
+                        </p>
+                        <p class="setting-text">{{USER_SETTING_SECURITY.Binding.Mobile.Text}}</p>
+                    {{else}}
+                        <p class="setting-title">{{USER_SETTING_SECURITY.Binding.Third_party.Title}}</p>
+                        <p class="setting-text">{{USER_SETTING_SECURITY.Binding.Third_party.Text}}</p>
+                    {{/if}}
+                {{else}}
+                    <i class="icon user-phone-binding setting-security"></i>
+                    <p class="setting-title">
+                        {{if UserPhone}}
+                            {{USER_SETTING_SECURITY.Not_Text}}
+                        {{else}}
+                            {{USER_SETTING_SECURITY.Text}}
+                        {{/if}}
+                    </p>
+                    <p class="setting-name">
+                        {{if UserPhone}}
+                            {{UserPhone}}
+                        {{/if}}
+                    </p>
+                {{/if}}
             </div>
         </div>
     </div>

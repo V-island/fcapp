@@ -1,22 +1,25 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
-
+import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
 
 import {
+	getUserInfo,
     personCenter
 } from '../api';
 
 import {
     extend,
+    jumpURL,
     createDom,
     addEvent,
     getData
 } from '../util';
 
 const LANG = getLangConfig();
+const modal = new Modal();
 
 export default class User extends EventEmitter {
 	constructor(element, options) {
@@ -52,14 +55,21 @@ export default class User extends EventEmitter {
 	}
 
 	_bindEvent() {
-		let self = this;
+		let {userId, BindingStatus} = getUserInfo();
 
-		for (let i = 0; i < self.listItemEl.length; i++) {
-			addEvent(self.listItemEl[i], 'click', function() {
-				let href = getData(this, self.options.listItemHref);
-				return location.href = href;
-	        });
+		if (!BindingStatus) {
+		    modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
+		        modal.closeModal(_modal);
+		        return location.href = jumpURL('#/register/safeguard');
+		    }, LANG.REGISTER.Madal.Account_Not_Safe.Buttons);
 		}
+
+		Array.prototype.slice.call(this.listItemEl).forEach(ItemEl => {
+			addEvent(ItemEl, 'click', () => {
+				let href = getData(ItemEl, this.options.listItemHref);
+				return location.href = jumpURL(href);
+	        });
+		});
 	}
 
 	static attachTo(element, options) {

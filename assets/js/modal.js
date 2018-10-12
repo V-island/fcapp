@@ -315,6 +315,10 @@ export default class Modal extends EventEmitter {
         });
         modal.find('.modal-close').on('click', function(e) {
             self.closeModal(modal);
+
+            if (typeof params.closeBtn === 'function') {
+                params.closeBtn();
+            }
         });
         self.openModal(modal);
         return modal[0];
@@ -371,9 +375,10 @@ export default class Modal extends EventEmitter {
      * @param  {[string]} title      标题文字
      * @param  {[function]} callbackOk 通过事件
      * @param  {[string]} button     提示按钮
+     * @param  {[function]} callbackCancel 通过事件
      * @return {[object]}            params
      */
-    alert(text, title, callbackOk, button) {
+    alert(text, title, callbackOk, button, callbackCancel) {
         const self = this;
 
         if (typeof title === 'function') {
@@ -383,7 +388,7 @@ export default class Modal extends EventEmitter {
         return self.modal({
             text: text || '',
             title: typeof title === 'undefined' ? self.defaults.modalTitle : title,
-            closeBtn: true,
+            closeBtn: typeof callbackCancel === 'undefined' ? true : callbackCancel,
             verticalButtons: true,
             buttons: [{
                 text: typeof button === 'undefined' ? self.defaults.modalAlertButton : button,

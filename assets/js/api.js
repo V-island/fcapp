@@ -36,7 +36,8 @@ const DistGreen = false;
 const Type = 'POST';
 const MacType = 1; // 设备类型 1.手机 2.PC
 const PhoneType = null;
-const LoginMode = 2; // 登入方式 1.APP 2.web 3.PC
+const LoginMode = 2; // 登入方式 1.APP 2.web 3.PC 4.快速登入
+const QuickLoginMode = 4; // 登入方式 1.APP 2.web 3.PC 4.快速登入
 
 
 // localStorage KEY
@@ -297,7 +298,6 @@ export const checkCountry = () =>{
             			resolve(true);
             		});
             	}).catch((error) => {
-            		console.log(error);
             		resolve(true);
             	});
 	        });
@@ -499,7 +499,7 @@ export const getLogin = (params, callback) => {
 						userId: userId,
 						phoneCode: phoneCode,
 						userPhone: userPhone
-					}, token, _mac, true);
+					}, token, _mac, LoginMode, true);
 					Spinner.remove();
 				});
 			}).catch(() => {
@@ -507,10 +507,90 @@ export const getLogin = (params, callback) => {
 					userId: userId,
 					phoneCode: phoneCode,
 					userPhone: userPhone
-				}, token, _mac, true);
+				}, token, _mac, LoginMode, true);
 				Spinner.remove();
 			});
 
+			resolve(true);
+		}, (response) => {
+			reject(response.message);
+		});
+	});
+};
+
+/**
+ * 快速登入
+ * @param  {[type]} _userId 用户ID
+ * @return {[type]}         [description]
+ */
+export const QuickLogin = (_userId) => {
+	let {id} = getLocalStorage(COUNTRY_ID_NAME) === null ? {id: 2} : getLocalStorage(COUNTRY_ID_NAME);
+	let _mac = getMac();
+	let _params = {
+		country_id: id,
+		loginMode: QuickLoginMode,
+		mac_type: MacType,
+		mac: _mac
+	}
+
+	if (DistGreen) {
+		_params.channel_id = 1;
+	}
+	return new Promise((resolve, reject) => {
+		getPost('/QuickLogin', _params, (response) => {
+			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			const {token, user_id} = response.data;
+
+			setLocalStorage(TOKEN_NAME, token);
+			Spinner.start(body);
+			checkIMChannel(user_id, null, null, null).then(({praiseURL, commentURL, giftURL}) => {
+				SendBirdAction.getInstance().disconnect();
+				CreateIMChannel(userId, praiseURL, commentURL, giftURL).then((data) => {
+					if (!data) QuickLogin(_params);
+
+					personCenter({
+						userId: user_id,
+						phoneCode: null,
+						userPhone: null
+					}, token, _mac, QuickLoginMode, true);
+					Spinner.remove();
+				});
+			}).catch(() => {
+				personCenter({
+					userId: user_id,
+					phoneCode: null,
+					userPhone: null
+				}, token, _mac, QuickLoginMode, true);
+				Spinner.remove();
+			});
+
+			resolve(true);
+		}, (response) => {
+			reject(response.message);
+		});
+	});
+};
+
+/**
+ * 绑定手机号或第三方
+ * @param  {[type]} params [description]
+ * @return {[type]}        [description]
+ */
+export const bindAccount = (params) => {
+	let _params = isObject(params) ? params : urlParse(params);
+	let {userId, userLoginMode} = getUserInfo();
+
+	_params.user_id = userId;
+	_params.loginMode = userLoginMode;
+	_params.mac_type = MacType;
+	_params.mac = getMac();
+
+	return new Promise((resolve, reject) => {
+
+		getPost('/bindAccount', _params, (response) => {
+			setUserInfo('BindingStatus', true);
+			setUserInfo('phoneCode', _params.phoneCode);
+			setUserInfo('userPhone', _params.user_phone);
 			resolve(true);
 		}, (response) => {
 			reject(response.message);
@@ -561,12 +641,12 @@ export const getUpdatePassword = (params) => {
  * @return {[type]} [description]
  */
 export const appLoginOut = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		status: 2,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -630,14 +710,16 @@ export const allLogin = () => {
  * 个人中心/个人信息
  * @return {[type]} [description]
  */
-export const personCenter = (params, token, mac, _checkLogin = false) => {
+export const personCenter = (params, token, mac, loginMode, _checkLogin = false) => {
 	let _info = isObject(params) ? params : getUserInfo();
 		token = typeof token !== 'undefined' ? token : getLocalStorage(TOKEN_NAME);
-		mac = typeof mac !== 'undefined' ? mac : getMac();;
+		mac = typeof mac !== 'undefined' ? mac : getMac();
+		loginMode = typeof loginMode !== 'undefined' ? loginMode : _info.userLoginMode;
+
 	let _params = {
 		userId: _info.userId,
 		token: token,
-		loginMode: LoginMode,
+		loginMode: loginMode,
 		mac: mac
 	}
 
@@ -649,6 +731,8 @@ export const personCenter = (params, token, mac, _checkLogin = false) => {
 			_info.userHead = response.data.user_head;
 			_info.userSex = response.data.user_sex;
 			_info.userPackage = response.data.user_package;
+			_info.userLoginMode = loginMode;
+			_info.BindingStatus = loginMode == 4 ? false : true;
 
 			setLocalStorage(UER_NAME, _info);
 
@@ -665,11 +749,11 @@ export const personCenter = (params, token, mac, _checkLogin = false) => {
  * @return {[type]} [description]
  */
 export const findAllUserHobby = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -706,11 +790,11 @@ export const findHobbyByUserId = (userID) => {
  * @return {[type]} [description]
  */
 export const findAllCharacterType = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -748,12 +832,12 @@ export const findCharacterTypeByUserId = (userID, id = 1) => {
  * @return {[type]}    [description]
  */
 export const saveInterest = (id) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		hobby_id: id,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -773,13 +857,13 @@ export const saveInterest = (id) => {
  * @return {[type]}        [description]
  */
 export const saveMyType = (typeId, id = 1) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		type_id: typeId,
 		belong_id: id,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -797,11 +881,11 @@ export const saveMyType = (typeId, id = 1) => {
  * @return {[type]} [description]
  */
 export const personInfo = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -820,11 +904,11 @@ export const personInfo = () => {
  * @return {[type]}        [description]
  */
 export const updateUserInfo = (params) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 	if (typeof params.name !== 'undefined') {
@@ -862,13 +946,13 @@ export const updateUserInfo = (params) => {
  * @return {[type]}         [description]
  */
 export const findMyVideo = (_page = 1, _number = 10) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		page: _page,
 		number: _number,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -888,13 +972,13 @@ export const findMyVideo = (_page = 1, _number = 10) => {
  * @return {[type]}         [description]
  */
 export const findWatchHistory = (_page = 1, _number = 10) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		page: _page,
 		number: _number,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -968,14 +1052,14 @@ export const selVideoByUserId = (Id, _page = 1, _number = 10) => {
  * @return {[type]}         [description]
  */
 export const selCommentById = (videoId, _page = 1, _number = 10) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		videoId: videoId,
 		page: _page,
 		number: _number,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -995,13 +1079,13 @@ export const selCommentById = (videoId, _page = 1, _number = 10) => {
  * @return {[type]}         [description]
  */
 export const commentVideo = (videoId, content) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		videoId: videoId,
 		content: content,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1021,13 +1105,13 @@ export const commentVideo = (videoId, content) => {
  * @return {[type]}         [description]
  */
 export const praiseVideo = (videoId, status = 1) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		videoId: videoId,
 		status: status,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1069,14 +1153,14 @@ export const searchUserInfo = (_userID) => {
  * @return {[type]}         [description]
  */
 export const followList = (_page = 1, _number = 10, _type) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		type: _type,
 		page: _page,
 		number: _number,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1099,7 +1183,7 @@ export const followList = (_page = 1, _number = 10, _type) => {
  * @return {[type]}             [description]
  */
 export const videoGifts = (videoUserId, videoId, giftsId, amount = 1, price) => {
-	let {userId, userPackage} = getUserInfo();
+	let {userId, userPackage, userLoginMode} = getUserInfo();
 	let _params = {
 		giftsId: giftsId,
 		videoId: videoId,
@@ -1107,7 +1191,7 @@ export const videoGifts = (videoUserId, videoId, giftsId, amount = 1, price) => 
 		videoUserId: videoUserId,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1131,13 +1215,13 @@ export const videoGifts = (videoUserId, videoId, giftsId, amount = 1, price) => 
  * @return {[type]}              [description]
  */
 export const uploadHead = (_file, callback, onProgress) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let formData = new FormData();
 
 	formData.append("keyword", 'uploadHead');
 	formData.append("userId", userId);
 	formData.append("token", getLocalStorage(TOKEN_NAME));
-	formData.append("loginMode", LoginMode);
+	formData.append("loginMode", userLoginMode);
 	formData.append("mac", getMac());
 	formData.append("file", _file);
 
@@ -1175,11 +1259,11 @@ export const findAllgifts = () => {
  * @return {[type]} [description]
  */
 export const createChannel = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1262,14 +1346,14 @@ export const closeChannel = (channel) => {
  * @return {[type]}            [description]
  */
 export const userEvaluate = (channel, liveUserId, stars) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		channel: channel,
 		liveUserId: liveUserId,
 		stars: stars,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 	return new Promise((resolve) => {
@@ -1287,11 +1371,11 @@ export const userEvaluate = (channel, liveUserId, stars) => {
  * @return {[type]} [description]
  */
 export const newDayRecord = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1325,12 +1409,12 @@ export const getAdvertisement = () => {
  * @return {[type]}         [description]
  */
 export const playVideo = (videoID) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		id: videoID,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1441,11 +1525,11 @@ export const videoType = () => {
  * @return {[type]}           [description]
  */
 export const reward = (liveID, channelID, giftsID, amount = 1) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac(),
 		live_user_id: liveID,
 		live_room_id: channelID,
@@ -1468,11 +1552,11 @@ export const reward = (liveID, channelID, giftsID, amount = 1) => {
  * @return {[type]}           [description]
  */
 export const roomProfit = (channelID) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac(),
 		channel: channelID
 	}
@@ -1491,11 +1575,11 @@ export const roomProfit = (channelID) => {
  * @return {[type]} [description]
  */
 export const liveAgain = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1526,14 +1610,14 @@ export const uploadVideo = (_file, _type, _title, _imgUrl) => {
 	    _imgUrl = arguments[2];
 	    _title = false;
 	}
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let { id } = getLocalStorage(COUNTRY_ID_NAME);
 	let formData = new FormData();
 
 	formData.append("userId", userId);
 	formData.append("type", _type);
 	formData.append("token", getLocalStorage(TOKEN_NAME));
-	formData.append("loginMode", LoginMode);
+	formData.append("loginMode", userLoginMode);
 	formData.append("mac", getMac());
 	formData.append("country_id", id);
 	formData.append("keyword", 'upload');
@@ -1570,11 +1654,11 @@ export const uploadVideo = (_file, _type, _title, _imgUrl) => {
  * @return {[type]} [description]
  */
 export const hasAudit = () => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1593,12 +1677,12 @@ export const hasAudit = () => {
  * @return {[type]}     [description]
  */
 export const deleteVideo = (_id) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		id: _id,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1640,13 +1724,13 @@ export const shareInfo = (id) => {
  * @return {[type]}         [description]
  */
 export const createOrder = (goodsId, type) => {
-	let {userId} = getUserInfo();
+	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		goods_id: goodsId,
 		pay_type: type,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
-		loginMode: LoginMode,
+		loginMode: userLoginMode,
 		mac: getMac()
 	}
 
@@ -1823,6 +1907,33 @@ export const payWay = () => {
 	return new Promise((resolve) => {
 		getPost('/payWay', _params, (response) => {
 			resolve(response.data ? response.data : false);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * codapay支付
+ * @param  {[type]} _country  国家代码
+ * @param  {[type]} _currency 国家货币
+ * @param  {[type]} _goodId   商品ID
+ * @param  {[type]} _title    商品名字
+ * @param  {[type]} _price    商品价格不带单位
+ * @return {[type]}           [description]
+ */
+export const myCodaPay = (_country, _currency, _goodId, _title, _price) => {
+	let _params = {
+		country: _country,
+		currency: _currency,
+		good_id: _goodId,
+		title: _title,
+		price: _price
+	}
+
+	return new Promise((resolve) => {
+		getPost('/mycodapay', _params, (response) => {
+			resolve(response.data);
 		}, (response) => {
 			resolve(false);
 		});

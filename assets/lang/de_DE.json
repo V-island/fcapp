@@ -226,7 +226,18 @@
     },
     "USER_SETTING_SECURITY": {
         "Title": "Account security",
-        "Text": "Mobile phone number registered"
+        "Text": "Mobile phone number registered",
+        "Not_Text": "Unbound mobile number",
+        "Binding": {
+            "Mobile": {
+                "Title": "Telephone number has been registered",
+                "Text": "You can login with phone number and password next time"
+            },
+            "Third_party": {
+                "Title": "Account has been registered",
+                "Text": "You can login with this account next time"
+            }
+        }
     },
     "USER_SETTING_HELP": {
         "Title": "Help",
@@ -300,6 +311,7 @@
             "Title": "or login",
             "Text": "coming soon",
             "Mobile": "Mobile",
+            "QuickLogin": "Fast registration",
             "Facebook": "Facebook",
             "Snapchat": "Snapchat",
             "Twitter": "Twitter",
@@ -319,11 +331,28 @@
     "REGISTER": {
         "Title": "Register",
         "Buttons": {
-            "Title": "Sign up"
+            "Title": "Sign up",
+            "Title_Bind": "Bind"
+
+        },
+        "Safeguard": {
+            "Title": "Safeguard"
         },
         "Terms": {
             "Text": "Registration indicates that you agree to the",
             "Title": "terms of service"
+        },
+        "Madal": {
+            "Account_Not_Safe": {
+                "Title": "Account is not safe",
+                "Text": "Your ID %S is not safe yet.Please bind it as soon as possible to facilitate your login",
+                "Buttons": "GO"
+            },
+            "Binding_Failed": {
+                "Title": "Binding failed",
+                "Text": "The mobil phone number has been registered.Please try another number.",
+                "Buttons": "OK"
+            }
         }
     },
     "PERSONAL_DETAIL": {

@@ -43,6 +43,10 @@
             <div class="login-footer">
                 <p>{{LOGIN.Third_party.Title}}</p>
                 <div class="tag tag-share">
+                    <label class="share-label btn-quick-login">
+                        <i class="icon modals-quick-login" data-ripple></i>
+                        <span>{{LOGIN.Third_party.QuickLogin}}</span>
+                    </label>
                     {{if ThirdPartyList}}
                         {{each ThirdPartyList}}
                             {{if $value.id == 1}}

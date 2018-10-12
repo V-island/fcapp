@@ -134,12 +134,15 @@ export default class Forms {
 
         // 选择时间
         if (this.dataTimeEl.length > 0) {
-            addEvent(this.dataTimeEl[0], 'change', () => {
-                let valueLength = this.dataTimeEl[0].value.length;
+            Array.prototype.slice.call(this.dataTimeEl).forEach(inputEl => {
+                addEvent(inputEl, 'keyup', (e) => {
+                    if (e.keyCode == 8) return;
 
-                if (valueLength == 2) {
-                    this.dataTimeEl[0].value = `${this.dataTimeEl[0].value}/`;
-                }
+                    let valueLength = inputEl.value.length;
+                    if (valueLength == 2) {
+                        inputEl.value = `${inputEl.value}/`;
+                    }
+                });
             });
         }
 

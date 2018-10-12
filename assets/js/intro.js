@@ -4,6 +4,7 @@ import Login from './pages/login';
 import LoginMobile from './pages/login_mobile';
 import Register from './pages/register';
 import RegisterTerms from './pages/register_terms';
+import RegisterSafeguard from './pages/register_safeguard';
 import FindPassword from './pages/find_password';
 import SetPassword from './pages/set_password';
 
@@ -33,7 +34,8 @@ import UserSettingHelp from './pages/user_setting_help';
 import UserSettingSuggestion from './pages/user_setting_suggestion';
 import UserSettingAbout from './pages/user_setting_about';
 
-const adminBase = '/';
+const adminBase = '../';
+
 // 全局变量
 export const fcConfig = {
     autoInit: false, //自动初始化页面
@@ -41,7 +43,7 @@ export const fcConfig = {
     router: true, //默认使用router
     swipePanel: "left", //滑动打开侧栏
     swipePanelOnlyClose: true, //只允许滑动关闭，不允许滑动打开侧栏
-    importJs: 'webcomponentsLite.js',
+    importJs: '@webcomponents/webcomponentsjs/webcomponents-lite',
     publicFile: {
         home_items: {
             name: 'home_items',
@@ -104,6 +106,11 @@ export const fcConfig = {
         component: Register,
         init: 1,
         children: [{
+            name: 'safeguard',
+            path: `${adminBase}pages/register_safeguard.html`,
+            component: RegisterSafeguard,
+            init: 1
+        }, {
             name: 'terms',
             path: `${adminBase}pages/register_terms.html`,
             component: RegisterTerms,
@@ -209,7 +216,11 @@ export const domainURL = location.pathname == '/' ? location.origin : location.o
 
 // Server 地址配置
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
-// export const baseURL = 'http://192.168.1.211:8080/live-app/open/gate.do';
+// export const baseURL = 'https://13.57.137.240:8443/live-app/open/gate';
+// export const baseURL = 'https://52.53.136.48:8443/live-app/open/gate';
+// export const baseURL = 'http://52.53.136.48:8080/live-app/open/gate';
+// 本地地址
+// export const baseURL = 'http://192.168.1.36:8080/open/gate.do';
 
 // 直播配置
 export const agoraConfig = {
@@ -222,7 +233,8 @@ export const agoraConfig = {
 // IM配置
 export const sendBirdConfig = {
     sendBird: true, // 默认使用SendBird DSK
-    sendBirdAppID: '07F10EB7-6318-4B3C-887B-F69758A7C257',
+    // sendBirdAppID: '07F10EB7-6318-4B3C-887B-F69758A7C257',
+    sendBirdAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
     sendBirdAppURL: 'https://api.sendbird.com',
     customerUserId: 339,
     customerIds: 'CS_01',
@@ -234,8 +246,18 @@ export const sendBirdConfig = {
 export const paypalConfig = {
     paypal: true, // 默认使用paypal DSK
     paypalSDKAPI: 'https://www.paypalobjects.com/api/checkout.js',
-    sandboxClientID: '07F10EB7-6318-4B3C-887B-F69758A7C257', // 沙盒，用于测试，用添加的sandbox账号测试能否交易成功
+    paypalSuccessUrl: 'http://52.53.136.48:8080/live-app/pay/success',
+    sandboxClientID: '***', // 沙盒，用于测试，用添加的sandbox账号测试能否交易成功
     productionClientID: '***' // 生产环境，部署上线时使用的环境
+};
+
+// Codapay配置
+export const codapayConfig = {
+    codapay: true, // 默认使用codapay DSK
+    codapaySDKAPI: 'https://sandbox.codapayments.com/airtime/js/airtime_v1.0.js',
+    codapaySandboxUrl: 'https://sandbox.codapayments.com/airtime/begin',
+    codapayProductionUrl: 'https://airtime.codapayments.com/airtime/begin',
+    codapaySuccessUrl: 'http://52.53.136.48:8080/live-app/pay/success'
 };
 
 // 第三方配置
@@ -262,7 +284,5 @@ export const twitterConfig = {
     twitterAPIKey: 'tsDbsfweUhFLcOoNFr2RFo5DO',
     twitterAPISecretKey: 'MeVPBkseBSK5qfgKw1iIuNANukvMEJsJAVefvDhnLy9zonvHiQ'
 };
-
-
 
 export const body = document.querySelector('body');

@@ -1,6 +1,7 @@
 import Template from 'art-template/lib/template-web';
 import { Spinner } from './components/Spinner';
 import Tabs from './tabs';
+import Modal from './modal';
 import {
     body,
     fcConfig
@@ -10,7 +11,8 @@ import {
 } from './lang';
 import {
     checkLogin,
-    checkCountry
+    checkCountry,
+    getUserInfo
 } from './api';
 import {
     jumpURL,
@@ -63,6 +65,7 @@ import {
     }
 
     const LANG = getLangConfig();
+    const modal = new Modal();
 
     /**
      * 验证浏览器是否支持CustomEvent
@@ -244,7 +247,8 @@ import {
         barTabClass: '.bar-tab',
         // 根目录
         rootUrl: '#/home',
-        notloginUrl: '#/login/mobile'
+        notloginUrl: '#/login/mobile',
+        safeguardUrl: '#/register/safeguard'
     }
 
     let DIRECTION = {
@@ -264,6 +268,7 @@ import {
             this.matcher = this._createRouteMap(options || []);
             this._init();
             this.xhr = null;
+            this.BindingTimer = null;
             Util.oldchange();
             window.addEventListener("hashchange", this._onHashchange.bind(this), false);
         }
@@ -413,6 +418,15 @@ import {
             if (checkLogin() && this.cache[url].init !== 1) {
                 return location.href = jumpURL(routerConfig.notloginUrl);
             }
+
+            let {userId, BindingStatus} = getUserInfo();
+            if (!BindingStatus && this.cache[url].init !== 1) {
+                if (this.BindingTimer != null) {
+                    clearTimeout(this.BindingTimer);
+                }
+                this.BindingTimer = this._bindingTimerEvent(userId);
+            }
+
             // if (this.cache[url].init !== 1) {
             //     return location.href = '#/login';
             // }
@@ -537,29 +551,6 @@ import {
             document.head.appendChild(link);
         }
 
-
-        _createScript(url) {
-            return new Promise((resolve, reject) => {
-                const heads = document.getElementsByTagName("head");
-                const script = document.createElement("script");
-
-                script.setAttribute("type", "text/javascript");
-                script.setAttribute("src", url);
-                script.onload = script.onreadystatechange = function(e) {
-                    if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-                        resolve(true);
-                        // Handle memory leak in IE
-                        script.onload = script.onreadystatechange = null;
-                    }
-                };
-                if (heads.length) {
-                    heads[0].appendChild(script);
-                } else {
-                    document.documentElement.appendChild(script);
-                }
-            });
-        }
-
         /**
          * 把一个页面的相关信息保存到 this.cache 中
          *
@@ -576,7 +567,7 @@ import {
             // if (!$doc.hasClass(routerConfig.sectionGroupClass)) {
             //     throw new Error('missing router view mark: ' + routerConfig.sectionGroupClass);
             // }
-
+            // this._createScript(param.component);
             this.cache[url] = {
                 content: doc,
                 component: param.component,
@@ -729,6 +720,17 @@ import {
          */
         _generateRandomId() {
             return "page-" + (+new Date());
+        }
+
+        _bindingTimerEvent(userId) {
+            return setTimeout(() => {
+                modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
+                    modal.closeModal(_modal);
+                    return location.href = jumpURL(routerConfig.safeguardUrl);
+                }, LANG.REGISTER.Madal.Account_Not_Safe.Buttons, () => {
+                    this.BindingTimer = null;
+                });
+            }, 120000);
         }
 
         /**

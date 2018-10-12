@@ -11,7 +11,8 @@ import {
 
 import {
     extend,
-    createDom
+    createDom,
+    getVariableFromUrl
 } from '../util';
 
 const LANG = getLangConfig();
@@ -32,7 +33,12 @@ export default class UserSettingSecurity extends EventEmitter {
 	}
 
 	init(element) {
-		this.data.UserInfo = getUserInfo();
+		const {bindtype} = getVariableFromUrl();
+		const {userPhone} = getUserInfo();
+
+		this.data.UserPhone = userPhone ? userPhone : false;
+		this.data.BindType = bindtype ? bindtype : false;
+
 		this.UserSettingSecurityEl = createDom(Template.render(element, this.data));
 
 		setTimeout(() => {

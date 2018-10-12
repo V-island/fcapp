@@ -1303,6 +1303,7 @@ p.lives-remark{
 	text-align: center;
 
 	>i.icon.setting-security{
+		position: relative;
 		width: 3.15rem;
 		height: 4.9rem;
 
@@ -1317,6 +1318,20 @@ p.lives-remark{
 				line-height: 2;
 			}
 		}
+		>i.icon.setting-sub-security{
+			@include size(1.05rem);
+			position: absolute;
+		    bottom: 0;
+		    right: 0;
+		}
+
+		&.icons-two{
+			@include size(3.15rem);
+		}
+	}
+	p.setting-text{
+		color: $color-text-gray-light;
+		font-size: 0.4rem;
 	}
 
 	>i.icon.app-logo{

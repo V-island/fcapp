@@ -44,6 +44,9 @@ export default class TwitterLogin extends EventEmitter {
 
 		extend(this.options, options);
 
+		this.onLogin = null;
+		this.onClickEvent = null;
+		this.onCancelEvent = null;
 		this._init();
 
 	}
@@ -98,29 +101,13 @@ export default class TwitterLogin extends EventEmitter {
 		hello(network).login().then((auth) => {
 			hello(auth.network).api('me').then((response) => {
 				let {id} = getCountry();
-				let userId = response.id;
+				let accountId = response.id;
 				let userName = response.name ? response.name : '';
 				let userHead = response.thumbnail ? response.thumbnail : '';
 
-				getLogin({
-					userAccount: userId,
-					account_type: 2,
-					country_id: id,
-					// user_name: userName,
-					user_head: userHead
-				}).then((result) => {
-				    gtag('event', 'success', {
-				        'event_label': 'Twitter',
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
-				}).catch((reason) => {
-				    gtag('event', 'error', {
-				        'event_label': `Twitter-${reason}`,
-				        'event_category': 'Login',
-				        'non_interaction': true
-				    });
-				});
+				if (this.onLogin) {
+				    this.onLogin(accountId, thirdPartyType.twitter, id, userHead, userName);
+				}
 			});
 		}, (e) => {
 			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
@@ -128,18 +115,14 @@ export default class TwitterLogin extends EventEmitter {
 				this.trigger('twitterLogin.cancel');
 			});
 
-			gtag('event', 'cancel', {
-			    'event_label': 'Twitter',
-			    'event_category': 'Login',
-			    'non_interaction': true
-			});
+			if (this.onCancelEvent) {
+			    this.onCancelEvent();
+			}
 		});
 
-		gtag('event', 'click', {
-		    'event_label': 'Twitter',
-		    'event_category': 'Login',
-		    'non_interaction': true
-		});
+		if (this.onClickEvent) {
+		    this.onClickEvent();
+		}
 	}
 
 	Share(URL) {

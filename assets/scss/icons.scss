@@ -120,7 +120,7 @@ $users: account, blacklist, live, price, score, setting, video, watch, invite, a
 // Modal Icon
 // -----------------------------
 
-$modals: mobile, fecebook, snapchat, tumblr, Twitter, cards, paypal, confirm, phiz, video, live, close;
+$modals: mobile, quick-login, fecebook, snapchat, tumblr, Twitter, bind-pass, cards, paypal, confirm, phiz, video, live, close;
 
 @each $modal in $modals {
     .modals-#{$modal}{
