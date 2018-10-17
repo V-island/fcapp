@@ -18,12 +18,12 @@
                                 <span class="list-item-secondary">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}
                                     {{if $value.status == 1}}
                                         <span class="list-item-status color-review">{{PUBLIC.Review}}</span>
-                                    {{else if $value.status == 3}}
+                                    {{else if $value.status == 3 || $value.status == 4}}
                                         <span class="list-item-status color-refuse">{{PUBLIC.Refuse}}</span>
                                     {{/if}}
                                 </span>
                             </span>
-                            <span class="list-item-meta-txt">{{$value.total_money}}</span>
+                            <span class="list-item-meta-txt {{if $value.status == 3 || $value.status == 4}} color-gray {{/if}}">{{$value.total_money}}</span>
                             <span class="icon {{if $value.status != 2 || $value.status != 4}} user-arrow-forward {{/if}} list-item-meta"></span>
                         </div>
                     {{/each}}
