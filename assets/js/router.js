@@ -12,7 +12,8 @@ import {
 import {
     checkLogin,
     checkCountry,
-    getUserInfo
+    getUserInfo,
+    checkBindingStatus
 } from './api';
 import {
     jumpURL,
@@ -419,12 +420,12 @@ import {
                 return location.href = jumpURL(routerConfig.notloginUrl);
             }
 
-            let {userId, BindingStatus} = getUserInfo();
-            if (!BindingStatus && this.cache[url].init !== 1) {
+            // 判断是否绑定
+            if (checkBindingStatus() && this.cache[url].init !== 1) {
                 if (this.BindingTimer != null) {
                     clearTimeout(this.BindingTimer);
                 }
-                this.BindingTimer = this._bindingTimerEvent(userId);
+                this.BindingTimer = this._bindingTimerEvent();
             }
 
             // if (this.cache[url].init !== 1) {
@@ -722,7 +723,8 @@ import {
             return "page-" + (+new Date());
         }
 
-        _bindingTimerEvent(userId) {
+        _bindingTimerEvent() {
+            let {userId} = getUserInfo();
             return setTimeout(() => {
                 modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
                     modal.closeModal(_modal);

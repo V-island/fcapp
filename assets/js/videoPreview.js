@@ -18,6 +18,7 @@ import {
     findAllgifts,
     selCommentById,
     follow,
+    payWay,
     praiseVideo,
     commentVideo,
     videoGifts,
@@ -111,13 +112,15 @@ export default class VideoPreview extends EventEmitter {
         this.SendBird = new SendBirdAction();
         let getAllgifts = findAllgifts();
         let getSelAllGoods = selAllGoods();
+        let getPayWay = payWay();
         let getComment = selCommentById(this.options.id, this._page, this._number);
         let SendBirdConnect = this.SendBird.connect(this.localInfo.userId);
 
-        Promise.all([getAllgifts, getComment, getSelAllGoods, SendBirdConnect]).then((data) => {
+        Promise.all([getAllgifts, getComment, getSelAllGoods, getPayWay, SendBirdConnect]).then((data) => {
             this.data.GiftList = data[0] ? data[0] : false;
             this.data.CommentList = data[1] ? data[1] : false;
             this.data.AllGoodsList = data[2] ? data[2] : false;
+            this.data.PayWayList = data[3] ? data[3] : false;
             this.data.UserInfoList = this.localInfo;
 
             importTemplate(this.videoPreviewFile, (id, _template) => {

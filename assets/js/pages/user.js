@@ -7,7 +7,8 @@ import {
 
 import {
 	getUserInfo,
-    personCenter
+    personCenter,
+    checkBindingStatus
 } from '../api';
 
 import {
@@ -55,9 +56,9 @@ export default class User extends EventEmitter {
 	}
 
 	_bindEvent() {
-		let {userId, BindingStatus} = getUserInfo();
 
-		if (!BindingStatus) {
+		if (checkBindingStatus()) {
+			let {userId} = getUserInfo();
 		    modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
 		        modal.closeModal(_modal);
 		        return location.href = jumpURL('#/register/safeguard');

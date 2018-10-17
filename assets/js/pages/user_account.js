@@ -12,6 +12,7 @@ import {
 } from '../lang';
 
 import {
+	payWay,
     personCenter,
     selAllGoods
 } from '../api';
@@ -50,11 +51,13 @@ export default class UserAccount extends EventEmitter {
 
 	init(element) {
 		let getUserInfo = personCenter();
-		let getselAllGoods = selAllGoods();
+		let getSelAllGoods = selAllGoods();
+		let getPayWay = payWay();
 
-		Promise.all([getUserInfo, getselAllGoods]).then((data) => {
+		Promise.all([getUserInfo, getSelAllGoods, getPayWay]).then((data) => {
 			this.data.UserInfo = data[0] ? data[0] : false;
 			this.data.AllGoodsList = data[1] ? data[1] : false;
+			this.data.PayWayList = data[2] ? data[2] : false;
 
 			this.UserAccountEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.UserAccountEl);

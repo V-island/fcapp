@@ -43,6 +43,7 @@ const QuickLoginMode = 4; // 登入方式 1.APP 2.web 3.PC 4.快速登入
 // localStorage KEY
 const TOKEN_NAME = 'TOKEN';
 const UER_NAME = 'USE_INFO';
+const UER_BINDING_STATUS = 'UER_BINDING_STATUS';
 const UUID = 'UUID';
 const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const COUNTRY_NAME = 'COUNTRY';
@@ -263,6 +264,13 @@ export const getCountry = () => {
 	}
 
 	return Country;
+}
+
+// 判断快速登录绑定状态
+export const checkBindingStatus = () => {
+	let binding = getLocalStorage(UER_BINDING_STATUS);
+
+	return binding === null ? false : binding;
 }
 
 // 判断是否是主播
@@ -588,9 +596,10 @@ export const bindAccount = (params) => {
 	return new Promise((resolve, reject) => {
 
 		getPost('/bindAccount', _params, (response) => {
-			setUserInfo('BindingStatus', true);
 			setUserInfo('phoneCode', _params.phoneCode);
 			setUserInfo('userPhone', _params.user_phone);
+			setLocalStorage(UER_BINDING_STATUS, true);
+
 			resolve(true);
 		}, (response) => {
 			reject(response.message);
@@ -732,9 +741,12 @@ export const personCenter = (params, token, mac, loginMode, _checkLogin = false)
 			_info.userSex = response.data.user_sex;
 			_info.userPackage = response.data.user_package;
 			_info.userLoginMode = loginMode;
-			_info.BindingStatus = loginMode == 4 ? false : true;
 
 			setLocalStorage(UER_NAME, _info);
+
+			if (loginMode == QuickLoginMode) {
+				setLocalStorage(UER_BINDING_STATUS, false);
+			}
 
 			if (_checkLogin) {
 				return location.href = jumpURL(CONFIG.rootUrl);
@@ -1920,22 +1932,31 @@ export const payWay = () => {
  * @param  {[type]} _goodId   商品ID
  * @param  {[type]} _title    商品名字
  * @param  {[type]} _price    商品价格不带单位
+ * @param  {[type]} _payTotal 支付总金额（带货币单位）
  * @return {[type]}           [description]
  */
-export const myCodaPay = (_country, _currency, _goodId, _title, _price) => {
+export const myCodaPay = (_country, _currency, _goodId, _title, _price, _payTotal) => {
+	let { userId } = getUserInfo();
 	let _params = {
 		country: _country,
 		currency: _currency,
-		good_id: _goodId,
+		goods_id: _goodId,
 		title: _title,
-		price: _price
+		price: _price,
+		pay_total: _payTotal,
+		user_id: userId,
+		pay_type: 2
 	}
 
-	return new Promise((resolve) => {
+	if (DistGreen) {
+		_params.channel_id = 1;
+	}
+
+	return new Promise((resolve, reject) => {
 		getPost('/mycodapay', _params, (response) => {
-			resolve(response.data);
+			resolve(response.data ? response.data : false);
 		}, (response) => {
-			resolve(false);
+			reject(false);
 		});
 	});
 };

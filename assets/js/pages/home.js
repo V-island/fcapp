@@ -90,7 +90,8 @@ export default class Home extends EventEmitter {
 		let getvideoType = videoType();
 
 		Promise.all([getFreeVideoClips, getVideoClips, getvideoType]).then((data) => {
-			this.data.FreeVideoList = data[0] ? (data[0].length > 2 ? data[0].slice(0, 2) : data[0]) : false;
+			// this.data.FreeVideoList = data[0] ? (data[0].length > 2 ? data[0].slice(0, 2) : data[0]) : false;
+			this.data.FreeVideoList = data[0] ? data[0] : false;
 			this.data.VideoList = data[1] ? data[1] : false;
 			this.data.VideoType = data[2] ? data[2] : false;
 			this.HomeEl = createDom(Template.render(element, this.data));
@@ -158,7 +159,7 @@ export default class Home extends EventEmitter {
 							// free
 							if (data) {
 								this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-								data = data.length > 2 ? data.slice(0, 2) : data;
+								// data = data.length > 2 ? data.slice(0, 2) : data;
 								data.forEach((itemData, index) => {
 									this.data.VideosList = itemData;
 									this.data.NotFreeVideos = false;
@@ -255,7 +256,7 @@ export default class Home extends EventEmitter {
 					// free
 					if (data) {
 						this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-						data = data.length > 2 ? data.slice(0, 2) : data;
+						// data = data.length > 2 ? data.slice(0, 2) : data;
 						data.forEach((itemData, index) => {
 							this.data.VideosList = itemData;
 							this.data.NotFreeVideos = false;
@@ -286,11 +287,11 @@ export default class Home extends EventEmitter {
 		this.pagesVideoSwiper.on('pullingUp', () => {
 			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
-			videoClips(_page, this._number, this.tagId, 2).then((data) => {
+			videoClips(_page, this._number, this.tagId, 1).then((data) => {
 				if (data) {
 					data.forEach((itemData, index) => {
 						this.data.VideosList = itemData;
-
+						this.data.NotFreeVideos = false;
 						let element = createDom(Template.render(this.tpl.list_videos, this.data));
 						this._cardVideoEvent(element);
 						this.cardsVideoEl.append(element);
@@ -300,6 +301,20 @@ export default class Home extends EventEmitter {
 				this.pagesVideoSwiper.finishPullUp();
 				this.pagesVideoSwiper.refresh();
 			});
+			// videoClips(_page, this._number, this.tagId, 2).then((data) => {
+			// 	if (data) {
+			// 		data.forEach((itemData, index) => {
+			// 			this.data.VideosList = itemData;
+						// this.data.NotFreeVideos = true;
+			// 			let element = createDom(Template.render(this.tpl.list_videos, this.data));
+			// 			this._cardVideoEvent(element);
+			// 			this.cardsVideoEl.append(element);
+			// 		});
+			// 		setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+			// 	}
+			// 	this.pagesVideoSwiper.finishPullUp();
+			// 	this.pagesVideoSwiper.refresh();
+			// });
 		});
 
 		this.pagesVideoSwiper.on('scroll', (pos) => {

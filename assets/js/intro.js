@@ -215,12 +215,13 @@ export const fcConfig = {
 export const domainURL = location.pathname == '/' ? location.origin : location.origin + location.pathname;
 
 // Server 地址配置
-export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
+export const baseURL = 'https://shineliveapp.com/live-app/open/gate.do';
 // export const baseURL = 'https://13.57.137.240:8443/live-app/open/gate';
 // export const baseURL = 'https://52.53.136.48:8443/live-app/open/gate';
 // export const baseURL = 'http://52.53.136.48:8080/live-app/open/gate';
 // 本地地址
 // export const baseURL = 'http://192.168.1.36:8080/open/gate.do';
+// export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
 
 // 直播配置
 export const agoraConfig = {
@@ -267,6 +268,17 @@ export const thirdPartyType = {
     line: 3,
     kakoo: 4,
     snapchat: 5
+};
+
+// 支付配置
+export const payType = {
+    googlePay: 1,
+    paypalPay: 2,
+    linePay: 3,
+    kakooPay: 4,
+    paytmPay: 5,
+    visaPay: 6,
+    codaPay: 7,
 };
 
 // Facebook配置

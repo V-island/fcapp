@@ -4,6 +4,7 @@ import { Spinner } from './components/Spinner';
 import Modal from './modal';
 import {
 	baseURL,
+	payType,
 	paypalConfig,
 	codapayConfig
 } from './intro';
@@ -13,6 +14,7 @@ import {
 } from './lang';
 
 import {
+	myCodaPay,
     createOrder
 } from './api';
 
@@ -28,10 +30,19 @@ import {
     getLocalStorage
 } from './util';
 
-const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const LANG = getLangConfig();
 const modal = new Modal();
-
+const CODAPAY_CODAS = {
+	'7': 356, 		// India
+	'8': 764, 		// Thailand
+	'11': 458,  	// Malaysia
+	'12': 360,		// Indonesia
+	'13': 608, 		// Philippines
+	'14': 702,		// Singapore
+	'Vietnam': 704, 	//
+	'Myanmar': 104, 	//
+	'Cambodia': 116 	//
+};
 export default class Pay extends EventEmitter {
 	constructor(element, options) {
 	    super();
@@ -43,44 +54,71 @@ export default class Pay extends EventEmitter {
 	    	listClass: '.list',
 	    	listItemClass: 'list-item',
 	    	btnPaypalId: '#paypal-button',
-	    	btnCreditId: '#credit-card-button',
+	    	btnPayId: '#button-pay',
 	    	dataIndex: 'id',
+	    	dataTitle: 'title',
 	    	dataPrice: 'price',
+	    	dataTotal: 'total',
 	    	dataCurrency: 'currency',
 	    	hideClassDOM: 'hide',
+	    	disabledClassDOM: 'disabled',
 	    	showClass: 'active'
         };
 
 	    extend(this.options, options);
 
 	    this._init();
-
 	}
 
-
 	_init() {
-		const { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
-		this.payType = 1;
-		this.totalPrice = '';
-		this.goodsPrice = '';
-		this.goodsId = '';
-		this.currency = currency_type;
+		this.payType = null;
+
+		// 商品价格
+		this.goodsId = null;
+		this.goodsTitle = null;
+		this.goodsPrice = null;
+		this.totalPrice = null;
+		this.currencyId = null;
 
 		let createPaypal = this._createPaypalScript();
 		let createCodapay = this._createCodapayScript();
 
 		this.tagsEl = this.PayEl.querySelector(this.options.tagsClass);
 		this.tagLabelEl = this.tagsEl.getElementsByClassName(this.options.tagLabelClass);
+		this.tagActiveEl = this.tagsEl.getElementsByClassName(this.options.showClass);
 
-		// this.listEl = this.PayEl.querySelector(this.options.listClass);
-		// this.listItemEl = this.listEl.getElementsByClassName(this.options.listItemClass);
+		this.listEl = this.PayEl.querySelector(this.options.listClass);
+		this.listItemEl = this.listEl.getElementsByClassName(this.options.listItemClass);
+		this.listActiveEl = this.listEl.getElementsByClassName(this.options.showClass);
 
 		this.btnPaypalEl = this.PayEl.querySelector(this.options.btnPaypalId);
-		this.btnCreditEl = this.PayEl.querySelector(this.options.btnCreditId);
+		this.btnPayEl = this.PayEl.querySelector(this.options.btnPayId);
+
 		Spinner.start(this.PayEl);
 		Promise.all([createPaypal, createCodapay]).then((data) => {
+			// 初始化标签内容
+			if (this.tagActiveEl.length > 0) {
+			    this.goodsId = parseInt(getData(this.tagActiveEl[0], this.options.dataIndex));
+			    this.goodsTitle = getData(this.tagActiveEl[0], this.options.dataTitle);
+			    this.goodsPrice = getData(this.tagActiveEl[0], this.options.dataPrice);
+			    this.totalPrice = getData(this.tagActiveEl[0], this.options.dataTotal);
+			    this.currencyId = getData(this.tagActiveEl[0], this.options.dataCurrency);
+			}
+
+			// 初始化支付方式
+			if (this.listActiveEl.length > 0) {
+				this.payType = parseInt(getData(this.listActiveEl[0], this.options.dataIndex));
+			}
+
+			// 初始化payPal button
+			if (this.payType === payType.paypalPay) {
+				addClass(this.btnPayEl, this.options.hideClassDOM);
+				removeClass(this.btnPaypalEl, this.options.hideClassDOM);
+			}
+
 			this._paypalServerEvent();
 			this._bindEvent();
+			Spinner.remove();
 		});
 	}
 
@@ -137,6 +175,7 @@ export default class Pay extends EventEmitter {
 	}
 
 	_bindEvent() {
+		// 价格商品选择
 		Array.prototype.slice.call(this.tagLabelEl).forEach(labelEl => {
 			addEvent(labelEl, 'click', () => {
 				if (hasClass(labelEl, this.options.showClass)) return false;
@@ -146,30 +185,66 @@ export default class Pay extends EventEmitter {
 				if (activeLabelEl) {
 					removeClass(activeLabelEl, this.options.showClass);
 				}
+
 				this.goodsId = parseInt(getData(labelEl, this.options.dataIndex));
-				this.totalPrice = getData(labelEl, this.options.dataPrice);
+				this.goodsTitle = getData(labelEl, this.options.dataTitle);
+				this.goodsPrice = getData(labelEl, this.options.dataPrice);
+				this.totalPrice = getData(labelEl, this.options.dataTotal);
+				this.currencyId = getData(labelEl, this.options.dataCurrency);
+
 				addClass(labelEl, this.options.showClass);
-				removeClass(this.btnPaypalEl, this.options.hideClassDOM);
-				addClass(this.btnCreditEl, this.options.hideClassDOM);
 	        });
 		});
 
-		// Array.prototype.slice.call(this.listItemEl).forEach(itemEl => {
-		// 	addEvent(itemEl, 'click', () => {
-		// 		if (hasClass(itemEl, this.options.showClass)) return false;
+		// 支付方式选择
+		Array.prototype.slice.call(this.listItemEl).forEach(itemEl => {
+			addEvent(itemEl, 'click', () => {
+				if (hasClass(itemEl, this.options.showClass)) return false;
 
-		// 		const activeitemEl = this.listEl.getElementsByClassName(this.options.showClass)[0];
+				const activeitemEl = this.listEl.getElementsByClassName(this.options.showClass)[0];
 
-		// 		if (activeitemEl) {
-		// 			removeClass(activeitemEl, this.options.showClass);
-		// 		}
-		// 		this.payType = parseInt(getData(itemEl, this.options.dataIndex));
-		// 		addClass(itemEl, this.options.showClass);
+				if (activeitemEl) {
+					removeClass(activeitemEl, this.options.showClass);
+				}
 
-		// 		toggleClass(this.btnPaypalEl, this.options.hideClassDOM);
-		// 		toggleClass(this.btnCreditEl, this.options.hideClassDOM);
-		// 	});
-		// });
+				this.payType = parseInt(getData(itemEl, this.options.dataIndex));
+
+				addClass(itemEl, this.options.showClass);
+
+				// 初始化payPal button
+				if (this.payType === payType.paypalPay) {
+					addClass(this.btnPayEl, this.options.hideClassDOM);
+					removeClass(this.btnPaypalEl, this.options.hideClassDOM);
+				}else {
+					removeClass(this.btnPayEl, this.options.hideClassDOM);
+					addClass(this.btnPaypalEl, this.options.hideClassDOM);
+				}
+			});
+		});
+
+		// 支付 Butoon
+		addEvent(this.btnPayEl, 'click', () => {
+			switch(this.payType) {
+				case payType.googlePay:
+					modal.toast(LANG.LOGIN.Madal.Error);
+					break;
+				case payType.linePay:
+					modal.toast(LANG.LOGIN.Madal.Error);
+					break;
+				case payType.kakooPay:
+					modal.toast(LANG.LOGIN.Madal.Error);
+					break;
+				case payType.paytmPay:
+					modal.toast(LANG.LOGIN.Madal.Error);
+					break;
+				case payType.visaPay:
+					modal.toast(LANG.LOGIN.Madal.Error);
+					break;
+				case payType.codaPay:
+					this._codaPayEvent(this.currencyId);
+					break;
+			}
+		});
 	}
 
 	_paypalServerEvent() {
@@ -201,9 +276,8 @@ export default class Pay extends EventEmitter {
 						keyword: 'pay',
 						order_id: order.order_id,
 						total: order.goods_price,
-						currency: this.currency
+						currency: this.currencyId
 					};
-					this.goodsPrice = order.goods_price;
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
 						.then((res) => {
@@ -261,27 +335,38 @@ export default class Pay extends EventEmitter {
 			}
 
 		}, this.options.btnPaypalId);
-		Spinner.remove();
 	}
 
-	_codapayServerEvent() {
-		let winObj = window.open(`${codapayConfig.codapaySandboxUrl}`, '_blank', 'toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes');
+	_codaPayEvent(countryID) {
+		let _country = CODAPAY_CODAS[countryID] ? CODAPAY_CODAS[countryID] : false;
+		let _currency = CODAPAY_CODAS[countryID] ? CODAPAY_CODAS[countryID] : false;
 
-		return new Promise((resolve) => {
-			shareInfo(thirdPartyType.twitter).then((data) => {
-				let title = data ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
+		if (!_country || !_currency) {
+			return modal.toast(LANG.LOGIN.Madal.Error);
+		}
 
-				var loop = setInterval(() => {
-					if(winObj.closed) {
-						clearInterval(loop);
-						modal.alert(title, (_modal) => {
-						 	modal.closeModal(_modal);
-						 	resolve();
-						});
-					}
-				}, 1000);
-			});
+		gtag('event', 'click', {
+		    'event_label': `${this.totalPrice} commodity`,
+		    'event_category': 'CodaPay',
+		    'non_interaction': true
 		});
+
+		return myCodaPay(_country, _currency, this.goodsId, this.goodsTitle, this.goodsPrice, this.totalPrice).then((data) => {
+				if (!data) return false;
+				airtime_checkout(data.txnId);
+
+				gtag('event', 'success', {
+				    'event_label': `${this.totalPrice} commodity`,
+				    'event_category': 'CodaPay',
+				    'non_interaction': true
+				});
+			}).catch((reason) => {
+		        gtag('event', 'error', {
+		    	    'event_label': `${this.totalPrice} commodity`,
+		    	    'event_category': 'CodaPay',
+		    	    'non_interaction': true
+		    	});
+			});
 	}
 
 	static attachTo(element, options) {

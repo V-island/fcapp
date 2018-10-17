@@ -1,7 +1,67 @@
+import Template from 'art-template/lib/template-web';
 import hello from 'hellojs/dist/hello.all.js';
+
+import RedirectDom from '../../pages/admins/redirect.html';
+
 import {
+	body,
 	twitterConfig
 } from '../intro';
+
+import {
+    getLangConfig
+} from '../lang';
+
+import {
+    extend,
+    addEvent,
+    createDom,
+    getVariableFromUrl
+} from '../util';
+
+const LANG = getLangConfig();
+
+class Redirect {
+	constructor(options) {
+
+	    this.data = {};
+	    this.options = {
+	    	btnRedirectClass: 'btn-redirect'
+        };
+
+	    extend(this.options, options);
+	    extend(this.data, LANG);
+
+	    this.init();
+	}
+
+	init() {
+		const {TxnId, OrderId} = getVariableFromUrl();
+
+		this.data.TxnId = TxnId ? TxnId : false;
+		this.RedirectEl = createDom(Template.render(RedirectDom, this.data));
+		this.btnRedirectEl = this.RedirectEl.getElementsByClassName(this.options.btnRedirectClass);
+
+		body.appendChild(this.RedirectEl);
+		this._bindEvent();
+	}
+
+	_bindEvent() {
+
+		if (this.btnRedirectEl.length > 0) {
+			Array.prototype.slice.call(this.btnRedirectEl).forEach(btnEl => {
+				addEvent(btnEl, 'click', () => {
+					return location.href = `${window.location.origin}/#/user/account`;
+		        });
+			});
+		}
+	}
+
+	static attachTo(options) {
+	    return new Redirect(options);
+	}
+}
+Redirect.attachTo();
 
 window.twttr = (function(d, s, id) {
 	var js, fjs = d.getElementsByTagName(s)[0],

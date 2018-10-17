@@ -104,7 +104,7 @@ $messages: comment, friends, hi, like, message, service, gift, album, giving, vi
 // User Icon
 // -----------------------------
 
-$users: account, blacklist, live, price, score, setting, video, watch, invite, arrow-forward, arrow-forward-active, stars, checkbox, upload-photos, upload-video, under-review, audit-failure, video-play, add-video, close-video, purse, phone-binding, gold, paypal, visa;
+$users: account, blacklist, live, price, score, setting, video, watch, invite, arrow-forward, arrow-forward-active, stars, checkbox, upload-photos, upload-video, under-review, audit-failure, video-play, add-video, close-video, purse, phone-binding, gold, success, paypal, visa;
 
 @each $user in $users {
     .user-#{$user}{
@@ -120,7 +120,7 @@ $users: account, blacklist, live, price, score, setting, video, watch, invite, a
 // Modal Icon
 // -----------------------------
 
-$modals: mobile, quick-login, fecebook, snapchat, tumblr, Twitter, bind-pass, cards, paypal, confirm, phiz, video, live, close;
+$modals: mobile, quick-login, fecebook, snapchat, tumblr, Twitter, bind-pass, codapay, cards, paypal, confirm, phiz, video, live, close;
 
 @each $modal in $modals {
     .modals-#{$modal}{
