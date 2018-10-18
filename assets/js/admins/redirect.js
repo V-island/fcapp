@@ -51,6 +51,7 @@ class Redirect {
 		if (this.btnRedirectEl.length > 0) {
 			Array.prototype.slice.call(this.btnRedirectEl).forEach(btnEl => {
 				addEvent(btnEl, 'click', () => {
+					callAndroid();
 					return location.href = `${window.location.origin}/#/user/account`;
 		        });
 			});
@@ -61,7 +62,6 @@ class Redirect {
 	    return new Redirect(options);
 	}
 }
-Redirect.attachTo();
 
 window.twttr = (function(d, s, id) {
 	var js, fjs = d.getElementsByTagName(s)[0],
@@ -102,3 +102,12 @@ function login_twitter(network) { //登录方法，并将twitter 作为参数传
 		// self.location= '/home/login.twLogin.do?result='+res;
 	}, log);
 }
+
+// js调用了android中的hello方法
+function callAndroid(){
+	if (window.payRedirect) {
+		window.payRedirect.hello();
+	}
+}
+
+Redirect.attachTo();

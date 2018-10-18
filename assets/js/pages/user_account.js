@@ -3,6 +3,7 @@ import EventEmitter from '../eventEmitter';
 import Modal from '../modal';
 import Pay from '../Pay';
 import {
+	body,
 	baseURL,
 	paypalConfig
 } from '../intro';

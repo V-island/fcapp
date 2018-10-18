@@ -421,7 +421,7 @@ import {
             }
 
             // 判断是否绑定
-            if (checkBindingStatus() && this.cache[url].init !== 1) {
+            if (!checkBindingStatus() && this.cache[url].init !== 1) {
                 if (this.BindingTimer != null) {
                     clearTimeout(this.BindingTimer);
                 }

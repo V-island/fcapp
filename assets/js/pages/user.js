@@ -56,8 +56,7 @@ export default class User extends EventEmitter {
 	}
 
 	_bindEvent() {
-
-		if (checkBindingStatus()) {
+		if (!checkBindingStatus()) {
 			let {userId} = getUserInfo();
 		    modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
 		        modal.closeModal(_modal);

@@ -1,10 +1,13 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from './eventEmitter';
 import { Spinner } from './components/Spinner';
+import { MessageChat } from './components/MessageChat';
+import SendBirdAction from './SendBirdAction';
 import Modal from './modal';
 import {
 	baseURL,
 	payType,
+	sendBirdConfig,
 	paypalConfig,
 	codapayConfig
 } from './intro';
@@ -15,7 +18,8 @@ import {
 
 import {
 	myCodaPay,
-    createOrder
+    createOrder,
+    getUserInfo
 } from './api';
 
 import {
@@ -27,6 +31,7 @@ import {
     toggleClass,
     setData,
     getData,
+    errorAlert,
     getLocalStorage
 } from './util';
 
@@ -55,6 +60,7 @@ export default class Pay extends EventEmitter {
 	    	listItemClass: 'list-item',
 	    	btnPaypalId: '#paypal-button',
 	    	btnPayId: '#button-pay',
+	    	btnCustomerId: '#button-customer',
 	    	dataIndex: 'id',
 	    	dataTitle: 'title',
 	    	dataPrice: 'price',
@@ -82,6 +88,7 @@ export default class Pay extends EventEmitter {
 
 		let createPaypal = this._createPaypalScript();
 		let createCodapay = this._createCodapayScript();
+		let createCustomer = this._createCustomerChannel();
 
 		this.tagsEl = this.PayEl.querySelector(this.options.tagsClass);
 		this.tagLabelEl = this.tagsEl.getElementsByClassName(this.options.tagLabelClass);
@@ -93,9 +100,10 @@ export default class Pay extends EventEmitter {
 
 		this.btnPaypalEl = this.PayEl.querySelector(this.options.btnPaypalId);
 		this.btnPayEl = this.PayEl.querySelector(this.options.btnPayId);
+		this.btnCustomerEl = this.PayEl.querySelector(this.options.btnCustomerId);
 
 		Spinner.start(this.PayEl);
-		Promise.all([createPaypal, createCodapay]).then((data) => {
+		Promise.all([createPaypal, createCodapay, createCustomer]).then((data) => {
 			// 初始化标签内容
 			if (this.tagActiveEl.length > 0) {
 			    this.goodsId = parseInt(getData(this.tagActiveEl[0], this.options.dataIndex));
@@ -171,6 +179,36 @@ export default class Pay extends EventEmitter {
 			}else {
 				resolve(true);
 			}
+		});
+	}
+
+	// 链接客服频道号
+	_createCustomerChannel() {
+		const SendBird = new SendBirdAction();
+		const {userId} = getUserInfo();
+
+		return new Promise((resolve) => {
+			if (userId == sendBirdConfig.customerUserId) {
+				resolve(false);
+			}
+
+			SendBird.connect(userId).then(user => {
+				SendBirdAction.getInstance()
+					.createChannelWithUserIds(sendBirdConfig.customerIds, sendBirdConfig.customerName, sendBirdConfig.customerType)
+					.then(channel => {
+						addEvent(this.btnCustomerEl, 'click', () => {
+							MessageChat.getInstance().render(channel.url, false);
+						});
+						resolve(false);
+					})
+					.catch(error => {
+						errorAlert(error.message);
+						resolve(false);
+					});
+			}).catch(() => {
+				errorAlert('SendBird connection failed.');
+				resolve(false);
+			});
 		});
 	}
 

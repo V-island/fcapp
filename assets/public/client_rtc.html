@@ -89,7 +89,7 @@
         <div class="tag tag-recharge">
             {{if AllGoodsList}}
                 {{each AllGoodsList}}
-                    <label class="recharge-label {{if $index == 0}}active{{/if}}" data-id="{{$value.id}}" data-currency="USD" data-ripple>
+                    <label class="recharge-label {{if $index == 0}} active {{/if}}" data-id="{{$value.id}}" data-title="{{$value.title}}" data-price="{{$value.goods_price}}" data-total="{{$value.total_price}}" data-currency="{{$value.country_id}}" data-ripple>
                         <p class="cost">{{$value.title}} {{LIVE_PREVIEW.Actions.Coins}}</p>
                         <p>{{$value.total_price}}</p>
                     </label>
@@ -98,8 +98,23 @@
         </div>
     </div>
     <div class="actions-modal-group recharge-group">
+        <p class="recharge-label">
+            <span>{{LIVE_PREVIEW.Recharge.Payment_Method}}</span>
+            <span>{{LIVE_PREVIEW.Recharge.Not_Pay.Title}}<span id="button-customer" class="color-primary"> {{LIVE_PREVIEW.Recharge.Not_Pay.Text}}</span></span>
+        </p>
+        <ul class="list">
+            {{if PayWayList}}
+                {{each PayWayList}}
+                    <li class="list-item {{if $index == 0}} active {{/if}}" data-id="{{$value.id}}" data-ripple>
+                        <span class="icon modals-paypal list-item-graphic" style="{{if $value.pay_img}} background-image: url({{$value.pay_img}}); {{/if}}"></span>
+                        <span class="list-item-text">{{$value.pay_way}}</span>
+                        <span class="icon modals-confirm list-item-meta"></span>
+                    </li>
+                {{/each}}
+            {{/if}}
+        </ul>
         <div id="paypal-button" class="button-paypal hide"></div>
-        <div id="credit-card-button" class="button button-primary" data-ripple>{{USER_ACCOUNT.Buttons}}</div>
+        <div id="button-pay" class="button button-primary" data-ripple>{{USER_ACCOUNT.Buttons}}</div>
     </div>
 </script>
 

@@ -529,6 +529,10 @@
             "Payment_Method": "付款方式",
             "PayPal": "PayPal",
             "Credit_Card": "信用卡",
+            "Not_Pay": {
+                "Title": "支付不成功",
+                "Text": "帮助"
+            },
             "Buttons": "确认"
         },
         "Called_Caller": {
@@ -602,6 +606,11 @@
     "OTHER_DETAILS": {
         "Private_Letter": "私信",
         "Video_Chat": "视频聊天"
+    },
+    "REDIRECT": {
+        "Title": "充值成功",
+        "Text": "充值成功",
+        "Buttons": "返回"
     },
     "PUBLIC": {
         "Billing": "金币",

@@ -512,6 +512,10 @@
             "Payment_Method": "Payment Method",
             "PayPal": "PayPal",
             "Credit_Card": "Credit Card",
+            "Not_Pay": {
+                "Title": "unable to pay",
+                "Text": "help"
+            },
             "Buttons": "CONFIRM"
         },
         "Called_Caller": {
@@ -585,6 +589,11 @@
     "OTHER_DETAILS": {
         "Private_Letter": "Private letter",
         "Video_Chat": "Video chat"
+    },
+    "REDIRECT": {
+        "Title": "Recharge successful",
+        "Text": "Recharge successful",
+        "Buttons": "Yes"
     },
     "PUBLIC": {
         "Billing": "Gold",

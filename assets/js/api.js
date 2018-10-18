@@ -269,8 +269,10 @@ export const getCountry = () => {
 // 判断快速登录绑定状态
 export const checkBindingStatus = () => {
 	let binding = getLocalStorage(UER_BINDING_STATUS);
-
-	return binding === null ? false : binding;
+	if (binding === null) {
+		return true;
+	}
+	return binding;
 }
 
 // 判断是否是主播
