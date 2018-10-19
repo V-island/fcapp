@@ -7,7 +7,9 @@
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -webkit-touch-callout: none;
 }
-
+* {
+    touch-action: pan-y;
+}
 // We fix position the body and scroll `.content`.
 body {
     position: absolute;

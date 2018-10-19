@@ -1,6 +1,6 @@
-import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import { Spinner } from '../components/Spinner';
+import { PullLoad } from '../components/PullLoad';
 import EventEmitter from '../eventEmitter';
 import Modal from '../modal';
 import VideoPreview from '../videoPreview';
@@ -53,20 +53,28 @@ export default class Home extends EventEmitter {
             slideWrapper: '.slide-wrapper',
             slideContent: 'slide-content',
             slideItem: 'slide-item',
+
+            // banner
             bannerWrapper: '.banner',
             bannerContent: 'banner-box',
             bannerItem: 'banner-item',
             bannerPagination: '.banner-pagination',
             bannerPaginationBullet: 'item',
+
+            // pages
             pagesNewClass: '.pages-new',
             pagesHotClass: '.pages-hot',
             pagesVideoClass: '.pages-video',
-            pagesContentClass: '.pages-contents',
+
+            sectionLiveClass: '.section-live',
+            sectionVideoClass: '.section-video',
+
             boxCardsClass: 'box-cards',
+
+            // Tag
             tagsClass: '.tag',
             tagsLabelClass: 'tag-label',
-            pulldownClass: '.pulldown-wrapper',
-            pullupClass: '.pullup-wrapper',
+
             dataUserPackage: 'userPackage',
             cardsPageIndex: 'page',
             tagsIndex: 'id',
@@ -107,18 +115,13 @@ export default class Home extends EventEmitter {
 	}
 
 	_init() {
-		// pages
+		// pages video
 		this.pagesVideoEl = this.HomeEl.querySelector(this.options.pagesVideoClass);
-		this.contentsVideoEl = this.pagesVideoEl.querySelector(this.options.pagesContentClass);
 		this.cardsVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxCardsClass)[0];
-		this.contentsVideoEl.style.minHeight = `${this.pagesVideoEl.offsetHeight + 1}px`;
 
 		this.tagsEl = this.HomeEl.querySelector(this.options.tagsClass);
 
-		this.pullDownEl = this.HomeEl.querySelector(this.options.pulldownClass);
-		this.pullUpEl = this.HomeEl.querySelector(this.options.pullupClass);
-
-		this._pagesVideo();
+		this._VideoPages();
 		this._bindEvent();
 		this._listEvent();
 
@@ -223,11 +226,9 @@ export default class Home extends EventEmitter {
 	}
 
 	// Video 模块
-	_pagesVideo() {
-		let pullDownRefresh = false,
-			pullDownInitTop = -50;
+	_VideoPages() {
 
-		this.pagesVideoSwiper = new BScroll(this.options.pagesVideoClass, {
+		const pagesVideo = new PullLoad(this.pagesVideoEl, {
 			probeType: 1,
 			startY: 0,
 			scrollY: true,
@@ -245,83 +246,76 @@ export default class Home extends EventEmitter {
 		});
 
 		// 下拉刷新
-		this.pagesVideoSwiper.on('pullingDown', () => {
-			pullDownRefresh = true;
-			videoClips(this._page, this._number, this.tagId, 1).then((data) => {
-				videoClips(1, 10, this.tagId, 2).then((_data) => {
-					if (!data && !_data) return;
+		pagesVideo.onPullingDown = () => {
+			return new Promise((resolve) => {
+				videoClips(this._page, this._number, this.tagId, 1).then((data) => {
+					videoClips(1, 10, this.tagId, 2).then((_data) => {
+						if (!data && !_data) return;
 
-					this.cardsVideoEl.innerHTML = '';
+						this.cardsVideoEl.innerHTML = '';
 
-					// free
+						// free
+						if (data) {
+							this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
+							// data = data.length > 2 ? data.slice(0, 2) : data;
+							data.forEach((itemData, index) => {
+								this.data.VideosList = itemData;
+								this.data.NotFreeVideos = false;
+								this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+							});
+						}
+
+						if (_data) {
+							this.cardsVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+
+							_data.forEach((itemData, index) => {
+								this.data.VideosList = itemData;
+								this.data.NotFreeVideos = true;
+								this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+							});
+						}
+						setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+						this._listEvent();
+						resolve(true);
+					});
+				});
+			});
+		};
+
+		// 上拉加载
+		pagesVideo.onPullingUp = () => {
+			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
+			_page = parseInt(_page) + 1;
+
+			return new Promise((resolve) => {
+				videoClips(_page, this._number, this.tagId, 1).then((data) => {
 					if (data) {
-						this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-						// data = data.length > 2 ? data.slice(0, 2) : data;
 						data.forEach((itemData, index) => {
 							this.data.VideosList = itemData;
 							this.data.NotFreeVideos = false;
-							this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+							let element = createDom(Template.render(this.tpl.list_videos, this.data));
+							this._cardVideoEvent(element);
+							this.cardsVideoEl.append(element);
 						});
+						setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
 					}
-
-					if (_data) {
-						this.cardsVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
-
-						_data.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
-							this.data.NotFreeVideos = true;
-							this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
-						});
-					}
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
-					pullDownRefresh = false;
-					this.pullDownEl.style.top = '-1rem';
-					this.pagesVideoSwiper.finishPullDown();
-					this.pagesVideoSwiper.refresh();
-					this._listEvent();
+					resolve(true);
 				});
+				// videoClips(_page, this._number, this.tagId, 2).then((data) => {
+				// 	if (data) {
+				// 		data.forEach((itemData, index) => {
+				// 			this.data.VideosList = itemData;
+							// this.data.NotFreeVideos = true;
+				// 			let element = createDom(Template.render(this.tpl.list_videos, this.data));
+				// 			this._cardVideoEvent(element);
+				// 			this.cardsVideoEl.append(element);
+				// 		});
+				// 		setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+				// 	}
+				// 	this.pagesVideoSwiper.finishPullUp();
+				// 	this.pagesVideoSwiper.refresh();
+				// });
 			});
-		});
-
-		// 上拉加载
-		this.pagesVideoSwiper.on('pullingUp', () => {
-			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
-			_page = parseInt(_page) + 1;
-			videoClips(_page, this._number, this.tagId, 1).then((data) => {
-				if (data) {
-					data.forEach((itemData, index) => {
-						this.data.VideosList = itemData;
-						this.data.NotFreeVideos = false;
-						let element = createDom(Template.render(this.tpl.list_videos, this.data));
-						this._cardVideoEvent(element);
-						this.cardsVideoEl.append(element);
-					});
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
-				}
-				this.pagesVideoSwiper.finishPullUp();
-				this.pagesVideoSwiper.refresh();
-			});
-			// videoClips(_page, this._number, this.tagId, 2).then((data) => {
-			// 	if (data) {
-			// 		data.forEach((itemData, index) => {
-			// 			this.data.VideosList = itemData;
-						// this.data.NotFreeVideos = true;
-			// 			let element = createDom(Template.render(this.tpl.list_videos, this.data));
-			// 			this._cardVideoEvent(element);
-			// 			this.cardsVideoEl.append(element);
-			// 		});
-			// 		setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
-			// 	}
-			// 	this.pagesVideoSwiper.finishPullUp();
-			// 	this.pagesVideoSwiper.refresh();
-			// });
-		});
-
-		this.pagesVideoSwiper.on('scroll', (pos) => {
-			if (pullDownRefresh) {
-				return;
-			}
-			this.pullDownEl.style.top = Math.min(pos.y + pullDownInitTop, 10)+ 'px';
-		});
+		}
 	}
 }
