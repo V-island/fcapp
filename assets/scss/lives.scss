@@ -1,0 +1,1256 @@
+// live
+// ---------------------------------------------------
+$lives-content-frame: 0.75rem;
+$lives-float-loves-color: rgba(255, 51, 118, 0.3);
+$lives-countdown-bg-color: rgba(255, 255, 255, 0.8);
+$lives-countdown-color: rgba(255,94,94,1);
+$lives-fuzzy-shadow: 0 0 0.35rem $color-text inset;
+
+$lives-button-charge-colosr: rgba(255, 221, 51, 0.8);
+$lives-button-party-colosr: rgba(255, 94, 94, 0.8);
+$lives-button-border-radius: 3rem;
+$live-floating-duration: 800ms;
+
+$lives-footer-bg-color: rgba(51, 51, 51, .8);
+$lives-footer-title-font: 0.6rem;
+
+$popup-input-bg-color: #4C4C53;
+$popup-border-color: #444;
+
+$waiting-loading-duration: 800ms;
+// lives-wrapper/record-wrapper
+//--------------------------------
+.lives-wrapper{
+	overflow: hidden;
+	background: $color-gray;
+	padding: $lives-content-frame;
+
+	&.fuzzy-show{
+		>.lives-video{
+			@include filter-blur(0.25rem);
+		}
+		.lives-anchor-offline{
+			display: block;
+		}
+	}
+}
+.record-wrapper {
+    width: 100%;
+    height: 100%;
+    z-index: 10400;
+    color: $color-text;
+    background-color: $color-bg;
+    padding: $lives-content-frame;
+    overflow: hidden;
+    @include animated($live-duration);
+    @include scrollable;
+
+    &.record-in {
+        @include fadeInUp;
+    }
+    &.record-out {
+        @include fadeOutDown;
+    }
+}
+
+.lives-content,
+.record-content {
+	position: relative;
+	height: 100%;
+}
+
+.record-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 10200;
+    visibility: hidden;
+    opacity: 0;
+    transition-duration: $live-duration;
+    &.record-overlay-visible {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.lives-video,
+.lives-photo {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.lives-video{
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+
+	>.video{
+		width: 100%;
+		height: 100%;
+		background: $live-mask-bg-color;
+	}
+
+	&.lives-video-us{
+		top: auto;
+		left: auto;
+		right: 0;
+		bottom: 1.05rem;
+		width: 4.9rem;
+		height: 7rem;
+
+		video.video{
+			background: $color-primary;
+		}
+	}
+}
+.lives-photo{
+	background: $color-bg;
+	background-position: center;
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
+// 直播模块
+//--------------------------------
+.lives-header{
+	@include  spindle-center(space-between);
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+
+	>.icon{
+		@include size(1.05rem);
+	}
+
+	&.lives-anchor {
+		padding: $lives-content-frame;
+		flex-direction: row-reverse;
+	}
+}
+.lives-footer{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	padding: $lives-content-frame;
+	background: $lives-footer-bg-color;
+
+	>.title {
+		font-size: $lives-footer-title-font;
+	    margin-bottom: $lives-content-frame;
+	}
+
+	.button {
+		height: 2rem;
+	}
+}
+.lives-attention{
+	background: $live-mask-bg-color;
+	padding: 0.35rem;
+	width: 7.5rem;
+	height: 2.1rem;
+	border-radius: 1rem;
+	@include  spindle-center(space-between);
+
+	>i.icon{
+		@include size(1.45rem);
+	}
+}
+// 直播描述
+p.lives-remark{
+	position: absolute;
+	top: 3.5rem;
+	left: 1rem;
+	right: 1rem;
+	z-index: 2;
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 0.1rem;
+	font-size: 0.7rem;
+	text-align: center;
+	padding: 0.7rem 0;
+	line-height: 1.5;
+}
+// 评论
+.lives-comments{
+	position: absolute;
+	left: 0;
+	bottom: 3.75rem;
+	width: 10rem;
+	max-height: 12rem;
+    overflow-y: auto;
+	@include flex-vertical(column);
+
+	label{
+		@include newline;
+		background: $live-mask-bg-color;
+		padding: 0.2rem 0.5rem;
+		color: $color-text;
+		font-size: 0.5rem;
+		line-height: 1.5;
+		margin: 0.25rem 0;
+	    border-radius: 0.7rem;
+
+		span{
+			color: $color-primary;
+		}
+
+		&.anchor span{
+			color: $live-anchor-txt-color;
+		}
+	}
+}
+// 礼物
+.lives-gifts{
+	@include  spindle-vertical(column);
+	position: absolute;
+	left: 0;
+    bottom: 16rem;
+    max-height: 11rem;
+    padding: 0.3rem 0;
+    overflow-y: auto;
+
+	>.gifts-items{
+		width: 9.1rem;
+		border-radius: 3rem;
+	    padding: 0.2rem 0.35rem;
+	    margin: 0.35rem 0;
+		background: linear-gradient(to right, rgba(51, 51, 51, 0.2), rgba(51, 51, 51, 0));
+
+		&:first-of-type {
+			margin-top: 0;
+		}
+
+		&:last-of-type {
+			margin-bottom: 0;
+		}
+	}
+
+	.user-info{
+		>i.icon{
+			@include size(2.1rem);
+			margin-top: -0.7rem;
+		}
+
+		.user-txt{
+			color: $color-primary;
+		}
+
+		.gift-amount{
+			font-size: 1rem;
+		    color: $color-primary;
+		}
+	}
+}
+// 按钮组
+.lives-button-groups {
+	@include spindle-center(start);
+	position: absolute;
+	z-index: 2;
+	>i.icon {
+		@include size(2.1rem);
+		margin: 0 0.9rem;
+
+		&:first-of-type {
+			margin-left: 0;
+		}
+		&:last-of-type {
+			margin-right: 0;
+		}
+	}
+
+	>.lives-float-loves {
+		@include spindle-center(center);
+		@include size(2.1rem);
+		position: relative;
+		background: $lives-float-loves-color;
+		border-radius: 50%;
+
+		>i.icon {
+			@include size(1.05rem);
+			background-position: 0 0;
+			background-size: 100%;
+		}
+
+		// 点赞漂浮
+		.love-floating{
+			@include animated($live-floating-duration);
+			position: absolute;
+			top: 0.5rem;
+		    left: 0.5rem;
+		    &.show{
+		    	@include floatOutUp;
+		    }
+		}
+	}
+	>.charge-shows,
+	>.party-shows {
+		border-radius: $lives-button-border-radius;
+		margin: 0;
+		line-height: 2.1rem;
+	    height: 2.1rem;
+	    min-width: 5.4rem;
+        border-width: 0;
+	}
+	>.charge-shows {
+		background: $lives-button-charge-colosr;
+	}
+	>.party-shows {
+		background: $lives-button-party-colosr;
+	}
+
+	&.top-right {
+		top: 5rem;
+		right: 0;
+	}
+
+	&.bottom-left {
+		bottom: 0;
+		left: 0;
+	}
+	&.bottom-right {
+		bottom: 0;
+		right: 0;
+	}
+}
+// 插件按钮组
+.lives-plugins {
+	@include flex-spindle-center(end, column);
+
+	>i.icon {
+		@include size(1.5rem);
+		margin: 0.45rem 0;
+
+		&:first-of-type {
+			margin-top: 0;
+		}
+		&:last-of-type {
+			margin-bottom: 0;
+		}
+	}
+}
+// 倒计时
+.lives-countdown {
+	@include flex-spindle-center(start, column);
+	align-items: start;
+	background: $lives-countdown-bg-color;
+	border-radius: 3rem;
+	position: absolute;
+	left: 0;
+	top: 2.75rem;
+	padding: 0.35rem 0.75rem 0.2rem;
+
+	>p {
+	    line-height: 1rem;
+	}
+	>p.title {
+		color: $color-text-secondary;
+		font-size: 0.45rem;
+		line-height: 1;
+	}
+	>p.times {
+		color: $lives-countdown-color;
+		font-size: 0.75;
+		font-weight: bold;
+	}
+}
+// 余额不足 模糊层
+.lives-fuzzy-layer {
+	padding: $lives-content-frame;
+	overflow: hidden;
+	box-shadow: $lives-fuzzy-shadow;
+
+	>.lives-layer-top {
+		text-align: right;
+
+		>.icon{
+			@include size(1.05rem);
+		}
+	}
+
+	>.lives-layer-content {
+		@include spindle-vertical(column);
+		padding-top: 3.5rem;
+		color: $color-text;
+
+		>h5 {
+			font-weight: bold;
+			font-size: 0.75rem;
+			margin: 1.5rem 0;
+		}
+		>p {
+			font-weight: lighter;
+		    font-size: 0.6rem;
+		}
+		>.button {
+			margin-top: 2.4rem;
+			min-width: 5.4rem;
+		}
+	}
+
+	.user-info {
+		@include flex-spindle-center(center, column);
+		margin-bottom: 4rem;
+
+		>.user-img {
+			@include size(3.9rem);
+
+			+span.lives-label {
+				background: $color-danger;
+				color: $color-text;
+				border-radius: 0.35rem;
+				font-size: 0.4rem;
+				text-align: center;
+				line-height: 0.9rem;
+				min-width: 3rem;
+				margin: -0.45rem auto 0;
+			}
+		}
+	}
+}
+// 主播不在线 提示层
+.lives-anchor-offline {
+	@include spindle-center(center);
+	position: absolute;
+	top: 12rem;
+	left: 0;
+    right: 0;
+    display: none;
+    text-align: center;
+
+    >p {
+		min-width: 9rem;
+		border-radius: 1rem;
+		line-height: 2rem;
+		font-size: 0.75rem;
+		font-weight: bold;
+		padding: 0 1rem;
+		display: inline-block;
+		background: rgba(0,0,0,0.3);
+    }
+}
+
+// 视频预览
+//--------------------------------
+.lives-preview-footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 7.35rem;
+	background: rgba(51, 51, 51, 0.8);
+	padding: 1.4rem 2.1rem;
+
+	p.preview-title {
+		color: $color-text;
+		font-size: 0.6rem;
+		text-align: center;
+		margin-bottom: 0.7rem;
+	    line-height: 1.5rem;
+	}
+	>.buttons{
+		@include flex-spindle(space-between);
+
+		.button{
+			margin: 0;
+			min-width: 5.6rem;
+		}
+	}
+}
+.video-preview-content{
+	position: absolute;
+	// bottom: 5rem;
+	bottom: 6.75rem;
+	left: 0;
+	right: 0;
+	z-index: 2;
+
+	p.preview-text{
+		@include  multi-wrap-space(2);
+		font-size: 0.75rem;
+		color: $color-text;
+	}
+}
+.video-preview-footer{
+	@include  spindle-center(space-between);
+	align-items: start;
+	position: absolute;
+	// bottom: 0.75rem;
+	bottom: 1.75rem;
+	left: 0;
+	right: 0;
+	z-index: 2;
+
+	>.lives-buttons{
+	    align-items: start;
+	    position: initial;
+	    bottom: 0;
+	    left: 0;
+	}
+	.video-preview-item {
+		@include spindle-vertical(column);
+		position: relative;
+
+		>span{
+			font-size: 0.5rem;
+		    line-height: 2;
+		    color: $color-text;
+		}
+	}
+
+	i.icon {
+		@include size(2.1rem);
+	}
+
+	i.lives-float {
+		@include size(0.8rem);
+		@include animation(animated_float 3s);
+		position: absolute;
+		top: 0.65rem;
+		left: 0.65rem;
+
+		@keyframes animated_float {
+			0% {
+				@include transform-scale(1);
+				top: 0.65rem;
+				opacity: 1;
+			}
+
+			100% {
+				@include transform-scale(2);
+				top: -7rem;
+				opacity: 0;
+			}
+
+		}
+	}
+}
+
+// 视频录制模块
+//--------------------------------
+// 录制时间
+.lives-times{
+	@include  spindle-center(center);
+	position: absolute;
+	bottom: 1.5rem;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    line-height: 1.5rem;
+    font-size: 0.6rem;
+}
+// 录制视频本地上传
+.lives-localUpload{
+	@include  spindle-center(center);
+	@include  size(2.1rem);
+	position: absolute;
+	bottom: 4.2rem;
+    right: 2.1rem;
+    z-index: 3;
+}
+// 录制按钮组
+.lives-buttons{
+	@include  spindle-center(space-between);
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 10rem;
+	z-index: 2;
+
+	>.icon{
+		@include size(2.1rem);
+	}
+
+	.btn-record{
+		@include size(3.85rem);
+		border-radius: 50%;
+		background: $live-btnRecord-bg-color;
+		position: relative;
+
+		&:after {
+		    content: "";
+		    background: $live-btnRecord-color;
+		    @include size(2.45rem);
+		    display: block;
+		    border-radius: 50%;
+		    margin: 0.7rem auto;
+		    position: absolute;
+		    top: 0;
+		    left: 50%;
+		    margin-left: -1.225rem;
+		}
+		>canvas{
+			@include size(3.85rem);
+		}
+	}
+
+	.btn-photo{
+		@include size(3.8rem);
+		border-radius: 50%;
+		background: transparent;
+		border: 0.1rem solid $color-text;
+		position: relative;
+
+		&:after {
+		    content: "";
+		    background: $color-text;
+		    @include size(3.4rem);
+		    display: block;
+		    border-radius: 50%;
+		    margin: 0.1rem auto;
+		    position: absolute;
+		    top: 0;
+		    left: 50%;
+		    margin-left: -1.7rem;
+		}
+	}
+
+	&.rtc-buttons {
+		@include  spindle-center(start);
+
+		>.icon{
+		    margin-right: 1.8rem;
+
+		    &:last-of-type{
+		    	margin-right: 0;
+		    }
+		}
+	}
+
+	&.record-start{
+		.btn-record:after {
+		    content: "";
+		    background: $live-btnRecordEnd-color;
+		    @include size(1.4rem);
+		    border-radius: 0.1rem;
+		    margin: 1.23rem auto;
+		    margin-left: -0.7rem;
+		}
+	}
+
+	&.record-buttons{
+		@include  spindle-center(center);
+		bottom: 3.15rem;
+		left: 2.1rem;
+		right: 2.1rem;
+		width: auto;
+
+		&.active{
+			@include  spindle-center(space-between);
+		}
+	}
+
+	&.photo-buttons{
+		@include  spindle-center(center);
+		left: 3.5rem;
+	    right: 3.5rem;
+        bottom: 3.15rem;
+		width: auto;
+
+		&.active{
+			@include  spindle-center(space-between);
+			left: 3.5rem;
+		}
+	}
+}
+
+// 弹框模块
+//--------------------------------
+// 积分礼物
+.score-gift{
+	.item{
+		@include flex-center;
+	    margin: 0.35rem 1.3rem;
+
+		>span{
+			display: inline-block;
+		}
+	}
+	.item-img{
+		width: 4.55rem;
+		height: 4.2rem;
+		padding: 1.05rem;
+		background-position: center;
+	    background-repeat: no-repeat;
+	    background-size: contain;
+	}
+	.item-amount{
+		color: $color-primary;
+		font-size: 0.6rem;
+	    font-weight: 500;
+	}
+}
+// 发送礼物弹框
+.gift-group{
+	position: relative;
+	padding: 0.35rem 0.5rem;
+	@include hairline(top, $actions-modal-color-split);
+	@include flex-spindle(space-between);
+
+	.button{
+		margin: 0;
+		line-height: 1.4rem;
+		height: 1.4rem;
+		font-size: 0.6rem;
+		padding: 0 0.7rem;
+	}
+
+	.recharge-box{
+		color: $color-gift-txt;
+		font-size: 0.5rem;
+		@include spindle-center(start);
+
+		>.button{
+			border-radius: $btn-fill-border-radius;
+			margin-right: 0.35rem;
+		}
+
+		span{
+			color: $color-text-gray-light;
+		}
+	}
+}
+// 收到礼物列表弹框
+.receive-gift-group{
+	@include flex-vertical(column);
+	overflow-y: auto;
+	height: 15rem;
+	padding: 0 0.35rem;
+
+	>.receive-item {
+	    @include flex-spindle(start);
+	    align-items: start;
+	    position: relative;
+	    margin: 0.35rem 0;
+	    padding: 0.35rem 0;
+	    min-height: 2.4rem;
+
+	    &:first-of-type {
+	    	margin-top: 0;
+	    }
+
+	    &:last-of-type {
+	    	margin-bottom: 0;
+	    }
+
+	    &:after {
+	        content: "";
+	        background: $actions-modal-color-split;
+	        height: 0.05rem;
+	        position: absolute;
+	        bottom: 0;
+	        right: 0;
+            left: 2rem;
+	    }
+	}
+	.item-avatar {
+	    @include size(1.5rem);
+	    flex: 0 0 1.5rem;
+	    border-radius: 50%;
+	    margin-right: 0.35rem;
+	    margin-left: 0;
+	    background-color: $color-primary;
+	    background-repeat: no-repeat;
+	    background-size: cover;
+	    background-position: center;
+	}
+	.item-content {
+	    flex: 1 0 0;
+
+	    >h5 {
+	        color: $color-text-gray;
+	        font-size: 0.6rem;
+	        font-weight: bold;
+            margin: 0;
+
+	        >span {
+                color: $color-text-secondary;
+                font-size: 0.5rem;
+                margin-left: 0.35rem;
+            }
+
+	        +p {
+	            color: $color-text-gray;
+	            font-size: 0.55rem;
+	        }
+	    }
+	}
+	.item-thumb {
+	    @include size(1.5rem);
+	    flex: 0 0 1.5rem;
+	    background-position: center;
+	    background-repeat: no-repeat;
+	    background-size: contain;
+	    margin-left: 0.35rem;
+	}
+}
+// 充值弹框
+.recharge-group{
+	>p.recharge-label{
+		margin: 0.35rem 0.7rem;
+		@include spindle-center(space-between);
+
+		span{
+			color: $color-text-gray-light;
+			font-size: 0.7rem;
+
+			&.money{
+				color: $color-gift-txt;
+			}
+		}
+	}
+
+	>p.amount-label{
+		margin: 0.35rem 3.15rem;
+		color: $color-text-gray;
+		font-size: 0.7rem;
+
+		span{
+			color: $color-gift-txt;
+		}
+	}
+
+	>.tag{
+	    position: relative;
+		@include hairline(bottom, $actions-modal-color-split);
+		padding: 0.35rem 0;
+	}
+
+	>.button{
+		width: 10rem;
+	    margin: 0.7rem auto 0.25rem;
+	}
+
+	>.buttons{
+		width: 80%;
+	    margin: 1rem auto 0;
+
+		.button{
+			width: 5.5rem;
+		}
+	}
+
+	>.button-paypal {
+		width: 14rem;
+	    height: 2.1rem;
+	    border-radius: 0.1rem;
+	    margin: 0.7rem auto 0.25rem;
+	    overflow: hidden;
+	}
+
+	&.theme-white{
+		>p.recharge-label{
+			span{
+				&.money{
+					color: $color-primary;
+				}
+			}
+		}
+		.tag{
+			&:after{
+				background: #444;
+			}
+
+			label.recharge-label{
+				border-color: $color-text;
+
+				.cost{
+					color: $color-text;
+				}
+				&.active{
+					border-color: $color-primary;
+
+					.cost{
+						color: $color-text-gray;
+					}
+				}
+			}
+		}
+		.list{
+			color: $color-text;
+		}
+		>.button{
+			width: 12rem;
+			margin-top: 2rem;
+		}
+		>.button-paypal {
+		    margin-top: 2rem;
+		}
+		.account-pay{
+			font-size: 0.6rem;
+			color: $color-text;
+			text-align: center;
+		    line-height: 1.5rem;
+		}
+	}
+}
+// 分享弹框
+.share-group{
+	margin: 0.4rem 0 0.8rem;
+}
+// 发布留言/弹幕框
+.news-group{
+	@include spindle-center(start);
+
+	.news-input {
+	    flex-grow: 1;
+	    border-color: $color-text;
+	    font-size: 0.6rem;
+	    color: $color-text-gray;
+	    caret-color: $color-primary;
+	}
+
+	.news-phiz{
+		margin-left: 0.35rem;
+		flex-grow: 0;
+
+		>i.icon{
+			@include size(1.05rem);
+		}
+	}
+
+	>.button{
+		height: 1.4rem;
+		line-height: 1.4rem;
+		font-size: 0.6rem;
+		margin: 0 0.35rem;
+		flex-grow: 0;
+	}
+}
+// 评论列表
+.comments-group{
+	padding: 0 0.7rem;
+	height: 10rem;
+    overflow-y: auto;
+
+    >p.no-more{
+    	color: $color-more-gray;
+		margin: 1.2rem 0 0.35rem 0;
+    }
+}
+.comments-forms{
+    box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);
+}
+// 信息详情弹框
+.anchor-group{
+	@include spindle-vertical(column);
+    padding: 0.35rem 0.7rem;
+
+	>.anchor-header{
+		@include flex-spindle(flex-end);
+		width: 100%;
+
+		>i.icon{
+			@include size(0.8rem);
+		    margin: 0 0.5rem;
+
+		    &:first-of-type {
+		    	margin-left: 0;
+		    }
+
+		    &:last-of-type {
+		    	margin-right: 0;
+		    }
+		}
+	}
+	>.user-info{
+		@include spindle-vertical(column);
+	    padding: 0.35rem;
+
+	    .user-img{
+	        @include size(3rem);
+	    }
+	    .across-title{
+	        @include spindle-center(start);
+
+			.user-name{
+		        font-size: 0.75rem;
+		        margin-right: 0.2rem;
+		        color: $color-text-gray;
+		    }
+	        i.icon{
+	            width: 1.4rem;
+	            height: 0.7rem;
+	            font-size: 0.5rem;
+	            line-height: 0.5rem;
+	            text-align: right;
+	            padding: 0.1rem 0.2rem;
+	            flex: 0 0 1.4rem;
+	            margin-right: 0.35rem;
+	        }
+	    }
+	    .user-txt{
+	        font-size: 0.5rem;
+	        color: $color-text-gray-light;
+
+	        i.icon{
+	            @include size(0.7rem);
+	            margin-right: 0.2rem;
+	        }
+	    }
+	}
+	>.anchor-content{
+		@include flex-spindle(center);
+		align-items: start;
+	    padding: 0.35rem 0.7rem;
+		min-height: 4rem;
+	    width: 100%;
+
+		label.theme-gray{
+			background: $actions-modal-color-split;
+			color: $color-text-gray;
+		}
+		i.icon{
+			@include size(0.6rem);
+			margin-right: 0.2rem;
+		}
+	}
+	>.anchor-footer{
+	    width: 100%;
+	    border-top: 0.02rem solid $actions-modal-color-split;
+	    padding: 0.7rem 0 0.35rem;
+
+	    .button{
+	    	min-width: 5rem;
+	    	height: 2rem;
+	    	line-height: 2rem;
+	    	margin: 0 auto;
+	    }
+	}
+}
+// 拉黑/投诉弹框
+.popup-wrapper {
+	>.popup-group{
+		border-bottom: 0.02rem solid $popup-border-color;
+	    padding: 0.35rem 0;
+
+		>p.title {
+			font-size: 0.6rem;
+			color: $color-text-gray-light;
+			line-height: 1rem;
+			text-align: left;
+		}
+		>.anchor-content {
+			padding: 0.35rem 0;
+
+			&.input {
+				@include flex-vertical(column);
+				background: $popup-input-bg-color;
+				padding: 0.35rem;
+			    margin: 0.35rem 0;
+				border-radius: 0.2rem;
+			}
+			.across {
+				@include size(2.5rem);
+				border-radius: 0.2rem;
+			    margin-top: 0.35rem;
+			}
+		}
+
+		&:last-of-type {
+			border-bottom-width: 0;
+		}
+	}
+	>.button {
+	    width: 11rem;
+	    margin-top: 5rem;
+	}
+}
+
+// 直播结算模块
+//--------------------------------
+.lives-count-wrapper {
+
+	.user-info {
+		@include flex-vertical(column);
+
+		>.user-img{
+			@include size(3.85rem);
+
+			+.user-name{
+				color: $color-primary;
+				font-size: 0.6rem;
+				font-weight: 600;
+			}
+		}
+
+		+p.today-title{
+			font-size: 0.5rem;
+		    margin: 0;
+		    line-height: 1.2rem;
+		}
+	}
+
+	.anchor-score{
+		@include flex-spindle(space-around);
+		margin-top: 0.35rem;
+		width: 100%;
+
+		.score-item{
+			text-align: center;
+
+			>h3{
+				font-weight: 600;
+				font-size: 1.05rem;
+				color: $color-text;
+				margin: 0.35rem 0;
+				small{
+					font-size: 0.5rem;
+				}
+			}
+
+			>p{
+				font-size: 0.5rem;
+				color: $color-text-gray-light;
+			}
+		}
+	}
+
+	.stars{
+		width: 12rem;
+		margin: 0 auto 2rem;
+	}
+
+	.waiting-box {
+		@include spindle-vertical(column);
+	    padding: 2rem 0 1rem;
+
+		>i.icon {
+			@include size(2rem);
+			margin-bottom: 1rem;
+		}
+		>p {
+			color: $color-text-remarks;
+			font-size: 0.6rem;
+		    line-height: 1rem;
+		}
+	}
+
+	>.buttons{
+		margin: 0.35rem 0;
+		&.buttons-block,
+		&.buttons-vertical{
+			>.button{
+				width: 10.5rem;
+			}
+		}
+		.button{
+			width: 5.6rem;
+		}
+	}
+}
+
+// 一对一直播
+//--------------------------------
+.waiting-wrapper {
+	>.waiting-header {
+		@include spindle-center(center);
+		height: 2.2rem;
+		padding: 0 0.5rem;
+	    line-height: 1.8rem;
+
+	    >h1.title {
+	    	@include wrap-space;
+	    	font-size: 0.85rem;
+	    	font-weight: 500;
+	    	padding-left: 2rem;
+	    	margin: 0;
+	    	flex: 1 0 0;
+	    }
+
+	    >.icon-btn {
+	    	flex: 0 0 auto;
+	    	text-align: center;
+	    	width: 2rem;
+	    	height: 1.8rem;
+	    	cursor: pointer;
+
+	    	>i.icon {
+	    		@include size(1rem);
+	    	}
+	    }
+	}
+	>.waiting-content {
+		>.scan-box{
+			@include size(16rem);
+
+			.scan-loading {
+				@include size(3.15rem);
+				@include animated-infinite($waiting-loading-duration);
+				@include rotateLoop;
+				background-repeat: no-repeat;
+			    background-position: center;
+			    background-size: cover;
+			}
+		}
+	}
+	>.buttons {
+		.button {
+			min-width: 10rem;
+		}
+	}
+}
+
+// 直播统一样式
+//--------------------------------
+// 次级说明提示
+p.caption-title {
+	font-size: 0.5rem;
+	color: $color-text-gray-light;
+   	margin-bottom: 0;
+    min-width: 13rem;
+    display: inline-block;
+    position: relative;
+
+    $starts: after, before;
+    @each $start in $starts {
+	    &:#{$start}{
+	    	content: "";
+    	    height: 1px;
+    	    width: 2.1rem;
+    	    display: block;
+    	    background: $color-text-gray-light;
+    	    position: absolute;
+    	    top: 0.35rem;
+
+	        @if $start == after {
+	            left: 0;
+	        }
+	        @else {
+	        	right: 0;
+	        }
+
+	    }
+
+	}
+}
+
+
+// 直播插件模块
+//--------------------------------
+// 美颜
+.glugin-beauty-group{
+	@include spindle-center(space-evenly);
+	height: 6rem;
+
+	>.beauty-item{
+		@include size(2.1rem);
+		line-height: 2.1rem;
+		text-align: center;
+		border: 0.05rem solid $actions-modal-color-split;
+		border-radius: 50%;
+		color: $color-text-gray;
+
+		&.active{
+			background: $color-primary;
+			border-color: $color-primary;
+		}
+	}
+}

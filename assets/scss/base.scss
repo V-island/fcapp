@@ -178,6 +178,13 @@ p.no-more {
     line-height: 2;
     margin: 0.35rem 0;
 }
+a.load-more {
+    text-align: center;
+    font-size: 0.6rem;
+    color: $color-text;
+    display: block;
+    font-weight: lighter;
+}
 
 //color
 .color-price{
@@ -213,6 +220,12 @@ p.no-more {
 }
 
 // bg color
+.bg-trans{
+    background: transparent !important;
+}
+.bg-black{
+    background: $color-light-black !important;
+}
 .bg-success{
     background: #29B369 !important;
 }
@@ -223,4 +236,12 @@ p.no-more {
 
 .bg-danger{
     background: #FF5E5E !important;
+}
+// 蓝色
+.bg-blue{
+    background: #4E87FA !important;
+}
+// 紫色
+.bg-purple{
+    background: #9250FF !important;
 }

@@ -19,11 +19,15 @@
         "FreeVideo": {
             "Title": "Freevideo"
         },
+        "Live": {
+            "Title": "Live"
+        },
         "Madal": {
             "NotCoins": {
                 "Title": "Not enough coins",
-                "Text": "She is looking forward to your true love",
-                "ButtonsText": "BUYNOW"
+                "Text": "Your gold coins will be used after %S please recharge in time",
+                "Text_Coins": "The balance is not enough, please recharge first",
+                "ButtonsText": "Buy now"
             },
             "DataIncomplete": {
                 "Title": "Data incomplete",
@@ -498,6 +502,7 @@
             "Only_Once": "The same user can only comment once"
         },
         "Share": {
+            "Title": "Share to",
             "Facebook": "Facebook",
             "Twitter": "Twitter",
             "Tumblr": "Tumblr",
@@ -547,7 +552,47 @@
             "Buttons_Yes": "Take a rest",
             "Buttons_Live_Again": "Live Again"
         },
+        "Live_Countdown": {
+            "Title": "Show start at"
+        },
+        "Live_Fuzzy_Layer": {
+            "Title": "Not enough coins",
+            "Label": "Show time",
+            "Text": "Go and buy enough coins to enjoy crazy"
+        },
+        "Live_Anchor": {
+            "Title": "Choose the type of live stream you want to start"
+        },
+        "Feedback": {
+            "Title": "Feedback",
+            "Text": "Reason",
+            "Text_Secondary": "Description",
+            "Buttons": "Submit"
+        },
+        "Impression": {
+            "Title": "Impression",
+            "Text": "Public impression",
+            "Text_Secondary": "Choose your impression of the anchor",
+            "Buttons": "Save"
+        },
+        "Buttons": {
+            "Gold_Show": "Gold show",
+            "Party_Show": "Party show",
+            "Buy_Now": "Buy now"
+        },
+        "Glugin": {
+            "Beauty": {
+                "Title": "Beauty"
+            },
+            "Sticker": {
+                "Title": "Mask"
+            }
+        },
         "Madal": {
+            "ReceiveGift": {
+                "Title": "Gift received",
+                "Text": "Give you"
+            },
             "Online": {
                 "Title": "If you like her,get in touch with her bravely",
                 "Buttons_Maybe": "Maybe later",
@@ -564,6 +609,25 @@
             "InsufficientAmount": {
                 "Title": "Insufficient Amount",
                 "Text": "Your gold coins will be used <span>after 1 minutes</span> please recharge in"
+            },
+            "Blacklist": {
+                "Title": "Blacklist",
+                "Text": "No longer be able to add to favorite list"
+            },
+            "PluginsShield": {
+                "Text": "You will no longer see the other party's image!"
+            },
+            "GoldShow": {
+                "Text": "Show start at"
+            },
+            "PartyShow": {
+                "Text": "Do you want to quit show time？"
+            },
+            "EndLive": {
+                "Text": "Do you want to end this live？"
+            },
+            "AnchorOffline": {
+                "Text": "The anchor has left ~"
             },
             "SendSuccess": {
                 "Text": "Send successful"
@@ -602,11 +666,13 @@
         "Free": "Free",
         "Heat": "heat",
         "Country": "Country",
-        "No_More": "Nomore~",
+        "No_More": "No more~",
         "Terms_Of_Service": "Terms of Service",
-        "Status": {
-            "Busy": "Busy",
-            "Waiting": "waiting"
+        "LIVE_MODE": {
+            "Private": "Private chat",
+            "Party": "Party chat",
+            "Gold": "Gold show",
+            "Sexy": "Sexy show"
         },
         "Froms": {
             "Country": {

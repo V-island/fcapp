@@ -161,14 +161,11 @@ export default class Modal extends EventEmitter {
         let isToast = modal.hasClass('toast');
         if (isModal) {
             modal.show();
-            modal.css({
-                marginTop: - Math.round(modal.outerWidth() / 2) + 'px'
-            });
+            modal[0].style.marginTop = `-${modal[0].offsetHeight / 2}px`;
         }
         if (isToast) {
-            modal.css({
-                marginLeft: - Math.round(modal.outerWidth() / 1.5) + 'px' //2*1.185 是初始化时候的放大效果
-            });
+            modal[0].style.marginTop = `-${modal[0].offsetHeight / 2}px`;
+            modal[0].style.marginLeft = `-${modal[0].offsetWidth / 2}px`;
         }
 
         let overlay;

@@ -1,7 +1,7 @@
-import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
 import { Spinner } from '../components/Spinner';
+import { PullLoad } from '../components/PullLoad';
 import RecordVideo from '../record-video';
 import Modal from '../modal';
 
@@ -43,10 +43,7 @@ export default class UserVideo extends EventEmitter {
 	    this.data = {};
 	    this.options = {
 	    	userWrapper: '.user-wrapper',
-	    	pagesContentClass: '.user-contents',
 	    	boxCardsClass: '.box-cards',
-	    	pulldownClass: '.pulldown-wrapper',
-	    	pullupClass: '.pullup-wrapper',
 	    	cardsPageIndex: 'page',
 	    	videoAddClass: 'video-add-card',
 	    	videoCloseClass: 'btn-close-video',
@@ -63,9 +60,9 @@ export default class UserVideo extends EventEmitter {
 	}
 
 	init(element) {
-		let _page = 1;
-		let _number = 10;
-		let getMyVideo = findMyVideo(_page, _number);
+		this._page = 1;
+		this._number = 10;
+		let getMyVideo = findMyVideo(this._page, this._number);
 
 		getMyVideo.then((data) => {
 			this.data.MyVideo = data;
@@ -84,21 +81,15 @@ export default class UserVideo extends EventEmitter {
 
 	_init() {
 		this.pagesVideoEl = this.UserVideoEl.querySelector(this.options.userWrapper);
-		this.contentsVideoEl = this.pagesVideoEl.querySelector(this.options.pagesContentClass);
 		this.cardsVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
 		this.VideoEl = this.pagesVideoEl.getElementsByClassName(this.options.cardvideoClass);
 		this.videoAddEl = this.pagesVideoEl.getElementsByClassName(this.options.videoAddClass)[0];
-		this.contentsVideoEl.style.minHeight = `${this.pagesVideoEl.offsetHeight + 1}px`;
 
-		this.pullDownEl = this.UserVideoEl.querySelector(this.options.pulldownClass);
-		this.pullUpEl = this.UserVideoEl.querySelector(this.options.pullupClass);
-
-		this._pagesVideo();
+		this._VideoPullLoad();
 		this._bindEvent();
 	}
 
 	_bindEvent() {
-
 		// 上传
 		addEvent(this.videoAddEl, 'click', () => {
 			let record = new RecordVideo({
@@ -144,11 +135,9 @@ export default class UserVideo extends EventEmitter {
 	}
 
 	// Video 模块
-	_pagesVideo() {
-		let pullDownRefresh = false,
-			pullDownInitTop = -50;
+	_VideoPullLoad() {
 
-		this.pagesVideoSwiper = new BScroll(this.options.userWrapper, {
+		const VideoPullLoad = new PullLoad(this.pagesVideoEl, {
 			probeType: 1,
 			startY: 0,
 			scrollY: true,
@@ -166,60 +155,48 @@ export default class UserVideo extends EventEmitter {
 		});
 
 		// 下拉刷新
-		this.pagesVideoSwiper.on('pullingDown', () => {
-			pullDownRefresh = true;
+		VideoPullLoad.onPullingDown = () => {
+			return new Promise((resolve) => {
+				findMyVideo(this._page, this._number).then((data) => {
+					if (!data) return resolve(true);
 
-			findMyVideo(1, 10).then((data) => {
-				if (data) {
-					this.cardsVideoEl.innerHTML = '';
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_add_item, this.data)));
+					if (data) {
+						this.cardsVideoEl.innerHTML = '';
+						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_add_item, this.data)));
 
-					data.forEach((itemData, index) => {
-						this.data.VideosList = itemData;
-						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
-					});
-
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+						data.forEach((itemData, index) => {
+							this.data.VideosList = itemData;
+							this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
+						});
+					}
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, this._page);
 					this._bindEvent();
-				}
-
-				pullDownRefresh = false;
-				this.pullDownEl.style.top = '-1rem';
-				this.pagesVideoSwiper.finishPullDown();
-				this.pagesVideoSwiper.refresh();
+					resolve(true);
+				});
 			});
-		});
+		};
 
 		// 上拉加载
-		this.pagesVideoSwiper.on('pullingUp', () => {
+		VideoPullLoad.onPullingUp = () => {
 			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
 
-			findMyVideo(_page, 10).then((data) => {
-				if (data) {
-					data.forEach((itemData, index) => {
-						this.data.VideosList = itemData;
+			return new Promise((resolve) => {
+				findMyVideo(_page, this._number).then((data) => {
+					if (data) {
+						data.forEach((itemData, index) => {
+							this.data.VideosList = itemData;
 
-						let element = createDom(Template.render(this.tpl.list_my_videos_item, this.data));
-						this._cardVideoEvent(element);
-						this.cardsVideoEl.append(element);
-					});
-
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
-					this._bindEvent();
-				}
-
-				this.pagesVideoSwiper.finishPullUp();
-				this.pagesVideoSwiper.refresh();
+							let element = createDom(Template.render(this.tpl.list_my_videos_item, this.data));
+							this._cardVideoEvent(element);
+							this.cardsVideoEl.append(element);
+						});
+						setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+					}
+					resolve(true);
+				});
 			});
-		});
-
-		this.pagesVideoSwiper.on('scroll', (pos) => {
-			if (pullDownRefresh) {
-				return;
-			}
-			this.pullDownEl.style.top = Math.min(pos.y + pullDownInitTop, 10)+ 'px';
-		})
+		};
 	}
 
 	static attachTo(element, options) {

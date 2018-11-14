@@ -26,8 +26,9 @@
                             {{each MyVideo}}
                                 {{if $value.status != 4}}
                                 <div class="col-50 card card-video" data-id="{{$value.id}}">
-                                    <div class="card-content">
-                                        <div class="card-video-header">
+                                    <div class="card-content" style="background-image: url({{$value.img_url}});">
+                                        <div class="cards-top">
+                                            <i class="icon user-close-video btn-close-video"></i>
                                             {{if $value.status == 1}}
                                                 <span class="status-label review">{{PUBLIC.Review}}</span>
                                             {{else if $value.status == 2}}
@@ -39,10 +40,8 @@
                                             {{else if $value.status == 3}}
                                                 <span class="status-label refuse">{{PUBLIC.Refuse}}</span>
                                             {{/if}}
-                                            <i class="icon user-close-video btn-close-video"></i>
                                         </div>
-                                        <div class="media" data-url="{{$value.video_url}}" style="background-image: url({{$value.img_url}});"></div>
-                                        <div class="showdom">
+                                        <div class="cards-bottom">
                                             <p class="summary-txt">{{$value.video_description}}</p>
                                             <div class="video-info">
                                                 <p class="video-time">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}</p>
@@ -73,29 +72,7 @@
                     <!-- /.box-cards -->
                 </div>
                 <!-- /.contents-video -->
-
-                <div class="pullup-wrapper">
-                    <div class="loading-down">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <!-- /.pullup-wrapper -->
             </div>
-
-            <div class="pulldown-wrapper">
-                <div class="loading-down">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <!-- /.pulldown-wrapper -->
         </div>
     </div>
 </div>

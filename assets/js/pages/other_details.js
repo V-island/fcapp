@@ -1,7 +1,7 @@
-import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
 import { Spinner } from '../components/Spinner';
+import { PullLoad } from '../components/PullLoad';
 import Modal from '../modal';
 import VideoPreview from '../videoPreview';
 
@@ -48,20 +48,17 @@ export default class OtherDetails extends EventEmitter {
 	    this.data = {};
 	    this.options = {
 	    	slideWrapper: '.slide-wrapper',
-            slideContent: 'slide-content',
-            slideItem: 'slide-item',
 	    	tabsItemClass: 'tab-item',
+
 	    	pagesVideoClass: '.pages-video',
-	    	pagesContentClass: '.pages-contents',
 	    	cardVideoClass: '.card-video',
-	    	boxCardsClass: 'box-cards',
+	    	boxCardsClass: '.box-cards',
+
 	    	btnPrivateLetterClass: 'btn-private-letter',
 	    	btnVideoChatClass: 'btn-video-chat',
 	    	btnAddAttentionClass: 'btn-add-attention',
 	    	iconAttentionClass: 'live-attention',
             iconAddAttentionClass: 'live-add-attention',
-            pulldownClass: '.pulldown-wrapper',
-            pullupClass: '.pullup-wrapper',
             cardsPageIndex: 'page',
             showClass: 'active'
         };
@@ -77,10 +74,10 @@ export default class OtherDetails extends EventEmitter {
 	init(element) {
 		const { userid } = getVariableFromUrl();
 
-		let _page = 1;
-		let _number = 10;
+		this._page = 1;
+		this._number = 10;
 		let getUserDetail = searchUserInfo(userid);
-		let getVideo = selVideoByUserId(userid, _page, _number);
+		let getVideo = selVideoByUserId(userid, this._page, this._number);
 
 		Promise.all([getUserDetail, getVideo]).then((data) => {
 			this.data.UserDetail = data[0] ? data[0] : false;
@@ -102,40 +99,16 @@ export default class OtherDetails extends EventEmitter {
 
 	_init() {
 		this.btnAddAttentionEl = this.OtherDetailsEl.getElementsByClassName(this.options.btnAddAttentionClass)[0];
-
-		// tab
-		this.tabsItemEl = this.OtherDetailsEl.getElementsByClassName(this.options.tabsItemClass);
-
-		// slide
-		this.slideWrapperEl = this.OtherDetailsEl.querySelector(this.options.slideWrapper);
-		this.slideContentEl = this.slideWrapperEl.getElementsByClassName(this.options.slideContent)[0];
-		this.slideItemEl = this.slideWrapperEl.getElementsByClassName(this.options.slideItem);
-
-		this.pullDownEl = this.OtherDetailsEl.querySelector(this.options.pulldownClass);
-		this.pullUpEl = this.OtherDetailsEl.querySelector(this.options.pullupClass);
-
 		this.pagesVideoEl = this.OtherDetailsEl.querySelector(this.options.pagesVideoClass);
-		this.contentsVideoEl = this.pagesVideoEl.querySelector(this.options.pagesContentClass);
-		this.cardsVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxCardsClass)[0];
-		this.contentsVideoEl.style.minHeight = `${this.pagesVideoEl.offsetHeight + 1}px`;
+		this.cardsVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
 
-		this._setSlideWidth();
-		this._slideSwiper();
-		this._pagesVideo();
+		this._SlidePullLoad();
+		this._VideoPullLoad();
 		this._bindEvent();
 		this._listEvent();
 	}
 
 	_bindEvent() {
-		// 切换
-		Array.prototype.slice.call(this.tabsItemEl).forEach((itemEl, index) => {
-			addEvent(itemEl, 'click', () => {
-	            if (hasClass(itemEl, this.options.showClass)) return;
-
-	            this.slideSwiper.goToPage(index, 0);
-	        });
-		});
-
 		// 加关注
 		addEvent(this.btnAddAttentionEl, 'click', () => {
 		    let index = getData(this.btnAddAttentionEl, 'id'),
@@ -156,7 +129,6 @@ export default class OtherDetails extends EventEmitter {
 
 	_listEvent() {
 		this.cardVideoEl = this.OtherDetailsEl.querySelectorAll(this.options.cardVideoClass);
-
 		// video list
 		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
 			this._cardVideoEvent(cardVideoItemEl);
@@ -178,21 +150,12 @@ export default class OtherDetails extends EventEmitter {
 		});
 	}
 
-	// 滑块初始化
-	_setSlideWidth() {
-		let width = 0;
-		let slideWidth = this.slideWrapperEl.clientWidth;
-
-		Array.prototype.slice.call(this.slideItemEl).forEach(itemEl => {
-			itemEl.style.width = slideWidth + 'px';
-			width += slideWidth;
-		});
-		this.slideContentEl.style.width = width + 'px';
-	}
-
 	// Slide 滑块
-	_slideSwiper() {
-		this.slideSwiper = new BScroll(this.options.slideWrapper, {
+	_SlidePullLoad() {
+		const slideWrapperEl = this.OtherDetailsEl.querySelector(this.options.slideWrapper);
+		const tabsItemEl = this.OtherDetailsEl.getElementsByClassName(this.options.tabsItemClass);
+
+		const SlidePullLoad = new PullLoad(slideWrapperEl, {
 			startX: 1,
 			scrollX: true,
 			scrollY: false,
@@ -209,26 +172,31 @@ export default class OtherDetails extends EventEmitter {
 				}
 			},
 			bounce: false
+		}, {
+			pullingModule: false,
+			slideModule: true
 		});
+		SlidePullLoad.onScrollEnd = () => {
+			let slideIndex = SlidePullLoad.getCurrentPage().pageX;
+			if (hasClass(tabsItemEl[slideIndex], this.options.showClass)) return;
 
-		this.slideSwiper.on('scrollEnd', (pos) => {
-			let slideIndex = this.slideSwiper.getCurrentPage().pageX;
-
-			if (hasClass(this.tabsItemEl[slideIndex], this.options.showClass)) return;
-
-			Array.prototype.slice.call(this.tabsItemEl).forEach(itemEl => {
+			Array.prototype.slice.call(tabsItemEl).forEach(itemEl => {
 				toggleClass(itemEl, this.options.showClass);
 			});
+		};
+		Array.prototype.slice.call(tabsItemEl).forEach((itemEl, index) => {
+			addEvent(itemEl, 'click', () => {
+	            if (hasClass(itemEl, this.options.showClass)) return;
+
+	            SlidePullLoad.goToPage(index, 0);
+	        });
 		});
-		this.slideSwiper.goToPage(1, 0);
+		SlidePullLoad.goToPage(1, 0);
 	}
 
 	// Video 模块
-	_pagesVideo() {
-		let pullDownRefresh = false,
-			pullDownInitTop = -50;
-
-		this.pagesVideoSwiper = new BScroll(this.options.pagesVideoClass, {
+	_VideoPullLoad() {
+		const VideoPullLoad = new PullLoad(this.pagesVideoEl, {
 			probeType: 1,
 			startY: 0,
 			scrollY: true,
@@ -246,60 +214,49 @@ export default class OtherDetails extends EventEmitter {
 		});
 
 		// 下拉刷新
-		this.pagesVideoSwiper.on('pullingDown', () => {
-			pullDownRefresh = true;
+		VideoPullLoad.onPullingDown = () => {
+			return new Promise((resolve) => {
+				selVideoByUserId(this.info.user_id, this._page, this._number).then((data) => {
+					if (!data) return;
 
-			selVideoByUserId(this.info.user_id, 1, 10).then((data) => {
-				if (!data) return;
+					this.cardsVideoEl.innerHTML = '';
 
-				this.cardsVideoEl.innerHTML = '';
-
-				data.forEach((itemData, index) => {
-					this.data.VideosList = itemData;
-					this.data.HeaderVideos = true;
-					this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
-				});
-
-				setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
-				pullDownRefresh = false;
-				this.pullDownEl.style.top = '-1rem';
-				this.pagesVideoSwiper.finishPullDown();
-				this.pagesVideoSwiper.refresh();
-				this._listEvent();
-			});
-		});
-
-		// 上拉加载
-		this.pagesVideoSwiper.on('pullingUp', () => {
-			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
-			_page = parseInt(_page) + 1;
-
-			selVideoByUserId(this.info.user_id, _page, 10).then((data) => {
-				if (data) {
 					data.forEach((itemData, index) => {
 						this.data.VideosList = itemData;
 						this.data.HeaderVideos = true;
-
-						let element = createDom(Template.render(this.tpl.list_videos_item, this.data));
-						this._cardVideoEvent(element);
-						this.cardsVideoEl.append(element);
+						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
 					});
 
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
-				}
-
-				this.pagesVideoSwiper.finishPullUp();
-				this.pagesVideoSwiper.refresh();
+					setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+					this._listEvent();
+					resolve(true);
+				});
 			});
-		});
+		};
 
-		this.pagesVideoSwiper.on('scroll', (pos) => {
-			if (pullDownRefresh) {
-				return;
-			}
-			this.pullDownEl.style.top = Math.min(pos.y + pullDownInitTop, 10)+ 'px';
-		})
-	}
+		// 上拉加载
+		VideoPullLoad.onPullingUp = () => {
+			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
+			_page = parseInt(_page) + 1;
+
+			return new Promise((resolve) => {
+				selVideoByUserId(this.info.user_id, _page, this._number).then((data) => {
+					if (data) {
+						data.forEach((itemData, index) => {
+							this.data.VideosList = itemData;
+							this.data.HeaderVideos = true;
+
+							let element = createDom(Template.render(this.tpl.list_videos_item, this.data));
+							this._cardVideoEvent(element);
+							this.cardsVideoEl.append(element);
+						});
+						setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+					}
+					resolve(true);
+				});
+			});
+		};
+	};
 
 	static attachTo(element, options) {
 	    return new OtherDetails(element, options);

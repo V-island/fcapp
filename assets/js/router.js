@@ -1,6 +1,6 @@
 import Template from 'art-template/lib/template-web';
 import { Spinner } from './components/Spinner';
-import Tabs from './tabs';
+import { TabMain } from './components/MenuItem';
 import Modal from './modal';
 import {
     body,
@@ -474,8 +474,9 @@ import {
 
                     // 判断Nav Tabs
                     if (this.cache[url].navTabs === 1) {
-                        let tabs = new Tabs($visibleSection[0]);
+                        let tabs = new TabMain();
                         direction = true;
+                        $visibleSection.prepend(tabs.element);
                     }
 
                     $visibleSection.addClass(routerConfig.curPageClass);

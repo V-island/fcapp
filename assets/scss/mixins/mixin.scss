@@ -199,3 +199,12 @@
     height: auto;
     box-sizing: initial;
 }
+
+@mixin filter-blur($num) {
+    -webkit-filter: blur($num); /* Chrome, Opera */
+    -moz-filter: blur($num);
+    -ms-filter: blur($num);
+    -o-filter: blur($num);
+    filter: blur($num);
+    filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius=10, MakeShadow=false); /* IE6~IE9 */
+}

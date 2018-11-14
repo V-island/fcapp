@@ -1,5 +1,5 @@
 import SendBirdAction from './SendBirdAction';
-import Modal from './modal';
+import { alert, toast } from './components/Modal';
 import { Spinner } from './components/Spinner';
 import ProgressLine from './ProgressLine';
 import {
@@ -25,7 +25,6 @@ import {
 } from './util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 
 const CONFIG = {
     rootUrl: '#/home',
@@ -112,18 +111,16 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 			response = JSON.parse(response);
 			// console.log(response);
 		}
-		if (response.code === 1000 || response.code === 1001 || response.code === 1011) {
+		if (response.code === 1000 || response.code === 1001 || response.code === 1002 || response.code === 1011) {
 			return callback(response);
 		}
 		if (response.code === 2012) {
-			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			toast({text: LANG.SYSTEM_CODE[response.code]});
 			clearLocalStorage();
 			return location.href = jumpURL(CONFIG.notloginUrl);
 		}
 
-		modal.alert(LANG.SYSTEM_CODE[response.code], (_modal) => {
-			modal.closeModal(_modal);
-		});
+		alert({text: LANG.SYSTEM_CODE[response.code]});
 
 		if (isFunction(callbackCancel)) {
 			return callbackCancel(response);
@@ -228,15 +225,22 @@ const getMac = () => {
 }
 
 // 获取用户信息
-export const getUserInfo = () => {
+export const getUserInfo = (check) => {
 	let _info = getLocalStorage(UER_NAME);
 
-	if (_info === null) {
+	if (_info === null && !check) {
 		clearLocalStorage();
 		return location.href = jumpURL(CONFIG.notloginUrl);
 	}
 
 	return _info;
+}
+
+// 获取用户ID
+export const getUserId = () => {
+	const _info = getLocalStorage(UER_NAME);
+
+	return _info !== null ? _info.userId : false;
 }
 
 // 更新用户信息
@@ -391,7 +395,6 @@ export const checkIMChannel = (userID, praiseURL, commentURL, giftURL) => {
 			    });
 			});
 		}).catch(() => {
-			redirectToIndex('SendBird connection failed.');
 			reject('SendBird connection failed.');
 		});
 	});
@@ -439,6 +442,8 @@ export const sendVerificationCode = (_phone) => {
 			phone: _phone
 		}, (response) => {
 			resolve(true);
+		}, (response) => {
+			resolve(false);
 		});
 	});
 };
@@ -453,9 +458,7 @@ export const getRegister = (params, callback) => {
 	let _params = isObject(params) ? params : urlParse(params);
 
 	if (typeof _params.userPassword === 'undefined') {
-		return modal.alert(LANG.PUBLIC.Froms.Password.Text, (_modal) => {
-			modal.closeModal(_modal);
-		});
+		return alert({text: LANG.PUBLIC.Froms.Password.Text});
 	}
 	_params.registerWay = LoginMode;
 
@@ -495,7 +498,7 @@ export const getLogin = (params, callback) => {
 
 	return new Promise((resolve, reject) => {
 		getPost('/appLogin', _params, (response) => {
-			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			toast({text: LANG.SYSTEM_CODE[response.code]});
 			const {token, userId, phoneCode, userPhone, praise_channel, comment_channel, gift_channel} = response.data;
 
 			setLocalStorage(TOKEN_NAME, token);
@@ -548,7 +551,7 @@ export const QuickLogin = (_userId) => {
 	}
 	return new Promise((resolve, reject) => {
 		getPost('/QuickLogin', _params, (response) => {
-			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			toast({text: LANG.SYSTEM_CODE[response.code]});
 			const {token, user_id} = response.data;
 
 			setLocalStorage(TOKEN_NAME, token);
@@ -641,7 +644,7 @@ export const getUpdatePassword = (params) => {
 
 	return new Promise((resolve) => {
 		getPost('/updatePassword', _params, (response) => {
-			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			toast({text: LANG.SYSTEM_CODE[response.code]});
 			resolve(true);
 		});
 	});
@@ -663,7 +666,7 @@ export const appLoginOut = () => {
 
 	return new Promise((resolve) => {
 		getPost('/appLoginOut', _params, (response) => {
-			modal.toast(LANG.SYSTEM_CODE[response.code]);
+			toast({text: LANG.SYSTEM_CODE[response.code]});
 			clearLocalStorage();
 			location.href = jumpURL(CONFIG.notloginUrl);
 			resolve(true);
@@ -742,6 +745,8 @@ export const personCenter = (params, token, mac, loginMode, _checkLogin = false)
 			_info.userHead = response.data.user_head;
 			_info.userSex = response.data.user_sex;
 			_info.userPackage = response.data.user_package;
+			_info.liveRoomId = response.data.live_room_id;
+			_info.iMChannel = response.data.im_channel;
 			_info.userLoginMode = loginMode;
 
 			setLocalStorage(UER_NAME, _info);
@@ -1976,6 +1981,295 @@ export const selAllGoods = () => {
 
 	return new Promise((resolve) => {
 		getPost('/selAllGoods', {country_id: id}, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+//------------------------------------------------------------------------------------------------------
+//-----直播新接口
+//------------------------------------------------------------------------------------------------------
+
+/**
+ * 显示主播列表接口
+ * @return {[type]} [description]
+ */
+export const showLiveList = () => {
+	return new Promise((resolve) => {
+		getPost('/showLiveList', {}, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 查询是否可以提交申请成为主播
+ * @return {[type]} [description]
+ */
+export const isAudit = () => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/isAudit', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 开播
+ * @param  {[type]} id      [直播间ID]
+ * @param  {[type]} type    [直播类型 1.一对一直播 2.一对多免费 3.一对多收费直播]
+ * @return {[type]}         [description]
+ */
+export const beginLive = (id, type) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		live_room_type: type,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/beginLive', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 下播
+ * @param  {[type]} id [直播间ID]
+ * @return {[type]}    [description]
+ */
+export const endLive = (id) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/endLive', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 一对多切换直播间类型
+ * @param  {[type]} id    [直播间ID]
+ * @param  {[type]} type  [直播类型 1.一对一直播 2.一对多免费 3.一对多收费直播]
+ * @param  {[type]} price [收费价格]
+ * @return {[type]}       [description]
+ */
+export const switchRoom = (id, type, price) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		live_room_type: type,
+		live_price: price
+	}
+
+	return new Promise((resolve) => {
+		getPost('/switchRoom', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 用户进入直播间
+ * @param  {[type]} id    [直播间ID]
+ * @param  {[type]} type  [直播类型 1.一对一直播 2.一对多免费 3.一对多收费直播]
+ * @param  {[type]} price [该直播间收费价格]
+ * @return {[type]}       [description]
+ */
+export const entryRoom = (id, type, price) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		live_room_type: type,
+		chat_price: price,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/entryRoom', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 用户离开直播间
+ * @param  {[type]} id   [直播间ID]
+ * @param  {[type]} type [直播类型 1.一对一直播 2.一对多免费 3.一对多收费直播]
+ * @return {[type]}      [description]
+ */
+export const leaveRoom = (id, type) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		live_room_type: type,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/leaveRoom', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 赠送礼物接口
+ * @param  {[type]} roomId [直播间ID]
+ * @param  {[type]} giftId [礼物ID]
+ * @param  {[type]} amount [数量]
+ * @param  {[type]} type   [消费类型 1.礼物消费 2.聊天消费 3.看视频消费]
+ * @return {[type]}        [description]
+ */
+export const giveGift = (roomId, giftId, amount, type) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: roomId,
+		gifts_id: giftId,
+		amount: amount,
+		consum_type: type,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/giveGift', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 主播端心跳检测接口
+ * @param  {[type]} id [直播间ID]
+ * @return {[type]}    [description]
+ */
+export const checkLiveRoom = (id) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/checkLiveRoom', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 客户端心跳检测
+ * @param  {[type]} id [直播间ID]
+ * @return {[type]}    [description]
+ */
+export const checkClient = (id) => {
+	let {userId, userLoginMode} = getUserInfo();
+	let _params = {
+		live_room_id: id,
+		userId: userId,
+		token: getLocalStorage(TOKEN_NAME),
+		loginMode: userLoginMode,
+		mac: getMac()
+	}
+
+	return new Promise((resolve) => {
+		getPost('/checkClient', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 主播信息显示
+ * @param  {[type]} id	   [主播ID]
+ * @return {[type]}        [description]
+ */
+export const anchorInfo = (id, tourist) => {
+	let _params = {
+		userId: id
+	}
+
+	if (!tourist) {
+		let {userId} = getUserInfo();
+		_params.look_user_id = userId;
+	}
+
+	return new Promise((resolve) => {
+		getPost('/anchorInfo', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 主播端结算
+ * @return {[type]} [description]
+ */
+export const anchorBalance = () => {
+	let {userId} = getUserInfo();
+	let _params = {
+		live_user_id: userId
+	}
+
+	return new Promise((resolve) => {
+		getPost('/anchorBalance', _params, (response) => {
 			resolve(response.data);
 		}, (response) => {
 			resolve(false);

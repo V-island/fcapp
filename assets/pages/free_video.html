@@ -9,7 +9,7 @@
         </header>
         <!-- 这里是页面内容区 -->
         <div class="content block user-wrapper" ref="wrapper">
-            <div class="user-content" style="min-height: 100%;">
+            <div class="user-content">
                 <div class="users-contents" ref="listWrapper">
                     {{if VideoType}}
                         <div class="tag tag-video">
@@ -24,9 +24,9 @@
                         <div class="row box-cards" data-page="1">
                         {{each VideoList}}
                             <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                <div class="card-content">
-                                    <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                    <div class="showdom">
+                                <div class="card-content" style="background-image: url({{$value.img_url}});">
+                                    <div class="cards-top"></div>
+                                    <div class="cards-bottom">
                                         <p class="summary-txt">{{$value.video_description}}</p>
                                         <div class="video-info">
                                             <div class="user-info">
@@ -63,27 +63,7 @@
                     {{/if}}
                 </div>
                 <!-- /.contents-video -->
-                <div class="pullup-wrapper">
-                    <div class="loading-down">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <!-- /.pullup-wrapper -->
             </div>
-            <div class="pulldown-wrapper">
-                <div class="loading-down">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            <!-- /.pulldown-wrapper -->
         </div>
     </div>
 </div>

@@ -1,3 +1,12 @@
+$cards-herght: 11.2rem;
+$cards-padding: 0.35rem;
+$cards-showdom-height: 3.5rem;
+$cards-font-size: 0.5rem;
+
+@mixin cards-showdom($path) {
+    background: linear-gradient(to $path, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
 /* === Cards === */
 .box-cards {
     // margin: 0.7rem 0;
@@ -41,7 +50,6 @@
         }
     }
 }
-
 .card {
     box-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.3);
     margin: 0.35rem 0;
@@ -54,38 +62,54 @@
         margin-left: 0;
         margin-right: 0;
     }
-
 }
-
 .card-content {
     position: relative;
     display: block;
+    width: 100%;
+    height: $cards-herght;
+    margin: auto;
+    @include ImageBox(place-chart);
+    background-size: cover;
+    @include flex-spindle-center(space-between, column);
+    align-items: inherit;
 
-    .media {
-        position: absolute;
-        width: 100%;
-        top: 0;
-        bottom: 0;
-        z-index: 1;
-        @include ImageBox(place-chart);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-
-    }
-
-    .showdom {
-        position: absolute;
-        width: 100%;
-        top: 0;
-        left: 0;
+    .cards-top {
+        @include cards-showdom(bottom);
+        @include flex-spindle-center(space-between, row-reverse);
+        align-items: start;
         color: $color-text;
-        font-size: 0.5rem;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
-        height: 1.5rem;
-        z-index: 2;
+        font-size: $cards-font-size;
+        height: $cards-showdom-height;
+        padding: $cards-padding;
+
+        &.not-reverse {
+            @include flex-vertical(row);
+        }
+        span.tag-label {
+            font-size: $cards-font-size;
+        }
     }
 
+    .cards-bottom {
+        @include cards-showdom(top);
+        color: $color-text;
+        font-size: $cards-font-size;
+        height: $cards-showdom-height;
+        padding: $cards-padding;
+    }
+
+    .user-info {
+        display: flex;
+        width: 3.5rem;
+        margin-right: 0.2rem;
+
+        .user-img {
+            margin-right: 0.35rem;
+            flex: 0 0 1rem;
+
+        }
+    }
 }
 
 .card-foot {
@@ -131,7 +155,6 @@
         }
 
     }
-
 }
 
 span.tag-label {
@@ -192,38 +215,90 @@ span.status-label {
     }
 }
 
-.card-list {
+.card-live {
     .card-content {
-        width: 100%;
-        overflow: hidden;
+        height: 8.05rem;
 
-        //需要触发BFC消除margin折叠的问题
+        .cards-bottom {
+            @include spindle-center(space-between);
+            height: 3rem;
 
-        &:after {
-            content: '';
-            display: block;
-            margin-top: 100%;
-            //margin 百分比相对父元素宽度计算
+            > .user-heat {
+                font-size: 0.6rem;
+                font-weight: 500;
+            }
         }
-
-        .showdom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .busy {
-            color: $color-text-active;
-        }
-
     }
 
+    .user-info {
+        .user-img {
+            @include size(1.5rem);
+            flex: 0 0 1.5rem;
+        }
+
+        .user-name {
+            line-height: 1.5rem !important;
+            font-size: 0.75rem !important;
+        }
+    }
+
+    &.card-live-blurry {
+        >.blurry-showdom {
+            @include filter-blur(0.3rem);
+            width: 100%;
+            height: $cards-herght;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        >.card-content {
+            background-size: 65% 100%;
+            height: $cards-herght;
+
+            .user-info {
+                width: auto;
+            }
+        }
+    }
+
+    span.live-label {
+        background: $tag-bg-color;
+        border-radius: $tag-border-radius;
+        font-size: 0.6rem;
+        color: $tag-txt-color;
+        padding: 0 0.6rem;
+        text-align: center;
+        line-height: 1.3rem;
+
+        &.theme-live {
+            background: rgba(255, 255, 255, .8);
+            color: $color-danger;
+
+            &:before {
+                content: "";
+                width: 0.35rem;
+                height: 0.35rem;
+                display: inline-block;
+                margin-right: 0.2rem;
+                background: $color-danger;
+                @include border-radius(100%);
+            }
+        }
+
+        &.theme-danger {
+            background: rgba(246, 64, 51, .5);
+            color: $color-text;
+        }
+    }
 }
 
 .card-video {
     &.video-add-card {
         background: transparent;
-        box-shadow: 0 0 0.1rem rgba(225, 225, 255, 0.3);
+        box-shadow: 0 0 0.1rem rgba(255, 255, 255, 0.3);
 
         .card-content {
             font-size: 0.5rem;
@@ -250,31 +325,9 @@ span.status-label {
         }
     }
     .card-content {
-        width: 100%;
-        height: 11.2rem;
 
-        .card-video-header{
-            @include spindle-center(space-between);
-            align-items: start;
-            position: absolute;
-            top: 0;
-            right: 0;
-            left: 0;
-            z-index: 2;
+        .cards-top {
             height: 3.5rem;
-            padding: 0.3rem;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
-
-            span.tag-label {
-                font-size: 0.5rem;
-            }
-        }
-
-        .showdom {
-            top: auto;
-            bottom: 0;
-            height: 3.5rem;
-            padding: 0.35rem;
         }
 
         .summary-txt {
@@ -309,36 +362,6 @@ span.status-label {
         }
     }
 
-    .user-info {
-        display: flex;
-        width: 3.5rem;
-        margin-right: 0.2rem;
-
-        .user-img {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 1rem;
-            border: 1px solid $card-border-color;
-            margin-right: 0.35rem;
-            overflow: hidden;
-            flex: 0 0 1rem;
-
-            >img {
-                width: auto;
-                height: 100%;
-            }
-
-        }
-
-        .user-name {
-            line-height: 1rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-break: keep-all;
-            white-space: nowrap;
-        }
-    }
-
     .user-follow {
         display: flex;
         justify-content: space-around;
@@ -358,7 +381,6 @@ span.status-label {
             }
 
         }
-
     }
 
 }

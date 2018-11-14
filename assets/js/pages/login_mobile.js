@@ -1,7 +1,6 @@
 import Template from 'art-template/lib/template-web';
+import { FacebookPlugin, TwitterPlugin } from '../components/ThirdPartyPlugin';
 import EventEmitter from '../eventEmitter';
-import FacebookLogin from '../FacebookLogin';
-import TwitterLogin from '../TwitterLogin';
 import Modal from '../modal';
 import Form from '../forms';
 import {
@@ -110,7 +109,7 @@ export default class LoginMobile extends EventEmitter {
 
         // Facebook 登录
         if (this.btnFecebookEl.length > 0) {
-        	this.FB = new FacebookLogin();
+        	this.FB = new FacebookPlugin();
         	this.FB.onLogin = (accountId, accountType, countryId, userHead, userName) => {
         		getLogin({
         			userAccount: accountId,
@@ -157,7 +156,7 @@ export default class LoginMobile extends EventEmitter {
 
         // Twitter 登录
         if (this.btnTwitterEl.length > 0) {
-        	this.Twitter = new TwitterLogin();
+        	this.Twitter = new TwitterPlugin();
         	this.Twitter.onLogin = (accountId, accountType, countryId, userHead, userName) => {
         		getLogin({
 					userAccount: accountId,

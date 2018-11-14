@@ -1,0 +1,77 @@
+<div class="page-group">
+    <div class="page">
+        <!-- 标题栏 -->
+        <header class="bar bar-flex">
+            <a class="icon-btn back" data-ripple>
+                <i class="icon icon-arrow-back"></i>
+            </a>
+            <h1 class="title">{{REGISTER.Safeguard.Title}}</h1>
+        </header>
+        <!-- 这里是页面内容区 -->
+        <div class="content login-wrapper">
+            <div class="login-content">
+                <form class="form-register-safeguard">
+                    <input type="hidden" class="phoneCode" name="phoneCode" value="" />
+                    <input type="hidden" class="countryId" name="country_id" value="" />
+                	<div class="form-group country">
+                		<label class="form-label">{{PUBLIC.Froms.Country.Title}}</label>
+						<div class="form-control countryName"></div>
+						<i class="icon user-arrow-forward mete"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label phoneCodeLabel"></label>
+            		    <input type="tel" name="user_phone" class="form-control" placeholder="{{PUBLIC.Froms.Telephone.Placeholder}}">
+                        <div class="button fill-primary btn-verification disabled">{{PUBLIC.Froms.Telephone.Verification}}</div>
+                	</div>
+                	<!-- /.form-group -->
+
+                    <div class="form-group">
+                        <label class="form-label">{{PUBLIC.Froms.Verification.Title}}</label>
+                        <input type="text" name="authCode" class="form-control" placeholder="{{PUBLIC.Froms.Verification.Placeholder}}">
+                    </div>
+                    <!-- /.form-group -->
+
+                	<div class="form-group">
+                		<label class="form-label">{{PUBLIC.Froms.Password.Title}}</label>
+            		    <input type="text" name="password" class="form-control" placeholder="{{PUBLIC.Froms.Password.Placeholder}}">
+            		    <i class="icon icon-eye btn-bright"></i>
+                	</div>
+                	<!-- /.form-group -->
+
+					<div class="form-group form-button">
+						<button type="submit" class="button button-primary button-block" data-ripple>{{REGISTER.Buttons.Title_Bind}}</button>
+					</div>
+					<!-- /.form-group -->
+
+                    <div class="form-section">
+                        <p class="section-span">{{REGISTER.Terms.Text}}<br/><a href="#/register/terms">{{REGISTER.Terms.Title}}</a></p>
+                    </div>
+                </form>
+            </div>
+            <!-- /.login-content -->
+            <div class="login-footer">
+                <p>{{LOGIN.Third_party.Title}}</p>
+                <div class="tag tag-share">
+                    {{if ThirdPartyList}}
+                        {{each ThirdPartyList}}
+                            {{if $value.id == 1}}
+                                <label class="share-label btn-fecebook">
+                                    <i class="icon modals-fecebook" data-ripple></i>
+                                    <span>{{LOGIN.Third_party.Facebook}}</span>
+                                </label>
+                            {{else if $value.id == 2}}
+                                <label class="share-label btn-twitter">
+                                    <i class="icon modals-Twitter" data-ripple></i>
+                                    <span>{{LOGIN.Third_party.Twitter}}</span>
+                                </label>
+                            {{/if}}
+                        {{/each}}
+                    {{/if}}
+                </div>
+            </div>
+            <!-- /.login-footer -->
+        </div>
+    </div>
+</div>

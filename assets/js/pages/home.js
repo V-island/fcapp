@@ -13,6 +13,7 @@ import {
 } from '../lang';
 
 import {
+	showLiveList,
     videoClips,
     videoType,
     playVideo,
@@ -37,6 +38,17 @@ import {
 const LANG = getLangConfig();
 const MADAL = LANG.HOME.Madal;
 const modal = new Modal();
+
+const liveDom = [{
+	everyday_img: "https://usa-imges.s3.us-west-1.amazonaws.com/1541403877342.jpg",
+	fans_number: 1,
+	live_price: 2,
+	live_room_id: 64521560,
+	live_room_type: 2,
+	user_head: "https://usa-imges.s3.us-west-1.amazonaws.com/1536633775311.jpg",
+	user_id: 12,
+	user_name: "Geraldine"
+}];
 
 const INIT_INDEX = 2;
 
@@ -69,7 +81,10 @@ export default class Home extends EventEmitter {
             sectionLiveClass: '.section-live',
             sectionVideoClass: '.section-video',
 
-            boxCardsClass: 'box-cards',
+            boxLivesClass: 'box-lives',
+            boxVideosClass: 'box-videos',
+
+            cardLiveClass: 'card-live',
 
             // Tag
             tagsClass: '.tag',
@@ -96,12 +111,15 @@ export default class Home extends EventEmitter {
 		let getFreeVideoClips = videoClips(this._page, this._number, this.tagId, 1);
 		let getVideoClips = videoClips(this._page, this._number, this.tagId, 2);
 		let getvideoType = videoType();
+		let getShowLiveList = showLiveList();
 
-		Promise.all([getFreeVideoClips, getVideoClips, getvideoType]).then((data) => {
+		Promise.all([getFreeVideoClips, getVideoClips, getvideoType, getShowLiveList]).then((data) => {
 			// this.data.FreeVideoList = data[0] ? (data[0].length > 2 ? data[0].slice(0, 2) : data[0]) : false;
 			this.data.FreeVideoList = data[0] ? data[0] : false;
 			this.data.VideoList = data[1] ? data[1] : false;
 			this.data.VideoType = data[2] ? data[2] : false;
+			this.data.LivesList = data[3] ? data[3] : liveDom;
+
 			this.HomeEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.HomeEl);
 			this._init();
@@ -115,13 +133,17 @@ export default class Home extends EventEmitter {
 	}
 
 	_init() {
+		// pages lives
+		this.boxLivesEl = this.HomeEl.getElementsByClassName(this.options.boxLivesClass)[0];
+		this.cardsLivesEl = this.boxLivesEl.getElementsByClassName(this.options.cardLiveClass);
+
 		// pages video
 		this.pagesVideoEl = this.HomeEl.querySelector(this.options.pagesVideoClass);
-		this.cardsVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxCardsClass)[0];
+		this.boxVideoEl = this.pagesVideoEl.getElementsByClassName(this.options.boxVideosClass)[0];
 
 		this.tagsEl = this.HomeEl.querySelector(this.options.tagsClass);
 
-		this._VideoPages();
+		this._VideoPullLoad();
 		this._bindEvent();
 		this._listEvent();
 
@@ -133,6 +155,17 @@ export default class Home extends EventEmitter {
 	}
 
 	_bindEvent() {
+		if (this.cardsLivesEl.length > 0) {
+	    	Array.prototype.slice.call(this.cardsLivesEl).forEach(ItemEl => {
+	    		addEvent(ItemEl, 'click', () => {
+	    			let id = getData(ItemEl, 'id');
+	    			let type = getData(ItemEl, 'roomType');
+	    			let price = getData(ItemEl, 'price');
+	    			return location.href = jumpURL(`#/live?anchorid=${id}&type=${type}&price=${type}`);
+	            });
+	    	});
+		}
+
 		// tags
 		if (this.tagsEl) {
 			this.tagsLabelEl = this.tagsEl.getElementsByClassName(this.options.tagsLabelClass);
@@ -157,29 +190,29 @@ export default class Home extends EventEmitter {
 						videoClips(1, 10, this.tagId, 2).then((_data) => {
 							if (!data && !_data) return Spinner.remove();
 
-							this.cardsVideoEl.innerHTML = '';
+							this.boxVideoEl.innerHTML = '';
 
 							// free
 							if (data) {
-								this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
+								this.boxVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
 								// data = data.length > 2 ? data.slice(0, 2) : data;
 								data.forEach((itemData, index) => {
 									this.data.VideosList = itemData;
 									this.data.NotFreeVideos = false;
-									this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+									this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
 								});
 							}
 
 							if (_data) {
-								this.cardsVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+								this.boxVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
 
 								_data.forEach((itemData, index) => {
 									this.data.VideosList = itemData;
 									this.data.NotFreeVideos = true;
-									this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+									this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
 								});
 							}
-							setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+							setData(this.boxVideoEl, this.options.cardsPageIndex, 1);
 							this._listEvent();
 							Spinner.remove();
 						});
@@ -226,9 +259,8 @@ export default class Home extends EventEmitter {
 	}
 
 	// Video 模块
-	_VideoPages() {
-
-		const pagesVideo = new PullLoad(this.pagesVideoEl, {
+	_VideoPullLoad() {
+		const VideoPullLoad = new PullLoad(this.pagesVideoEl, {
 			probeType: 1,
 			startY: 0,
 			scrollY: true,
@@ -246,35 +278,35 @@ export default class Home extends EventEmitter {
 		});
 
 		// 下拉刷新
-		pagesVideo.onPullingDown = () => {
+		VideoPullLoad.onPullingDown = () => {
 			return new Promise((resolve) => {
 				videoClips(this._page, this._number, this.tagId, 1).then((data) => {
 					videoClips(1, 10, this.tagId, 2).then((_data) => {
-						if (!data && !_data) return;
+						if (!data && !_data) return resolve(true);
 
-						this.cardsVideoEl.innerHTML = '';
+						this.boxVideoEl.innerHTML = '';
 
 						// free
 						if (data) {
-							this.cardsVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
+							this.boxVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
 							// data = data.length > 2 ? data.slice(0, 2) : data;
 							data.forEach((itemData, index) => {
 								this.data.VideosList = itemData;
 								this.data.NotFreeVideos = false;
-								this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+								this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
 							});
 						}
 
 						if (_data) {
-							this.cardsVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+							this.boxVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
 
 							_data.forEach((itemData, index) => {
 								this.data.VideosList = itemData;
 								this.data.NotFreeVideos = true;
-								this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+								this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
 							});
 						}
-						setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
+						setData(this.boxVideoEl, this.options.cardsPageIndex, 1);
 						this._listEvent();
 						resolve(true);
 					});
@@ -283,8 +315,8 @@ export default class Home extends EventEmitter {
 		};
 
 		// 上拉加载
-		pagesVideo.onPullingUp = () => {
-			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
+		VideoPullLoad.onPullingUp = () => {
+			let _page = getData(this.boxVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
 
 			return new Promise((resolve) => {
@@ -295,9 +327,9 @@ export default class Home extends EventEmitter {
 							this.data.NotFreeVideos = false;
 							let element = createDom(Template.render(this.tpl.list_videos, this.data));
 							this._cardVideoEvent(element);
-							this.cardsVideoEl.append(element);
+							this.boxVideoEl.append(element);
 						});
-						setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+						setData(this.boxVideoEl, this.options.cardsPageIndex, _page);
 					}
 					resolve(true);
 				});
@@ -308,14 +340,14 @@ export default class Home extends EventEmitter {
 							// this.data.NotFreeVideos = true;
 				// 			let element = createDom(Template.render(this.tpl.list_videos, this.data));
 				// 			this._cardVideoEvent(element);
-				// 			this.cardsVideoEl.append(element);
+				// 			this.boxVideoEl.append(element);
 				// 		});
-				// 		setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+				// 		setData(this.boxVideoEl, this.options.cardsPageIndex, _page);
 				// 	}
 				// 	this.pagesVideoSwiper.finishPullUp();
 				// 	this.pagesVideoSwiper.refresh();
 				// });
 			});
-		}
+		};
 	}
 }

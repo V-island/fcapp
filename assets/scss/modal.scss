@@ -1,3 +1,33 @@
+// Modal
+// ---------------------------------------------------
+$modal-bg-color: #3D4150;
+$modal-close-color: $color-text-secondary;
+$modal-buton-color: $modal-bg-color;
+$modal-buton-bg: $color-primary;
+$modal-buton-active-bg: #d4d4d4;
+$modal-duration: 400ms;
+$modal-border-radius: 0.1rem;
+$modal-input-bg-color: #2C2C33;
+$modal-input-text-color: #666;
+$actions-modal-bg-color: $color-text;
+$actions-modal-title-color: $color-text-gray;
+$actions-modal-duration: 300ms;
+$actions-modal-border-radius: 0.2rem 0.2rem 0 0;
+$actions-modal-color-split: #F1F1F1;
+$popup-bg-color: $color-text-gray;
+$popup-gradient-color-top: #313443;
+$popup-gradient-color-bottom: #535969;
+$popup-duration: 400ms;
+$picker-text-color: #B2B2B2;
+$picker-text-color-active: $color-text;
+// Theme-black
+// ---------------------------------------------------
+// Modal
+// ---------------------------------------------------
+$theme-actions-modal-bg-color: #535969;
+$theme-actions-modal-title-color: $color-text;
+$theme-actions-modal-color-split: #666;
+
 /* === Modals === */
 .modal-overlay, .preloader-indicator-overlay, .popup-overlay {
     position: absolute;
@@ -6,7 +36,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.6);
-    z-index: 10600;
+    z-index: 10400;
     visibility: hidden;
     opacity: 0;
     transition-duration: $modal-duration;
@@ -14,42 +44,50 @@
         visibility: visible;
         opacity: 1;
     }
+    &.topping{
+        z-index: 10600;
+    }
 }
 
-.popup-overlay {
-    z-index: 10200;
-}
 .modal {
     width: 14rem;
     position: absolute;
-    z-index: 11000;
-    left: 50%;
-    margin-left: -6.75rem;
-    margin-top: 0;
+    z-index: 10600;
+    left: 0;
+    right: 0;
     top: 50%;
+    margin: 0 auto;
     text-align: center;
-    border-radius: $modal-border-radius;
-    opacity: 0;
-    transform: translate3d(0,0,0) scale(1.185);
-    transition-property: transform, opacity;
     color: $color-text;
     background: $modal-bg-color;
+    border-radius: $modal-border-radius;
     display: none;
+    @include animated($modal-duration);
     &.modal-in {
-        opacity: 1;
-        transition-duration: $modal-duration;
-        transform: translate3d(0,0,0) scale(1);
+        @include bounceIn;
     }
     &.modal-out {
-        opacity: 0;
-        z-index: 11000-1;
-        transition-duration: $modal-duration;
-        transform: translate3d(0,0,0) scale(0.815);
+        z-index: 10600-1;
+        @include bounceOut;
+    }
+    &.topping{
+        z-index: 10800;
     }
 }
+
 .modal-header{
     padding: 0.75rem 1rem 0;
     position: relative;
+}
+.modal-content {
+    padding: 0.4rem;
+}
+.modal-footer {
+    padding: 0.4rem;
+
+    >.button{
+        min-width: 5rem;
+    }
 }
 .modal-inner {
     padding: 0.75rem;
@@ -66,7 +104,6 @@
         font-size: 0.6rem;
         line-height: 1.8rem;
     }
-
 }
 .modal-close{
     position: absolute;
@@ -236,67 +273,6 @@ html.with-statusbar-overlay {
     }
 }
 
-// Actions
-.actions-modal {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    z-index: 11000;
-    width: 100%;
-    transform: translate3d(0,100%,0);
-    background: $actions-modal-bg-color;
-    border-radius: $actions-modal-border-radius;
-    min-height: 2rem;
-    &.modal-in {
-        transition-duration: $actions-modal-duration;
-        transform: translate3d(0,0,0);
-    }
-    &.modal-out {
-        z-index: 11000-1;
-        transition-duration: $actions-modal-duration;
-        transform: translate3d(0,100%,0);
-    }
-    .modal-header{
-        padding: 0.35rem;
-        margin-bottom: 0.5rem;
-    }
-    .modal-title{
-        font-size: 0.75rem;
-        color: $actions-modal-title-color;
-    }
-    .modal-close{
-        right: 0.6rem;
-    }
-    &.theme-black{
-        background: $theme-actions-modal-bg-color;
-        .modal-title, span{
-            color: $theme-actions-modal-title-color;
-        }
-        > .actions-button-cancel{
-            color: $theme-actions-modal-title-color !important;
-            @include hairline(top, $theme-actions-modal-color-split);
-        }
-    }
-}
-.actions-modal-group {
-    padding: 0.4rem;
-}
-.actions-button-cancel{
-    color: $color-text-gray !important;
-    position: relative;
-    padding: 0.3rem 0.5rem;
-    height: 2.1rem;
-    line-height: 1.5rem;
-    text-align: center;
-    text-decoration: none;
-    font-size: 0.6rem;
-    display: block;
-    @include hairline(top, $actions-modal-color-split);
-    >i.icon{
-        @include size(0.6rem);
-    }
-}
-
 // toast
 .toast {
   background: rgba(0, 0, 0, .8);
@@ -306,7 +282,7 @@ html.with-statusbar-overlay {
   height: 2rem;
   line-height: 2rem;
   font-size: 0.6rem;
-  width: auto;
+  width: fit-content;
   box-sizing: content-box;
 }
 // Picker
@@ -350,5 +326,103 @@ html.with-statusbar-overlay {
                 background: $color-primary;
             }
         }
+    }
+}
+
+// Actions
+.actions-modal {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 10600;
+    width: 100%;
+    min-height: 2rem;
+    background: $actions-modal-bg-color;
+    border-radius: $actions-modal-border-radius;
+    @include animated($actions-modal-duration);
+
+    &.modal-in {
+        @include fadeInUp;
+    }
+    &.modal-out {
+        z-index: 10600-1;
+        @include fadeOutDown;
+    }
+    &.topping{
+        z-index: 10800;
+    }
+    .modal-header{
+        padding: 0.35rem;
+        margin-bottom: 0.5rem;
+    }
+    .modal-title{
+        font-size: 0.75rem;
+        color: $actions-modal-title-color;
+    }
+    .modal-close{
+        right: 0.6rem;
+    }
+    &.theme-black{
+        background: $theme-actions-modal-bg-color;
+        .modal-title, span{
+            color: $theme-actions-modal-title-color;
+        }
+        > .actions-button-cancel{
+            color: $theme-actions-modal-title-color !important;
+            @include hairline(top, $theme-actions-modal-color-split);
+        }
+    }
+}
+.actions-modal-group {
+    padding: 0.4rem;
+}
+.actions-button-cancel{
+    color: $color-text-gray !important;
+    position: relative;
+    padding: 0.3rem 0.5rem;
+    height: 2.1rem;
+    line-height: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.6rem;
+    display: block;
+    @include hairline(top, $actions-modal-color-split);
+    >i.icon{
+        @include size(0.6rem);
+    }
+}
+
+// Popup
+.popup-overlay {
+    z-index: 10000;
+
+    &.topping{
+        z-index: 10800;
+    }
+}
+.popup-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10200;
+    color: $color-text;
+    background-color: $color-bg;
+    box-sizing: border-box;
+    @include animated($popup-duration);
+    @include scrollable;
+
+    &.modal-in {
+        @include slideInRight;
+    }
+    &.modal-out {
+        @include slideOutRight;
+    }
+    &.topping{
+        z-index: 11000;
+    }
+    .popup-content {
+        padding: 0.75rem;
     }
 }

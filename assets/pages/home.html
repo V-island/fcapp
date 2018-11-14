@@ -12,38 +12,81 @@
         <div class="content pages-video" ref="wrapper">
             <div class="pages-wrapper">
                 <div class="pages-contents" ref="listWrapper">
-                    <div class="content-block section-live">
-                        {{if LiveList}}
-                            <div class="row box-cards">
-                                {{each LiveList}}
-                                    <div class="col-50 card card-list" data-user-info="{{$value}}">
-                                        <div class="card-content">
-                                            <div class="media" style="background-image: url({{$value.everyday_img}});"></div>
-                                            <div class="showdom">
-                                                <span class="tag-label">{{$value.live_price}}/{{PUBLIC.Billing}}</span>
-                                                {{if $value.status == 1}}
-                                                    <span class="tag-label busy">{{PUBLIC.Status.Busy}}</span>
-                                                {{else if $value.status == 3}}
-                                                    <span class="tag-label waiting">{{PUBLIC.Status.Waiting}}</span>
-                                                {{/if}}
+                    <div class="content-block bg-black section-live">
+                        <div class="row box-cards box-lives">
+                            {{if LivesList}}
+                                {{if LivesList.length == 1}}
+                                    {{each LivesList}}
+                                        <div class="col-100 card card-live card-live-blurry" data-id="{{$value.user_id}}" data-room-type="{{$value.live_room_type}}" data-price="{{$value.live_price}}">
+                                            <div class="blurry-showdom" style="background-image: url({{$value.everyday_img}});"></div>
+                                            <div class="card-content" style="background-image: url({{$value.everyday_img}});">
+                                                <div class="cards-top">
+                                                    <span class="live-label theme-danger">
+                                                        {{if $value.live_room_type == 1}}
+                                                            {{PUBLIC.LIVE_MODE.Private}}
+                                                        {{else if $value.live_room_type == 2}}
+                                                            {{PUBLIC.LIVE_MODE.Party}}
+                                                        {{else if $value.live_room_type == 3}}
+                                                            {{PUBLIC.LIVE_MODE.Gold}}
+                                                        {{else if $value.live_room_type == 4}}
+                                                            {{PUBLIC.LIVE_MODE.Sexy}}
+                                                        {{/if}}
+                                                    </span>
+                                                    <span class="live-label theme-live">{{HOME.Live.Title}}</span>
+                                                </div>
+                                                <div class="cards-bottom">
+                                                    <div class="user-info">
+                                                        <div class="user-img avatar-female">
+                                                            {{if $value.user_head}}
+                                                                <img src="{{$value.user_head}}">
+                                                            {{/if}}
+                                                        </div>
+                                                        <p class="user-name">{{$value.user_name}}</p>
+                                                    </div>
+                                                    <div class="user-heat">{{$value.fans_number}}</div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="card-foot">
-                                            <div class="user-img avatar-female">
-                                                <img src="{{$value.user_head}}">
+                                    {{/each}}
+                                {{else}}
+                                    {{each LivesList}}
+                                        <div class="col-50 card card-live" data-id="{{$value.user_id}}" data-room-type="{{$value.live_room_type}}" data-price="{{$value.live_price}}">
+                                            <div class="card-content" style="background-image: url({{$value.everyday_img}});">
+                                                <div class="cards-top">
+                                                    <span class="live-label">
+                                                        {{if $value.live_room_type == 1}}
+                                                            {{PUBLIC.LIVE_MODE.Private}}
+                                                        {{else if $value.live_room_type == 2}}
+                                                            {{PUBLIC.LIVE_MODE.Party}}
+                                                        {{else if $value.live_room_type == 3}}
+                                                            {{PUBLIC.LIVE_MODE.Gold}}
+                                                        {{else if $value.live_room_type == 4}}
+                                                            {{PUBLIC.LIVE_MODE.Sexy}}
+                                                        {{/if}}
+                                                    </span>
+                                                    <span class="live-label theme-live">{{HOME.Live.Title}}</span>
+                                                </div>
                                             </div>
-                                            <div class="foot-info">
-                                                <h3 class="name">
-                                                    {{$value.user_name}}
-                                                </h3>
-                                                <p class="txt">{{$value.heat}} {{PUBLIC.Heat}}</p>
+                                            <div class="card-foot">
+                                                <div class="user-img avatar-female">
+                                                    {{if $value.user_head}}
+                                                        <img src="{{$value.user_head}}">
+                                                    {{/if}}
+                                                </div>
+                                                <div class="foot-info">
+                                                    <h3 class="name">{{$value.user_name}}</h3>
+                                                    <p class="txt">{{$value.fans_number}} {{PUBLIC.Heat}}</p>
+                                                </div>
                                             </div>
                                         </div>
+                                    {{/each}}
+                                    <div class="col-100">
+                                        <a class="load-more color-primary" href="#/home/liveList">{{HOME.Video.Free.More}}</a>
                                     </div>
-                                {{/each}}
-                            </div>
-                            <!-- /.box-cards -->
-                        {{/if}}
+                                {{/if}}
+                            {{/if}}
+                        </div>
+                        <!-- /.box-cards -->
                     </div>
 
                     <div class="content-block section-video">
@@ -56,7 +99,7 @@
                             <!-- /.tag -->
                         {{/if}}
 
-                        <div class="row box-cards" data-page="1">
+                        <div class="row box-cards box-videos" data-page="1">
                             {{if FreeVideoList}}
                                 <div class="col-100 cards-header video-header">
                                     <p>{{HOME.Video.Free.Title}}</p>
@@ -64,9 +107,9 @@
                                 </div>
                                 {{each FreeVideoList}}
                                     <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                        <div class="card-content">
-                                            <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                            <div class="showdom">
+                                        <div class="card-content" style="background-image: url({{$value.img_url}});">
+                                            <div class="cards-top"></div>
+                                            <div class="cards-bottom">
                                                 <p class="summary-txt">{{$value.video_description}}</p>
                                                 <div class="video-info">
                                                     <div class="user-info">
@@ -104,12 +147,11 @@
                                 </div>
                                 {{each VideoList}}
                                     <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                        <div class="card-content">
-                                            <div class="card-video-header">
+                                        <div class="card-content" style="background-image: url({{$value.img_url}});">
+                                            <div class="cards-top">
                                                 <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
                                             </div>
-                                            <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                            <div class="showdom">
+                                            <div class="cards-bottom">
                                                 <p class="summary-txt">{{$value.video_description}}</p>
                                                 <div class="video-info">
                                                     <div class="user-info">

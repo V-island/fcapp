@@ -1,5 +1,5 @@
-import Template from 'art-template/lib/template-web';
 import EventEmitter from './eventEmitter';
+import { closeModal, popupPart } from '../components/Modal';
 import {
     fcConfig
 } from './intro';

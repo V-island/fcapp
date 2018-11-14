@@ -1,26 +1,28 @@
 <!-- live list -->
 <script id="list_cards" type="text/html">
-    <div class="col-50 card card-list" data-user-info="{{CardsList}}">
-        <div class="card-content">
-            <div class="media" style="background-image: url({{CardsList.everyday_img}});"></div>
-            <div class="showdom">
-                <span class="tag-label">{{CardsList.live_price}}/{{PUBLIC.Billing}}</span>
-                {{if CardsList.status == 1}}
-                    <span class="tag-label busy">{{PUBLIC.Status.Busy}}</span>
-                {{else if CardsList.status == 3}}
-                    <span class="tag-label waiting">{{PUBLIC.Status.Waiting}}</span>
-                {{/if}}
+    <div class="col-50 card card-live" data-channel-id="{{LiveList.id}}">
+        <div class="card-content" style="background-image: url({{LiveList.everyday_img}});">
+            <div class="cards-top">
+                <span class="tag-label">
+                    {{if LiveList.status == 1}}
+                        {{PUBLIC.LIVE_MODE.Private}}
+                    {{else if LiveList.status == 2}}
+                        {{PUBLIC.LIVE_MODE.Party}}
+                    {{else if LiveList.status == 3}}
+                        {{PUBLIC.LIVE_MODE.Gold}}
+                    {{else if LiveList.status == 4}}
+                        {{PUBLIC.LIVE_MODE.Sexy}}
+                    {{/if}}
+                </span>
             </div>
         </div>
         <div class="card-foot">
             <div class="user-img avatar-female">
-                <img src="{{CardsList.user_head}}">
+                <img src="{{LiveList.user_head}}">
             </div>
             <div class="foot-info">
-                <h3 class="name">
-                    {{CardsList.user_name}}
-                </h3>
-                <p class="txt">{{CardsList.heat}} {{PUBLIC.Status.Heat}}</p>
+                <h3 class="name">{{LiveList.user_name}}</h3>
+                <p class="txt">{{LiveList.heat}} {{PUBLIC.Heat}}</p>
             </div>
         </div>
     </div>
@@ -28,15 +30,14 @@
 
 <!-- small video list -->
 <script id="list_videos" type="text/html">
-    <div class="col-50 card card-video" data-user-info="{{VideosList}}">
-        <div class="card-content">
-            {{if NotFreeVideos}}
-            <div class="card-video-header">
-                <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
+    <div class="col-50 card card-video" data-user-info="{{$VideosList}}">
+        <div class="card-content" style="background-image: url({{$VideosList.img_url}});">
+            <div class="cards-top">
+                {{if NotFreeVideos}}
+                    <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
+                {{/if}}
             </div>
-            {{/if}}
-            <div class="media" style="background-image: url({{VideosList.img_url}});"></div>
-            <div class="showdom">
+            <div class="cards-bottom">
                 <p class="summary-txt">{{VideosList.video_description}}</p>
                 <div class="video-info">
                     <div class="user-info">

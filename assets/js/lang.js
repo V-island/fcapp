@@ -1,24 +1,25 @@
 // lang
 import US from '../lang/en_US.json';
 
-const adminBase = '../assets/';
+const adminBase = '../';
+
 const LANG_NAME = 'LANG';
 const LangDefault = {
-    'zh_CN': `${adminBase}lang/zh_CN.json`,
-	'en_US': `${adminBase}lang/en_US.json`,
-	'ja_JP': `${adminBase}lang/ja_JP.json`,
-    'pt_BR': `${adminBase}lang/pt_BR.json`,
-    'en_UK': `${adminBase}lang/en_GB.json`,
-    'de_DE': `${adminBase}lang/de_DE.json`,
-    'id_IN': `${adminBase}lang/id_IN.json`,
-    'th_TH': `${adminBase}lang/th_TH.json`,
-    'ko_KR': `${adminBase}lang/ko_KR.json`,
-    'cd_CA': `${adminBase}lang/cd_CA.json`,
-    'ms_MY': `${adminBase}lang/ms_MY.json`,
-    'id_ID': `${adminBase}lang/id_ID.json`,
-    'en_PH': `${adminBase}lang/en_PH.json`,
-    'zh_SG': `${adminBase}lang/zh_SG.json`,
-    'ms_BN': `${adminBase}lang/ms_BN.json`
+    'zh_CN': `${adminBase}assets/lang/zh_CN.json`,
+	'en_US': `${adminBase}assets/lang/en_US.json`,
+	'ja_JP': `${adminBase}assets/lang/ja_JP.json`,
+    'pt_BR': `${adminBase}assets/lang/pt_BR.json`,
+    'en_GB': `${adminBase}assets/lang/en_GB.json`,
+    'de_DE': `${adminBase}assets/lang/de_DE.json`,
+    'id_IN': `${adminBase}assets/lang/id_IN.json`,
+    'th_TH': `${adminBase}assets/lang/th_TH.json`,
+    'ko_KR': `${adminBase}assets/lang/ko_KR.json`,
+    'cd_CA': `${adminBase}assets/lang/cd_CA.json`,
+    'ms_MY': `${adminBase}assets/lang/ms_MY.json`,
+    'id_ID': `${adminBase}assets/lang/id_ID.json`,
+    'en_PH': `${adminBase}assets/lang/en_PH.json`,
+    'zh_SG': `${adminBase}assets/lang/zh_SG.json`,
+    'ms_BN': `${adminBase}assets/lang/ms_BN.json`
 };
 
 /**

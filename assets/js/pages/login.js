@@ -1,8 +1,8 @@
 import Template from 'art-template/lib/template-web';
+import { FacebookPlugin, TwitterPlugin } from '../components/ThirdPartyPlugin';
 import EventEmitter from '../eventEmitter';
 import Modal from '../modal';
-import FacebookLogin from '../FacebookLogin';
-import TwitterLogin from '../TwitterLogin';
+
 import {
     getLangConfig
 } from '../lang';
@@ -34,8 +34,8 @@ export default class Login extends EventEmitter {
 
 	    extend(this.options, options);
 
-	    this.FB = new FacebookLogin();
-		this.Twitter = new TwitterLogin();
+	    this.FB = new FacebookPlugin();
+		this.Twitter = new TwitterPlugin();
 	    this._init(element);
 	}
 

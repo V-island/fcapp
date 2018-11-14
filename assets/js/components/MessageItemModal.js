@@ -3,6 +3,7 @@ import { Spinner } from './Spinner';
 import Modal from '../modal';
 
 import {
+    body,
     sendBirdConfig
 } from '../intro';
 
@@ -94,12 +95,7 @@ class MessageItemSystem {
             setData(itemMessageThumb, 'id', videoId);
             itemMessageThumb.appendChild(iconPlay);
             messageItem.appendChild(itemMessageThumb);
-        }else {
-            const btnDetails = createDivEl({className: ['button', 'fill-success', 'btn-details'], content: LANG.MESSAGE.Details});
-            messageItem.appendChild(btnDetails);
-        }
 
-        if (isOpenChannel) {
             addEvent(itemMessageThumb, 'click', () => {
                 Spinner.start(body);
                 playVideo(videoId).then((data) => {
@@ -111,6 +107,9 @@ class MessageItemSystem {
                     });
                 });
             });
+        }else {
+            const btnDetails = createDivEl({className: ['button', 'fill-success', 'btn-details'], content: LANG.MESSAGE.Details});
+            messageItem.appendChild(btnDetails);
         }
 
         return messageItem;

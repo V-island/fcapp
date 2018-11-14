@@ -72,7 +72,7 @@ $names: search, filter, arrow-back, home, favorite, live, message, me, female, m
 // Live Icon
 // -----------------------------
 
-$lives: attention, add-attention, close, news, share, gift, thumbs-upion, thumbs-float, cutover, confirm, cancel, local-upload;
+$lives: attention, add-attention, close, news, share, gift, thumbs-upion, thumbs-float, cutover, confirm, cancel, local-upload, beauty, shield, sticker;
 
 @each $live in $lives {
     .live-#{$live}{

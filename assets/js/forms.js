@@ -44,8 +44,8 @@ const phonesRule = {
     'th_TH': /^\d{9,10}$/,
     'ko_KR': /^01\d{9}$/,
     'cd_CA': /^\d{7}$/,
-    'ms_MY': /^(\+?6?01){1}(([145]{1}(\-|\s)?\d{7,8})|([236789]{1}(\s|\-)?\d{7}))$/,
-    'id_ID': /^[2-7]\d{6,9}$/,
+    'ms_MY': /^([145]{1}(\-|\s)?\d{7,8})|([236789]{1}(\s|\-)?\d{7})$/,
+    'id_ID': /^[8-9]\d{7,10}$/,
     'en_PH': /^91\d{8}$/,
     'zh_SG': /^[89]\d{7}$/,
     'ms_BN': /^\d{7}$/
@@ -191,7 +191,9 @@ export default class Forms {
                 });
 
                 if (phonesRule[this.Country.language_code].test(_value)) {
-                    return sendVerificationCode(this.Country.phone_code + _value).then(() => {
+                    return sendVerificationCode(this.Country.phone_code + _value).then((data) => {
+                        if (!data) return Spinner.remove();
+
                         inputEl.setAttribute(this.options.disabledClass, this.options.disabledClass);
                         addClass(this.btnVerificationEl[0], this.options.disabledClass);
                         addCountdown(this.btnVerificationEl[0], inputEl, this.options.disabledClass, 60);

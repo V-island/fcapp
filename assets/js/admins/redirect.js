@@ -103,7 +103,7 @@ function login_twitter(network) { //登录方法，并将twitter 作为参数传
 	}, log);
 }
 
-// js调用了android中的hello方法
+// js调用了android中的payRedirect类中hello方法
 function callAndroid(){
 	if (window.payRedirect) {
 		window.payRedirect.hello();

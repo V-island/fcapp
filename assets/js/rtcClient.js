@@ -2,7 +2,7 @@ import Template from 'art-template/lib/template-web';
 import * as moment from 'moment';
 import BScroll from 'better-scroll';
 import EventEmitter from './eventEmitter';
-import AgoraRTC from './components/AgoraRTCSDK-2.3.1';
+import AgoraRTC from './components/AgoraRTCSDK-2.5.0';
 import Modal from './modal';
 import {
     fcConfig,

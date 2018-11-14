@@ -1,6 +1,6 @@
 // import Template from 'art-template/lib/template-web';
-import { Spinner } from '../components/Spinner';
-import { MessageItemSystem, MessageItemModal } from '../components/MessageItemModal';
+import { Spinner } from './Spinner';
+import { MessageItemSystem, MessageItemModal } from './MessageItemModal';
 
 import SendBirdAction from '../SendBirdAction';
 import SendBirdChatEvent from '../SendBirdChatEvent';

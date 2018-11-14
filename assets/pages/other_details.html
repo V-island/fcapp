@@ -41,7 +41,7 @@
             <div class="other-details-content slide-wrapper">
                 <div class="slide-content">
                     <div class="slide-item">
-                        <div class="list-table">
+                        <div class="content-block list-table">
                             <div class="item">
                                 <div class="item-label">{{PERSONAL_DETAIL.Age.Title}}</div>
                                 <div class="item-control">{{UserDetail.user_age}} {{PERSONAL_DETAIL.Age.Unit}}</div>
@@ -106,16 +106,15 @@
                                     {{if VideoList}}
                                         {{each VideoList}}
                                             <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                                <div class="card-content">
-                                                    <div class="card-video-header">
+                                                <div class="card-content" style="background-image: url({{$value.img_url}});">
+                                                    <div class="cards-top not-reverse">
                                                         {{if $value.type == 1}}
                                                             <span class="status-label free">{{PUBLIC.Free}}</span>
                                                         {{else if $value.type == 2}}
                                                             <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
                                                         {{/if}}
                                                     </div>
-                                                    <div class="media" style="background-image: url({{$value.img_url}});"></div>
-                                                    <div class="showdom">
+                                                    <div class="cards-bottom">
                                                         <p class="summary-txt">{{$value.video_description}}</p>
                                                         <div class="video-info">
                                                             <div class="user-info">
@@ -149,28 +148,7 @@
                                 </div>
                                 <!-- /.box-cards -->
                             </div>
-                            <div class="pullup-wrapper">
-                                <div class="loading-down">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            </div>
-                            <!-- /.pullup-wrapper -->
                         </div>
-
-                        <div class="pulldown-wrapper">
-                            <div class="loading-down">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                        <!-- /.pulldown-wrapper -->
                     </div>
                     <!-- /.slide-item -->
                 </div>

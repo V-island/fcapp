@@ -1,7 +1,6 @@
-import BScroll from 'better-scroll';
 import Template from 'art-template/lib/template-web';
+import { PullLoad } from '../components/PullLoad';
 import EventEmitter from '../eventEmitter';
-
 import {
 	fcConfig
 } from '../intro';
@@ -35,9 +34,6 @@ export default class Favorite extends EventEmitter {
 	    this.data = {};
 	    this.options = {
 	    	favoriteWrapper: '.favorite-wrapper',
-            favoriteContent: '.favorite-contents',
-            pulldownClass: '.pulldown-wrapper',
-            pullupClass: '.pullup-wrapper',
 	    	listFavoriteClass: 'list-favorite',
 	    	btnFollwClass: 'btn-follow',
 	    	listsPageIndex: 'page',
@@ -54,9 +50,10 @@ export default class Favorite extends EventEmitter {
 	}
 
 	init(element) {
-		let _page = 1;
-		let _number = 10;
-		let getFollowList = followList(_page, _number, 1);
+		this._page = 1;
+		this._number = 10;
+		this._type = 1;
+		let getFollowList = followList(this._page, this._number, this._type);
 
 		Promise.all([getFollowList]).then((data) => {
 			this.data.FollowList = data[0] ? data[0] : false;
@@ -75,14 +72,9 @@ export default class Favorite extends EventEmitter {
 
 	_init() {
 		this.pagesFavoriteEl = this.FavoriteEl.querySelector(this.options.favoriteWrapper);
-		this.contentsFavoriteEl = this.pagesFavoriteEl.querySelector(this.options.favoriteContent);
 		this.listFavoriteEl = this.pagesFavoriteEl.getElementsByClassName(this.options.listFavoriteClass)[0];
-		this.contentsFavoriteEl.style.minHeight = `${this.pagesFavoriteEl.offsetHeight + 1}px`;
 
-		this.pullDownEl = this.FavoriteEl.querySelector(this.options.pulldownClass);
-		this.pullUpEl = this.FavoriteEl.querySelector(this.options.pullupClass);
-
-		this._pagesVideo();
+		this._FollwPullLoad();
 		this._bindEvent();
 	}
 
@@ -90,7 +82,7 @@ export default class Favorite extends EventEmitter {
 		this.btnFollwEl = this.FavoriteEl.getElementsByClassName(this.options.btnFollwClass);
 
 		Array.prototype.slice.call(this.btnFollwEl).forEach(follwEl => {
-			this._cardVideoEvent(follwEl);
+			this._cardFollwEvent(follwEl);
 		});
 	}
 
@@ -115,83 +107,69 @@ export default class Favorite extends EventEmitter {
 	}
 
 	// Video 模块
-	_pagesVideo() {
-		let pullDownRefresh = false,
-			pullDownInitTop = -50;
-
-		this.favoriteSwiper = new BScroll(this.options.favoriteWrapper, {
+	_FollwPullLoad() {
+		const FollwPullLoad = new PullLoad(this.pagesFavoriteEl, {
+			probeType: 1,
 			startY: 0,
 			scrollY: true,
 			scrollX: false,
-			probeType: 3,
 			click: true,
+			tap: true,
+			bounce: true,
 			pullDownRefresh: {
 				threshold: 50,
 				stop: 20
 			},
 			pullUpLoad: {
-				threshold: -20
-			},
-			mouseWheel: true,
-			bounce: true
+				threshold: 0
+			}
 		});
 
 		// 下拉刷新
-		this.favoriteSwiper.on('pullingDown', () => {
-			pullDownRefresh = true;
+		FollwPullLoad.onPullingDown = () => {
+			return new Promise((resolve) => {
+				followList(this._page, this._number, this._type).then((data) => {
+					if (!data) return;
 
-			followList(1, 10, 1).then((data) => {
-				if (!data) return;
+					this.listFavoriteEl.innerHTML = '';
 
-				this.listFavoriteEl.innerHTML = '';
-
-				data.forEach((itemData, index) => {
-					this.data.FollowList = itemData;
-					this.data.HeaderVideos = true;
-					this.listFavoriteEl.append(createDom(Template.render(this.tpl.list_favorite_items, this.data)));
-				});
-
-				setData(this.listFavoriteEl, this.options.listsPageIndex, 1);
-
-				pullDownRefresh = false;
-				this.pullDownEl.style.top = '-1rem';
-				this.favoriteSwiper.finishPullDown();
-				this.favoriteSwiper.refresh();
-				this._bindEvent();
-			});
-		});
-
-		// 上拉加载
-		this.favoriteSwiper.on('pullingUp', () => {
-			let _page = getData(this.listFavoriteEl, this.options.listsPageIndex);
-			_page = parseInt(_page) + 1;
-
-			followList(_page, 10, 1).then((data) => {
-				if (data) {
 					data.forEach((itemData, index) => {
 						this.data.FollowList = itemData;
 						this.data.HeaderVideos = true;
-
-						let element = createDom(Template.render(this.tpl.list_favorite_items, this.data));
-						this._cardVideoEvent(element);
-						this.listFavoriteEl.append(element);
+						this.listFavoriteEl.append(createDom(Template.render(this.tpl.list_favorite_items, this.data)));
 					});
 
-					setData(this.listFavoriteEl, this.options.listsPageIndex, _page);
-				}
-				this.favoriteSwiper.finishPullUp();
-				this.favoriteSwiper.refresh();
+					setData(this.listFavoriteEl, this.options.listsPageIndex, 1);
+					this._bindEvent();
+					resolve(true);
+				});
 			});
-		});
+		};
 
-		this.favoriteSwiper.on('scroll', (pos) => {
-			if (pullDownRefresh) {
-				return;
-			}
-			this.pullDownEl.style.top = Math.min(pos.y + pullDownInitTop, 10)+ 'px';
-		})
+		// 上拉加载
+		FollwPullLoad.onPullingUp = () => {
+			let _page = getData(this.listFavoriteEl, this.options.listsPageIndex);
+			_page = parseInt(_page) + 1;
+
+			return new Promise((resolve) => {
+				followList(_page, this._number, this._type).then((data) => {
+					if (data) {
+						data.forEach((itemData, index) => {
+							this.data.FollowList = itemData;
+							this.data.HeaderVideos = true;
+
+							let element = createDom(Template.render(this.tpl.list_favorite_items, this.data));
+							this._cardFollwEvent(element);
+							this.listFavoriteEl.append(element);
+						});
+
+						setData(this.listFavoriteEl, this.options.listsPageIndex, _page);
+					}
+					resolve(true);
+				});
+			});
+		};
 	}
-
 
 	static attachTo(element, options) {
 	    return new Favorite(element, options);

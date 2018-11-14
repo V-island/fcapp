@@ -1,8 +1,7 @@
 import Template from 'art-template/lib/template-web';
+import { FacebookPlugin, TwitterPlugin } from './components/ThirdPartyPlugin';
 import BScroll from 'better-scroll';
 import EventEmitter from './eventEmitter';
-import FacebookLogin from './FacebookLogin';
-import TwitterLogin from './TwitterLogin';
 import SendBirdAction from './SendBirdAction';
 import SignalingClient from './signalingClient';
 import Client from './client';
@@ -100,8 +99,8 @@ export default class VideoPreview extends EventEmitter {
         extend(this.options, options);
 
         this.videoPreviewFile = fcConfig.publicFile.client_rtc;
-        this.FB = new FacebookLogin();
-        this.Twitter = new TwitterLogin();
+        this.FB = new FacebookPlugin();
+        this.Twitter = new TwitterPlugin();
         this.init();
     }
 

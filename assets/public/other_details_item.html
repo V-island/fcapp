@@ -1,18 +1,17 @@
 <!-- small video list -->
 <script id="list_videos_item" type="text/html">
     <div class="col-50 card card-video" data-user-info="{{VideosList}}">
-        <div class="card-content">
+        <div class="card-content" style="background-image: url({{VideosList.img_url}});">
             {{if HeaderVideos}}
-            <div class="card-video-header">
-                {{if VideosList.type == 1}}
-                    <span class="status-label free">{{PUBLIC.Free}}</span>
-                {{else if VideosList.type == 2}}
-                    <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
-                {{/if}}
-            </div>
+                <div class="cards-top not-reverse">
+                    {{if VideosList.type == 1}}
+                        <span class="status-label free">{{PUBLIC.Free}}</span>
+                    {{else if VideosList.type == 2}}
+                        <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
+                    {{/if}}
+                </div>
             {{/if}}
-            <div class="media" style="background-image: url({{VideosList.img_url}});"></div>
-            <div class="showdom">
+            <div class="cards-bottom">
                 <p class="summary-txt">{{VideosList.video_description}}</p>
                 <div class="video-info">
                     <div class="user-info">
@@ -59,23 +58,24 @@
 <!-- small video list -->
 <script id="list_my_videos_item" type="text/html">
     <div class="col-50 card card-video" data-id="{{VideosList.id}}" data-url="{{VideosList.video_url}}">
-        <div class="card-content">
-            <div class="card-video-header">
-                {{if VideosList.status == 1}}
-                    <span class="status-label review">{{PUBLIC.Review}}</span>
-                {{else if VideosList.status == 2}}
-                    {{if VideosList.type == 1}}
-                        <span class="status-label free">{{PUBLIC.Free}}</span>
-                    {{else if VideosList.type == 2}}
-                        <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
+        <div class="card-content" style="background-image: url({{VideosList.img_url}});">
+            {{if HeaderVideos}}
+                <div class="cards-top">
+                    <i class="icon user-close-video btn-close-video"></i>
+                    {{if VideosList.status == 1}}
+                        <span class="status-label review">{{PUBLIC.Review}}</span>
+                    {{else if VideosList.status == 2}}
+                        {{if VideosList.type == 1}}
+                            <span class="status-label free">{{PUBLIC.Free}}</span>
+                        {{else if VideosList.type == 2}}
+                            <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>
+                        {{/if}}
+                    {{else if VideosList.status == 3}}
+                        <span class="status-label refuse">{{PUBLIC.Refuse}}</span>
                     {{/if}}
-                {{else if VideosList.status == 3}}
-                    <span class="status-label refuse">{{PUBLIC.Refuse}}</span>
-                {{/if}}
-                <i class="icon user-close-video btn-close-video"></i>
-            </div>
-            <div class="media" style="background-image: url({{VideosList.img_url}});"></div>
-            <div class="showdom">
+                </div>
+            {{/if}}
+            <div class="cards-bottom">
                 <p class="summary-txt">{{VideosList.video_description}}</p>
                 <div class="video-info">
                     <p class="video-time">{{VideosList.create_time | dateFormat 'YYYY-MM-DD'}}</p>

@@ -66,6 +66,27 @@ export const addCountdown = (element, inputEl, disabledClass, val) => {
     }
 };
 
+// Math.ceil();  //向上取整。
+
+// Math.floor();  //向下取整。
+
+// Math.round();  //四舍五入。
+
+// Math.random();  //0.0 ~ 1.0 之间的一个伪随机数。【包含0不包含1】 //比如0.8647578968666494
+
+// Math.ceil(Math.random()*10);      // 获取从1到10的随机整数 ，取0的概率极小。
+
+// Math.round(Math.random());   //可均衡获取0到1的随机整数。
+
+// Math.floor(Math.random()*10);  //可均衡获取0到9的随机整数。
+
+// Math.round(Math.random()*10);  //基本均衡获取0到10的随机整数，其中获取最小值0和最大值10的几率少一半。
+
+// 生成随机整数
+export const random = num => {
+    return Math.ceil(Math.random()*num);
+};
+
 // 保存
 export const setLocalStorage = (name, data) =>{
     return localStorage.setItem(name, JSON.stringify(data));
@@ -199,6 +220,12 @@ export const getUuid = () => {
   });
 };
 
+//用于生成ClientId
+export const getClientId = () => {
+  let data = new Date().getTime();
+  return data;
+};
+
 // 防XSS
 export const protectFromXSS = text => {
   return typeof text === 'string'
@@ -285,6 +312,17 @@ export const timestampFromNow = timestamp => {
     return moment(timestamp).fromNow();
 };
 
+export const hourFromNow = (sec) => {
+    return moment(sec, 'mm:ss').startOf('hour').fromNow();
+};
+
+export const countFromNow = (start, end) => {
+    const _start = moment(start);
+    const _end   = moment(end);
+
+    return _end.from(_start, true);
+};
+
 export const secToTime = (timestamp) => {
     var t;
     if(timestamp > -1){
@@ -303,6 +341,33 @@ export const secToTime = (timestamp) => {
         t += sec.toFixed();
     }
     return t;
+}
+
+export const setTimes = (str) => {
+    const data = str.split(':');
+    let times;
+    switch(data.length) {
+        case 1:
+            times = parseInt(data[0]);
+            break;
+        case 2:
+            times = (parseInt(data[0]) * 60) + parseInt(data[1]);
+            break;
+        case 3:
+            times = (parseInt(data[0]) * 60) + (parseInt(data[1]) * 60) + parseInt(data[2]);
+            break;
+    }
+    return times;
+}
+
+export const setTimesFormat = (times) => {
+    let time = [];
+    let minute = `${parseInt(parseInt(times) / 60)}`;
+    let second = `${parseInt(parseInt(times) % 60)}`;
+
+    time.push(minute.length < 2 ? `0${minute}` : minute);
+    time.push(second.length < 2 ? `0${second}` : second);
+    return time.join(':');
 }
 
 // 版本

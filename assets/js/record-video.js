@@ -299,15 +299,16 @@ export default class RecordVideo extends EventEmitter {
         livesVideo.appendChild(video);
         wrapper.appendChild(livesVideo);
 
+        const content = createDivEl({className: 'record-content'});
         const livesHeader = createDivEl({className: 'lives-header'});
         const closeIcon = createDivEl({element: 'i', className: ['icon', options.closeClass]});
         const cutoverIcon = createDivEl({element: 'i', className: ['icon', options.cutoverClass]});
         livesHeader.appendChild(closeIcon);
         livesHeader.appendChild(cutoverIcon);
-        wrapper.appendChild(livesHeader);
+        content.appendChild(livesHeader);
 
         const livesTimes = createDivEl({className: 'lives-times', content: '00:00:00'});
-        wrapper.appendChild(livesTimes);
+        content.appendChild(livesTimes);
 
         const livesButtons = createDivEl({className: ['lives-buttons', 'record-buttons']});
         const cancelIcon = createDivEl({element: 'i', className: ['icon', options.cancelClass]});
@@ -316,15 +317,17 @@ export default class RecordVideo extends EventEmitter {
         livesButtons.appendChild(cancelIcon);
         livesButtons.appendChild(recordBtn);
         livesButtons.appendChild(confirmIcon);
-        wrapper.appendChild(livesButtons);
+        content.appendChild(livesButtons);
 
         const uploadIcon = createDivEl({element: 'i', className: ['icon', 'lives-localUpload', options.localUploadClass]});
-        wrapper.appendChild(uploadIcon);
+        content.appendChild(uploadIcon);
 
         if (!options.newDayVideo) {
             const livesRemark = createDivEl({element: 'p', className: options.livesRemarkClass, content: RECORD_LANG.Prompt.Checked});
-            wrapper.appendChild(livesRemark);
+            content.appendChild(livesRemark);
         }
+
+        wrapper.appendChild(content);
 
         return wrapper;
     }

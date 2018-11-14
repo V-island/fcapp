@@ -13,17 +13,29 @@ import Favorite from './pages/favorite';
 import Message from './pages/message';
 import User from './pages/user';
 
+// 直播模块
+import Live from './pages/live';
+import LiveList from './pages/live_list';
+import LiveAnchor from './pages/live_anchor';
+
+
 import FreeVideo from './pages/free_video';
+
 import OtherDetails from './pages/other_details';
 
 // 用户中心
 import UserDetail from './pages/user_detail';
 import UserVideo from './pages/user_video';
 import UserWatch from './pages/user_watch';
+import UserPrice from './pages/user_price';
+import UserProof from './pages/user_proof';
+import UserInvite from './pages/user_invite';
+import UserBlacklist from './pages/user_blacklist';
 
 import UserAccount from './pages/user_account';
 import UserAccountHistory from './pages/user_account_history';
 import UserAccountTerms from './pages/user_account_terms';
+
 import UserScore from './pages/user_score';
 import UserScoreHistory from './pages/user_score_history';
 import UserScoreWithdraw from './pages/user_score_withdraw';
@@ -129,6 +141,22 @@ export const fcConfig = {
             init: 1
         }]
     }, {
+        name: 'live',
+        path: `${adminBase}pages/live.html`,
+        component: Live,
+        init: 1,
+        children: [{
+            name: 'anchor',
+            path: `${adminBase}pages/live_anchor.html`,
+            component: LiveAnchor,
+            init: 1
+        }, {
+            name: 'liveList',
+            path: `${adminBase}pages/live_list.html`,
+            component: LiveList,
+            init: 1
+        }]
+    }, {
         name: 'favorite',
         path: `${adminBase}pages/favorite.html`,
         component: Favorite,
@@ -160,6 +188,10 @@ export const fcConfig = {
             path: `${adminBase}pages/user_watch.html`,
             component: UserWatch
         }, {
+            name: 'price',
+            path: adminBase + '../pages/user_price.html',
+            component: UserPrice
+        }, {
             name: 'account',
             path: `${adminBase}pages/user_account.html`,
             component: UserAccount,
@@ -186,6 +218,18 @@ export const fcConfig = {
                 path: `${adminBase}pages/user_score_withdraw.html`,
                 component: UserScoreWithdraw
             }]
+        }, {
+            name: 'proof',
+            path: adminBase + '../pages/user_proof.html',
+            component: UserProof
+        }, {
+            name: 'invite',
+            path: adminBase + '../pages/user_invite.html',
+            component: UserInvite
+        }, {
+            name: 'blacklist',
+            path: adminBase + '../pages/user_blacklist.html',
+            component: UserBlacklist
         }, {
             name: 'setting',
             path: `${adminBase}pages/user_setting.html`,
@@ -215,13 +259,13 @@ export const fcConfig = {
 export const domainURL = location.pathname == '/' ? location.origin : location.origin + location.pathname;
 
 // Server 地址配置
-export const baseURL = 'https://shineliveapp.com/live-app/open/gate.do';
+// export const baseURL = 'https://shineliveapp.com/live-app/open/gate.do';
 // export const baseURL = 'https://13.57.137.240:8443/live-app/open/gate';
 // export const baseURL = 'https://52.53.136.48:8443/live-app/open/gate';
 // export const baseURL = 'http://52.53.136.48:8080/live-app/open/gate';
 // 本地地址
 // export const baseURL = 'http://192.168.1.36:8080/open/gate.do';
-// export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
+export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
 
 // 直播配置
 export const agoraConfig = {
@@ -238,6 +282,18 @@ export const sendBirdConfig = {
     sendBirdAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
     sendBirdSandboxAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
     sendBirdAppURL: 'https://api.sendbird.com',
+    customerUserId: 339,
+    customerIds: 'CS_01',
+    customerName: 'Customer service',
+    customerType: 'customer'
+};
+
+export const pubnubConfig = {
+    pubnub: true, // 默认使用pubnub DSK
+    publishKey: 'pub-c-d8599c43-cecf-42ba-a72f-aa3b24653c2b',
+    subscribeKey: 'sub-c-6c6c021c-c4e2-11e7-9628-f616d8b03518',
+    // publishKey: 'pub-c-d569fe13-e17f-48b5-b630-dd9312021dba',
+    // subscribeKey: 'sub-c-f4900850-dda0-11e8-94b4-42638ad66e25',
     customerUserId: 339,
     customerIds: 'CS_01',
     customerName: 'Customer service',

@@ -33,6 +33,7 @@ $color-money: $color-gift-txt;
 //分割线的颜色
 $color-bg: #383840;
 $color-text: #fff;
+$color-light-black: #222;
 $color-black: #000;
 //文案色
 $color-text-active: #ff00ff;
@@ -81,29 +82,6 @@ $tag-txt-color: #fff;
 $tag-bg-color: transparent;
 $tag-bg-color-active: #4E87FA;
 $tag-recharge-border-default: $tag-border-width solid $color-text-gray-light;
-
-// Modal
-// ---------------------------------------------------
-$modal-bg-color: #3D4150;
-$modal-close-color: $color-text-secondary;
-$modal-buton-color: $modal-bg-color;
-$modal-buton-bg: $color-primary;
-$modal-buton-active-bg: #d4d4d4;
-$modal-duration: 400ms;
-$modal-border-radius: 0.1rem;
-$modal-input-bg-color: #2C2C33;
-$modal-input-text-color: #666;
-$actions-modal-bg-color: $color-text;
-$actions-modal-title-color: $color-text-gray;
-$actions-modal-duration: 300ms;
-$actions-modal-border-radius: 0.2rem 0.2rem 0 0;
-$actions-modal-color-split: #F1F1F1;
-$popup-bg-color: $color-text-gray;
-$popup-gradient-color-top: #313443;
-$popup-gradient-color-bottom: #535969;
-$popup-duration: 400ms;
-$picker-text-color: #B2B2B2;
-$picker-text-color-active: $color-text;
 
 // Buttons
 // --------------------------------------------------
@@ -167,10 +145,3 @@ $live-btnRecord-color: $color-primary;
 $live-btnRecordEnd-color: #FF5E5E;
 $live-upload-bg-color: #535969;
 $live-upload-duration: 200ms;
-// Theme-black
-// ---------------------------------------------------
-// Modal
-// ---------------------------------------------------
-$theme-actions-modal-bg-color: #535969;
-$theme-actions-modal-title-color: $color-text;
-$theme-actions-modal-color-split: #666;

@@ -4,7 +4,8 @@ import {
 } from './intro';
 import {
     isNull,
-    isNumber
+    isNumber,
+    isObject
 } from './util';
 
 let instance = null;
@@ -147,7 +148,8 @@ export default class SendBirdAction {
     }
 
     // 创建开放频道
-    createOpenChannel(channelName) {
+    createOpenChannel(channelName, customType) {
+
         return new Promise((resolve, reject) => {
             channelName ? this.sb.OpenChannel.createChannel(channelName, null, null, (openChannel, error) => {
                     error ? reject(error) : resolve(openChannel);
@@ -157,7 +159,7 @@ export default class SendBirdAction {
         });
     }
 
-    // 输入状态
+    // 输入一个开放频道
     enter(channelUrl) {
         return new Promise((resolve, reject) => {
             this.sb.OpenChannel.getChannel(channelUrl, (openChannel, error) => {
@@ -165,7 +167,7 @@ export default class SendBirdAction {
                     reject(error);
                 } else {
                     openChannel.enter((response, error) => {
-                        error ? reject(error) : resolve();
+                        error ? reject(error) : resolve(openChannel);
                     });
                 }
             });
@@ -293,6 +295,21 @@ export default class SendBirdAction {
         });
     }
 
+    // 加入公共群组频道作为会员
+    join(channelUrl) {
+        return new Promise((resolve, reject) => {
+            this.sb.GroupChannel.getChannel(channelUrl, (groupChannel, error) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    groupChannel.join((response, error) => {
+                        error ? reject(error) : resolve();
+                    });
+                }
+            });
+        });
+    }
+
     // 频道离开状态
     leave(channelUrl) {
         return new Promise((resolve, reject) => {
@@ -361,8 +378,8 @@ export default class SendBirdAction {
     }
 
     // 发送频道消息
-    sendChannelMessage({channel, message, data, handler}) {
-        return channel.sendUserMessage(message, JSON.stringify(data), (message, error) => {
+    sendChannelMessage({channel, message, data, type, handler}) {
+        return channel.sendUserMessage(message, isObject(data) ? JSON.stringify(data) : data, type, (message, error) => {
             if (handler) handler(message, error);
         });
     }
