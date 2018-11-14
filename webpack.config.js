@@ -18,9 +18,7 @@ module.exports = {
 			'./assets/js/components/webcomponents-bundle'
 		],
 		slScript: [
-			// './assets/js/zepto-adapter',
 			'./assets/js/lang',
-			// './assets/js/device',
 			'./assets/js/fastclick',
 			'./assets/js/init',
 			'./assets/js/router',

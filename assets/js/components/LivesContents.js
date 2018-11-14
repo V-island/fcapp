@@ -1033,14 +1033,10 @@ class LivesAnchorOffline {
         this.data = data;
         this.options = {
             wrapperClass: 'lives-wrapper',
-            headerClass: 'lives-header'
+            headerClass: 'lives-header',
             contentClass: 'lives-content'
         };
         this.element = this._createElement();
-    }
-
-    get acrossUrl() {
-        return this.data.user_head ? protectFromXSS(this.data.user_head) : acrossFemaleImg;
     }
 
     get acrossUrl() {

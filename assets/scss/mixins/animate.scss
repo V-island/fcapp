@@ -1686,7 +1686,7 @@
   }
 }
 
-.rotateLoop {
+@mixin rotateLoop {
   -webkit-animation-name: rotateLoop;
   animation-name: rotateLoop;
 }

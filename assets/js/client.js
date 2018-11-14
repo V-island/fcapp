@@ -86,7 +86,7 @@ export default class Client extends EventEmitter {
                 this._onGiftsCall(_info.gift_id);
             }
             if (_info.status == 'settlement') {
-                console.log('用户退出');
+                console.log('用户退出')
             }
         });
 

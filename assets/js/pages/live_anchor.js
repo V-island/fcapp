@@ -143,10 +143,24 @@ export default class LiveAnchor extends EventEmitter {
 
 		// 一对一直播
 		livesAnchor.onParty = () => {
+			const {userHead} = getUserInfo();
 			this.listWrapperEl.parentNode.removeChild(livesAnchor.element);
+			const handler = () => {
 
+			};
+			const minimize = () => {
+
+			};
+			const livesWaiting = new LivesWaiting({
+				handler,
+				minimize,
+				data: {
+					userHead: userHead
+				}
+			});
 			popup({
-				
+				element: livesWaiting.element,
+				notPadding: true
 			});
 			// Spinner.start(body);
 			// beginLive(this.liveRoomId, 1).then((data) => {
