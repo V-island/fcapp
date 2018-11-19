@@ -28,6 +28,10 @@ import loveBlueIcon from '../../img/lives/love-blue@2x.png';
 import loveDeepBlueIcon from '../../img/lives/love-deep-blue@2x.png';
 import lovePurpleIcon from '../../img/lives/love-purple@2x.png';
 
+import enterAvatar from '../../img/lives/enter-avatar@2x.png';
+import enterBg from '../../img/lives/enter-bg@2x.png';
+import enterDrop from '../../img/lives/enter-drop@2x.png';
+
 // 弹幕
 class NewsItem {
     constructor(data) {
@@ -159,21 +163,70 @@ class GiftItem {
     _createElement(handler) {
         const label = createDivEl({element: 'label', className: this.options.labelClass});
 
+        const floatIcon = createDivEl({element: 'i', className: ['icon', 'float-icon'], background: this.imgUrl});
         const icon = createDivEl({element: 'i', className: 'icon', background: this.imgUrl});
         const name = createDivEl({element: 'p', className: 'name', content: this.name});
         const title = createDivEl({element: 'p', content: this.price+ ' ' +LANG.LIVE_PREVIEW.Actions.Coins});
 
+        label.appendChild(floatIcon);
         label.appendChild(icon);
         label.appendChild(name);
         label.appendChild(title);
 
         addEvent(label, 'click', () => {
             addClass(label, this.options.showCalss);
-            if (handler) handler(label, this.id, this.price, this.name, this.imgUrl);
+            if (handler) handler(label, floatIcon, this.id, this.price, this.name, this.imgUrl);
         });
         return label;
     }
 }
+
+// 用户进场
+class ArrivalsItem {
+    constructor({data}) {
+        this.data = data;
+        this.options = {
+            itemClass: 'arrivals-item',
+            avatarClass: 'enter-avatar',
+            dropClass: 'enter-drop'
+        };
+        this.element = this._createElement();
+    }
+
+    get acrossUrl() {
+        return this.data.profileUrl ? protectFromXSS(this.data.profileUrl) : acrossMaleImg;
+    }
+
+    get name() {
+        return this.data.nickname ? `${this.data.nickname}` : `${LANG.MESSAGE.Anonymous}`;
+    }
+
+    _createElement() {
+        const item = createDivEl({className: this.options.itemClass});
+
+        const itemDrop = createDivEl({className: this.options.dropClass, background: enterDrop});
+        item.appendChild(itemDrop);
+
+        // across
+        const acrossInfo = createDivEl({className: ['user-info', 'across']});
+        const acrossAvatar = createDivEl({className: this.options.avatarClass, background: enterAvatar});
+        const acrossImg = createDivEl({element: 'img', className: 'user-img'});
+        acrossImg.src = this.acrossUrl;
+        acrossInfo.appendChild(acrossAvatar);
+        acrossInfo.appendChild(acrossImg);
+        item.appendChild(acrossInfo);
+
+        const Title = createDivEl({element: 'p', className: 'title'});
+        const TitleSpan = createDivEl({element: 'span', content: this.name});
+        const TitleFont = createDivEl({element: 'font', content: `${LANG.LIVE_PREVIEW.Live_Arrivals.Text}`});
+        Title.appendChild(TitleSpan);
+        Title.appendChild(TitleFont);
+        item.appendChild(Title);
+
+        return item;
+    }
+}
+
 
 // 贴图
 class StickerItem {
@@ -246,10 +299,7 @@ class NotCoinsItem {
     constructor({data, handler}) {
         this.data = data;
         this.options = {
-            labelClass: 'gift-label',
-            dataId: 'id',
-            dataUrl: 'url',
-            showCalss: 'active'
+            groupClass: 'notCoins-group'
         };
         this.element = this._createElement(handler);
     }
@@ -267,13 +317,22 @@ class NotCoinsItem {
     }
 
     _createElement(handler) {
-        const label = createDivEl({element: 'label', className: ['icon', this.options.labelClass], background: this.imgUrl});
+        const group = createDivEl({className: this.options.groupClass});
 
-        addEvent(label, 'click', () => {
-            addClass(label, this.options.showCalss);
-            if (handler) handler(label, this.id);
+        const groupText = createDivEl({element: 'p'});
+        const groupTime = createDivEl({element: 'font', className: 'color-danger', content: this.time});
+        const groupSpan = createDivEl({element: 'span', content: this.text.replace('%S', groupTime)});
+
+        groupText.appendChild(groupSpan);
+        group.appendChild(groupText);
+
+        const button = createDivEl({className: ['button', 'button-primary'], content: this.button});
+        addEvent(button, 'click', () => {
+            if (handler) handler();
         });
-        return label;
+        group.appendChild(button);
+
+        return group;
     }
 }
 
@@ -473,4 +532,4 @@ class PayItem {
 }
 
 
-export { NewsItem, GiftBox, GiftItem, StickerItem, LovesItem, NotCoinsItem, ReceiveGiftItem, GiftCountItem, RechargeItem, PayItem };
+export { NewsItem, GiftBox, GiftItem, ArrivalsItem, StickerItem, LovesItem, NotCoinsItem, ReceiveGiftItem, GiftCountItem, RechargeItem, PayItem };

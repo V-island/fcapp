@@ -25,7 +25,7 @@
         "Madal": {
             "NotCoins": {
                 "Title": "Not enough coins",
-                "Text": "Your gold coins will be used after %S please recharge in time",
+                "Text": "Your gold coins will be used %S please recharge in time",
                 "Text_Coins": "The balance is not enough, please recharge first",
                 "ButtonsText": "Buy now"
             },
@@ -337,7 +337,6 @@
         "Buttons": {
             "Title": "Sign up",
             "Title_Bind": "Bind"
-
         },
         "Safeguard": {
             "Title": "Safeguard"
@@ -549,11 +548,21 @@
             "Chat_Length": "Chat length",
             "Increase_Score": "Increase Score",
             "Text": "The gift received on this broadcast",
+            "Not_Gift": "You have not received any gifts yet",
+            "Waiting": {
+                "Title": "please waiting",
+                "Text": "The data is being calculated"
+            },
             "Buttons_Yes": "Take a rest",
             "Buttons_Live_Again": "Live Again"
         },
         "Live_Countdown": {
-            "Title": "Show start at"
+            "Title": "Show start at",
+            "Text": "Show time",
+            "Explain": "It's show time!"
+        },
+        "Live_Arrivals": {
+            "Text": "is welcome to enter the live room"
         },
         "Live_Fuzzy_Layer": {
             "Title": "Not enough coins",
@@ -562,6 +571,11 @@
         },
         "Live_Anchor": {
             "Title": "Choose the type of live stream you want to start"
+        },
+        "Lives_Waiting": {
+            "Title": "Live successful",
+            "Text": "Online users are searching,please wait...",
+            "Buttons": "Minimize"
         },
         "Feedback": {
             "Title": "Feedback",
@@ -602,6 +616,16 @@
                 "Title": "Maybe shi is busy，you can leave her a message",
                 "Buttons_Maybe": "Maybe later",
                 "Buttons_Details": "Details"
+            },
+            "NotCoins": {
+                "Title": "Not enough coins",
+                "Text": "go and buy enough coins to enjoy crazy",
+                "Buttons": "Buy now"
+            },
+            "GoldShowProgress": {
+                "Title": "gold show in progress",
+                "Text": "Do you want to join in? Many people are waiting for you",
+                "Buttons": "confirm"
             },
             "QuitLive": {
                 "Text": "Are you sure you want to quit?"
@@ -668,6 +692,10 @@
         "Country": "Country",
         "No_More": "No more~",
         "Terms_Of_Service": "Terms of Service",
+        "Status": {
+            "Busy": "繁忙",
+            "Waiting": "等待"
+        },
         "LIVE_MODE": {
             "Private": "Private chat",
             "Party": "Party chat",

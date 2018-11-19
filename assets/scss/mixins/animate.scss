@@ -998,6 +998,47 @@
   animation-name: slideInLeft;
 }
 
+@-webkit-keyframes slideInLeftLoop {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  50% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes slideInLeftLoop {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  50% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@mixin slideInLeftLoop {
+  -webkit-animation-name: slideInLeftLoop;
+  animation-name: slideInLeftLoop;
+}
+
 @-webkit-keyframes slideInRight {
   from {
     -webkit-transform: translate3d(100%, 0, 0);
@@ -1124,6 +1165,37 @@
 @mixin slideOutLeft {
   -webkit-animation-name: slideOutLeft;
   animation-name: slideOutLeft;
+}
+
+@-webkit-keyframes slideOutLeftBig {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+  }
+
+  to {
+    visibility: hidden;
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes slideOutLeftBig {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+  }
+
+  to {
+    visibility: hidden;
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@mixin slideOutLeftBig {
+  -webkit-animation-name: slideOutLeftBig;
+  animation-name: slideOutLeftBig;
 }
 
 @-webkit-keyframes slideOutRight {
@@ -1592,6 +1664,52 @@
   animation-name: zoomOutUp;
 }
 
+
+@-webkit-keyframes zoomOutUpSub {
+  40% {
+    opacity: 1;
+    -webkit-transform: scale3d(1.575, 1.575, 1.575) translate3d(0, 20px, 0);
+    transform: scale3d(1.575, 1.575, 1.575) translate3d(0, 20px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+
+  to {
+    opacity: 0;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -400px, 0);
+    transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -400px, 0);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+  }
+}
+
+@keyframes zoomOutUpSub {
+  40% {
+    opacity: 1;
+    -webkit-transform: scale3d(1.575, 1.575, 1.575) translate3d(0, 20px, 0);
+    transform: scale3d(1.575, 1.575, 1.575) translate3d(0, 20px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+
+  to {
+    opacity: 0;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -400px, 0);
+    transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -400px, 0);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+  }
+}
+
+@mixin zoomOutUpSub {
+  -webkit-animation-name: zoomOutUpSub;
+  animation-name: zoomOutUpSub;
+}
+
 /**
  * float Exits
  */
@@ -1667,8 +1785,8 @@
   to {
     -webkit-transform-origin: center;
     transform-origin: center;
-    -webkit-transform: rotate3d(0, 0, 1, 200deg);
-    transform: rotate3d(0, 0, 1, 200deg);
+    -webkit-transform: rotate3d(0, 0, 1, 360deg);
+    transform: rotate3d(0, 0, 1, 360deg);
   }
 }
 
@@ -1681,8 +1799,8 @@
   to {
     -webkit-transform-origin: center;
     transform-origin: center;
-    -webkit-transform: rotate3d(0, 0, 1, 200deg);
-    transform: rotate3d(0, 0, 1, 200deg);
+    -webkit-transform: rotate3d(0, 0, 1, 360deg);
+    transform: rotate3d(0, 0, 1, 360deg);
   }
 }
 
@@ -1718,4 +1836,10 @@
     @include animated($time);
     -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
+}
+
+@mixin animated-timing($value) {
+    -webkit-animation-timing-function: $value;
+    -moz-animation-timing-function: $value;
+    animation-timing-function: $value;
 }

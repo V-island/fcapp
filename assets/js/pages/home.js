@@ -1,9 +1,11 @@
 import Template from 'art-template/lib/template-web';
+import { LivesCallingClient } from '../components/LivesContents';
+import { closeModal, alert, popup } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import { PullLoad } from '../components/PullLoad';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 import VideoPreview from '../videoPreview';
+import SendBirdAction from '../SendBirdAction';
 import {
 	body,
 	fcConfig
@@ -18,7 +20,8 @@ import {
     videoType,
     playVideo,
     getUserInfo,
-    setUserInfo
+    setUserInfo,
+    checkLogin
 } from '../api';
 
 import {
@@ -32,23 +35,12 @@ import {
     addClass,
     toggleClass,
     removeClass,
+    errorAlert,
     importTemplate
 } from '../util';
 
 const LANG = getLangConfig();
 const MADAL = LANG.HOME.Madal;
-const modal = new Modal();
-
-const liveDom = [{
-	everyday_img: "https://usa-imges.s3.us-west-1.amazonaws.com/1541403877342.jpg",
-	fans_number: 1,
-	live_price: 2,
-	live_room_id: 64521560,
-	live_room_type: 2,
-	user_head: "https://usa-imges.s3.us-west-1.amazonaws.com/1536633775311.jpg",
-	user_id: 12,
-	user_name: "Geraldine"
-}];
 
 const INIT_INDEX = 2;
 
@@ -118,7 +110,7 @@ export default class Home extends EventEmitter {
 			this.data.FreeVideoList = data[0] ? data[0] : false;
 			this.data.VideoList = data[1] ? data[1] : false;
 			this.data.VideoType = data[2] ? data[2] : false;
-			this.data.LivesList = data[3] ? data[3] : liveDom;
+			this.data.LivesList = data[3] ? data[3] : false;
 
 			this.HomeEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.HomeEl);
@@ -130,6 +122,10 @@ export default class Home extends EventEmitter {
 		importTemplate(this.homeFile, (id, _template) => {
 		    this.tpl[id] = _template;
 		});
+
+		if (!checkLogin()) {
+			this._createIMChannel();
+		}
 	}
 
 	_init() {
@@ -157,12 +153,7 @@ export default class Home extends EventEmitter {
 	_bindEvent() {
 		if (this.cardsLivesEl.length > 0) {
 	    	Array.prototype.slice.call(this.cardsLivesEl).forEach(ItemEl => {
-	    		addEvent(ItemEl, 'click', () => {
-	    			let id = getData(ItemEl, 'id');
-	    			let type = getData(ItemEl, 'roomType');
-	    			let price = getData(ItemEl, 'price');
-	    			return location.href = jumpURL(`#/live?anchorid=${id}&type=${type}&price=${type}`);
-	            });
+	    		this._liveClientEvent(ItemEl);
 	    	});
 		}
 
@@ -222,8 +213,156 @@ export default class Home extends EventEmitter {
 		}
 	}
 
+	// 链接IM服务
+	_createIMChannel() {
+		const {userId} = getUserInfo();
+		const SendBird = new SendBirdAction();
+
+		return new Promise((resolve) => {
+			SendBird.connect(userId).then(user => {
+				resolve(true);
+			}).catch(() => {
+				errorAlert('SendBird connection failed.');
+				resolve(false);
+			});
+		});
+	}
+
 	static attachTo(element, options) {
 	    return new Home(element, options);
+	}
+
+	_liveClientEvent(ItemEl) {
+		addEvent(ItemEl, 'click', () => {
+			let anchorId = getData(ItemEl, 'id');
+			let price = getData(ItemEl, 'price');
+			let roomId = getData(ItemEl, 'roomId');
+			let roomType = getData(ItemEl, 'roomType');
+			let status = getData(ItemEl, 'status');
+			let clientName = getData(ItemEl, 'name');
+			let clientHead = getData(ItemEl, 'head');
+
+			let { userPackage } = (roomType == '1' || roomType == '3') ? getUserInfo() : {userPackage: 0};
+
+			switch (roomType) {
+				case '1':
+					if (status != '3') return false;
+
+					if (userPackage >= parseInt(price)) {
+						return this._livesCalling({clientName, clientHead, anchorId, roomId, roomType, price});
+					}
+					return alert({
+						title: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Title}`,
+						text: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Text}`,
+						button: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Buttons}`,
+						callback: () => {
+							return location.href = jumpURL('#/user/account');
+						}
+					});
+					break;
+				case '2':
+					location.href = jumpURL(`#/live?anchorid=${anchorId}&type=${roomType}&price=${price}`);
+					break;
+				case '3':
+					if (userPackage >= parseInt(price)) {
+						return alert({
+							title: `${LANG.LIVE_PREVIEW.Madal.GoldShowProgress.Title}`,
+							text: `${LANG.LIVE_PREVIEW.Madal.GoldShowProgress.Text}`,
+							button: `${LANG.LIVE_PREVIEW.Madal.GoldShowProgress.Buttons}`,
+							callback: () => {
+								return location.href = jumpURL(`#/live?anchorid=${anchorId}&type=${roomType}&price=${price}`);
+							}
+						});
+					}
+					return alert({
+						title: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Title}`,
+						text: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Text}`,
+						button: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Buttons}`,
+						callback: () => {
+							return location.href = jumpURL('#/user/account');
+						}
+					});
+					break;
+			}
+        });
+	}
+
+	_livesCalling({clientName, clientHead, anchorId, roomId, roomType, price}) {
+		const { userSex } = getUserInfo();
+		SendBirdAction.getInstance()
+			.createChannelWithUserIds(anchorId)
+			.then(groupChannel => {
+				let modalEl;
+				const pass = () => {
+					closeModal(modalEl);
+					return location.href = jumpURL(`#/live?anchorid=${anchorId}&type=${roomType}&price=${price}`);
+				};
+				const redial = ({anchor_id, room_id, room_type, room_price}) => {
+					closeModal(modalEl);
+
+					switch (room_type) {
+						case '1':
+							this._livesCalling({
+								anchorId: anchor_id ? anchor_id : anchorId,
+								roomId: room_id ? room_id : roomId,
+								roomType: room_type ? room_type : roomType,
+								price: room_price ? room_price : price
+							});
+							break;
+						default:
+							location.href = jumpURL(`#/live?anchorid=${anchor_id}&type=${room_type}&price=${room_price}`);
+							break;
+					}
+				};
+				const close = () => {
+					closeModal(modalEl);
+				};
+				const cancel = () => {
+					closeModal(modalEl);
+					SendBirdAction.getInstance()
+					    .sendChannelMessage({
+					        channel: groupChannel,
+					        message: '',
+					        data: '',
+					        type: 'cancel'
+					    });
+				};
+				const callback = () => {
+					return showLiveList();
+				};
+				const livesCalling = new LivesCallingClient({
+					pass,
+					redial,
+					close,
+					cancel,
+					callback,
+					channel: groupChannel,
+					data: {
+						userHead: clientHead,
+						userName: clientName
+					}
+				});
+				modalEl = popup({
+					element: livesCalling.element,
+					notPadding: true
+				});
+
+				SendBirdAction.getInstance()
+				    .sendChannelMessage({
+				        channel: groupChannel,
+				        message: '',
+				        type: 'invite',
+				        data: {
+				        	userSex: userSex,
+				        	live_room_id: roomId,
+				        	live_price: price
+				        }
+				    });
+
+			})
+			.catch(error => {
+				errorAlert(error.message);
+			});
 	}
 
 	_listEvent() {
@@ -240,9 +379,14 @@ export default class Home extends EventEmitter {
 			let { userPackage } = getUserInfo(this.options.dataUserPackage);
 
 			if (parseInt(userPackage / info.price) < 1) {
-			    return modal.alert(MADAL.NotCoins.Text, MADAL.NotCoins.Title, () => {
-			        return location.href = jumpURL('#/user');
-			    }, MADAL.NotCoins.ButtonsText);
+			    return alert({
+			    	title: `${LANG.HOME.Madal.NotCoins.Title}`,
+			    	text: `${LANG.HOME.Madal.NotCoins.Text}`,
+			    	button: `${LANG.HOME.Madal.NotCoins.ButtonsText}`,
+			    	callback: () => {
+			    		return location.href = jumpURL('#/user');
+			    	}
+			    });
 			}
 
 			Spinner.start(body);
@@ -311,6 +455,14 @@ export default class Home extends EventEmitter {
 						resolve(true);
 					});
 				});
+
+				// let getFreeVideo = videoClips(this._page, this._number, this.tagId, 1);
+				// let getVideoClips =videoClips(1, 10, this.tagId, 2);
+				// let getShowLiveList = showLiveList();
+
+				// Promise.all([getFreeVideo, getVideoClips, getShowLiveList]).then((data) => {
+
+				// });
 			});
 		};
 

@@ -30,6 +30,17 @@
             </div>
     	</header>
 
+        <nav class="bar nav-details">
+            <div class="bar-item btn-private-letter" data-ripple>
+                <i class="icon icon-private-letter"></i>
+                <span class="tab-label">{{OTHER_DETAILS.Private_Letter}}</span>
+            </div>
+            <div class="bar-item active btn-video-chat" data-name="{{UserDetail.user_name}}" data-head="{{UserDetail.user_head}}" data-id="{{UserDetail.user_id}}" data-room-id="{{UserDetail.anchor.live_room_id}}" data-room-type="{{UserDetail.anchor.live_room_type}}" data-price="{{UserDetail.live_price}}" data-status="{{UserDetail.anchor.status}}" data-ripple>
+                <i class="icon icon-video-chat"></i>
+                <span class="tab-label color-primary">{{OTHER_DETAILS.Video_Chat}}</span>
+            </div>
+        </nav>
+
         <!-- 这里是页面内容区 -->
         <div class="content other-details-wrapper">
             <div class="tab">

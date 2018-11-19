@@ -1,6 +1,7 @@
 import { closeModal, alert, popupPart } from './Modal';
 import {
-    checkAuth
+    checkAuth,
+    checkLogin
 } from '../api';
 import {
     getLangConfig
@@ -142,6 +143,9 @@ class TabMain {
         liveItem.appendChild(liveItemIcon);
         liveItem.appendChild(liveItemSpen);
         addEvent(liveItem, 'click', () => {
+            if (checkLogin()) {
+                return location.href = jumpURL('#/login/mobile');
+            }
         	if (!checkAuth()) {
         	    return alert({
         	    	title: `${LANG.HOME.Madal.DataIncomplete.Title}`,

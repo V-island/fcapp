@@ -11,13 +11,17 @@ $lives-button-party-colosr: rgba(255, 94, 94, 0.8);
 $lives-button-border-radius: 3rem;
 $live-floating-duration: 800ms;
 
+$live-showtime-duration: 800ms;
+
 $lives-footer-bg-color: rgba(51, 51, 51, .8);
 $lives-footer-title-font: 0.6rem;
 
 $popup-input-bg-color: #4C4C53;
 $popup-border-color: #444;
 
-$waiting-loading-duration: 800ms;
+$waiting-loading-duration: 2000ms;
+$waiting-arrivals-duration: 4000ms;
+
 // lives-wrapper/record-wrapper
 //--------------------------------
 .lives-wrapper{
@@ -93,19 +97,6 @@ $waiting-loading-duration: 800ms;
 		width: 100%;
 		height: 100%;
 		background: $live-mask-bg-color;
-	}
-
-	&.lives-video-us{
-		top: auto;
-		left: auto;
-		right: 0;
-		bottom: 1.05rem;
-		width: 4.9rem;
-		height: 7rem;
-
-		video.video{
-			background: $color-primary;
-		}
 	}
 }
 .lives-photo{
@@ -213,7 +204,7 @@ p.lives-remark{
 	position: absolute;
 	left: 0;
     bottom: 16rem;
-    max-height: 11rem;
+    max-height: 6rem;
     padding: 0.3rem 0;
     overflow-y: auto;
 
@@ -306,6 +297,12 @@ p.lives-remark{
 		background: $lives-button-party-colosr;
 	}
 
+	>.local-video{
+		width: 5rem;
+	    height: 7rem;
+		border-radius: 0.2rem;
+	}
+
 	&.top-right {
 		top: 5rem;
 		right: 0;
@@ -355,10 +352,108 @@ p.lives-remark{
 		font-size: 0.45rem;
 		line-height: 1;
 	}
+	>p.text,
 	>p.times {
 		color: $lives-countdown-color;
-		font-size: 0.75;
+		font-size: 0.75rem;
 		font-weight: bold;
+	}
+}
+// show Time
+.lives-showTime {
+	position: absolute;
+    top: 12rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    font-size: 0.7rem;
+    padding: 0.7rem;
+
+    @include animated($live-showtime-duration);
+
+    &.show {
+        @include zoomInDown;
+    }
+    &.hide {
+        @include zoomOut;
+    }
+}
+// 新人进场
+.lives-arrivals {
+	@include flex-spindle(start);
+	position: absolute;
+	top: 5rem;
+	left: 0;
+	right: 0;
+	z-index: 2;
+
+	>.arrivals-item {
+		@include flex-spindle(start);
+		@include animated($waiting-arrivals-duration);
+		@include animated-timing(linear);
+	    position: relative;
+		width: 15rem;
+		height: 2rem;
+		background: linear-gradient(to right,rgba(242,122,90,1) ,rgba(250,61,203, 0.3),rgba(250,61,203, 0));
+		border-radius: 2rem;
+		padding: 0.3rem;
+		overflow: hidden;
+
+		>.user-info.across {
+		    position: relative;
+			margin-right: 0.35rem;
+
+			>.user-img {
+				position: absolute;
+				top: 0;
+				left: 0.1rem;
+				margin-right: 0;
+			}
+			>.enter-avatar {
+				@include size(1.6rem);
+				@include animated-infinite($waiting-loading-duration);
+				@include animated-timing(linear);
+				@include rotateLoop;
+
+				background-repeat: no-repeat;
+			    background-position: center;
+			    background-size: cover;
+			}
+		}
+
+		>p.title {
+			font-size: 0.5rem;
+		    white-space: nowrap;
+		    font-weight: 600;
+	        line-height: 1.3rem;
+		    color: $color-text;
+	        text-align: left;
+
+		    >span {
+		    	color: $color-primary;
+	    	    margin-right: 0.2rem;
+		    }
+		}
+
+		>.enter-drop {
+			@include size(100%);
+			@include animated-infinite($waiting-loading-duration);
+			@include animated-timing(linear);
+			@include slideInLeftLoop;
+
+			background-position: center;
+			background-repeat: repeat;
+			background-size: contain;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: -1;
+		}
+
+		&.active {
+			@include slideOutLeftBig;
+		}
 	}
 }
 // 余额不足 模糊层
@@ -938,6 +1033,16 @@ p.lives-remark{
 .comments-forms{
     box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);
 }
+.notCoins-group{
+	>p {
+		font-size: 0.6rem;
+		color: $color-text-gray;
+		padding: 1rem 3rem;
+	}
+	>.button {
+		width: 11rem;
+	}
+}
 // 信息详情弹框
 .anchor-group{
 	@include spindle-vertical(column);
@@ -1149,6 +1254,7 @@ p.lives-remark{
 
 // 一对一直播
 //--------------------------------
+// 直播等待
 .waiting-wrapper {
 	>.waiting-header {
 		@include spindle-center(center);
@@ -1178,22 +1284,132 @@ p.lives-remark{
 	    }
 	}
 	>.waiting-content {
+		@include spindle-vertical(column);
+		padding: 2rem 0;
+
 		>.scan-box{
 			@include size(16rem);
+			position: relative;
+			background-repeat: no-repeat;
+		    background-position: center;
+		    background-size: cover;
 
 			.scan-loading {
-				@include size(3.15rem);
+				@include size(16rem);
 				@include animated-infinite($waiting-loading-duration);
+				@include animated-timing(linear);
 				@include rotateLoop;
+
 				background-repeat: no-repeat;
 			    background-position: center;
 			    background-size: cover;
+
+			    +.anchor-across {
+			    	@include size(5rem);
+		    		background-repeat: no-repeat;
+		    	    background-position: center;
+		    	    background-size: cover;
+					box-shadow: 0 0 0.5rem $color-text;
+				    border-radius: 50%;
+		    	    position: absolute;
+		    	    top: 5.5rem;
+		    	    left: 5.5rem;
+			    }
+			}
+
+			+p.title {
+				color: $color-text-gray-light;
+				font-size: 0.6rem;
+				margin-top: 1rem;
 			}
 		}
 	}
 	>.buttons {
 		.button {
-			min-width: 10rem;
+			min-width: 11rem;
+		}
+	}
+}
+
+// 呼叫
+.calling-wrapper {
+    padding: 3rem 0 0;
+
+	>.calling-content {
+		@include flex-spindle-center(center, column);
+
+	    &.refuse-content {
+	    	padding: 2rem 0;
+	    	>p {
+				font-size: 0.75rem;
+	    	}
+	    	>.tag-anchor {
+    		    margin: 2rem 0;
+	    	}
+	    }
+	}
+	.user-info {
+		@include flex-spindle-center(center, column);
+
+		.user-img {
+			@include size(5rem);
+
+			+.user-name {
+				font-size: 0.75rem;
+			    line-height: 2rem;
+
+				>i.icon {
+					@include size(0.7rem);
+					margin-left: 0.35rem;
+					vertical-align: text-top;
+				}
+
+			}
+
+		}
+	}
+	.calling-time {
+		font-size: 0.6rem;
+	}
+	.calling-surge {
+		text-align: center;
+		border: 0.2rem solid $color-text;
+		@include size(8.4rem);
+		border-radius: 50%;
+		line-height: 12rem;
+		font-size: 0.6rem;
+		color: $color-text;
+		position: relative;
+	    margin: 2rem auto;
+
+		&:after {
+		    content: "";
+		    border: 0.2rem solid rgba(255, 255, 255, 0.15);
+		    @include size(8.4rem);
+		    display: flex;
+		    position: absolute;
+		    top: -0.4rem;
+		    left: -0.4rem;
+		    border-radius: 50%;
+		}
+
+		.calling-sprite {
+			@include size(8.6rem);
+			position: absolute;
+		    top: 0;
+		    left: -0.6rem;
+		}
+	}
+	>.buttons {
+		&.buttons-block {
+			.button {
+				min-width: 6rem;
+			}
+		}
+		&.buttons-vertical {
+			.button {
+				min-width: 11rem;
+			}
 		}
 	}
 }

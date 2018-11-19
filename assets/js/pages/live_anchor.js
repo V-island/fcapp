@@ -1,4 +1,4 @@
-import { LivesContent, LivesContentAnchor, LivesWaiting, LivesAnchorCount } from '../components/LivesContents';
+import { LivesContent, LivesContentAnchor, LivesWaiting, LivesCallingAnchor, LivesAnchorCount } from '../components/LivesContents';
 import { closeModal, popup } from '../components/Modal';
 import { MessageChat } from '../components/MessageChat';
 import { Spinner } from '../components/Spinner';
@@ -39,7 +39,8 @@ export default class LiveAnchor extends EventEmitter {
 	    this.options = {
 	    	listWrapperClass: '.lives-wrapper',
 	    	listVideoClass: '.lives-video',
-	    	videoId: 'video'
+	    	videoId: 'video',
+	    	localVideoId: 'user-video'
         };
 
 	    extend(this.options, options);
@@ -51,7 +52,6 @@ export default class LiveAnchor extends EventEmitter {
 	init(element) {
 		const {userId, liveRoomId, iMChannel} = getUserInfo();
 		const getIMChannel = this._createIMChannel(userId);
-		console.log(userId, liveRoomId, iMChannel);
 
 		this.userId = userId;
 		this.liveRoomId = liveRoomId;
@@ -67,6 +67,8 @@ export default class LiveAnchor extends EventEmitter {
 
 	_init() {
 		this.listWrapperEl = this.LiveAnchorEl.querySelector(this.options.listWrapperClass);
+		this.listVideoEl = this.listWrapperEl.querySelector(this.options.listVideoClass);
+		this.VideoEl = this.listVideoEl.querySelector(`#${this.options.videoId}`);
 
 		this._bindEvent();
 		this._livesAnchorEvent();
@@ -78,8 +80,9 @@ export default class LiveAnchor extends EventEmitter {
 		this.client.connect().then(() => {
 			this.client.join(`${this.liveRoomId}`, this.userId).then((uid) => {
 				this.stream = new AgoraStream(uid);
+				this.clientUid = uid;
 
-				this.stream.setVideoProfile('480P_2');
+				this.stream.setVideoProfile('360p_4');
 				this.stream.connect().then(() => {
 					this.stream.play(this.options.videoId);
 				});
@@ -87,12 +90,13 @@ export default class LiveAnchor extends EventEmitter {
 		});
 	}
 
-	// 链接直播服务
+	// 链接IM服务
 	_createIMChannel(userId) {
 		const SendBird = new SendBirdAction();
 
 		return new Promise((resolve) => {
 			SendBird.connect(userId).then(user => {
+				this.createConnectionHandler();
 				resolve(true);
 			}).catch(() => {
 				errorAlert('SendBird connection failed.');
@@ -115,7 +119,7 @@ export default class LiveAnchor extends EventEmitter {
 		};
 
 		// 一对多直播
-		livesAnchor.onPrivate = () => {
+		livesAnchor.onParty = () => {
 			Spinner.start(body);
 			beginLive(this.liveRoomId, 2).then((data) => {
 				if (!data) return Spinner.remove();
@@ -130,7 +134,6 @@ export default class LiveAnchor extends EventEmitter {
 						this.openChannel = openChannel;
 
 						this.createHeartbeatHandler();
-						this.createConnectionHandler();
 						this._livesPrivateEvent();
 						Spinner.remove();
 					})
@@ -142,67 +145,108 @@ export default class LiveAnchor extends EventEmitter {
 		};
 
 		// 一对一直播
-		livesAnchor.onParty = () => {
+		livesAnchor.onPrivate = () => {
 			const {userHead} = getUserInfo();
-			this.listWrapperEl.parentNode.removeChild(livesAnchor.element);
-			const handler = () => {
+			Spinner.start(body);
+			beginLive(this.liveRoomId, 1).then((data) => {
+				if (!data) return Spinner.remove();
+				this.livePrice = data.live_price;
 
-			};
-			const minimize = () => {
+				Spinner.remove();
+				this.createHeartbeatHandler();
 
-			};
-			const livesWaiting = new LivesWaiting({
-				handler,
-				minimize,
-				data: {
-					userHead: userHead
-				}
+				let waitingEl,
+					livesWaiting;
+				const handler = ({channel, clientName, clientHead, clientSex, liveRoomId, livePrice}) => {
+					return this._livesCallingEvent({channel, clientName, clientHead, clientSex}).then(() => {
+						closeModal(waitingEl);
+						this.stream.close();
+						SendBirdAction.getInstance()
+						    .sendChannelMessage({
+						        channel: channel,
+						        message: '',
+						        type: 'agree',
+						        data: {
+						        	userSex: clientSex,
+						        	live_room_id: liveRoomId,
+						        	live_price: livePrice
+						        }
+						    });
+						this.listWrapperEl.parentNode.removeChild(livesAnchor.element);
+						this.groupChannel = channel;
+						const livesPrivate = this._livesPartyEvent();
+
+						this.VideoEl.removeChild(this.VideoEl.firstChild);
+
+						this.stream = new AgoraStream(this.clientUid);
+
+						this.stream.setVideoProfile('360p_4');
+						this.stream.connect().then(() => {
+							this.stream.play(this.options.localVideoId);
+
+							this.client.publish(this.stream.stream);
+
+							this.client.clientEmitter.on('stream-added', (evt) => {
+								let stream = evt.stream;
+								this.client.subscribe(stream);
+							});
+
+							// 该回调通知应用程序已接收远程音视频流
+							this.client.clientEmitter.on('stream-subscribed', (evt) => {
+							    let stream = evt.stream;
+							    stream.play(this.options.videoId);
+							});
+
+							// 已删除远程音视频流，即对方调用了 Client.unpublish
+							this.client.clientEmitter.on('stream-removed', (evt) => {
+							    let stream = evt.stream;
+							    this.client.unsubscribe(stream);
+							    livesPrivate.onClose();
+							});
+
+							this.client.clientEmitter.on('error', (err) => {
+						    	console.log("Got error msg:", err.reason);
+						  	});
+						});
+					}).catch((data) => {
+						livesWaiting.notInvite = true;
+						if (data) return false;
+						SendBirdAction.getInstance()
+						    .sendChannelMessage({
+						        channel: channel,
+						        message: '',
+						        type: 'refuse',
+						        data: ''
+						    });
+					});
+				};
+				const close = () => {
+					Spinner.start(body);
+					endLive(this.liveRoomId).then((data) => {
+						if (!data) return Spinner.remove();
+						clearInterval(this.heartbeatEvent);
+						Spinner.remove();
+						closeModal(waitingEl);
+					});
+				};
+				livesWaiting = new LivesWaiting({
+					handler,
+					close,
+					data: {
+						userHead: userHead
+					}
+				});
+				waitingEl = popup({
+					element: livesWaiting.element,
+					extraclass: 'fade',
+					notPadding: true
+				});
 			});
-			popup({
-				element: livesWaiting.element,
-				notPadding: true
-			});
-			// Spinner.start(body);
-			// beginLive(this.liveRoomId, 1).then((data) => {
-			// 	if (!data) return Spinner.remove();
-			// 	this.livePrice = data.live_price;
-
-			// 	this.listWrapperEl.parentNode.removeChild(livesAnchor.element);
-
-			// 	this.client.publish(this.stream.stream);
-			// 	this.client.clientEmitter.on('stream-added', (evt) => {
-			// 		let stream = evt.stream;
-			// 		console.log('该回调通知应用程序远程音视频流已添加');
-		 	//		console.log("New stream added: " + stream.getId());
-			// 		this.client.subscribe(stream);
-			// 	});
-
-			// 	// 该回调通知应用程序已接收远程音视频流
-			// 	this.client.clientEmitter.on('stream-subscribed', (evt) => {
-			// 	    let stream = evt.stream;
-			// 	    console.log('该回调通知应用程序已接收远程音视频流');
-			// 	    stream.play(this.options.videoId);
-			// 	});
-
-			// 	SendBirdAction.getInstance()
-			// 		.enter(this.iMChannel)
-			// 		.then(openChannel => {
-			// 			console.log('连接IM');
-			// 			this.openChannel = openChannel;
-			// 			this.createConnectionHandler();
-
-			// 			this._livesPartyEvent();
-			// 			Spinner.remove();
-			// 		})
-			// 		.catch(error => {
-			// 			errorAlert(error.message);
-			// 			Spinner.remove();
-			// 		});
-			// });
 		};
 		this.listWrapperEl.parentNode.appendChild(livesAnchor.element);
 	}
 
+	// 一对多窗口
 	_livesPrivateEvent() {
 		const {userHead, userName} = getUserInfo();
 
@@ -214,7 +258,8 @@ export default class LiveAnchor extends EventEmitter {
 				}
 			},
 			channel: this.openChannel,
-			client: false
+			client: false,
+			oneToMany: true
 		});
 		// 关闭直播
 		livesPrivate.onClose = () => {
@@ -224,7 +269,6 @@ export default class LiveAnchor extends EventEmitter {
 			this.stream.close();
 
 			endLive(this.liveRoomId).then((data) => {
-				if (!data) return Spinner.remove();
 				clearInterval(this.heartbeatEvent);
 
 				const leaveClient = this.client.leave();
@@ -244,28 +288,19 @@ export default class LiveAnchor extends EventEmitter {
 			        channel: this.openChannel,
 			        message: message,
 			        data: '',
-			        type: 'chats',
-			        handler: (message, error) => {
-			        	console.log(message);
-			        	console.log(error);
-			        }
+			        type: 'chats'
 			    });
 		};
 
 		// 发送开始收费直播消息
 		livesPrivate.onGetChargeShows = (second) => {
-			const handler = (message, error) => {
-				console.log(message);
-				console.log(error);
-			};
 
 			SendBirdAction.getInstance()
 			    .sendChannelMessage({
 			        channel: this.openChannel,
 			        message: '',
 			        type: 'chargeTime',
-			        data: `${second}`,
-			        handler
+			        data: `${second}`
 			    });
 		};
 
@@ -289,10 +324,94 @@ export default class LiveAnchor extends EventEmitter {
 		this.listWrapperEl.appendChild(livesPrivate.element);
 	}
 
+	// 一对一窗口
 	_livesPartyEvent() {
+		const {userHead, userName} = getUserInfo();
 
+		const livesPrivate = new LivesContent({
+			data: {
+				AnchorInfo: {
+					user_head: userHead,
+					user_name: userName
+				}
+			},
+			channel: this.groupChannel,
+			client: false,
+			oneToMany: false
+		});
+		// 关闭直播
+		livesPrivate.onClose = () => {
+			Spinner.start(body);
+
+			this.client.unpublish(this.stream.stream);
+			this.stream.close();
+
+			endLive(this.liveRoomId).then((data) => {
+				clearInterval(this.heartbeatEvent);
+
+				const leaveClient = this.client.leave();
+				const SendBirdDis = SendBirdAction.getInstance().disconnect();
+
+				Promise.all([leaveClient, SendBirdDis]).then((data) => {
+					Spinner.remove();
+					this._livesCountEvent({userHead, userName});
+				});
+			});
+		};
+
+		// 发送弹幕
+		livesPrivate.onNews = (message) => {
+			SendBirdAction.getInstance()
+			    .sendChannelMessage({
+			        channel: this.groupChannel,
+			        message: message,
+			        data: '',
+			        type: 'chats'
+			    });
+		};
+
+		this.listWrapperEl.appendChild(livesPrivate.element);
+
+		return livesPrivate;
 	}
 
+	// 呼叫窗口
+	_livesCallingEvent({channel, clientName, clientHead, clientSex}) {
+		return new Promise((resolve, reject) => {
+			let modalEl;
+			const agree = () => {
+				closeModal(modalEl);
+				resolve();
+			};
+			const refuse = () => {
+				closeModal(modalEl);
+				reject(false);
+			};
+			const cancel = () => {
+				closeModal(modalEl);
+				reject(true);
+			};
+			const livesCalling = new LivesCallingAnchor({
+				agree,
+				refuse,
+				cancel,
+				channel,
+				data: {
+					userHead: clientHead,
+					userName: clientName,
+					userSex: clientSex
+				}
+			});
+			modalEl = popup({
+				element: livesCalling.element,
+				extraclass: 'slider',
+				notPadding: true,
+				top: true
+			});
+		});
+	}
+
+	// 结算窗口
 	_livesCountEvent({userHead, userName}) {
 		let modalEl;
 		const handler = () => {
@@ -323,6 +442,7 @@ export default class LiveAnchor extends EventEmitter {
 		});
 	}
 
+	// 心跳检测
 	createHeartbeatHandler() {
 		// 心跳检测服务器连接
 		this.heartbeatEvent = setInterval(() => {

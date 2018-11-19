@@ -220,13 +220,8 @@ span.status-label {
         height: 8.05rem;
 
         .cards-bottom {
-            @include spindle-center(space-between);
-            height: 3rem;
-
-            > .user-heat {
-                font-size: 0.6rem;
-                font-weight: 500;
-            }
+            @include spindle-center(flex-end);
+            height: 2rem;
         }
     }
 
@@ -260,6 +255,16 @@ span.status-label {
 
             .user-info {
                 width: auto;
+            }
+
+            .cards-bottom {
+                @include spindle-center(space-between);
+                height: 3rem;
+
+                > .user-heat {
+                    font-size: 0.6rem;
+                    font-weight: 500;
+                }
             }
         }
     }

@@ -1997,6 +1997,7 @@ export const selAllGoods = () => {
  * @return {[type]} [description]
  */
 export const showLiveList = () => {
+
 	return new Promise((resolve) => {
 		getPost('/showLiveList', {}, (response) => {
 			resolve(response.data);

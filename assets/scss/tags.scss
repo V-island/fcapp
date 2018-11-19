@@ -2,7 +2,7 @@
 // ----------------------------------
 //
 .gift-wrapper{
-	overflow: hidden;
+	// overflow: hidden;
     height: 8.8rem;
     width: 18.2rem;
     margin: auto;
@@ -96,6 +96,7 @@
 	}
 	label.gift-label {
 		@include size(4.2rem);
+	    position: relative;
 		border: 1px solid transparent;
 		text-align: center;
 		padding: 0.35rem 0;
@@ -107,8 +108,18 @@
 		}
 
 		>i.icon{
-			width: 2rem;
-			height: 2rem;
+			@include size(2rem);
+		}
+
+		>i.float-icon {
+			@include animated(1000ms);
+			position: absolute;
+			top: 0.35rem;
+			left: 1.1rem;
+		    opacity: 0;
+		    &.active {
+		    	@include zoomOutUpSub;
+		    }
 		}
 
 		.name{

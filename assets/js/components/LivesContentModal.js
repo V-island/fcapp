@@ -11,6 +11,7 @@ import {
     random,
     addEvent,
     createDivEl,
+    animationEnd,
     protectFromXSS,
     timestampFromNow,
     replaceNote,
@@ -312,6 +313,7 @@ class LivesGift {
 
     _createElement(send, notCoins, recharge) {
         let activeEL = null,
+            floatEl = null,
             giftId = null,
             giftName = null,
             giftPrice = null,
@@ -326,11 +328,12 @@ class LivesGift {
         const tagItem1 = createDivEl({className: ['tag', this.options.itemClass]})
         const tagItem2 = createDivEl({className: ['tag', this.options.itemClass]});
         this.giftLists.forEach((data, index) => {
-            const handler = (element, id, price, name, imgURL) => {
+            const handler = (element, float, id, price, name, imgURL) => {
                 if (activeEL) {
                     removeClass(activeEL, this.options.showCalss);
                 }
                 activeEL = element;
+                floatEl = float;
                 giftId = id;
                 giftName = name;
                 giftPrice = parseInt(price);
@@ -375,7 +378,10 @@ class LivesGift {
             if (price < 0) {
                 return notCoins();
             }else {
-                if (send) send(giftId, giftPrice, giftName, giftImgURL, amount);
+                addClass(floatEl, this.options.showCalss);
+                animationEnd(floatEl, () => {
+                    if (send) send(giftId, giftPrice, giftName, giftImgURL, amount);
+                });
             }
         });
         group.appendChild(btnSend);

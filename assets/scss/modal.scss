@@ -425,4 +425,22 @@ html.with-statusbar-overlay {
     .popup-content {
         padding: 0.75rem;
     }
+
+    &.fade {
+        &.modal-in {
+            @include fadeIn;
+        }
+        &.modal-out {
+            @include fadeOut;
+        }
+    }
+
+    &.slider {
+        &.modal-in {
+            @include fadeInUp;
+        }
+        &.modal-out {
+            @include fadeOutDown;
+        }
+    }
 }

@@ -8,6 +8,7 @@ import {
     setLangConfig
 } from '../lang';
 import {
+    extend,
     addEvent,
     getData,
     setData,
@@ -81,26 +82,26 @@ const openModal = ({modal, top, callback}) => {
         if (popupOverlayEl.length > 0) {
             _popupOverlayEl = popupOverlayEl[0];
         }
-        if (modalOverlayEl.length === 0 && !isPopup) {
+        if (modalOverlayEl.length === 0 && !isPopup  && !top) {
             _modalOverlayEl = createDivEl({className: Options.modalOverlayClass});
             addEvent(_modalOverlayEl, 'click', () => {
                 closeModal();
             });
             body.appendChild(_modalOverlayEl);
         }
-        if (popupOverlayEl.length === 0 && isPopup) {
+        if (popupOverlayEl.length === 0 && isPopup && !top) {
             _popupOverlayEl = createDivEl({className: Options.popupOverlayClass});
 
             body.appendChild(_popupOverlayEl);
         }
-        if (top) {
-            if (!isPopup) {
-                addClass(_modalOverlayEl, Options.modalTopClass);
-            }
-            if (isPopup) {
-                addClass(_popupOverlayEl, Options.modalTopClass);
-            }
-        }
+        // if (top) {
+        //     if (!isPopup) {
+        //         addClass(_modalOverlayEl, Options.modalTopClass);
+        //     }
+        //     if (isPopup) {
+        //         addClass(_popupOverlayEl, Options.modalTopClass);
+        //     }
+        // }
         overlay = isPopup ? _popupOverlayEl : _modalOverlayEl;
         addClass(overlay, Options.modalVisibleClass);
     }
@@ -394,8 +395,12 @@ export const popupPart = ({element, title, themecalss, footer, cancelIcon}) => {
 }
 
 // 弹出整层
-export const popup = ({element, top, title, notBack, notPadding, cancelIcon}) => {
+export const popup = ({element, top, title, extraclass, notBack, notPadding, cancelIcon}) => {
     const modal = createDivEl({className: 'popup-modal'});
+
+    if (extraclass) {
+        addClass(modal, extraclass);
+    }
 
     if (top) {
         addClass(modal, Options.modalTopClass);
@@ -462,11 +467,16 @@ export const pickers = ({title, data, callback}) => {
 }
 
 // 日期时间选择器
-export const timePicker = ({title, format, rows, button, callback, callbackCancel}) => {
+export const timePicker = ({title, params, button, callback, callbackCancel}) => {
     const modal = createDivEl({className: 'modal'});
     title = title ? title : Defaults.modalTitle;
-    format = format ? format : 'YYYY-MM-DD';
-    rows = rows ? rows : 3;
+
+    let options = {
+        inline: true,
+        format: 'YYYY-MM-DD',
+        rows: 3
+    };
+    extend(options, params);
 
     // header
     if (title) {
@@ -487,11 +497,7 @@ export const timePicker = ({title, format, rows, button, callback, callbackCance
     // content
     const modalContent = createDivEl({className: 'modal-content'});
     const modalPicker = createDivEl({className: 'data-time-picker'});
-    const picker = new DateTimePicker(modalPicker, {
-        inline: true,
-        format: format,
-        rows: rows
-    });
+    const picker = new DateTimePicker(modalPicker, options);
 
     modalContent.appendChild(modalPicker);
     modal.appendChild(modalContent);
@@ -501,14 +507,14 @@ export const timePicker = ({title, format, rows, button, callback, callbackCance
     const buttonNo = createDivEl({className: ['button', 'fill-primary'], content: button ? Defaults.modalButtonCancel : Defaults.confirmButtonCancel});
     addEvent(buttonNo, 'click', () => {
         closeModal(modal);
-        if (callbackCancel) callbackCancel(picker.getDate(format));
+        if (callbackCancel) callbackCancel(picker.getDate(options.format));
     });
     modalFooter.appendChild(buttonNo);
 
     const buttonYes = createDivEl({className: ['button', 'button-primary'], content: button ? Defaults.modalButtonOk : Defaults.confirmButtonOk});
     addEvent(buttonYes, 'click', () => {
         closeModal(modal);
-        if (callback) callback(picker.getDate(format));
+        if (callback) callback(picker.getDate(options.format));
     });
     modalFooter.appendChild(buttonYes);
     modal.appendChild(modalFooter);

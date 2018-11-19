@@ -19,28 +19,14 @@
         "FreeVideo": {
             "Title": "免费视频"
         },
-        "VideoType": [
-            {
-                "Id": 1,
-                "Title": "舞蹈"
-            },
-            {
-                "Id": 2,
-                "Title": "唱歌"
-            },
-            {
-                "Id": 3,
-                "Title": "情感"
-            },
-            {
-                "Id": 4,
-                "Title": "艺术"
-            }
-        ],
+        "Live": {
+            "Title": "直播"
+        },
         "Madal": {
             "NotCoins": {
-                "Title": "没有足够的金币",
-                "Text": "她期待着你的真爱",
+                "Title": "没有足够的硬币",
+                "Text": "您的金币将被使用％S请及时充值",
+                "Text_Coins": "余额不够，请先充值",
                 "ButtonsText": "立即购买"
             },
             "DataIncomplete": {
@@ -515,6 +501,7 @@
             "Only_Once": "同一个用户只能评论一次"
         },
         "Share": {
+            "Title": "分享",
             "Facebook": "Facebook",
             "Twitter": "Twitter",
             "Tumblr": "Tumblr",
@@ -561,10 +548,65 @@
             "Chat_Length": "聊天长度",
             "Increase_Score": "增加积分",
             "Text": "此次直播收到的礼物",
+            "Not_Gift": "你还没有收到任何礼物",
+            "Waiting": {
+                "Title": "请等待",
+                "Text": "正在计算数据"
+            },
             "Buttons_Yes": "休息一下",
             "Buttons_Live_Again": "再来一次"
         },
+        "Live_Countdown": {
+            "Title": "表演开始于",
+            "Text": "表演时间",
+            "Explain": "这是表演时间！"
+        },
+        "Live_Arrivals": {
+            "Text": "欢迎进入现场"
+        },
+        "Live_Fuzzy_Layer": {
+            "Title": "没有足够的金币",
+            "Label": "表演时间",
+            "Text": "去购买足够的金币来享受疯狂"
+        },
+        "Live_Anchor": {
+            "Title": "选择您要开始的直播类型"
+        },
+        "Lives_Waiting": {
+            "Title": "直播等待",
+            "Text": "在线用户正在搜索，请稍候...",
+            "Buttons": "最小化"
+        },
+        "Feedback": {
+            "Title": "反馈",
+            "Text": "理由",
+            "Text_Secondary": "说明",
+            "Buttons": "提交"
+        },
+        "Impression": {
+            "Title": "标签",
+            "Text": "公众标签",
+            "Text_Secondary": "选择你对主播的印象",
+            "Buttons": "保存"
+        },
+        "Buttons": {
+            "Gold_Show": "收费表演",
+            "Party_Show": "免费表演",
+            "Buy_Now": "立即购买"
+        },
+        "Glugin": {
+            "Beauty": {
+                "Title": "美颜"
+            },
+            "Sticker": {
+                "Title": "贴纸"
+            }
+        },
         "Madal": {
+            "ReceiveGift": {
+                "Title": "Gift received",
+                "Text": "Give you"
+            },
             "Online": {
                 "Title": "如果你喜欢她,请勇敢地与她取得联系",
                 "Buttons_Maybe": "Maybe later",
@@ -575,12 +617,41 @@
                 "Buttons_Maybe": "Maybe later",
                 "Buttons_Details": "详细信息"
             },
+            "NotCoins": {
+                "Title": "没有足够的金币",
+                "Text": "去购买足够的  币来享受疯狂",
+                "Buttons": "立即购买"
+            },
+            "GoldShowProgress": {
+                "Title": "收费表演正在进行中",
+                "Text": "你想加入吗？很多人都在等你",
+                "Buttons": "确认"
+            },
             "QuitLive": {
                 "Text": "你确定要退出吗？"
             },
             "InsufficientAmount": {
                 "Title": "金币不足",
                 "Text": "你的金币已不足,将在 <span>1分钟后</span> 退出,请及时充值"
+            },
+            "Blacklist": {
+                "Title": "黑名单",
+                "Text": "无法再添加到收藏列表"
+            },
+            "PluginsShield": {
+                "Text": "你将不再看到对方的形象！"
+            },
+            "GoldShow": {
+                "Text": "表演开始于"
+            },
+            "PartyShow": {
+                "Text": "你想退出表演时间吗？"
+            },
+            "EndLive": {
+                "Text": "你想结束这个直播吗？"
+            },
+            "AnchorOffline": {
+                "Text": "主播已离开〜"
             },
             "SendSuccess": {
                 "Text": "发送成功"
@@ -624,6 +695,12 @@
         "Status": {
             "Busy": "繁忙",
             "Waiting": "等待"
+        },
+        "LIVE_MODE": {
+            "Private": "私聊",
+            "Party": "免费秀",
+            "Gold": "收费秀",
+            "Sexy": "性感秀"
         },
         "Froms": {
             "Country": {
