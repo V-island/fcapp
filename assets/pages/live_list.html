@@ -13,34 +13,6 @@
                 <div class="users-contents" ref="listWrapper">
                     {{if LiveList}}
                         <div class="row box-cards" data-page="1">
-                            {{each LiveList}}
-                                <div class="col-50 card card-live" data-channel-id="{{$value.id}}">
-                                    <div class="card-content" style="background-image: url({{$value.everyday_img}});">
-                                        <div class="cards-top">
-                                            <span class="tag-label">
-                                                {{if $value.status == 1}}
-                                                    {{PUBLIC.LIVE_MODE.Private}}
-                                                {{else if $value.status == 2}}
-                                                    {{PUBLIC.LIVE_MODE.Party}}
-                                                {{else if $value.status == 3}}
-                                                    {{PUBLIC.LIVE_MODE.Gold}}
-                                                {{else if $value.status == 4}}
-                                                    {{PUBLIC.LIVE_MODE.Sexy}}
-                                                {{/if}}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="card-foot">
-                                        <div class="user-img avatar-female">
-                                            <img src="{{$value.user_head}}">
-                                        </div>
-                                        <div class="foot-info">
-                                            <h3 class="name">{{$value.user_name}}</h3>
-                                            <p class="txt">{{$value.heat}} {{PUBLIC.Heat}}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            {{/each}}
                         </div>
                         <!-- /.box-cards -->
                     {{else}}

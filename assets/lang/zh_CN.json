@@ -141,33 +141,20 @@
     },
     "USER_PRICE": {
         "Title": "聊天价格",
-        "Current_Price": "当前价格: ",
-        "Certified": "星级越高,价格越贵",
-        "Non_Certified": "未认证",
-        "Button": "GO",
-        "Certified_Remarks": {
-            "Title": "如何提高星级评分",
-            "Content": [
-                {
-                    "Title": "聊天时间",
-                    "Text": "每天，聊天的时间必须超过两个小时"
-                },
-                {
-                    "Title": "积分",
-                    "Text": "分数代表用户对您的认可"
-                },
-                {
-                    "Title": "评价",
-                    "Text": "这非常重要，五星级奖项将占据你演出的重要部分"
-                }
-            ]
+        "Description": "(你还没有成为主播)",
+        "Not_Open": "(等级尚未开放)",
+        "Live_Price": {
+            "Private_Unit": " /分钟",
+            "Private_Title": "私人聊天",
+            "Gold_Unit": " /观众/分钟",
+            "Gold_Title": "收费表演"
         },
-        "Non_Certified_Remarks": {
-            "Title": "认证信息不完整",
-            "Content": [
-                "你必须完善你的认证信息；",
-                "认证完成后,你可以通过聊天来赚钱"
-            ]
+        "Level_Privilege": {
+            "Title": "级别权限",
+            "Text": "未完成",
+            "Price_Increase": "价格上涨",
+            "Kickout": "踢出",
+            "Identification": "鉴定"
         }
     },
     "USER_ACCOUNT": {
@@ -559,7 +546,8 @@
         "Live_Countdown": {
             "Title": "表演开始于",
             "Text": "表演时间",
-            "Explain": "这是表演时间！"
+            "Explain": "这是表演时间！",
+            "End_Explain": "节目时间结束了"
         },
         "Live_Arrivals": {
             "Text": "欢迎进入现场"
@@ -628,7 +616,10 @@
                 "Buttons": "确认"
             },
             "QuitLive": {
-                "Text": "你确定要退出吗？"
+                "Title": "直播结束",
+                "Text": "你确定要退出吗？",
+                "Prompt": "她/他离开了房间",
+                "Buttons": "OK"
             },
             "InsufficientAmount": {
                 "Title": "金币不足",
@@ -689,6 +680,7 @@
         "Refuse": "拒绝",
         "Free": "免费",
         "Heat": "heat",
+        "Online": "在线",
         "Country": "国家",
         "No_More": "没有了〜",
         "Terms_Of_Service": "服务条款",

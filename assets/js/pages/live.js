@@ -1,4 +1,5 @@
 import { LivesContent } from '../components/LivesContents';
+import { closeModal, alert } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import EventEmitter from '../eventEmitter';
 import SendBirdAction from '../SendBirdAction';
@@ -83,6 +84,7 @@ export default class Live extends EventEmitter {
 			this.data.AnchorInfo = data[0] ? data[0] : false;
 			this.data.AllGiftList = data[1] ? data[1] : false;
 			this.data.livePrice = this.livePrice;
+			this.data.userId = this.userId;
 			this.liveRoomId = this.data.AnchorInfo.live_room_id;
 			this.iMChannel = this.data.AnchorInfo.im_channel;
 
@@ -220,18 +222,27 @@ export default class Live extends EventEmitter {
 				this.client.clientEmitter.on('stream-removed', (evt) => {
 				    let stream = evt.stream;
 				    this.client.unsubscribe(stream);
-
-				    Spinner.start(body);
-
 				    this.client.unpublish(this.stream.stream);
 				    this.stream.close();
 
-				    leaveRoom(this.liveRoomId, this.liveRoomType).then((data) => {
-				    	clearInterval(this.heartbeatEvent);
+				    addClass(this.listWrapperEl, this.options.funzzyShowClass);
+				    this.VideoEl.removeChild(this.VideoEl.firstChild);
 
-				    	this.client.leave();
-				    	Spinner.remove();
-				    	return location.href = jumpURL('#/home');
+				    const callback = () => {
+				    	Spinner.start(body);
+				    	leaveRoom(this.liveRoomId, this.liveRoomType).then((data) => {
+				    		clearInterval(this.heartbeatEvent);
+
+				    		this.client.leave();
+				    		Spinner.remove();
+				    		return location.href = jumpURL('#/home');
+				    	});
+				    };
+				    alert({
+				    	title: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Title}`,
+				    	text: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Prompt}`,
+				    	button: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Buttons}`,
+				    	callback
 				    });
 				});
 
@@ -271,7 +282,7 @@ export default class Live extends EventEmitter {
 			leaveRoom(this.liveRoomId, this.liveRoomType).then((data) => {
 				clearInterval(this.heartbeatEvent);
 
-				this.Client.leave();
+				this.client.leave();
 				SendBirdAction.getInstance().exit(this.iMChannel);
 				SendBirdAction.getInstance().disconnect();
 

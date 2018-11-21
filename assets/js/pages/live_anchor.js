@@ -1,5 +1,5 @@
 import { LivesContent, LivesContentAnchor, LivesWaiting, LivesCallingAnchor, LivesAnchorCount } from '../components/LivesContents';
-import { closeModal, popup } from '../components/Modal';
+import { closeModal, alert, popup } from '../components/Modal';
 import { MessageChat } from '../components/MessageChat';
 import { Spinner } from '../components/Spinner';
 import EventEmitter from '../eventEmitter';
@@ -25,6 +25,7 @@ import {
 import {
     extend,
     jumpURL,
+    refreshURL,
     createDom,
     errorAlert
 } from '../util';
@@ -201,7 +202,16 @@ export default class LiveAnchor extends EventEmitter {
 							this.client.clientEmitter.on('stream-removed', (evt) => {
 							    let stream = evt.stream;
 							    this.client.unsubscribe(stream);
-							    livesPrivate.onClose();
+
+							    const callback = () => {
+							    	livesPrivate.onClose();
+							    };
+							    alert({
+							    	title: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Title}`,
+							    	text: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Prompt}`,
+							    	button: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Buttons}`,
+							    	callback
+							    });
 							});
 
 							this.client.clientEmitter.on('error', (err) => {
@@ -209,7 +219,7 @@ export default class LiveAnchor extends EventEmitter {
 						  	});
 						});
 					}).catch((data) => {
-						livesWaiting.notInvite = true;
+						livesWaiting.ChatEvent();
 						if (data) return false;
 						SendBirdAction.getInstance()
 						    .sendChannelMessage({
@@ -248,10 +258,11 @@ export default class LiveAnchor extends EventEmitter {
 
 	// 一对多窗口
 	_livesPrivateEvent() {
-		const {userHead, userName} = getUserInfo();
+		const {userId, userHead, userName} = getUserInfo();
 
 		const livesPrivate = new LivesContent({
 			data: {
+				userId: userId,
 				AnchorInfo: {
 					user_head: userHead,
 					user_name: userName
@@ -316,6 +327,7 @@ export default class LiveAnchor extends EventEmitter {
 				    .sendChannelMessage({
 				        channel: this.openChannel,
 				        message: '',
+				        data: '',
 				        type: 'partyTime'
 				    });
 			});
@@ -326,10 +338,11 @@ export default class LiveAnchor extends EventEmitter {
 
 	// 一对一窗口
 	_livesPartyEvent() {
-		const {userHead, userName} = getUserInfo();
+		const {userId, userHead, userName} = getUserInfo();
 
 		const livesPrivate = new LivesContent({
 			data: {
+				userId: userId,
 				AnchorInfo: {
 					user_head: userHead,
 					user_name: userName
@@ -419,7 +432,7 @@ export default class LiveAnchor extends EventEmitter {
 		};
 		const again = () => {
 			closeModal(modalEl);
-			return location.href = jumpURL('#/live/anchor');
+			return refreshURL();
 		};
 		const rest = () => {
 			closeModal(modalEl);

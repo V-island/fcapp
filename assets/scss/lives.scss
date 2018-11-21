@@ -437,11 +437,12 @@ p.lives-remark{
 		}
 
 		>.enter-drop {
-			@include size(100%);
-			@include animated-infinite($waiting-loading-duration);
+			@include animated-infinite($waiting-arrivals-duration);
 			@include animated-timing(linear);
-			@include slideInLeftLoop;
+			@include slideInLeft;
 
+			width: 400vw;
+			height: 100%;
 			background-position: center;
 			background-repeat: repeat;
 			background-size: contain;
@@ -1339,7 +1340,7 @@ p.lives-remark{
 		@include flex-spindle-center(center, column);
 
 	    &.refuse-content {
-	    	padding: 2rem 0;
+	    	padding: 1rem 0;
 	    	>p {
 				font-size: 0.75rem;
 	    	}

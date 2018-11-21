@@ -1,3 +1,5 @@
+$tag-level-undone-bg: #4C4C53;
+$tag-level-undone-border: 0.02rem solid #606066;
 // tag
 // ----------------------------------
 //
@@ -169,6 +171,38 @@
 			color: $color-text-gray-light;
 			font-size: 0.6rem;
 			margin-top: 0.35rem;
+		}
+	}
+	label.level-label {
+		@include spindle-vertical(column);
+	    margin: 1rem 0.7rem;
+
+		&:first-of-type {
+			margin-left: 0;
+		}
+
+		&:last-of-type {
+			margin-right: 0;
+		}
+
+		>i.icon {
+			@include size(2rem);
+		}
+
+		>span.title {
+			color: $color-text;
+			font-size: 0.5rem;
+			margin-top: 0.35rem;
+			line-height: 1.5;
+		}
+
+		>span.undone {
+			border-radius: 0.1rem;
+			border: $tag-level-undone-border;
+			background: $tag-level-undone-bg;
+			color: $color-text-gray-light;
+			font-size: 0.4rem;
+		    padding: 0.1rem 0.2rem;
 		}
 	}
 	label.anchor-label {

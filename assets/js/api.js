@@ -2277,3 +2277,17 @@ export const anchorBalance = () => {
 		});
 	});
 };
+
+/**
+ * 获取直播价格
+ * @return {[type]} [description]
+ */
+export const getLivePrice = () => {
+	return new Promise((resolve) => {
+		getPost('/getLivePrice', {}, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};

@@ -6,7 +6,8 @@ import {
 } from '../lang';
 
 import {
-    personCenter
+    personCenter,
+    getLivePrice
 } from '../api';
 
 import {
@@ -34,18 +35,15 @@ export default class UserPrice extends EventEmitter {
 
 	init(element) {
 		let getUserInfo = personCenter();
+		let getPrice = getLivePrice();
 
-		getUserInfo.then((data) => {
-			this.data.UserInfo = data ? data : false;
-			console.log(data);
+		Promise.all([getUserInfo, getPrice]).then((data) => {
+			this.data.UserInfo = data[0] ? data[0] : false;
+			this.data.LivePrice = data[1] ? data[1] : false;
 
 			this.UserPriceEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.UserPriceEl);
-			this._init();
 		});
-	}
-
-	_init() {
 	}
 
 	static attachTo(element, options) {

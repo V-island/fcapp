@@ -227,7 +227,6 @@ class ArrivalsItem {
     }
 }
 
-
 // 贴图
 class StickerItem {
     constructor({data, handler}) {

@@ -1,5 +1,6 @@
 import Template from 'art-template/lib/template-web';
 import { LivesCallingClient } from '../components/LivesContents';
+import { CardLiveItem, CardLiveMore } from '../components/CardsItem';
 import { closeModal, alert, popup } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import { PullLoad } from '../components/PullLoad';
@@ -110,7 +111,7 @@ export default class Home extends EventEmitter {
 			this.data.FreeVideoList = data[0] ? data[0] : false;
 			this.data.VideoList = data[1] ? data[1] : false;
 			this.data.VideoType = data[2] ? data[2] : false;
-			this.data.LivesList = data[3] ? data[3] : false;
+			this.LivesList = data[3] ? (data[3].length > 2 ? data[3].slice(0, 2) : data[3]) : [];
 
 			this.HomeEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.HomeEl);
@@ -131,7 +132,23 @@ export default class Home extends EventEmitter {
 	_init() {
 		// pages lives
 		this.boxLivesEl = this.HomeEl.getElementsByClassName(this.options.boxLivesClass)[0];
-		this.cardsLivesEl = this.boxLivesEl.getElementsByClassName(this.options.cardLiveClass);
+
+		this.LivesList.forEach((itemData, index) => {
+			const blurry = this.LivesList.length > 1 ? false : true;
+			const handler = ({clientName, clientHead, anchorId, roomId, roomType, price}) => {
+				this._livesCalling({clientName, clientHead, anchorId, roomId, roomType, price})
+			};
+			const liveItem = new CardLiveItem({
+				handler,
+				blurry,
+				data: itemData
+			});
+			this.boxLivesEl.append(liveItem.element);
+		});
+		if (this.LivesList.length > 1) {
+			const liveMore = new CardLiveMore();
+			this.boxLivesEl.append(liveMore.element);
+		}
 
 		// pages video
 		this.pagesVideoEl = this.HomeEl.querySelector(this.options.pagesVideoClass);
@@ -151,12 +168,6 @@ export default class Home extends EventEmitter {
 	}
 
 	_bindEvent() {
-		if (this.cardsLivesEl.length > 0) {
-	    	Array.prototype.slice.call(this.cardsLivesEl).forEach(ItemEl => {
-	    		this._liveClientEvent(ItemEl);
-	    	});
-		}
-
 		// tags
 		if (this.tagsEl) {
 			this.tagsLabelEl = this.tagsEl.getElementsByClassName(this.options.tagsLabelClass);
@@ -232,61 +243,6 @@ export default class Home extends EventEmitter {
 	    return new Home(element, options);
 	}
 
-	_liveClientEvent(ItemEl) {
-		addEvent(ItemEl, 'click', () => {
-			let anchorId = getData(ItemEl, 'id');
-			let price = getData(ItemEl, 'price');
-			let roomId = getData(ItemEl, 'roomId');
-			let roomType = getData(ItemEl, 'roomType');
-			let status = getData(ItemEl, 'status');
-			let clientName = getData(ItemEl, 'name');
-			let clientHead = getData(ItemEl, 'head');
-
-			let { userPackage } = (roomType == '1' || roomType == '3') ? getUserInfo() : {userPackage: 0};
-
-			switch (roomType) {
-				case '1':
-					if (status != '3') return false;
-
-					if (userPackage >= parseInt(price)) {
-						return this._livesCalling({clientName, clientHead, anchorId, roomId, roomType, price});
-					}
-					return alert({
-						title: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Title}`,
-						text: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Text}`,
-						button: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Buttons}`,
-						callback: () => {
-							return location.href = jumpURL('#/user/account');
-						}
-					});
-					break;
-				case '2':
-					location.href = jumpURL(`#/live?anchorid=${anchorId}&type=${roomType}&price=${price}`);
-					break;
-				case '3':
-					if (userPackage >= parseInt(price)) {
-						return alert({
-							title: `${LANG.LIVE_PREVIEW.Madal.GoldShowProgress.Title}`,
-							text: `${LANG.LIVE_PREVIEW.Madal.GoldShowProgress.Text}`,
-							button: `${LANG.LIVE_PREVIEW.Madal.GoldShowProgress.Buttons}`,
-							callback: () => {
-								return location.href = jumpURL(`#/live?anchorid=${anchorId}&type=${roomType}&price=${price}`);
-							}
-						});
-					}
-					return alert({
-						title: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Title}`,
-						text: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Text}`,
-						button: `${LANG.LIVE_PREVIEW.Madal.NotCoins.Buttons}`,
-						callback: () => {
-							return location.href = jumpURL('#/user/account');
-						}
-					});
-					break;
-			}
-        });
-	}
-
 	_livesCalling({clientName, clientHead, anchorId, roomId, roomType, price}) {
 		const { userSex } = getUserInfo();
 		SendBirdAction.getInstance()
@@ -299,14 +255,13 @@ export default class Home extends EventEmitter {
 				};
 				const redial = ({anchor_id, room_id, room_type, room_price}) => {
 					closeModal(modalEl);
-
 					switch (room_type) {
 						case '1':
 							this._livesCalling({
-								anchorId: anchor_id ? anchor_id : anchorId,
-								roomId: room_id ? room_id : roomId,
-								roomType: room_type ? room_type : roomType,
-								price: room_price ? room_price : price
+								anchorId: anchor_id,
+								roomId: room_id,
+								roomType: room_type,
+								price: room_price
 							});
 							break;
 						default:
@@ -339,7 +294,11 @@ export default class Home extends EventEmitter {
 					channel: groupChannel,
 					data: {
 						userHead: clientHead,
-						userName: clientName
+						userName: clientName,
+						anchorId: anchorId,
+						roomId: roomId,
+						roomType: roomType,
+						price: price
 					}
 				});
 				modalEl = popup({
@@ -424,45 +383,70 @@ export default class Home extends EventEmitter {
 		// 下拉刷新
 		VideoPullLoad.onPullingDown = () => {
 			return new Promise((resolve) => {
-				videoClips(this._page, this._number, this.tagId, 1).then((data) => {
-					videoClips(1, 10, this.tagId, 2).then((_data) => {
-						if (!data && !_data) return resolve(true);
+				let getFreeVideo = videoClips(this._page, this._number, this.tagId, 1);
+				let getVideoClips = videoClips(1, 10, this.tagId, 2);
+				let getShowLiveList = showLiveList();
 
-						this.boxVideoEl.innerHTML = '';
+				Promise.all([getFreeVideo, getVideoClips, getShowLiveList]).then((data) => {
+					const freeVideo = data[0] ? data[0] : false;
+					const videoLIst = data[1] ? data[1] : false;
+					const liveLIst = data[2] ? (data[2].length > 2 ? data[2].slice(0, 2) : data[2]) : [];
 
-						// free
-						if (data) {
-							this.boxVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-							// data = data.length > 2 ? data.slice(0, 2) : data;
-							data.forEach((itemData, index) => {
-								this.data.VideosList = itemData;
-								this.data.NotFreeVideos = false;
-								this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+					this.boxLivesEl.innerText = '';
+					this.boxVideoEl.innerText = '';
+
+					// free
+					if (freeVideo) {
+						this.boxVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
+						// data = data.length > 2 ? data.slice(0, 2) : data;
+						freeVideo.forEach((itemData, index) => {
+							this.data.VideosList = itemData;
+							this.data.NotFreeVideos = false;
+
+							let element = createDom(Template.render(this.tpl.list_videos, this.data));
+							this._cardVideoEvent(element);
+							this.boxVideoEl.append(element);
+						});
+					}
+
+					if (videoLIst) {
+						this.boxVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+
+						videoLIst.forEach((itemData, index) => {
+							this.data.VideosList = itemData;
+							this.data.NotFreeVideos = true;
+
+							let element = createDom(Template.render(this.tpl.list_videos, this.data));
+							this._cardVideoEvent(element);
+							this.boxVideoEl.append(element);
+						});
+					}
+
+					if (liveLIst) {
+						liveLIst.forEach((itemData, index) => {
+							const blurry = liveLIst.length > 1 ? false : true;
+							const handler = ({clientName, clientHead, anchorId, roomId, roomType, price}) => {
+								this._livesCalling({clientName, clientHead, anchorId, roomId, roomType, price})
+							};
+							const liveItem = new CardLiveItem({
+								handler,
+								blurry,
+								data: itemData
 							});
-						}
+							this.boxLivesEl.append(liveItem.element);
+						});
 
-						if (_data) {
-							this.boxVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
-
-							_data.forEach((itemData, index) => {
-								this.data.VideosList = itemData;
-								this.data.NotFreeVideos = true;
-								this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
-							});
+						if (liveLIst.length > 1) {
+							const liveMore = new CardLiveMore();
+							this.boxLivesEl.append(liveMore.element);
 						}
-						setData(this.boxVideoEl, this.options.cardsPageIndex, 1);
-						this._listEvent();
-						resolve(true);
-					});
+					}
+
+
+					setData(this.boxVideoEl, this.options.cardsPageIndex, 1);
+					resolve(true);
+
 				});
-
-				// let getFreeVideo = videoClips(this._page, this._number, this.tagId, 1);
-				// let getVideoClips =videoClips(1, 10, this.tagId, 2);
-				// let getShowLiveList = showLiveList();
-
-				// Promise.all([getFreeVideo, getVideoClips, getShowLiveList]).then((data) => {
-
-				// });
 			});
 		};
 

@@ -125,7 +125,7 @@ class LivesAnchorInfo {
         const content = createDivEl({className: this.options.contentClass});
         const contentTags = createDivEl({className: ['tag', 'tags-label']});
         this.tags.forEach((data, index) => {
-            let label = createDivEl({element: 'label', className: 'tag-label', content: data.title});
+            let label = createDivEl({element: 'label', className: 'tag-label', content: data.type_name});
             switch(random(5)) {
                 case 1:
                     addClass(label, 'bg-success');

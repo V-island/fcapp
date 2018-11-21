@@ -141,33 +141,20 @@
     },
     "USER_PRICE": {
         "Title": "Chatting price",
-        "Current_Price": "Current price: ",
-        "Certified": "The more star rating，the more money",
-        "Non_Certified": "Non certified",
-        "Button": "GO",
-        "Certified_Remarks": {
-            "Title": "How to improve the star rating",
-            "Content": [
-                {
-                    "Title": "Chatting time",
-                    "Text": "Every day，The time of chatting must be more than two hours"
-                },
-                {
-                    "Title": "Score",
-                    "Text": "The score represents the user's  approval of you"
-                },
-                {
-                    "Title": "Somebody's go od opinions",
-                    "Text": "That's very important，five star awards will take up an important part of your performance"
-                }
-            ]
+        "Description": "(You have not become an anchor yet)",
+        "Not_Open": "(Level up grade has not been opened yet)",
+        "Live_Price": {
+            "Private_Unit": " /Minute",
+            "Private_Title": "Private chat",
+            "Gold_Unit": " /Audience/Minute",
+            "Gold_Title": "Gold show"
         },
-        "Non_Certified_Remarks": {
-            "Title": "Live information incomplete",
-            "Content": [
-                "You must improve your live information;",
-                "After that， you can earn money by chatting;"
-            ]
+        "Level_Privilege": {
+            "Title": "Level privilege",
+            "Text": "Undone",
+            "Price_Increase": "Price increase",
+            "Kickout": "Kickout",
+            "Identification": "identification"
         }
     },
     "USER_ACCOUNT": {
@@ -559,7 +546,8 @@
         "Live_Countdown": {
             "Title": "Show start at",
             "Text": "Show time",
-            "Explain": "It's show time!"
+            "Explain": "It's show time!",
+            "End_Explain": "show time finished"
         },
         "Live_Arrivals": {
             "Text": "is welcome to enter the live room"
@@ -628,7 +616,10 @@
                 "Buttons": "confirm"
             },
             "QuitLive": {
-                "Text": "Are you sure you want to quit?"
+                "Title": "Live broadcast is over",
+                "Text": "Are you sure you want to quit?",
+                "Prompt": "She/he has left the live room",
+                "Buttons": "OK"
             },
             "InsufficientAmount": {
                 "Title": "Insufficient Amount",
@@ -689,12 +680,13 @@
         "Refuse": "Refuse",
         "Free": "Free",
         "Heat": "heat",
+        "Online": "online",
         "Country": "Country",
         "No_More": "No more~",
         "Terms_Of_Service": "Terms of Service",
         "Status": {
-            "Busy": "繁忙",
-            "Waiting": "等待"
+            "Busy": "Busy",
+            "Waiting": "Waiting"
         },
         "LIVE_MODE": {
             "Private": "Private chat",

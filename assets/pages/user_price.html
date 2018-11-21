@@ -10,56 +10,75 @@
         <!-- 这里是页面内容区 -->
         <div class="content block user-cover-wrapper">
             <div class="cover-header price-header">
-                <div class="user-info">
+                <div class="user-info price-info {{if UserInfo.user_authentication == 2}}across-bg{{/if}}">
                     <div class="user-img {{if UserInfo.user_sex == 1}} avatar-male {{else}} avatar-female {{/if}}" style="{{if UserInfo.user_head}} background-image: url({{UserInfo.user_head}}); {{/if}}"></div>
+                    <p class="user-level">{{UserInfo.live_level}}</p>
                 </div>
                 <!-- /.user-info -->
 
-                <p class="user-current-price"><label>{{USER_PRICE.Current_Price}}</label> <span class="color-primary"> {{UserInfo.live_price}} </span> {{PUBLIC.Billing}}</p>
-                <!-- /.user-current-price -->
-
                 <div class="star-box">
-                    <div class="star-label">
-                        <span class="{{if UserInfo.live_level == 1}} active {{/if}}"><span>1</span></span>
-                        <span class="{{if UserInfo.live_level == 2}} active {{/if}}"><span>2</span></span>
-                        <span class="{{if UserInfo.live_level == 3}} active {{/if}}"><span>3</span></span>
-                        <span class="{{if UserInfo.live_level == 4}} active {{/if}}"><span>4</span></span>
-                        <span class="{{if UserInfo.live_level == 5}} active {{/if}}"><span>5</span></span>
-                    </div>
-                    <!-- /.star-label -->
-
-                    <div class="star-content">
-                        <span class="{{if UserInfo.live_level >= 2}} active {{/if}}"></span>
-                        <span class="{{if UserInfo.live_level >= 3}} active {{/if}}"></span>
-                        <span class="{{if UserInfo.live_level >= 4}} active {{/if}}"></span>
-                        <span class="{{if UserInfo.live_level == 5}} active {{/if}}"></span>
+                    <div class="star-content {{if UserInfo.user_authentication == 1}}disable{{/if}}">
+                        <span class="star-title">Lv.{{UserInfo.live_level}}</span>
+                        <span class="star-line {{if UserInfo.live_level >= 1}} active {{/if}}"></span>
+                        <span class="star-line {{if UserInfo.live_level >= 2}} active {{/if}}"></span>
+                        <span class="star-line {{if UserInfo.live_level >= 3}} active {{/if}}"></span>
+                        <span class="star-line {{if UserInfo.live_level >= 4}} active {{/if}}"></span>
+                        <span class="star-line {{if UserInfo.live_level == 5}} active {{/if}}"></span>
                     </div>
                     <!-- /.star-content -->
-
-                    <p class="star-text">{{if UserInfo.user_authentication == 2}}{{USER_PRICE.Certified}}{{else}}{{USER_PRICE.Non_Certified}}{{/if}}</p>
+                    {{if UserInfo.user_authentication == 1}}
+                        <p class="star-text">{{USER_PRICE.Not_Open}}</p>
+                    {{/if}}
                 </div>
                 <!-- /.star-box -->
             </div>
             <!-- /.cover-header price-headerr -->
 
+            {{if LivePrice}}
+                <div class="score-list">
+                    {{each LivePrice}}
+                        {{if $index.live_type == 1}}
+                            <div class="score-item">
+                                <h3><span class="color-primary">{{$value.live_price}}</span> <small>{{USER_PRICE.Live_Price.Private_Unit}}</small></h3>
+                                <p>{{USER_PRICE.Live_Price.Private_Title}}</p>
+                            </div>
+                        {{else if $index.live_type == 3}}
+                            <div class="score-item">
+                                <h3><span class="color-primary">{{$value.live_price}}</span> <small>{{USER_PRICE.Live_Price.Gold_Unit}}</small></h3>
+                                <p>{{USER_PRICE.Live_Price.Gold_Title}}</p>
+                            </div>
+                        {{/if}}
+                    {{/each}}
+                </div>
+            {{/if}}
+            <!-- /.score-list -->
+
             <div class="cover-content price-content">
-                {{if UserInfo.user_authentication == 2}}
-                    <div class="price-remarks-header">
-                        <p>{{USER_PRICE.Certified_Remarks.Title}}</p>
-                    </div>
-                    {{each USER_PRICE.Certified_Remarks.Content}}
-                        <div class="price-remarks-box">
-                            <p class="price-remarks-title">{{$value.Title}}</p>
-                            <p class="price-remarks-txt">{{$value.Text}}</p>
-                        </div>
-                    {{/each}}
-                {{else}}
-                    <p class="price-not-remarks title-primary">{{USER_PRICE.Non_Certified_Remarks.Title}}</p>
-                    {{each USER_PRICE.Non_Certified_Remarks.Content}}
-                        <p class="price-not-remarks">{{$value}}</p>
-                    {{/each}}
-                    <a class="button button-primary" href="#/user/proof" data-ripple>{{USER_PRICE.Button}}</a>
-                {{/if}}
+                <p class="level-title">{{USER_PRICE.Level_Privilege.Title}}</p>
+
+                <div class="tag price-tag {{if UserInfo.user_authentication == 1}}undone{{/if}}">
+                    <label class="level-label">
+                        <i class="icon icon-price"></i>
+                        <span class="title">{{USER_PRICE.Level_Privilege.Price_Increase}}</span>
+                        {{if UserInfo.user_authentication == 1}}
+                            <span class="undone">{{USER_PRICE.Level_Privilege.Text}}</span>
+                        {{/if}}
+                    </label>
+                    <label class="level-label">
+                        <i class="icon icon-kickout"></i>
+                        <span class="title">{{USER_PRICE.Level_Privilege.Kickout}}</span>
+                        {{if UserInfo.user_authentication == 1}}
+                            <span class="undone">{{USER_PRICE.Level_Privilege.Text}}</span>
+                        {{/if}}
+                    </label>
+                    <label class="level-label">
+                        <i class="icon icon-ident"></i>
+                        <span class="title">{{USER_PRICE.Level_Privilege.Identification}}</span>
+                        {{if UserInfo.user_authentication == 1}}
+                            <span class="undone">{{USER_PRICE.Level_Privilege.Text}}</span>
+                        {{/if}}
+                    </label>
+                </div>
             </div>
             <!-- /.cover-content price-content -->
         </div>
