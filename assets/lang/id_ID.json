@@ -543,6 +543,11 @@
             "Buttons_Yes": "Take a rest",
             "Buttons_Live_Again": "Live Again"
         },
+        "Charge_Midway_Exit": {
+            "Title": "Do you want to leave?",
+            "Text": "Gold show in progress,You can't end this live.",
+            "Buttons": "OK"
+        },
         "Live_Countdown": {
             "Title": "Show start at",
             "Text": "Show time",
@@ -642,7 +647,7 @@
                 "Text": "Do you want to end this live？"
             },
             "AnchorOffline": {
-                "Text": "The anchor has left ~"
+                "Text": "Trying to connect with each other, please wait. . ."
             },
             "SendSuccess": {
                 "Text": "Send successful"
@@ -753,6 +758,13 @@
         "1008": "Failed, this data already exists",
         "1009": "This user has been frozen",
         "1010": "Sorry，We are unable to provide services in your area.",
+        "1011": "Presented today",
+        "1012": "You have already applied",
+        "1013": "You are already the anchor",
+        "1014": "You have submitted your application and cannot submit it again.",
+        "1015": "Can submit an application",
+        "1016": "The user did not enter any live room records",
+        "1017": "User not authenticated",
         "2000": "Request frequency is too high, invalid request",
         "2001": "Failed to send verification code",
         "2002": "The incoming mobile number is empty",
@@ -783,6 +795,10 @@
         "2027": "System error",
         "2028": "Delete failed",
         "2029": "You have already commented on",
-        "2030": "The praise failed, the system is busy, please try again later"
+        "2030": "The praise failed, the system is busy, please try again later",
+        "2031": "Paypal failed to pay the order",
+        "2032": "The account violation was banned",
+        "2033": "Has been broadcast due to network reasons",
+        "2034": "You have started broadcasting and cannot repeat the broadcast."
     }
 }

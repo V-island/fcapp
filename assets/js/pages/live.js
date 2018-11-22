@@ -6,6 +6,7 @@ import SendBirdAction from '../SendBirdAction';
 import SendBirdConnection from '../SendBirdConnection';
 import AgoraClient from '../AgoraClient';
 import AgoraStream from '../AgoraStream';
+import Pay from '../Pay';
 import {
 	body
 } from '../intro';
@@ -22,7 +23,9 @@ import {
 	entryRoom,
 	leaveRoom,
 	giveGift,
-	checkClient
+	checkClient,
+	selAllGoods,
+	payWay
 } from '../api';
 import {
 	jumpURL,
@@ -54,6 +57,7 @@ export default class Live extends EventEmitter {
 
 	    extend(this.options, options);
 
+	    this.anchorClose = false;
 	    this.Tourist = false;
 	    this.chargeLive = false;
 	    this.getLoves = false;
@@ -78,11 +82,15 @@ export default class Live extends EventEmitter {
 
 		const getAnchorInfo = anchorInfo(anchorid, this.Tourist);
 		const getfindAllgifts = findAllgifts();
+		const getSelAllGoods = selAllGoods();
+		const getPayWay = payWay();
 		const getIMChannel = this._createIMChannel(userId);
 
-		Promise.all([getAnchorInfo, getfindAllgifts, getIMChannel]).then((data) => {
+		Promise.all([getAnchorInfo, getfindAllgifts, getSelAllGoods, getPayWay, getIMChannel]).then((data) => {
 			this.data.AnchorInfo = data[0] ? data[0] : false;
 			this.data.AllGiftList = data[1] ? data[1] : false;
+			this.data.AllGoodsList = data[2] ? data[2] : false;
+			this.data.AllPayWayList = data[3] ? data[3] : false;
 			this.data.livePrice = this.livePrice;
 			this.data.userId = this.userId;
 			this.liveRoomId = this.data.AnchorInfo.live_room_id;
@@ -139,6 +147,8 @@ export default class Live extends EventEmitter {
 				    addClass(this.listWrapperEl, this.options.funzzyShowClass);
 
 				    this.VideoEl.removeChild(this.VideoEl.firstChild);
+
+				    this.anchorClose = true;
 				});
 			});
 		});
@@ -278,6 +288,14 @@ export default class Live extends EventEmitter {
 
 		// 关闭直播
 		livesPrivate.onClose = () => {
+			if (this.anchorClose) {
+				this.client.leave();
+				SendBirdAction.getInstance().exit(this.iMChannel);
+				SendBirdAction.getInstance().disconnect();
+
+				return location.href = jumpURL('#/home');
+			}
+
 			Spinner.start(body);
 			leaveRoom(this.liveRoomId, this.liveRoomType).then((data) => {
 				clearInterval(this.heartbeatEvent);

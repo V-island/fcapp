@@ -287,7 +287,11 @@ export default class LiveAnchor extends EventEmitter {
 
 				Promise.all([leaveClient, SendBirdDis]).then((data) => {
 					Spinner.remove();
-					this._livesCountEvent({userHead, userName});
+					this._livesCountEvent({
+						giftList: livesPrivate.ReceiveGiftList,
+						userHead,
+						userName
+					});
 				});
 			});
 		};
@@ -327,7 +331,7 @@ export default class LiveAnchor extends EventEmitter {
 				    .sendChannelMessage({
 				        channel: this.openChannel,
 				        message: '',
-				        data: '',
+				        message: '',
 				        type: 'partyTime'
 				    });
 			});
@@ -367,7 +371,11 @@ export default class LiveAnchor extends EventEmitter {
 
 				Promise.all([leaveClient, SendBirdDis]).then((data) => {
 					Spinner.remove();
-					this._livesCountEvent({userHead, userName});
+					this._livesCountEvent({
+						giftList: livesPrivate.ReceiveGiftList,
+						userHead,
+						userName
+					});
 				});
 			});
 		};
@@ -425,7 +433,7 @@ export default class LiveAnchor extends EventEmitter {
 	}
 
 	// 结算窗口
-	_livesCountEvent({userHead, userName}) {
+	_livesCountEvent({userHead, userName, giftList}) {
 		let modalEl;
 		const handler = () => {
 			return anchorBalance();
@@ -444,7 +452,8 @@ export default class LiveAnchor extends EventEmitter {
 			rest,
 			data: {
 				user_head: userHead,
-				user_name: userName
+				user_name: userName,
+				gift_list: giftList
 			}
 		});
 		modalEl = popup({

@@ -73,8 +73,12 @@ class TabMain {
         const ItemIcon = createDivEl({element: 'span', className: ['icon', 'icon-live']});
         Item.appendChild(ItemIcon);
         addEvent(Item, 'click', () => {
-            popupPart({
-            	element: this._createModalElement(),
+            let modalEl;
+            const handler = () => {
+                closeModal(modalEl);
+            };
+            modalEl = popupPart({
+            	element: this._createModalElement({handler}),
             	themecalss: 'theme-black',
             	footer: true,
             	cancelIcon: true
@@ -132,7 +136,7 @@ class TabMain {
         return nav;
     }
 
-    _createModalElement() {
+    _createModalElement({handler}) {
     	const group = createDivEl({className: 'share-group'});
 
     	const tag = createDivEl({className: ['tag', 'tag-share']});
@@ -143,6 +147,8 @@ class TabMain {
         liveItem.appendChild(liveItemIcon);
         liveItem.appendChild(liveItemSpen);
         addEvent(liveItem, 'click', () => {
+            if (handler) handler();
+
             if (checkLogin()) {
                 return location.href = jumpURL('#/login/mobile');
             }
@@ -166,6 +172,7 @@ class TabMain {
         videoItem.appendChild(videoItemIcon);
         videoItem.appendChild(videoItemSpen);
         addEvent(videoItem, 'click', () => {
+            if (handler) handler();
         	return location.href = jumpURL('#/user/video');
         });
         tag.appendChild(videoItem);

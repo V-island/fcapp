@@ -5,6 +5,7 @@ import ProgressLine from './ProgressLine';
 import {
 	fcConfig,
 	baseURL,
+	chinaBaseURL,
 	body
 } from './intro';
 import {
@@ -41,6 +42,7 @@ const QuickLoginMode = 4; // 登入方式 1.APP 2.web 3.PC 4.快速登入
 
 // localStorage KEY
 const TOKEN_NAME = 'TOKEN';
+const WHITE_LIST_ID = 'WHITE_LIST';
 const UER_NAME = 'USE_INFO';
 const UER_BINDING_STATUS = 'UER_BINDING_STATUS';
 const UUID = 'UUID';
@@ -48,28 +50,37 @@ const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const COUNTRY_NAME = 'COUNTRY';
 const SHARE_NAME = 'SHARE';
 
-function getPost(_url, param, callback, callbackCancel, onProgress, _type, _header, async) {
+function getPost(_url, param, callback, callbackCancel, onProgress, _type, _header, _baseURL, async) {
 	if (isObject(_url)) {
 	    onProgress = arguments[2];
 	    callback = arguments[1];
 	    param = arguments[0];
 	}
-
+	let whiteListId = getLocalStorage(WHITE_LIST_ID);
 	let token = localStorage.getItem('token');
 		_type = _type == undefined ? Type : _type;
-		// _baseURL = _url.indexOf('https')>-1 ? _url : baseURL;
 		_header = _header != undefined ? _header : '';
 		param = param != undefined ? param : '';
 
-	if (!isObject(_url)) {
+	if (isObject(_url)) {
+		_baseURL = baseURL;
+	}else {
+		_baseURL = _url.indexOf('https')>-1 ? _url : baseURL;
+	}
+
+	if (!isObject(_url) && (_url.indexOf('https') < 0)) {
 		param.keyword = _url.indexOf('/') > -1 ? _url.slice(1) : _url;
+	}
+
+	if (whiteListId && (_url.indexOf('https') < 0)) {
+		param.white_list_id = whiteListId;
 	}
 
 	let ajaxOpt ={
 		type: _type,
 		async: true,
 	  	crossDomain: true,
-		url: baseURL,
+		url: _baseURL,
 		cache: false,
 	    statusCode: {
 	        // 200: () => {console.log(200)},
@@ -420,7 +431,7 @@ export const findAllCountry = (id = 2, langId = 2) => {
 			    	_data.gain = true;
 			    	setLocalStorage(COUNTRY_ID_NAME, _data);
     				setLocalStorage(COUNTRY_NAME, data);
-    				resolve(true);
+    				resolve(data);
 			    }else {
 			    	resolve(false);
 			    }
@@ -480,11 +491,11 @@ export const getRegister = (params, callback) => {
 /**
  * 登录
  * @param  {[object]} params 	   [description]
- * @param  {[type]} callback     回调事件
  * @return {[type]} [description]
  */
-export const getLogin = (params, callback) => {
+export const getLogin = (params, china = false) => {
 	let _params = isObject(params) ? params : urlParse(params);
+	let _url = china ? chinaBaseURL :  '/appLogin';
 	let _mac = getMac();
 	_params.mac = _mac;
 	_params.macType = MacType;
@@ -497,11 +508,12 @@ export const getLogin = (params, callback) => {
 	}
 
 	return new Promise((resolve, reject) => {
-		getPost('/appLogin', _params, (response) => {
+		getPost(_url, _params, (response) => {
 			toast({text: LANG.SYSTEM_CODE[response.code]});
-			const {token, userId, phoneCode, userPhone, praise_channel, comment_channel, gift_channel} = response.data;
+			const {token, userId, phoneCode, userPhone, praise_channel, comment_channel, gift_channel, white_list_id} = response.data;
 
 			setLocalStorage(TOKEN_NAME, token);
+			setLocalStorage(WHITE_LIST_ID, white_list_id);
 			Spinner.start(body);
 			checkIMChannel(userId, praise_channel, comment_channel, gift_channel).then(({praiseURL, commentURL, giftURL}) => {
 				SendBirdAction.getInstance().disconnect();
@@ -617,7 +629,7 @@ export const bindAccount = (params) => {
  * @param  {[object]} params 	   [description]
  * @return {[type]} [description]
  */
-export const getFindPassword = (params) => {
+export const findPassword = (params) => {
 	let {phoneCode, userPhone} = isObject(params) ? params : urlParse(params);
 
 	return new Promise((resolve) => {
@@ -636,11 +648,11 @@ export const getFindPassword = (params) => {
  * @param  {[object]} params 	   [description]
  * @return {[type]} [description]
  */
-export const getUpdatePassword = (params) => {
+export const updatePassword = (params) => {
 	let _params = isObject(params) ? params : urlParse(params);
-	let {phoneCode, userPhone} = getUserInfo();
-	_params.phoneCode = phoneCode;
-	_params.userPhone = userPhone;
+	// let {phoneCode, userPhone} = getUserInfo();
+	// _params.phoneCode = phoneCode;
+	// _params.userPhone = userPhone;
 
 	return new Promise((resolve) => {
 		getPost('/updatePassword', _params, (response) => {

@@ -1,9 +1,7 @@
-const path = require('path');
+﻿const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-// const MinifyPlugin = require('babel-minify-webpack-plugin');
-// const WorkboxPlugin = require('workbox-webpack-plugin');
 const EncodingPlugin = require('webpack-encoding-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -37,12 +35,11 @@ module.exports = {
 		], // 中国区主播入口
 		redirect: './assets/js/admins/redirect',
 		editLangPack: './assets/js/admins/editLangPack'
-
 	},
 	devtool: 'inline-source-map',
 	output: {
 		filename: './assets/js/[name].js',
-		path: path.resolve(__dirname, 'dist')
+		path: path.resolve(__dirname, 'distGreen')
 	},
 	module: {
 		rules: [
@@ -67,9 +64,9 @@ module.exports = {
 			use: [{
 				loader: 'url-loader',
 				options: {
-					name: '[hash].[ext]',
-					outputPath: '/assets/img',
-					// publicPath: '/dist/',
+					name: '[path][name].[ext]',
+					// outputPath: '/assets/img',
+					publicPath: '/',
 					limit: 81920
 				}
 			}]
@@ -79,8 +76,8 @@ module.exports = {
 				loader: 'file-loader',
 				options: {
 					name: '[path][name].[ext]',
-					outputPath: '/'
-					// publicPath: '/dist/'
+					// outputPath: '/'
+					publicPath: '/'
 				}
 			}]
 		}, {
@@ -115,7 +112,7 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new CleanWebpackPlugin(['dist']),
+		new CleanWebpackPlugin(['distGreen']),
 		new UglifyJsPlugin({
 			uglifyOptions: {
 				compress: {
@@ -128,15 +125,6 @@ module.exports = {
 			sourceMap: true,
 			parallel: true
 		}),
-		// new MinifyPlugin({}, {
-		// 	sourceMap: false
-		// }),
-		// new WorkboxPlugin.GenerateSW({
-		// 	// 这些选项帮助 ServiceWorkers 快速启用
-		// 	// 不允许遗留任何“旧的” ServiceWorkers
-		// 	clientsClaim: true,
-		// 	skipWaiting: true
-		// }),
 		new EncodingPlugin({
 			encoding: 'utf-8'
 		}),
@@ -188,7 +176,7 @@ module.exports = {
 			title: 'SHINE LIVE- live video stream and chat',
 			filename: 'redirect.html',
 			template: './assets/admin.html',
-			chunks: ['redirect'],
+			chunks: ['redirect', 'slStyle'],
 			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',

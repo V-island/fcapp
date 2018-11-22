@@ -32,6 +32,7 @@ import enterAvatar from '../../img/lives/enter-avatar@2x.png';
 import enterBg from '../../img/lives/enter-bg@2x.png';
 import enterDrop from '../../img/lives/enter-drop@2x.png';
 
+import payOtherIcon from '../../img/modals/icon-other-pay@2x.png';
 // 弹幕
 class NewsItem {
     constructor(data) {
@@ -510,7 +511,7 @@ class PayItem {
     }
 
     get imgUrl() {
-        return this.data.pay_img ? protectFromXSS(this.data.pay_img) : protectFromXSS(giftImg);
+        return this.data.pay_img ? protectFromXSS(this.data.pay_img) : protectFromXSS(payOtherIcon);
     }
 
     _createElement() {

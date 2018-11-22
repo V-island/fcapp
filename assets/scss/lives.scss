@@ -525,7 +525,7 @@ p.lives-remark{
 		min-width: 9rem;
 		border-radius: 1rem;
 		line-height: 2rem;
-		font-size: 0.75rem;
+		font-size: 0.6rem;
 		font-weight: bold;
 		padding: 0 1rem;
 		display: inline-block;
@@ -997,6 +997,7 @@ p.lives-remark{
 
 	.news-input {
 	    flex-grow: 1;
+        border-width: 0;
 	    border-color: $color-text;
 	    font-size: 0.6rem;
 	    color: $color-text-gray;

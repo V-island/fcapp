@@ -266,6 +266,7 @@ export const domainURL = location.pathname == '/' ? location.origin : location.o
 // 本地地址
 // export const baseURL = 'http://192.168.1.36:8080/open/gate.do';
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
+export const chinaBaseURL = 'https://192.168.1.211:8443/live-app/login/appLogin';
 
 // 直播配置
 export const agoraConfig = {

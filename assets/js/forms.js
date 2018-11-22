@@ -1,5 +1,5 @@
+import { closeModal, alert, country } from './components/Modal';
 import { Spinner } from './components/Spinner';
-import Modal from './modal';
 import {
     body
 } from './intro';
@@ -25,7 +25,6 @@ import {
 
 const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const LANG = getLangConfig();
-const modal = new Modal();
 
 /*
 国家/地区           语言代码
@@ -122,8 +121,9 @@ export default class Forms {
         // 选择国家
         if (this.countryEl.length > 0) {
             addEvent(this.countryEl[0], 'click', () => {
-                modal.countryModal(this.Country.id);
-
+                country({
+                    countryId: this.Country.id
+                });
                 gtag('event', 'click', {
                     'event_label': 'Country selection button',
                     'event_category': 'Login',
@@ -200,9 +200,11 @@ export default class Forms {
                         Spinner.remove();
                     });
                 } else {
-                    return modal.alert(LANG.PUBLIC.Froms.Telephone.Text, (_modal) => {
-                        modal.closeModal(_modal);
-                        Spinner.remove();
+                    return alert({
+                        text: `${LANG.PUBLIC.Froms.Telephone.Text}`,
+                        callback: () => {
+                            Spinner.remove();
+                        }
                     });
                 }
             });
@@ -210,21 +212,23 @@ export default class Forms {
 
         // 明密文
         if (this.btnBrightEl.length > 0) {
-            addEvent(this.btnBrightEl[0], 'click', () => {
-                let groupEl = this.btnBrightEl[0].parentNode;
-                let inputEl = groupEl.getElementsByTagName(this.options.inputTagName)[0];
+            Array.prototype.slice.call(this.btnBrightEl).forEach(itemEl => {
+                addEvent(itemEl, 'click', () => {
+                    let groupEl = itemEl.parentNode;
+                    let inputEl = groupEl.getElementsByTagName(this.options.inputTagName)[0];
 
-                if (hasClass(this.btnBrightEl[0], this.options.eyeBlackIcon)) {
-                    // 密码可见
-                    removeClass(this.btnBrightEl[0], this.options.eyeBlackIcon);
-                    addClass(this.btnBrightEl[0], this.options.eyeIcon);
-                    inputEl.type = "text";
-                }else {
-                    // 密码不可见
-                    removeClass(this.btnBrightEl[0], this.options.eyeIcon);
-                    addClass(this.btnBrightEl[0], this.options.eyeBlackIcon);
-                    inputEl.type = "password";
-                }
+                    if (hasClass(itemEl, this.options.eyeBlackIcon)) {
+                        // 密码可见
+                        removeClass(itemEl, this.options.eyeBlackIcon);
+                        addClass(itemEl, this.options.eyeIcon);
+                        inputEl.type = "text";
+                    }else {
+                        // 密码不可见
+                        removeClass(itemEl, this.options.eyeIcon);
+                        addClass(itemEl, this.options.eyeBlackIcon);
+                        inputEl.type = "password";
+                    }
+                });
             });
         }
 

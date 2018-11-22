@@ -119,7 +119,7 @@ const openModal = ({modal, top, callback}) => {
 }
 
 export const closeModal = (modal) => {
-    const modalGroup = body.querySelectorAll(`.${Options.modalInClass}`);
+    const modalGroup = body.querySelectorAll(`.modal`);
     if (typeof modal == 'undefined') {
         modal = body.querySelector(`.${Options.modalInClass}`);
     }
@@ -134,9 +134,9 @@ export const closeModal = (modal) => {
         removeOnClose = hasClass(modal, Options.removeNOClose),
         overlay = isPopup ? popupOverlayEl : modalOverlayEl;
 
-    if (isPopup){
+    if (isPopup || isToast || isPickerModal || isActions){
         removeClass(overlay, Options.modalVisibleClass);
-    }else if (!(isPickerModal || isToast)) {
+    }else {
         if (modalGroup.length === 1) {
             removeClass(overlay, Options.modalVisibleClass);
         }
@@ -341,7 +341,7 @@ export const toast = ({text, duration, extraclass}) => {
 }
 
 // 弹出局部层
-export const popupPart = ({element, title, themecalss, footer, cancelIcon}) => {
+export const popupPart = ({element, title, themecalss, footer, cancelIcon, callback}) => {
     const modal = createDivEl({className: 'actions-modal'});
 
     if (themecalss) {
@@ -390,7 +390,7 @@ export const popupPart = ({element, title, themecalss, footer, cancelIcon}) => {
 
     body.appendChild(modal);
 
-    openModal({modal});
+    openModal({modal, callback});
     return modal;
 }
 

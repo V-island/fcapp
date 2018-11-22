@@ -156,7 +156,7 @@ class LivesContent {
     }
 
     get GoodList() {
-        return this.data.AllGoodlist ? this.data.AllGoodlist : [];
+        return this.data.AllGoodsList ? this.data.AllGoodsList : [];
     }
 
     get PayWayList() {
@@ -319,6 +319,13 @@ class LivesContent {
         // 关闭直播
         const headerIconClose = createDivEl({element: 'i', className: ['icon', this.options.closeClass]});
         addEvent(headerIconClose, 'click', () => {
+            if (!this.client && this.oneToMany && this.chargeTime) {
+                return alert({
+                    title: `${LANG.LIVE_PREVIEW.Charge_Midway_Exit.Title}`,
+                    text: `${LANG.LIVE_PREVIEW.Charge_Midway_Exit.Text}`,
+                    button: `${LANG.LIVE_PREVIEW.Charge_Midway_Exit.Buttons}`
+                });
+            }
             const callback = () => {
                 if (this.onClose) this.onClose();
             };
@@ -412,7 +419,10 @@ class LivesContent {
             };
             const newsEL = new LivesNews({send});
             modalsEl = popupPart({
-                element: newsEL.element
+                element: newsEL.element,
+                callback: () => {
+                    newsEL.input.focus();
+                }
             });
         });
         livesGroupsLeft.appendChild(GroupsIconNews);
@@ -599,7 +609,7 @@ class LivesContent {
                     if (this.onGetChargeShows) this.onGetChargeShows(time);
                 };
                 timePicker({
-                    title: `${LANG.LIVE_PREVIEW.Madal.GoldShow.Title}`,
+                    title: `${LANG.LIVE_PREVIEW.Madal.GoldShow.Text}`,
                     params: {
                         date: '03:00',
                         format: 'mm:ss',
@@ -736,7 +746,7 @@ class LivesContent {
 
                 if (this.oneToMany && user.userId != this.id) {
                     this.memberCount = openChannel.participantCount;
-                    headerAcrossBodyTxt.innerText = `${openChannel.participantCount + LANG.PUBLIC.Online}`;
+                    headerAcrossBodyTxt.innerText = `${openChannel.participantCount + ' ' + LANG.PUBLIC.Online}`;
 
                     const arrivalsItem = new ArrivalsItem({
                         data: user
@@ -1028,7 +1038,7 @@ class LivesWaiting {
         const headerSwitchIcon = createDivEl({element: 'i', className: 'icon', background: waitingSwitch});
         headerSwitch.appendChild(headerSwitchIcon);
         addEvent(headerSwitch, 'click', () => {
-            if (close) close();
+            if (this.onClose) this.onClose();
         });
         header.appendChild(headerSwitch);
         wapper.appendChild(header);
@@ -1437,6 +1447,10 @@ class LivesAnchorCount {
         return this.data.score ? `${this.data.score}` : `0`;
     }
 
+    get giftList() {
+        return this.data.gift_list ? this.data.giftList : [];
+    }
+
     _createElement(handler, again, rest) {
         const wrapper = createDivEl({className: ['lives-count-wrapper', this.options.wrapperClass]});
 
@@ -1514,11 +1528,11 @@ class LivesAnchorCount {
 
                 content.removeChild(Waiting);
 
-                if (giftList.list) {
+                if (giftList.list || this.giftList) {
                     // gift list
                     const Preloading = createDivEl({className: ['tag', 'score-gift']});
 
-                    giftList.list.forEach(data => {
+                    this.giftList.forEach(data => {
                         const item = new GiftCountItem({data});
                         Preloading.appendChild(item.element);
                     });

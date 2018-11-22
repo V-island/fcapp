@@ -195,9 +195,10 @@ class LivesNews {
 
     _createElement(send) {
         const group = createDivEl({className: this.options.groupClass});
-        const input = createDivEl({element: 'textarea', className: this.options.inputClass});
+        const input = createDivEl({element: 'input', className: this.options.inputClass});
         input.rows = 1;
         group.appendChild(input);
+        this.input = input;
 
         const phiz = createDivEl({className: this.options.phizClass});
         const phizIcon = createDivEl({element: 'i', className: ['icon', 'modals-phiz']});
@@ -433,7 +434,7 @@ class LivesRecharge {
     }
 
     get package() {
-        return this.data.userPackage ? `${this.data.userPackage + ' ' + LANG.LIVE_PREVIEW.Actions.Coins}` : `0 ${LANG.LIVE_PREVIEW.Actions.Coins}`;
+        return this.data.package ? `${this.data.package + ' ' + LANG.LIVE_PREVIEW.Actions.Coins}` : `0 ${LANG.LIVE_PREVIEW.Actions.Coins}`;
     }
 
     get goodslist() {
@@ -451,18 +452,18 @@ class LivesRecharge {
         const groupTag = createDivEl({className: this.options.groupClass});
         const tagLabel = createDivEl({element: 'p', className: this.options.labelClass});
         const tagLabelSpan = createDivEl({element: 'span', className: this.options.labelClass, content: `${LANG.LIVE_PREVIEW.Recharge.Select_Amount}`});
-        const tagLabelMoney = createDivEl({element: 'span', className: 'money', content: `${LANG.LIVE_PREVIEW.Actions.Account}`+`${this.package}`+`${LANG.LIVE_PREVIEW.Actions.Coins}`});
+        const tagLabelMoney = createDivEl({element: 'span', className: 'money', content: `${LANG.LIVE_PREVIEW.Actions.Account + this.package}`});
         tagLabel.appendChild(tagLabelSpan);
         tagLabel.appendChild(tagLabelMoney);
         groupTag.appendChild(tagLabel);
 
         const tagItems = createDivEl({className: ['tag', this.options.tagClass]})
         this.goodslist.forEach((data, index) => {
-            const rechargeItemEL = new RechargeItem({data, handler});
+            const rechargeItemEL = new RechargeItem({data});
             tagItems.appendChild(rechargeItemEL.element);
 
             if (index == 0) {
-                addClass(rechargeItemEL, this.options.showCalss);
+                addClass(rechargeItemEL.element, this.options.showCalss);
             }
         });
         groupTag.appendChild(tagItems);
@@ -484,11 +485,11 @@ class LivesRecharge {
 
         const listItems = createDivEl({className: ['ul', 'list']});
         this.payWaylist.forEach((data, index) => {
-            const payItemEL = new PayItem({data, handler});
+            const payItemEL = new PayItem({data});
             listItems.appendChild(payItemEL.element);
 
             if (index == 0) {
-                addClass(payItemEL, this.options.showCalss);
+                addClass(payItemEL.element, this.options.showCalss);
             }
         });
         groupItem.appendChild(listItems);
@@ -496,7 +497,7 @@ class LivesRecharge {
         const btnPaypal = createDivEl({id: 'paypal-button', className: ['button-paypal', 'hide']});
         groupItem.appendChild(btnPaypal);
 
-        const btnPay = createDivEl({id: 'button-pay', className: ['button', 'button-primary'], content: `${LANG.LIVE_PREVIEW.USER_ACCOUNT.Buttons}`});
+        const btnPay = createDivEl({id: 'button-pay', className: ['button', 'button-primary'], content: `${LANG.USER_ACCOUNT.Buttons}`});
         groupItem.appendChild(btnPay);
 
         wrapper.appendChild(groupItem);
