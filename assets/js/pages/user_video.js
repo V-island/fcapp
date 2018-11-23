@@ -1,9 +1,9 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
+import { closeModal, videoPreview } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import { PullLoad } from '../components/PullLoad';
 import RecordVideo from '../record-video';
-import Modal from '../modal';
 
 import {
 	body,
@@ -31,7 +31,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 Template.defaults.imports.dateFormat = (date, format) => {
 	return dateFormat(date, format);
 };
@@ -112,9 +111,9 @@ export default class UserVideo extends EventEmitter {
 		if (videoMediaEl.length > 0) {
 			addEvent(videoMediaEl[0], 'click', () => {
 				let videoUrl = getData(videoMediaEl[0], 'url');
-				Spinner.start(body);
-				modal.videoModal(videoUrl).then((_modal) => {
-					Spinner.remove();
+
+				videoPreview({
+					videoUrl: videoUrl
 				});
 	        });
 		}

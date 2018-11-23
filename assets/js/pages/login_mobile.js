@@ -1,7 +1,6 @@
 import Template from 'art-template/lib/template-web';
 import { FacebookPlugin, TwitterPlugin } from '../components/ThirdPartyPlugin';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 import Form from '../forms';
 import {
     getLangConfig
@@ -22,7 +21,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 
 export default class LoginMobile extends EventEmitter {
 	constructor(element, options) {

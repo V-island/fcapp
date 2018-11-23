@@ -1,6 +1,6 @@
 import Template from 'art-template/lib/template-web';
+import { closeModal, alert } from '../components/Modal';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
@@ -25,7 +25,6 @@ import {
 
 const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const LANG = getLangConfig();
-const modal = new Modal();
 
 export default class UserScore extends EventEmitter {
 	constructor(element, options) {
@@ -68,8 +67,8 @@ export default class UserScore extends EventEmitter {
 		    addEvent(scoreEl, 'click', () => {
 		    	const money = getData(scoreEl, this.options.dataMoney);
 		    	if (this.userScore <= money) {
-		    		return modal.alert(LANG.USER_SCORE.Insufficient_points, (_modal) => {
-						modal.closeModal(_modal);
+		    		return alert({
+						text: `${LANG.USER_SCORE.Insufficient_points}`
 					});
 		    	}
 		    	return location.href = jumpURL(`#/user/score/withdraw?money=${money}`);

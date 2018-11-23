@@ -1,6 +1,6 @@
 import Template from 'art-template/lib/template-web';
+import { closeModal, alert } from '../components/Modal';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
@@ -20,7 +20,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 
 export default class User extends EventEmitter {
 	constructor(element, options) {
@@ -58,10 +57,15 @@ export default class User extends EventEmitter {
 	_bindEvent() {
 		if (!checkBindingStatus()) {
 			let {userId} = getUserInfo();
-		    modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
-		        modal.closeModal(_modal);
-		        return location.href = jumpURL('#/register/safeguard');
-		    }, LANG.REGISTER.Madal.Account_Not_Safe.Buttons);
+
+		    alert({
+		    	title: `${LANG.REGISTER.Madal.Account_Not_Safe.Title}`,
+		    	text: `${LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId)}`,
+		    	button: `${LANG.REGISTER.Madal.Account_Not_Safe.Buttons}`,
+		    	callback: () => {
+		    		return location.href = jumpURL('#/register/safeguard');
+		    	}
+		    });
 		}
 
 		Array.prototype.slice.call(this.listItemEl).forEach(ItemEl => {

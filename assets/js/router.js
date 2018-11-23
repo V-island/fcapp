@@ -1,7 +1,7 @@
 import Template from 'art-template/lib/template-web';
+import { closeModal, alert } from './components/Modal';
 import { Spinner } from './components/Spinner';
 import { TabMain } from './components/MenuItem';
-import Modal from './modal';
 import {
     body,
     fcConfig
@@ -66,7 +66,6 @@ import {
     }
 
     const LANG = getLangConfig();
-    const modal = new Modal();
 
     /**
      * 验证浏览器是否支持CustomEvent
@@ -727,11 +726,16 @@ import {
         _bindingTimerEvent() {
             let {userId} = getUserInfo();
             return setTimeout(() => {
-                modal.alert(LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId), LANG.REGISTER.Madal.Account_Not_Safe.Title, (_modal) => {
-                    modal.closeModal(_modal);
-                    return location.href = jumpURL(routerConfig.safeguardUrl);
-                }, LANG.REGISTER.Madal.Account_Not_Safe.Buttons, () => {
-                    this.BindingTimer = null;
+                alert({
+                    title: `${LANG.REGISTER.Madal.Account_Not_Safe.Title}`,
+                    text: `${LANG.REGISTER.Madal.Account_Not_Safe.Text.replace('%S', userId)}`,
+                    button: `${LANG.REGISTER.Madal.Account_Not_Safe.Buttons}`,
+                    callback: () => {
+                        return location.href = jumpURL(routerConfig.safeguardUrl);
+                    },
+                    callbackCancel: () => {
+                        this.BindingTimer = null;
+                    }
                 });
             }, 120000);
         }

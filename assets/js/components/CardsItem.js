@@ -270,7 +270,7 @@ class CardLiveMore {
         const card = createDivEl({className: 'col-100'});
 
         const link = createDivEl({element: 'a', className: [this.options.moreCalss, 'color-primary'], content: `${LANG.HOME.Video.Free.More}`});
-        link.href = jumpURL(`#/live/liveList`);
+        link.href = '#/live/liveList';
         card.appendChild(link);
         return card;
     }

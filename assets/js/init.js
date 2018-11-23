@@ -1,9 +1,6 @@
-import Modal from './modal';
 import {
     fcConfig
 } from './intro';
-
-const modal = new Modal();
 
 +function($) {
     'use strict';
@@ -37,23 +34,23 @@ const modal = new Modal();
 
         });
         $(window).on('pageAnimationStart', function() {
-            modal.hideIndicator();
+            // modal.hideIndicator();
         });
         $(window).on('pageLoadCancel', function() {
-            modal.hideIndicator();
+            // modal.hideIndicator();
         });
         $(window).on('pageLoadComplete', function() {
-            modal.hideIndicator();
+            // modal.hideIndicator();
         });
         $(window).on('pageLoadError', function() {
-            modal.hideIndicator();
-            modal.toast('加载失败');
+            // modal.hideIndicator();
+            // modal.toast('加载失败');
         });
     }
 
     $(window).on('pageAnimationStart', function(event,id,page) {
         // 在路由切换页面动画开始前,为了把位于 .page 之外的 popup 等隐藏,此处做些处理
-        modal.closeModal();
+        // modal.closeModal();
         // 如果 panel 的 effect 是 reveal 时,似乎是 page 的动画或别的样式原因导致了 transitionEnd 时间不会触发
         // 这里暂且处理一下
         $('body').removeClass('panel-closing');
@@ -61,7 +58,7 @@ const modal = new Modal();
     });
 
     $(window).on('pageInit', function() {
-        modal.hideIndicator();
+        // modal.hideIndicator();
     });
     // safari 在后退的时候会使用缓存技术，但实现上似乎存在些问题，
     // 导致路由中绑定的点击事件不会正常如期的运行（log 和 debugger 都没法调试），

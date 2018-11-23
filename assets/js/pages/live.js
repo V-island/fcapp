@@ -401,8 +401,9 @@ export default class Live extends EventEmitter {
 		};
 
 		// 开始收费直播
-		livesPrivate.onChargeShows = () => {
+		livesPrivate.onChargeShows = (price) => {
 			this.chargeLive = true;
+			this.livePrice = price;
 		};
 
 		// 结束收费直播

@@ -1,5 +1,5 @@
 import EventEmitter from './eventEmitter';
-import Modal from './modal';
+import { closeModal, confirm } from './components/Modal';
 import Progress from './progress';
 import {
     uploadVideo
@@ -19,7 +19,6 @@ import {
 } from './util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 const RECORD_LANG = LANG.LIVE_RECORD;
 /**
 config: {
@@ -146,22 +145,32 @@ export default class Record extends EventEmitter {
 
         // 关闭录制器
         addEvent(self.closeEl, 'click', function() {
-            modal.confirm(RECORD_LANG.Madal.ExitRecord.Text, function() {
-                dispatchEvent(self.recordEl, 'click');
-                self.hide();
-            }, function() {}, true);
+
+            confirm({
+                text: `${RECORD_LANG.Madal.ExitRecord.Text}`,
+                button: true,
+                callback: () => {
+                    dispatchEvent(self.recordEl, 'click');
+                    self.hide();
+                }
+            });
         });
 
         // 删除录制视频
         addEvent(self.cancelEl, 'click', function() {
-            modal.confirm(RECORD_LANG.Madal.DeleteVideo.Text, function() {
-                self.buffers = [];
-                self.consentEnd = false;
-                showHideDom(self.cancelEl, 'none');
-                showHideDom(self.confirmEl, 'none');
-                removeClass(self.buttonsEl, self.options.showClass);
-                self._mediaRecorder();
-            }, function() {}, true);
+
+            confirm({
+                text: `${RECORD_LANG.Madal.DeleteVideo.Text}`,
+                button: true,
+                callback: () => {
+                    self.buffers = [];
+                    self.consentEnd = false;
+                    showHideDom(self.cancelEl, 'none');
+                    showHideDom(self.confirmEl, 'none');
+                    removeClass(self.buttonsEl, self.options.showClass);
+                    self._mediaRecorder();
+                }
+            });
         });
 
         // 上传视频

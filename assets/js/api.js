@@ -2300,7 +2300,7 @@ export const anchorBalance = () => {
 export const getLivePrice = () => {
 	return new Promise((resolve) => {
 		getPost('/getLivePrice', {}, (response) => {
-			resolve(response.data);
+			resolve(response.data ? response.data : []);
 		}, (response) => {
 			resolve(false);
 		});

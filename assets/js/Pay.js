@@ -1,9 +1,9 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from './eventEmitter';
+import { closeModal, alert, toast } from './components/Modal';
 import { Spinner } from './components/Spinner';
 import { MessageChat } from './components/MessageChat';
 import SendBirdAction from './SendBirdAction';
-import Modal from './modal';
 import {
 	baseURL,
 	payType,
@@ -36,7 +36,6 @@ import {
 } from './util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 const CODAPAY_CODAS = {
 	'7': 356, 		// India
 	'8': 764, 		// Thailand
@@ -264,19 +263,29 @@ export default class Pay extends EventEmitter {
 		addEvent(this.btnPayEl, 'click', () => {
 			switch(this.payType) {
 				case payType.googlePay:
-					modal.toast(LANG.LOGIN.Madal.Error);
+					toast({
+						text: `${LANG.LOGIN.Madal.Error}`
+					});
 					break;
 				case payType.linePay:
-					modal.toast(LANG.LOGIN.Madal.Error);
+					toast({
+						text: `${LANG.LOGIN.Madal.Error}`
+					});
 					break;
 				case payType.kakooPay:
-					modal.toast(LANG.LOGIN.Madal.Error);
+					toast({
+						text: `${LANG.LOGIN.Madal.Error}`
+					});
 					break;
 				case payType.paytmPay:
-					modal.toast(LANG.LOGIN.Madal.Error);
+					toast({
+						text: `${LANG.LOGIN.Madal.Error}`
+					});
 					break;
 				case payType.visaPay:
-					modal.toast(LANG.LOGIN.Madal.Error);
+					toast({
+						text: `${LANG.LOGIN.Madal.Error}`
+					});
 					break;
 				case payType.codaPay:
 					this._codaPayEvent(this.currencyId);
@@ -341,15 +350,17 @@ export default class Pay extends EventEmitter {
 				// Make a call to your server to execute the payment
 				return paypal.request.post(baseURL, _data)
 					.then((res) => {
-						modal.alert(LANG.SYSTEM_CODE[res.code], (_modal) => {
-							modal.closeModal(_modal);
-							this.trigger('pay.success', this.goodsPrice);
+						alert({
+							text: `${LANG.SYSTEM_CODE[res.code]}`,
+							callback: () => {
+								this.trigger('pay.success', this.goodsPrice);
 
-							gtag('event', 'success', {
-							    'event_label': `${this.totalPrice} commodity`,
-							    'event_category': 'Pay',
-							    'non_interaction': true
-							});
+								gtag('event', 'success', {
+								    'event_label': `${this.totalPrice} commodity`,
+								    'event_category': 'Pay',
+								    'non_interaction': true
+								});
+							}
 						});
 					});
 			},
@@ -380,7 +391,9 @@ export default class Pay extends EventEmitter {
 		let _currency = CODAPAY_CODAS[countryID] ? CODAPAY_CODAS[countryID] : false;
 
 		if (!_country || !_currency) {
-			return modal.toast(LANG.LOGIN.Madal.Error);
+			return toast({
+						text: `${LANG.LOGIN.Madal.Error}`
+					});
 		}
 
 		gtag('event', 'click', {

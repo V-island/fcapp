@@ -134,10 +134,10 @@ export const closeModal = (modal) => {
         removeOnClose = hasClass(modal, Options.removeNOClose),
         overlay = isPopup ? popupOverlayEl : modalOverlayEl;
 
-    if (isPopup || isToast || isActions){
+    if (isPopup || isActions){
         removeClass(overlay, Options.modalVisibleClass);
     }else {
-        if (modalGroup.length === 1) {
+        if (modalGroup.length === 1 && !isToast) {
             removeClass(overlay, Options.modalVisibleClass);
         }
     }
@@ -161,17 +161,17 @@ export const closeModal = (modal) => {
 }
 
 // 选择表
-export const options = ({lists, callback}) => {
+export const options = ({data}) => {
     const modal = createDivEl({className: 'modal'});
 
     // list
     const modalList = createDivEl({element: 'ul', className: ['list', 'modal-list']});
-    lists.forEach((data, index) => {
-        let item = createDivEl({element: 'li', className: 'list-item', content: data.title});
-        addEvent(item, 'click', () => {
-            if (callback) callback(data.value, data.title);
+    data.forEach((item, index) => {
+        let itemEl = createDivEl({element: 'li', className: 'list-item', content: item.title});
+        addEvent(itemEl, 'click', () => {
+            if (item.onClick) item.onClick(item.value, item.title);
         });
-        modalList.appendChild(item);
+        modalList.appendChild(itemEl);
     });
     modal.appendChild(modalList);
     body.appendChild(modal);
@@ -181,7 +181,7 @@ export const options = ({lists, callback}) => {
 }
 
 // 警告框
-export const alert = ({title, text, button, callback}) => {
+export const alert = ({title, text, button, callback, callbackCancel}) => {
     const modal = createDivEl({className: 'modal'});
     title = title ? title : Defaults.modalAlertButton;
     // header
@@ -197,6 +197,7 @@ export const alert = ({title, text, button, callback}) => {
         modal.appendChild(modalHeader);
         addEvent(modalClose, 'click', () => {
             closeModal(modal);
+            if (callbackCancel) callbackCancel();
         });
     }
 
@@ -621,17 +622,18 @@ export const checkbox = ({data, title, text, nameValue, nameText, filterName, fi
         if (filterName && itemData[filterName] != filterIndex) return;
 
         let item = createDivEl({element: 'li', className: 'list-item'});
+        setData(item, 'val', itemData[nameValue]);
+        setData(item, 'text', itemData[nameText]);
         let text = createDivEl({element: 'span', className: 'list-item-text', content: itemData[nameText]});
         let meta = createDivEl({element: 'span', className: ['icon', 'user-checkbox', 'list-item-meta']});
         item.appendChild(text);
         item.appendChild(meta);
-        setData(item, 'val', itemData[nameValue]);
-        setData(item, 'text', itemData[nameText]);
 
         addEvent(item, 'click', () => {
             const activeEl = list.querySelectorAll('.active');
-            if (activeEl.length >= selected) return false;
             if (hasClass(item, 'active')) return removeClass(item, 'active');
+            if (activeEl.length >= selected) return false;
+
             addClass(item, 'active');
         });
 
@@ -650,13 +652,12 @@ export const checkbox = ({data, title, text, nameValue, nameText, filterName, fi
         element: wrapper,
         title: title,
         cancelIcon: () => {
-            const activeEl = list.querySelectorAll('.active');
+            const activeEl = modal.querySelectorAll('.active');
             let value = [],
                 text = [];
-
             Array.prototype.slice.call(activeEl).forEach(itemEl => {
-                value.push(setData(itemEl, 'val'));
-                text.push(setData(itemEl, 'text'));
+                value.push(getData(itemEl, 'val'));
+                text.push(getData(itemEl, 'text'));
             });
             if (callbackOk) callbackOk(value, text);
         }

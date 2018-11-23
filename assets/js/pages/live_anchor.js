@@ -20,6 +20,7 @@ import {
 	switchRoom,
 	checkLiveRoom,
     getUserInfo,
+    getLivePrice,
     anchorBalance
 } from '../api';
 import {
@@ -134,9 +135,7 @@ export default class LiveAnchor extends EventEmitter {
 						this.openChannel = openChannel;
 
 						const livesPrivate = this._livesPrivateEvent();
-						this.createHeartbeatHandler({
-							_private: livesPrivate
-						});
+						this.createHeartbeatHandler(livesPrivate);
 						Spinner.remove();
 					})
 					.catch(error => {
@@ -325,14 +324,22 @@ export default class LiveAnchor extends EventEmitter {
 
 		// 发送开始收费直播消息
 		livesPrivate.onGetChargeShows = (second) => {
-
-			SendBirdAction.getInstance()
-			    .sendChannelMessage({
-			        channel: this.openChannel,
-			        message: '',
-			        type: 'chargeTime',
-			        data: `${second}`
-			    });
+			getLivePrice().then((priceList) => {
+				priceList.forEach((priceItem, index) => {
+					if (priceItem.live_type == 3) {
+						SendBirdAction.getInstance()
+	                        .sendChannelMessage({
+	                            channel: this.openChannel,
+	                            message: '',
+	                            type: 'chargeTime',
+	                            data: {
+	                            	second: second,
+	                            	price: priceItem.live_price
+	                            }
+	                        });
+					}
+		        });
+			});
 		};
 
 		// 开始收费直播
@@ -483,10 +490,10 @@ export default class LiveAnchor extends EventEmitter {
 	}
 
 	// 心跳检测
-	createHeartbeatHandler({_private}) {
+	createHeartbeatHandler(livesPrivate = false) {
 		// 心跳检测服务器连接
 		this.heartbeatEvent = setInterval(() => {
-            checkLiveRoom(this.liveRoomId, _private ? _private.memberCount : 0);
+            checkLiveRoom(this.liveRoomId, livesPrivate ? livesPrivate.memberCount : 0);
         }, 60000);
 	}
 

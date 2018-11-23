@@ -30,8 +30,8 @@
 
 <!-- small video list -->
 <script id="list_videos" type="text/html">
-    <div class="col-50 card card-video" data-user-info="{{$VideosList}}">
-        <div class="card-content" style="background-image: url({{$VideosList.img_url}});">
+    <div class="col-50 card card-video" data-user-info="{{VideosList}}">
+        <div class="card-content" style="background-image: url({{VideosList.img_url}});">
             <div class="cards-top">
                 {{if NotFreeVideos}}
                     <span class="tag-label">{{VideosList.price}} {{PUBLIC.Billing}}</span>

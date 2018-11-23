@@ -147,6 +147,9 @@ class LivesContent {
         return this.data.livePrice ? this.data.livePrice : 0;
     }
 
+    set price(value) {
+    }
+
     get AnchorInfo() {
         return this.data.AnchorInfo ? this.data.AnchorInfo : {};
     }
@@ -702,12 +705,14 @@ class LivesContent {
                     case 'chargeTime':
                         if (!this.client && this.secondTime && this.chargeTime) return false;
 
+                        const {second, price} = JSON.parse(messages.data);
+                        this.price = price;
+
                         if (this.price >= this.userPackage) this.notCoins = true;
                         this.chargeTime = true;
 
-                        const second = messages.data;
                         const callback = () => {
-                            if (this.onChargeShows) this.onChargeShows();
+                            if (this.onChargeShows) this.onChargeShows(price);
                         };
                         countDownEl = this._createCountdownElement(livesContent, parseInt(second), callback);
                         livesContent.appendChild(countDownEl);

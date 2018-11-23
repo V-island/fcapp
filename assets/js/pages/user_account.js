@@ -1,6 +1,5 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 import Pay from '../Pay';
 import {
 	body,
@@ -31,7 +30,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 
 export default class UserAccount extends EventEmitter {
 	constructor(element, options) {

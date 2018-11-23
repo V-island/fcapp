@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
 import EventEmitter from './eventEmitter';
-import Modal from './modal';
+import { closeModal, options, confirm } from './components/Modal';
 import {
     getLangConfig
 } from './lang';
@@ -16,7 +16,6 @@ import {
 } from './util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 const RECORD_LANG = LANG.LIVE_RECORD;
 
 export default class RecordPhoto extends EventEmitter {
@@ -67,15 +66,16 @@ export default class RecordPhoto extends EventEmitter {
     }
 
     _init() {
-        modal.options({
-            buttons: [{
-                text: RECORD_LANG.Photo.Madal.Take,
+
+        options({
+            data: [{
+                title: `${RECORD_LANG.Photo.Madal.Take}`,
                 value: 1,
                 onClick: (text, value) => {
                     this._initRecord();
                 }
             }, {
-                text: RECORD_LANG.Photo.Madal.Select,
+                title: `${RECORD_LANG.Photo.Madal.Select}`,
                 value: 2,
                 onClick: (text, value) => {
                     this._initInput();
@@ -221,21 +221,31 @@ export default class RecordPhoto extends EventEmitter {
 
         // 关闭录制器
         addEvent(this.closeEl, 'click', () => {
-            modal.confirm(RECORD_LANG.Madal.ExitRecord.Text, () => {
-                this._recordHide();
-                this._stopStreamedVideo();
-            }, () => {}, true);
+
+            confirm({
+                text: `${RECORD_LANG.Madal.ExitRecord.Text}`,
+                button: true,
+                callback: () => {
+                    this._recordHide();
+                    this._stopStreamedVideo();
+                }
+            });
         });
 
         // 删除保存的相片
         addEvent(this.cancelEl, 'click', () => {
-            modal.confirm(RECORD_LANG.Madal.DeleteVideo.Text, () => {
-                this.fileURL = [];
-                showHideDom(this.cancelEl, 'none');
-                showHideDom(this.confirmEl, 'none');
-                showHideDom(this.recordEl, 'block');
-                removeClass(this.buttonsEl, this.options.showClass);
-            }, () => {}, true);
+
+            confirm({
+                text: `${RECORD_LANG.Madal.DeleteVideo.Text}`,
+                button: true,
+                callback: () => {
+                    this.fileURL = [];
+                    showHideDom(this.cancelEl, 'none');
+                    showHideDom(this.confirmEl, 'none');
+                    showHideDom(this.recordEl, 'block');
+                    removeClass(this.buttonsEl, this.options.showClass);
+                }
+            });
         });
 
         // 确认保存的相片

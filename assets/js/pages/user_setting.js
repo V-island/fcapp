@@ -1,6 +1,6 @@
 import Template from 'art-template/lib/template-web';
+import { closeModal, options } from '../components/Modal';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 import {
     getLangConfig
 } from '../lang';
@@ -19,7 +19,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 const NOTIFICATION_NAME = 'Message_Notification';
 const SOUND_NAME = 'Message_Sound';
 const SHOCK_NAME = 'Message_Shock';
@@ -69,16 +68,17 @@ export default class UserSetting extends EventEmitter {
 	_bindEvent() {
 
 		addEvent(this.itemNotificationEl, 'click', () => {
-			modal.options({
-				buttons: [{
-					text: LANG.USER_SETTING.Message_Notification.Buttons.Open,
+
+			options({
+				data: [{
+					title: `${LANG.USER_SETTING.Message_Notification.Buttons.Open}`,
 					value: 1,
 					onClick: (text, value) => {
 						this.itemMetaTxtEl.innerText = text;
 						setLocalStorage(NOTIFICATION_NAME, value);
 					}
 				}, {
-					text: LANG.USER_SETTING.Message_Notification.Buttons.Not_Open,
+					title: `${LANG.USER_SETTING.Message_Notification.Buttons.Not_Open}`,
 					value: 2,
 					onClick: (text, value) => {
 						this.itemMetaTxtEl.innerText = text;

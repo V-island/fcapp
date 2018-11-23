@@ -1,9 +1,9 @@
 import Template from 'art-template/lib/template-web';
+import { closeModal, prompt, options, timePicker, pickers, checkbox } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import EventEmitter from '../eventEmitter';
 import RecordPhoto from '../record-photo';
 import SendBirdAction from '../SendBirdAction';
-import Modal from '../modal';
 
 import {
     getLangConfig
@@ -38,7 +38,6 @@ import {
 
 const LANG = getLangConfig();
 const DETAIL = LANG.PERSONAL_DETAIL;
-const modal = new Modal();
 
 export default class UserDetail extends EventEmitter {
 	constructor(element, options) {
@@ -137,8 +136,10 @@ export default class UserDetail extends EventEmitter {
 
 		// 用户名
 		addEvent(this.itemUsernameEl, 'click', () => {
-			modal.prompt(DETAIL.Username.Madal.Placeholder, DETAIL.Username.Madal.Title,
-				(value) => {
+			prompt({
+				title: `${DETAIL.Username.Madal.Title}`,
+				text: `${DETAIL.Username.Madal.Placeholder}`,
+				callback: (value) => {
 					this.itemUsernameTxtEl.innerText = value;
 					updateUserInfo({ name: value }).then((data) => {
 						if (!data) return;
@@ -146,14 +147,14 @@ export default class UserDetail extends EventEmitter {
 						SendBirdAction.getInstance().updateCurrentUserInfo(value, null);
 					});
 				}
-			);
+			});
         });
 
 		// 性别
 		addEvent(this.itemGenderEl, 'click', () => {
-			modal.options({
-				buttons: [{
-					text: DETAIL.Gender.Madal.Male,
+			options({
+				data: [{
+					title: `${DETAIL.Gender.Madal.Male}`,
 					value: 1,
 					onClick: (text, value) => {
 						this.itemGenderTxtEl.innerText = text;
@@ -163,7 +164,7 @@ export default class UserDetail extends EventEmitter {
 						});
 					}
 				}, {
-					text: DETAIL.Gender.Madal.Female,
+					title: `${DETAIL.Gender.Madal.Female}`,
 					value: 2,
 					onClick: (text, value) => {
 						this.itemGenderTxtEl.innerText = text;
@@ -178,56 +179,62 @@ export default class UserDetail extends EventEmitter {
 
 		// 年龄
 		addEvent(this.itemAgeEl, 'click', () => {
-
-			modal.dateTimePickerModal(DETAIL.Age.Madal.Title,
-				(value) => {
+			timePicker({
+				title: `${DETAIL.Age.Madal.Title}`,
+				callback: (value) => {
 					let ages = dataAges(value);
 
 					this.itemAgeTxtEl.innerText = ages;
 					updateUserInfo({
 						age: ages
 					});
-				},
-			);
+				}
+			});
 		});
 
 		// 身高
 		addEvent(this.itemHeightEl, 'click', () => {
 
-			modal.prompt(DETAIL.Height.Madal.Placeholder, DETAIL.Height.Madal.Title,
-				(value) => {
+			prompt({
+				title: `${DETAIL.Height.Madal.Title}`,
+				text: `${DETAIL.Height.Madal.Placeholder}`,
+				callback: (value) => {
 					this.itemHeightTxtEl.innerText = value + DETAIL.Height.Unit;
 					updateUserInfo({
 						height: value
 					});
 				}
-			);
+			});
 		});
 
 		// 体重
 		addEvent(this.itemWeightEl, 'click', () => {
 
-			modal.prompt(DETAIL.Body_Weight.Madal.Placeholder, DETAIL.Body_Weight.Madal.Title,
-				(value) => {
+			prompt({
+				title: `${DETAIL.Body_Weight.Madal.Title}`,
+				text: `${DETAIL.Body_Weight.Madal.Placeholder}`,
+				callback: (value) => {
 					this.itemWeightTxtEl.innerText = value + DETAIL.Body_Weight.Unit;
 					updateUserInfo({
 						weight: value
 					});
 				}
-			);
+			});
 		});
 
 		// 用户交友目的
 		addEvent(this.itemFriendsEl, 'click', () => {
 
-			modal.pickerModal(DETAIL.Why_Make_Friends.Madal.Lists, DETAIL.Why_Make_Friends.Madal.Title,
-				(value, text, index) => {
+			pickers({
+				title: `${DETAIL.Why_Make_Friends.Madal.Title}`,
+				data: DETAIL.Why_Make_Friends.Madal.Lists,
+				callback: (value, text, index) => {
 					this.itemFriendsTxtEl.innerText = text;
 					updateUserInfo({
 						goal: value
 					});
 				}
-			);
+			});
 		});
 
 		// 兴趣
@@ -236,23 +243,23 @@ export default class UserDetail extends EventEmitter {
 			let getHobby = findHobbyByUserId(this.userId);
 
 			Promise.all([getAllUserHobby, getHobby]).then((data) => {
-				modal.checkboxModal({
-					text: DETAIL.Interest.Madal.Text,
-					title: DETAIL.Interest.Madal.Title,
+				checkbox({
 					data: data[0],
+					title: `${DETAIL.Interest.Madal.Title}`,
+					text: `${DETAIL.Interest.Madal.Text}`,
 					nameValue: 'id',
 					nameText: 'hobby_name',
 					selectData: data[1],
-					closeBtn: true,
 					selected: 3,
-				}, (value, text) => {
-					this.itemInterestTxtEl.innerText = '';
+					callbackOk: (value, text) => {
+						this.itemInterestTxtEl.innerText = '';
 
-					text.forEach((itemData, index) => {
-						let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
-				        this.itemInterestTxtEl.appendChild(tagLabel);
-					});
-					saveInterest(value.toString());
+						text.forEach((itemData, index) => {
+							let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
+					        this.itemInterestTxtEl.appendChild(tagLabel);
+						});
+						saveInterest(value.toString());
+					}
 				});
 			});
 		});
@@ -264,25 +271,26 @@ export default class UserDetail extends EventEmitter {
 			let getCharacterType = findCharacterTypeByUserId(this.userId, 1);
 
 			Promise.all([getAllCharacterType, getCharacterType]).then((data) => {
-				modal.checkboxModal({
-					text: DETAIL.Your_Type.Madal.Text,
-					title: DETAIL.Your_Type.Madal.Title,
+
+				checkbox({
 					data: data[0],
+					title: `${DETAIL.Your_Type.Madal.Title}`,
+					text: `${DETAIL.Your_Type.Madal.Text}`,
 					nameValue: 'id',
 					nameText: 'type_name',
-					selectData: data[1],
 					filterName: 'sex',
 					filterIndex: sexIndex,
-					closeBtn: true,
+					selectData: data[1],
 					selected: 3,
-				}, (value, text) => {
-					this.itemTypeTxtEl.innerText = '';
+					callbackOk: (value, text) => {
+						this.itemTypeTxtEl.innerText = '';
 
-					text.forEach((itemData, index) => {
-						let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
-				        this.itemTypeTxtEl.appendChild(tagLabel);
-					});
-					saveMyType(value.toString(), 1);
+						text.forEach((itemData, index) => {
+							let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
+					        this.itemTypeTxtEl.appendChild(tagLabel);
+						});
+						saveMyType(value.toString(), 1);
+					}
 				});
 			});
 		});
@@ -294,25 +302,26 @@ export default class UserDetail extends EventEmitter {
 			let getCharacterLove = findCharacterTypeByUserId(this.userId, 2);
 
 			Promise.all([getAllCharacterType, getCharacterLove]).then((data) => {
-				modal.checkboxModal({
-					text: DETAIL.Love.Madal.Text,
-					title: DETAIL.Love.Madal.Title,
+
+				checkbox({
 					data: data[0],
+					title: `${DETAIL.Love.Madal.Title}`,
+					text: `${DETAIL.Love.Madal.Text}`,
 					nameValue: 'id',
 					nameText: 'type_name',
-					selectData: data[1],
 					filterName: 'sex',
 					filterIndex: sexIndex == 1 ? 2 : 1,
-					closeBtn: true,
+					selectData: data[1],
 					selected: 3,
-				}, (value, text) => {
-					this.itemLoveTxtEl.innerText = '';
+					callbackOk: (value, text) => {
+						this.itemLoveTxtEl.innerText = '';
 
-					text.forEach((itemData, index) => {
-						let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
-				        this.itemLoveTxtEl.appendChild(tagLabel);
-					});
-					saveMyType(value.toString(), 2);
+						text.forEach((itemData, index) => {
+							let tagLabel = createDivEl({element: 'label', className: 'tag-label', content: itemData});
+					        this.itemLoveTxtEl.appendChild(tagLabel);
+						});
+						saveMyType(value.toString(), 2);
+					}
 				});
 			});
 		});

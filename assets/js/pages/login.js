@@ -1,7 +1,7 @@
 import Template from 'art-template/lib/template-web';
 import { FacebookPlugin, TwitterPlugin } from '../components/ThirdPartyPlugin';
+import { closeModal, toast } from '../components/Modal';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
 
 import {
     getLangConfig
@@ -19,7 +19,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 
 export default class Login extends EventEmitter {
 	constructor(element, options) {
@@ -67,7 +66,9 @@ export default class Login extends EventEmitter {
         // Twitter 登录
 		addEvent(this.btnTwitterEl, 'click', () => {
 			this.Twitter.Login('twitter');
-			// return modal.toast(LANG.LOGIN.Third_party.Text);
+			return toast({
+				text: `${LANG.LOGIN.Third_party.Text}`
+			})
         });
 	}
 
