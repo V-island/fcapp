@@ -5,7 +5,8 @@ import ProgressLine from './ProgressLine';
 import {
 	fcConfig,
 	baseURL,
-	chinaBaseURL,
+	chinaAppLogin,
+	chinaRegister,
 	body
 } from './intro';
 import {
@@ -495,7 +496,7 @@ export const getRegister = (params, callback) => {
  */
 export const getLogin = (params, china = false) => {
 	let _params = isObject(params) ? params : urlParse(params);
-	let _url = china ? chinaBaseURL :  '/appLogin';
+	let _url = china ? chinaAppLogin :  '/appLogin';
 	let _mac = getMac();
 	_params.mac = _mac;
 	_params.macType = MacType;
@@ -648,14 +649,15 @@ export const findPassword = (params) => {
  * @param  {[object]} params 	   [description]
  * @return {[type]} [description]
  */
-export const updatePassword = (params) => {
+export const updatePassword = (params, china = false) => {
 	let _params = isObject(params) ? params : urlParse(params);
+	let _url = china ? chinaRegister :  '/updatePassword';
 	// let {phoneCode, userPhone} = getUserInfo();
 	// _params.phoneCode = phoneCode;
 	// _params.userPhone = userPhone;
 
 	return new Promise((resolve) => {
-		getPost('/updatePassword', _params, (response) => {
+		getPost(_url, _params, (response) => {
 			toast({text: LANG.SYSTEM_CODE[response.code]});
 			resolve(true);
 		});
@@ -2204,10 +2206,11 @@ export const giveGift = (roomId, giftId, amount, type) => {
  * @param  {[type]} id [直播间ID]
  * @return {[type]}    [description]
  */
-export const checkLiveRoom = (id) => {
+export const checkLiveRoom = (id, online) => {
 	let {userId, userLoginMode} = getUserInfo();
 	let _params = {
 		live_room_id: id,
+		online: online,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
 		loginMode: userLoginMode,

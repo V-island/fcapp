@@ -97,6 +97,7 @@ export default class LiveInformation extends EventEmitter {
 
     			let recordVideo = new RecordVideo({
 	    			minTimes: 5,
+	    			newDayVideo: true,
 	    		    notUpload: true
 	    		});
 

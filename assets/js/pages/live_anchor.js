@@ -47,7 +47,6 @@ export default class LiveAnchor extends EventEmitter {
 	    extend(this.options, options);
 
 	    this.init(element);
-
 	}
 
 	init(element) {
@@ -134,8 +133,10 @@ export default class LiveAnchor extends EventEmitter {
 					.then(openChannel => {
 						this.openChannel = openChannel;
 
-						this.createHeartbeatHandler();
-						this._livesPrivateEvent();
+						const livesPrivate = this._livesPrivateEvent();
+						this.createHeartbeatHandler({
+							_private: livesPrivate
+						});
 						Spinner.remove();
 					})
 					.catch(error => {
@@ -147,7 +148,7 @@ export default class LiveAnchor extends EventEmitter {
 
 		// 一对一直播
 		livesAnchor.onPrivate = () => {
-			const {userHead} = getUserInfo();
+			const {userHead, userName} = getUserInfo();
 			Spinner.start(body);
 			beginLive(this.liveRoomId, 1).then((data) => {
 				if (!data) return Spinner.remove();
@@ -202,9 +203,24 @@ export default class LiveAnchor extends EventEmitter {
 							this.client.clientEmitter.on('stream-removed', (evt) => {
 							    let stream = evt.stream;
 							    this.client.unsubscribe(stream);
+							    this.client.unpublish(this.stream.stream);
+							    this.stream.close();
 
 							    const callback = () => {
-							    	livesPrivate.onClose();
+							    	Spinner.start(body);
+
+							    	endLive(this.liveRoomId).then((data) => {
+							    		clearInterval(this.heartbeatEvent);
+
+							    		this.client.leave();
+							    		Spinner.remove();
+
+							    		return this._livesCountEvent({
+							    				giftList: livesPrivate.ReceiveGiftList,
+							    				userHead,
+							    				userName
+							    			});
+							    	});
 							    };
 							    alert({
 							    	title: `${LANG.LIVE_PREVIEW.Madal.QuitLive.Title}`,
@@ -331,13 +347,15 @@ export default class LiveAnchor extends EventEmitter {
 				    .sendChannelMessage({
 				        channel: this.openChannel,
 				        message: '',
-				        message: '',
+				        data: '',
 				        type: 'partyTime'
 				    });
 			});
 		};
 
 		this.listWrapperEl.appendChild(livesPrivate.element);
+
+		return livesPrivate;
 	}
 
 	// 一对一窗口
@@ -465,10 +483,10 @@ export default class LiveAnchor extends EventEmitter {
 	}
 
 	// 心跳检测
-	createHeartbeatHandler() {
+	createHeartbeatHandler({_private}) {
 		// 心跳检测服务器连接
 		this.heartbeatEvent = setInterval(() => {
-            checkLiveRoom(this.liveRoomId);
+            checkLiveRoom(this.liveRoomId, _private ? _private.memberCount : 0);
         }, 60000);
 	}
 

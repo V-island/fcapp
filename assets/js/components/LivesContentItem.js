@@ -411,11 +411,13 @@ class GiftCountItem {
     }
 
     get imgUrl() {
-        return this.data.gifts_url ? protectFromXSS(this.data.gifts_url) : protectFromXSS(giftImg);
+        // return this.data.gifts_url ? protectFromXSS(this.data.gifts_url) : protectFromXSS(giftImg);
+        return this.data.giftImgURL ? protectFromXSS(this.data.giftImgURL) : protectFromXSS(giftImg);
     }
 
     get amount() {
-        return this.data.amount ? `X${this.data.amount}` : `X1`;
+        // return this.data.amount ? `X${this.data.amount}` : `X1`;
+        return this.data.giftAmount ? `X${this.data.giftAmount}` : `X1`;
     }
 
     _createElement() {

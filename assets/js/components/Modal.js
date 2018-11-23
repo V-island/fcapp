@@ -134,7 +134,7 @@ export const closeModal = (modal) => {
         removeOnClose = hasClass(modal, Options.removeNOClose),
         overlay = isPopup ? popupOverlayEl : modalOverlayEl;
 
-    if (isPopup || isToast || isPickerModal || isActions){
+    if (isPopup || isToast || isActions){
         removeClass(overlay, Options.modalVisibleClass);
     }else {
         if (modalGroup.length === 1) {

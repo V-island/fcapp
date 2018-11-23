@@ -354,6 +354,7 @@ class LivesContent {
         const livesAnchorOfflineSpan = createDivEl({element: 'p', content: `${LANG.LIVE_PREVIEW.Madal.AnchorOffline.Text}`});
         livesAnchorOffline.appendChild(livesAnchorOfflineSpan);
         livesContent.appendChild(livesAnchorOffline);
+        this.AnchorOfflineEl = livesAnchorOfflineSpan;
 
         if (!this.client && false) {
             // plugins
@@ -1448,7 +1449,7 @@ class LivesAnchorCount {
     }
 
     get giftList() {
-        return this.data.gift_list ? this.data.giftList : [];
+        return this.data.gift_list ? this.data.gift_list : [];
     }
 
     _createElement(handler, again, rest) {
@@ -1532,7 +1533,8 @@ class LivesAnchorCount {
                     // gift list
                     const Preloading = createDivEl({className: ['tag', 'score-gift']});
 
-                    this.giftList.forEach(data => {
+                    this.giftList.forEach(messages => {
+                        const data = JSON.parse(messages.data);
                         const item = new GiftCountItem({data});
                         Preloading.appendChild(item.element);
                     });

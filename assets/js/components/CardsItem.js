@@ -58,7 +58,7 @@ class CardLiveItem {
     }
 
     get fans() {
-        return this.data.fans_number ? `${this.data.fans_number}` : `0`;
+        return this.data.live_room_type == 1 ? `${this.data.fans_number}` : `${this.data.online}`;
     }
 
     get fansTxt() {

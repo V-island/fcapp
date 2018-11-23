@@ -1,7 +1,7 @@
 {
-  "name": "fcapp",
+  "name": "ShineLive",
   "version": "1.0.0",
-  "description": "fun chat of app",
+  "description": "live video stream and chat",
   "private": true,
   "main": "src/js/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "star": "http-server dist",
     "start": "http-server dist -S -c -k",
     "dev": "webpack --inline --progress --mode development --config webpack.config.js",
-    "build": "webpack"
+    "build": "webpack --inline --progress --mode development --config webpack.green.config.js"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 import EventEmitter from './eventEmitter';
 import { Spinner } from './components/Spinner';
-import Modal from './modal';
+import { closeModal, alert, confirm, toast, videoPreview } from './components/Modal';
 import Progress from './progress';
 import {
     body
@@ -25,11 +25,12 @@ import {
     hasClass,
     addClass,
     removeClass,
+    setTimesFormat,
+    hourFromNow,
     showHideDom
 } from './util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 const RECORD_LANG = LANG.LIVE_RECORD;
 /**
 config: {
@@ -173,8 +174,10 @@ export default class RecordVideo extends EventEmitter {
     _bindEvent() {
         // 开始录制/结束录制
         addEvent(this.recordEl, 'click', () => {
-            if (this.consentEnd) {
-                return modal.toast(RECORD_LANG.Prompt.Length);
+            if (this.consentEnd && this.options.newDayVideo) {
+                return toast({
+                    text: `${RECORD_LANG.Prompt.Length}`
+                })
             }
             this.consentEnd = true;
 
@@ -202,29 +205,39 @@ export default class RecordVideo extends EventEmitter {
 
         // 关闭录制器
         addEvent(this.closeEl, 'click', () => {
-            modal.confirm(RECORD_LANG.Madal.ExitRecord.Text, () => {
-                this._stopStreamedVideo();
-                this.hide();
-            }, () => {}, true);
+
+            confirm({
+                text: `${RECORD_LANG.Madal.ExitRecord.Text}`,
+                button: true,
+                callback: () => {
+                    this._stopStreamedVideo();
+                    this.hide();
+                }
+            });
         });
 
         // 删除录制视频
         addEvent(this.cancelEl, 'click', () => {
-            modal.confirm(RECORD_LANG.Madal.DeleteVideo.Text, () => {
-                this.buffers = [];
-                this.consentEnd = false;
-                showHideDom(this.cancelEl, 'none');
-                showHideDom(this.confirmEl, 'none');
-                showHideDom(this.cutoverEl, 'block');
-                showHideDom(this.localUploadEl, 'block');
 
-                if (!this.options.newDayVideo && typeof this.livesRemarkEl !== 'undefined') {
-                    showHideDom(this.livesRemarkEl, 'block');
+            confirm({
+                text: `${RECORD_LANG.Madal.DeleteVideo.Text}`,
+                button: true,
+                callback: () => {
+                    this.buffers = [];
+                    this.consentEnd = false;
+                    showHideDom(this.cancelEl, 'none');
+                    showHideDom(this.confirmEl, 'none');
+                    showHideDom(this.cutoverEl, 'block');
+                    showHideDom(this.localUploadEl, 'block');
+
+                    if (!this.options.newDayVideo && typeof this.livesRemarkEl !== 'undefined') {
+                        showHideDom(this.livesRemarkEl, 'block');
+                    }
+
+                    removeClass(this.buttonsEl, this.options.showClass);
+                    this._mediaRecorder()
                 }
-
-                removeClass(this.buttonsEl, this.options.showClass);
-                this._mediaRecorder();
-            }, () => {}, true);
+            });
         });
 
         // 上传视频
@@ -621,9 +634,8 @@ export default class RecordVideo extends EventEmitter {
     _bindVideoInfoEvent() {
         // 播放视频
         addEvent(this.editVideoEl, 'click', () => {
-            Spinner.start(body);
-            modal.videoModal(URL.createObjectURL(this.videoFile)).then((_modal) => {
-                Spinner.remove();
+            videoPreview({
+                videoUrl: URL.createObjectURL(this.videoFile)
             });
         });
 
@@ -637,9 +649,9 @@ export default class RecordVideo extends EventEmitter {
             let _title = replaceNote(this.editTextareaEl.value);
 
             if (_title == "") {
-                return modal.alert(RECORD_LANG.Prompt.Not_Description, (_modal) => {
-                        modal.closeModal(_modal);
-                    });
+                alert({
+                    text: `${RECORD_LANG.Prompt.Not_Description}`
+                });
             }
 
             this._videoInfoHide();

@@ -215,7 +215,7 @@ export default class ChinaLogin {
 
 	    // 表单提交
 	    FormEvent.onsubmit = (params) => {
-	    	updatePassword(params).then(() => {
+	    	updatePassword(params, true).then(() => {
 	    		if (handler) handler();
 	    	});
 	    };
