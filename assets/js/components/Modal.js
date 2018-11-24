@@ -169,6 +169,7 @@ export const options = ({data}) => {
     data.forEach((item, index) => {
         let itemEl = createDivEl({element: 'li', className: 'list-item', content: item.title});
         addEvent(itemEl, 'click', () => {
+            closeModal(modal);
             if (item.onClick) item.onClick(item.value, item.title);
         });
         modalList.appendChild(itemEl);

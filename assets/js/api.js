@@ -30,6 +30,7 @@ const LANG = getLangConfig();
 
 const CONFIG = {
     rootUrl: '#/home',
+    chinaLoginUrl: 'login.html',
     notloginUrl: '#/login/mobile'
 }
 const DistGreen = true;
@@ -57,6 +58,7 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 	    callback = arguments[1];
 	    param = arguments[0];
 	}
+
 	let whiteListId = getLocalStorage(WHITE_LIST_ID);
 	let token = localStorage.getItem('token');
 		_type = _type == undefined ? Type : _type;
@@ -67,14 +69,14 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 		_baseURL = baseURL;
 	}else {
 		_baseURL = _url.indexOf('https')>-1 ? _url : baseURL;
-	}
 
-	if (!isObject(_url) && (_url.indexOf('https') < 0)) {
-		param.keyword = _url.indexOf('/') > -1 ? _url.slice(1) : _url;
-	}
+		if (_url.indexOf('https') < 0) {
+			param.keyword = _url.indexOf('/') > -1 ? _url.slice(1) : _url;
+		}
 
-	if (whiteListId && (_url.indexOf('https') < 0)) {
-		param.white_list_id = whiteListId;
+		if (whiteListId && (_url.indexOf('https') < 0)) {
+			param.white_list_id = whiteListId;
+		}
 	}
 
 	let ajaxOpt ={
@@ -670,6 +672,7 @@ export const updatePassword = (params, china = false) => {
  */
 export const appLoginOut = () => {
 	let {userId, userLoginMode} = getUserInfo();
+	let whiteListId = getLocalStorage(WHITE_LIST_ID);
 	let _params = {
 		status: 2,
 		userId: userId,
@@ -682,7 +685,11 @@ export const appLoginOut = () => {
 		getPost('/appLoginOut', _params, (response) => {
 			toast({text: LANG.SYSTEM_CODE[response.code]});
 			clearLocalStorage();
-			location.href = jumpURL(CONFIG.notloginUrl);
+			if (whiteListId) {
+				location.href = `${window.location.origin}/${CONFIG.chinaLoginUrl}`;
+			}else {
+				location.href = jumpURL(CONFIG.notloginUrl);
+			}
 			resolve(true);
 		});
 	});
@@ -1249,7 +1256,12 @@ export const videoGifts = (videoUserId, videoId, giftsId, amount = 1, price) => 
  */
 export const uploadHead = (_file, callback, onProgress) => {
 	let {userId, userLoginMode} = getUserInfo();
+	let whiteListId = getLocalStorage(WHITE_LIST_ID);
 	let formData = new FormData();
+
+	if (whiteListId) {
+		formData.append("white_list_id", whiteListId);
+	}
 
 	formData.append("keyword", 'uploadHead');
 	formData.append("userId", userId);
@@ -1645,6 +1657,7 @@ export const uploadVideo = (_file, _type, _title, _imgUrl) => {
 	}
 	let {userId, userLoginMode} = getUserInfo();
 	let { id } = getLocalStorage(COUNTRY_ID_NAME);
+	let whiteListId = getLocalStorage(WHITE_LIST_ID);
 	let formData = new FormData();
 
 	formData.append("userId", userId);
@@ -1654,6 +1667,10 @@ export const uploadVideo = (_file, _type, _title, _imgUrl) => {
 	formData.append("mac", getMac());
 	formData.append("country_id", id);
 	formData.append("keyword", 'upload');
+
+	if (whiteListId) {
+		formData.append("white_list_id", whiteListId);
+	}
 
 	if (Array.isArray(_file)) {
 		for (let i = 0; i < _file.length; i++) {

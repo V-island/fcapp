@@ -174,7 +174,7 @@ export default class RecordVideo extends EventEmitter {
     _bindEvent() {
         // 开始录制/结束录制
         addEvent(this.recordEl, 'click', () => {
-            if (this.consentEnd && this.options.newDayVideo) {
+            if (this.consentEnd && !this.options.newDayVideo) {
                 return toast({
                     text: `${RECORD_LANG.Prompt.Length}`
                 })
