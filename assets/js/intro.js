@@ -260,6 +260,8 @@ export const domainURL = location.pathname == '/' ? location.origin : location.o
 
 // Server 地址配置
 // export const baseURL = 'https://shineliveapp.com/live-app/open/gate.do';
+// export const chinaAppLogin = 'https://shineliveapp.com/live-app/login/appLogin.do';
+// export const chinaRegister = 'https://shineliveapp.com/live-app/register/updatePassword.do';
 // export const baseURL = 'https://13.57.137.240:8443/live-app/open/gate';
 // export const baseURL = 'https://52.53.136.48:8443/live-app/open/gate';
 // export const baseURL = 'http://52.53.136.48:8080/live-app/open/gate';

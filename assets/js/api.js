@@ -32,7 +32,7 @@ const CONFIG = {
     rootUrl: '#/home',
     notloginUrl: '#/login/mobile'
 }
-const DistGreen = false;
+const DistGreen = true;
 
 const Type = 'POST';
 const MacType = 1; // 设备类型 1.手机 2.PC
@@ -770,7 +770,7 @@ export const personCenter = (params, token, mac, loginMode, _checkLogin = false)
 			}
 
 			if (_checkLogin) {
-				return location.href = jumpURL(CONFIG.rootUrl);
+				return location.href = `${window.location.origin}/${CONFIG.rootUrl}`;
 			}
 			resolve(response.data ? response.data : USER_INFO);
 		});

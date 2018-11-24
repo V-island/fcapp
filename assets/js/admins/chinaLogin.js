@@ -49,7 +49,6 @@ export default class ChinaLogin {
 		FormEvent.onsubmit = (params) => {
 			getLogin(params, true).then(() => {
 				findAllCountry(1, 1);
-				return location.href = `${window.location.origin}/#/home`;
 			});
 		};
 	}
