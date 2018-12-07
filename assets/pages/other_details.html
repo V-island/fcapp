@@ -114,48 +114,6 @@
                         <div class="content-block">
                             <div class="pages-contents" ref="listWrapper">
                                 <div class="row box-cards" data-page="1">
-                                    {{if VideoList}}
-                                        {{each VideoList}}
-                                            <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                                <div class="card-content" style="background-image: url({{$value.img_url}});">
-                                                    <div class="cards-top not-reverse">
-                                                        {{if $value.type == 1}}
-                                                            <span class="status-label free">{{PUBLIC.Free}}</span>
-                                                        {{else if $value.type == 2}}
-                                                            <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
-                                                        {{/if}}
-                                                    </div>
-                                                    <div class="cards-bottom">
-                                                        <p class="summary-txt">{{$value.video_description}}</p>
-                                                        <div class="video-info">
-                                                            <div class="user-info">
-                                                                <div class="user-img avatar-female">
-                                                                    <img src="{{$value.user_head}}">
-                                                                </div>
-                                                                <p class="user-name">{{$value.user_name}}</p>
-                                                            </div>
-                                                            <div class="user-follow">
-                                                                <span class="tag-label praise">
-                                                                    {{if $value.support > 999}}
-                                                                        999+
-                                                                    {{else}}
-                                                                        {{$value.support}}
-                                                                    {{/if}}
-                                                                </span>
-                                                                <span class="tag-label eye">
-                                                                    {{if $value.watch_number > 999}}
-                                                                        999+
-                                                                    {{else}}
-                                                                        {{$value.watch_number}}
-                                                                    {{/if}}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {{/each}}
-                                    {{/if}}
                                 </div>
                                 <!-- /.box-cards -->
                             </div>

@@ -37,12 +37,12 @@
             {{if LivePrice}}
                 <div class="score-list">
                     {{each LivePrice}}
-                        {{if $index.live_type == 1}}
+                        {{if $value.live_type == 1}}
                             <div class="score-item">
                                 <h3><span class="color-primary">{{$value.live_price}}</span> <small>{{USER_PRICE.Live_Price.Private_Unit}}</small></h3>
                                 <p>{{USER_PRICE.Live_Price.Private_Title}}</p>
                             </div>
-                        {{else if $index.live_type == 3}}
+                        {{else if $value.live_type == 3}}
                             <div class="score-item">
                                 <h3><span class="color-primary">{{$value.live_price}}</span> <small>{{USER_PRICE.Live_Price.Gold_Unit}}</small></h3>
                                 <p>{{USER_PRICE.Live_Price.Gold_Title}}</p>

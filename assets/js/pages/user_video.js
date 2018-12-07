@@ -1,6 +1,7 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
-import { closeModal, videoPreview } from '../components/Modal';
+import { VideoWatchItem, CardVideoAdd } from '../components/CardsItem';
+import { closeModal, confirm, videoPreview } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import { PullLoad } from '../components/PullLoad';
 import RecordVideo from '../record-video';
@@ -53,7 +54,6 @@ export default class UserVideo extends EventEmitter {
 	    extend(this.options, options);
 	    extend(this.data, LANG);
 
-	    this.detailsItemFile = fcConfig.publicFile.other_details_item;
 	    this.init(element);
 
 	}
@@ -64,73 +64,65 @@ export default class UserVideo extends EventEmitter {
 		let getMyVideo = findMyVideo(this._page, this._number);
 
 		getMyVideo.then((data) => {
-			this.data.MyVideo = data;
+			this.VideoList = data;
 
 			this.UserVideoEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.UserVideoEl);
 			this._init();
 		});
-
-		this.tpl = {};
-
-		importTemplate(this.detailsItemFile, (id, _template) => {
-		    this.tpl[id] = _template;
-		});
 	}
 
 	_init() {
 		this.pagesVideoEl = this.UserVideoEl.querySelector(this.options.userWrapper);
-		this.cardsVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
-		this.VideoEl = this.pagesVideoEl.getElementsByClassName(this.options.cardvideoClass);
-		this.videoAddEl = this.pagesVideoEl.getElementsByClassName(this.options.videoAddClass)[0];
+		this.boxVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
+
+		// add video
+		const videoAddItem = new CardVideoAdd({
+			handler: () => {
+				let record = new RecordVideo({
+	    		    editVideoInfo: true
+	    		});
+				record.show();
+			}
+		});
+		this.boxVideoEl.append(videoAddItem.element);
+
+		if (this.VideoList.length > 0) {
+			// content
+			this.VideoList.forEach((itemData, index) => {
+				if (itemData.status == 4) return false;
+
+				let videoItem;
+				const Delete = (id) => {
+					const callback = () => {
+						let getDeleteVideo = deleteVideo(id);
+
+						getDeleteVideo.then((data) => {
+							if (!data) return;
+
+							this.boxVideoEl.removeChild(videoItem.element);
+						});
+					};
+					confirm({
+						text: `${LANG.USER_VIDEO.Delete_Prompt}`,
+						callback
+					});
+				};
+				const handler = (url) => {
+					videoPreview({
+						videoUrl: url
+					});
+				};
+				videoItem = new VideoWatchItem({
+					Delete,
+					handler,
+					data: itemData
+				});
+				this.boxVideoEl.append(videoItem.element);
+			});
+		}
 
 		this._VideoPullLoad();
-		this._bindEvent();
-	}
-
-	_bindEvent() {
-		// 上传
-		addEvent(this.videoAddEl, 'click', () => {
-			let record = new RecordVideo({
-    		    editVideoInfo: true
-    		});
-
-			record.show();
-        });
-
-		Array.prototype.slice.call(this.VideoEl).forEach(ItemEl => {
-			this._cardVideoEvent(ItemEl);
-		});
-	}
-
-	_cardVideoEvent(ItemEl) {
-		let videoMediaEl = ItemEl.getElementsByClassName(this.options.mediaClass);
-		let videoCloseEl = ItemEl.getElementsByClassName(this.options.videoCloseClass);
-
-		// 浏览视频
-		if (videoMediaEl.length > 0) {
-			addEvent(videoMediaEl[0], 'click', () => {
-				let videoUrl = getData(videoMediaEl[0], 'url');
-
-				videoPreview({
-					videoUrl: videoUrl
-				});
-	        });
-		}
-
-		// 删除视频
-		if (videoCloseEl.length > 0) {
-			addEvent(videoCloseEl[0], 'click', () => {
-				let videoId = getData(ItemEl, 'id');
-				let getDeleteVideo = deleteVideo(videoId);
-
-				getDeleteVideo.then((data) => {
-					if (!data) return;
-
-					showHideDom(ItemEl, 'none');
-				});
-	        });
-		}
 	}
 
 	// Video 模块
@@ -156,20 +148,58 @@ export default class UserVideo extends EventEmitter {
 		// 下拉刷新
 		VideoPullLoad.onPullingDown = () => {
 			return new Promise((resolve) => {
-				findMyVideo(this._page, this._number).then((data) => {
-					if (!data) return resolve(true);
+				findMyVideo(this._page, this._number).then((videoList) => {
+					if (!videoList) return resolve(true);
 
-					if (data) {
-						this.cardsVideoEl.innerHTML = '';
-						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_add_item, this.data)));
+					this.boxVideoEl.innerHTML = '';
 
-						data.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
-							this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_my_videos_item, this.data)));
+					// add video
+					const videoAddItem = new CardVideoAdd({
+						handler: () => {
+							let record = new RecordVideo({
+				    		    editVideoInfo: true
+				    		});
+							record.show();
+						}
+					});
+					this.boxVideoEl.append(videoAddItem.element);
+
+					if (videoList) {
+						// content
+						videoList.forEach((itemData, index) => {
+							if (itemData.status == 4) return false;
+
+							let videoItem;
+							const Delete = (id) => {
+								const callback = () => {
+									let getDeleteVideo = deleteVideo(id);
+
+									getDeleteVideo.then((data) => {
+										if (!data) return;
+
+										this.boxVideoEl.removeChild(videoItem.element);
+									});
+								};
+								confirm({
+									text: `${LANG.USER_VIDEO.Delete_Prompt}`,
+									callback
+								});
+							};
+							const handler = (url) => {
+								videoPreview({
+									videoUrl: url
+								});
+							};
+							videoItem = new VideoWatchItem({
+								Delete,
+								handler,
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
 						});
 					}
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, this._page);
-					this._bindEvent();
+
+					setData(this.boxVideoEl, this.options.cardsPageIndex, this._page);
 					resolve(true);
 				});
 			});
@@ -177,20 +207,46 @@ export default class UserVideo extends EventEmitter {
 
 		// 上拉加载
 		VideoPullLoad.onPullingUp = () => {
-			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
+			let _page = getData(this.boxVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
 
 			return new Promise((resolve) => {
-				findMyVideo(_page, this._number).then((data) => {
-					if (data) {
-						data.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
+				findMyVideo(_page, this._number).then((videoList) => {
+					if (videoList) {
+						// content
+						videoList.forEach((itemData, index) => {
+							if (itemData.status == 4) return false;
 
-							let element = createDom(Template.render(this.tpl.list_my_videos_item, this.data));
-							this._cardVideoEvent(element);
-							this.cardsVideoEl.append(element);
+							let videoItem;
+							const Delete = (id) => {
+								const callback = () => {
+									let getDeleteVideo = deleteVideo(id);
+
+									getDeleteVideo.then((data) => {
+										if (!data) return;
+
+										this.boxVideoEl.removeChild(videoItem.element);
+									});
+								};
+								confirm({
+									text: `${LANG.USER_VIDEO.Delete_Prompt}`,
+									callback
+								});
+							};
+							const handler = (url) => {
+								videoPreview({
+									videoUrl: url
+								});
+							};
+							videoItem = new VideoWatchItem({
+								Delete,
+								handler,
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
 						});
-						setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+
+						setData(this.boxVideoEl, this.options.cardsPageIndex, _page);
 					}
 					resolve(true);
 				});

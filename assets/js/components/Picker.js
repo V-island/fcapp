@@ -1,24 +1,26 @@
 import BScroll from 'better-scroll';
-import EventEmitter from './eventEmitter';
-
 import {
     extend,
-    createDom,
+    addEvent,
+    createDivEl,
+    getData,
+    setData,
     addClass,
     removeClass
-} from './util';
+} from '../util';
 
-export default class Picker extends EventEmitter {
+export default class Picker {
     constructor(options) {
-        super();
 
         this.options = {
             data: [],
             title: '',
+            unit: '',
             selectedIndex: null,
             closeBtn: true,
             valueEqualText: false,
             wrapperClass: 'wheels-wrapper',
+            lineClass: 'wheels-line',
             pickerClass: 'wheels',
             confirmClass: 'btn-confirm',
             closeClass: 'btn-close',
@@ -31,20 +33,24 @@ export default class Picker extends EventEmitter {
         extend(this.options, options);
 
         this.data = this.options.data;
-        this.modalEl = createDom(this._pickerTemplate(this.options));
 
-        document.body.append(this.modalEl);
+        this.element = this.createElement(this.options);
 
-        this.pickerEl = this.modalEl.getElementsByClassName(this.options.pickerClass);
-        this.confirmEl = this.modalEl.getElementsByClassName(this.options.confirmClass)[0];
-        this.cancelEl = this.modalEl.getElementsByClassName(this.options.closeClass)[0];
-        this.closeEl = this.modalEl.getElementsByClassName(this.options.iconCloseClass)[0];
-        this.scrollEl = this.modalEl.getElementsByClassName(this.options.itemClass);
+        this.onClose = null;
+        this.onSelect = null;
+        this.onConfirm = null;
+        this.onChange = null;
 
-        this._init();
+        this.init();
     }
 
-    _init() {
+    get price() {
+        return this.data.livePrice ? this.data.livePrice : 0;
+    }
+
+    init() {
+        this.pickerEl = this.element.getElementsByClassName(this.options.pickerClass);
+
         this.selectedIndex = [];
         this.selectedVal = [];
         this.selectedText = [];
@@ -55,57 +61,101 @@ export default class Picker extends EventEmitter {
                 this.selectedIndex[i] = 0;
             }
         }
-
-        this._bindEvent();
+        this.show();
     }
 
-    _bindEvent() {
-        let self = this;
+    createElement(options) {
+        const modal = createDivEl({className: 'modal'});
 
-        self.modalEl.addEventListener('touchmove', function(e) {
-            e.preventDefault();
+        // header
+        if (options.title) {
+            const modalHeader = createDivEl({className: 'modal-header'});
+            const modalTitle = createDivEl({className: 'modal-title', content: options.title});
+            modalHeader.appendChild(modalTitle);
+
+            const modalClose = createDivEl({className: 'modal-close'});
+            const modalCloseIcon = createDivEl({element: 'i', className: ['icon', 'modals-close']});
+            modalClose.appendChild(modalCloseIcon);
+            modalHeader.appendChild(modalClose);
+            modal.appendChild(modalHeader);
+            addEvent(modalClose, 'click', () => {
+                this.hide();
+                if (this.onClose) this.onClose();
+            });
+        }
+
+        // content
+        const modalContent = createDivEl({className: ['modal-content', options.wrapperClass]});
+        this.data.forEach((List, index) => {
+            let pickerContent = createDivEl({className: options.pickerClass});
+            let listEl = createDivEl({element: 'ul', className: options.scrollClass});
+
+            List.forEach((item, indexItem) => {
+                const itemEl = createDivEl({element: 'li', className: options.itemClass, content: item.text});
+                setData(itemEl, 'val', (options.valueEqualText ? item.text : item.value));
+                if (indexItem === 0) {
+                    addClass(itemEl, options.showClass);
+                }
+                listEl.appendChild(itemEl);
+            });
+
+            pickerContent.appendChild(listEl);
+            modalContent.appendChild(pickerContent);
         });
+        let lineContent = createDivEl({className: options.lineClass});
+        let lineContentSpen = createDivEl({element: 'span', content: options.unit});
+        lineContent.appendChild(lineContentSpen);
+        modalContent.appendChild(lineContent);
+        modal.appendChild(modalContent);
 
-        self.confirmEl.addEventListener('click', function() {
-            self.hide();
+        // footer
+        const modalFooter = createDivEl({className: ['modal-footer', 'buttons']});
+        const buttonNo = createDivEl({className: ['button', 'fill-primary'], content: options.buttonCancel});
+        addEvent(buttonNo, 'click', () => {
+            this.hide();
+            if (this.onClose) this.onClose();
+        });
+        modalFooter.appendChild(buttonNo);
 
+        const buttonYes = createDivEl({className: ['button', 'button-primary'], content: options.buttonOk});
+        addEvent(buttonYes, 'click', () => {
+            this.hide();
             let changed = false;
-            for (let i = 0; i < self.data.length; i++) {
-                let index = self.wheels[i].getSelectedIndex();
-                self.selectedIndex[i] = index;
+            for (let i = 0; i < this.data.length; i++) {
+                let index = this.wheels[i].getSelectedIndex();
+                this.selectedIndex[i] = index;
 
                 let value = null,
                     text = null;
-                if (self.data[i].length) {
-                    value = self.options.valueEqualText ? self.data[i][index].text : self.data[i][index].value;
-                    text = self.data[i][index].text;
+                if (this.data[i].length) {
+                    value = this.options.valueEqualText ? this.data[i][index].text : this.data[i][index].value;
+                    text = this.data[i][index].text;
                 }
-                if (self.selectedVal[i] !== value) {
+                if (this.selectedVal[i] !== value) {
                     changed = true;
                 }
-                self.selectedVal[i] = value;
-                self.selectedText[i] = text;
+                this.selectedVal[i] = value;
+                this.selectedText[i] = text;
             }
 
-            self.trigger('picker.select', self.selectedVal, self.selectedIndex);
+            if (this.onSelect) this.onSelect(this.selectedVal, this.selectedIndex);
 
             if (changed) {
-                self.trigger('picker.valuechange', self.selectedVal, self.selectedText, self.selectedIndex);
+                if (this.onConfirm) this.onConfirm(this.selectedVal, this.selectedText, this.selectedIndex);
             }
         });
+        modalFooter.appendChild(buttonYes);
+        modal.appendChild(modalFooter);
 
-        self.cancelEl.addEventListener('click', function() {
-            self.hide();
-            self.trigger('picker.cancel');
+        addEvent(modal, 'touchmove', (e) => {
+            e.preventDefault();
         });
-
-        self.closeEl.addEventListener('click', function() {
-            self.hide();
-            self.trigger('picker.cancel');
-        });
+        return modal;
     }
 
-    _createWheel(pickerEl, i) {
+    createWheel(pickerEl, i) {
+        const scrollEl = pickerEl[i].getElementsByClassName(this.options.itemClass);
+
         this.wheels[i] = new BScroll(pickerEl[i], {
             wheel: true,
             selectedIndex: this.selectedIndex[i],
@@ -122,45 +172,18 @@ export default class Picker extends EventEmitter {
 
             this.wheels[index].on('beforeScrollStart', () => {
                 let currentIndex = this.wheels[index].getSelectedIndex();
-                removeClass(this.scrollEl[currentIndex], showCls);
+                removeClass(scrollEl[currentIndex], showCls);
             });
             this.wheels[index].on('scrollEnd', () => {
                 let currentIndex = this.wheels[index].getSelectedIndex();
                 if (this.selectedIndex[i] !== currentIndex) {
                     this.selectedIndex[i] = currentIndex;
-                    addClass(this.scrollEl[currentIndex], showCls);
-                    this.trigger('picker.change', index, currentIndex);
+                    addClass(scrollEl[currentIndex], showCls);
+                    if (this.onChange) this.onChange(index, currentIndex);
                 }
             });
         })(i);
         return this.wheels[i];
-    }
-
-    _pickerTemplate(options) {
-        options = options || {};
-        let modalHTML = '';
-        let buttonsHTML = '';
-        let afterTextHTML = '';
-        if (options.buttons && options.buttons.length > 0) {
-            for (let i = 0; i < options.buttons.length; i++) {
-                buttonsHTML += '<span class="modal-button ' + (options.buttons[i].fill ? 'modal-button-fill ' + options.closeClass : options.confirmClass) + '" data-ripple>' + options.buttons[i].text + '</span>';
-            }
-        }
-        let titleHTML = options.title ? '<div class="modal-title">' + options.title + '</div>' : '';
-        let closeHTML = options.closeBtn ? '<a href="javascript: void(0)" class="'+ options.iconCloseClass +'"><i class="ion ion-md-close"></i></a>' : '';
-        options.data.forEach((_data, index) => {
-            afterTextHTML += '<div class="'+ options.pickerClass +'"><ul class="'+ options.scrollClass +'">'+ this._itemTemplate(_data) +'</ul></div>';
-        });
-        modalHTML = '<div class="modal"><div class="modal-header">' + (titleHTML + closeHTML) + '</div><div class="modal-inner '+ options.wrapperClass +'">' + afterTextHTML + '</div><div class="modal-buttons">' + buttonsHTML + '</div></div>';
-        return modalHTML;
-    }
-
-    _itemTemplate(data) {
-        let html = '';
-        data.forEach((_data, index) => {
-            html += '<li class="'+ this.options.itemClass + ' ' + (index === 0 ? this.options.showClass : '') +'" data-val="'+ (this.options.valueEqualText ? _data.text : _data.value) +'">'+ _data.text +'</li>';
-        });
-        return html;
     }
 
     /**
@@ -174,7 +197,7 @@ export default class Picker extends EventEmitter {
             if (!this.wheels) {
                 this.wheels = [];
                 for (let i = 0; i < this.data.length; i++) {
-                    this._createWheel(this.pickerEl, i);
+                    this.createWheel(this.pickerEl, i);
                 }
             } else {
                 for (let i = 0; i < this.data.length; i++) {
@@ -261,23 +284,3 @@ export default class Picker extends EventEmitter {
         wheel.wheelTo(dist);
     }
 }
-
-/**
- * picker.change
- * 当一列滚动停止的时候，会派发 picker.change 事件，同时会传递列序号 index 及滚动停止的位置 selectedIndex。
- */
-
-/**
- * picker.select
- * 当用户点击确定的时候，会派发 picker.select 事件，同时会传递每列选择的值数组 selectedVal 和每列选择的序号数组 selectedIndex。
- */
-
-/**
- * picker.cancel
- * 当用户点击取消的时候，会派发picker.cancel事件。
- */
-
-/**
- * picker.valuechange
- * 当用户点击确定的时候，如果本次选择的数据和上一次不一致，会派发 picker.valuechange 事件，同时会传递每列选择的值数组 selectedVal 和每列选择的序号数组 selectedIndex。
- */

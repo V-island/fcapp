@@ -18,8 +18,8 @@ import Live from './pages/live';
 import LiveList from './pages/live_list';
 import LiveAnchor from './pages/live_anchor';
 
-
-import FreeVideo from './pages/free_video';
+import Video from './pages/video';
+import VideoFree from './pages/video_free';
 
 import OtherDetails from './pages/other_details';
 
@@ -31,6 +31,7 @@ import UserPrice from './pages/user_price';
 import UserProof from './pages/user_proof';
 import UserInvite from './pages/user_invite';
 import UserBlacklist from './pages/user_blacklist';
+import UserInformation from './pages/user_information';
 
 import UserAccount from './pages/user_account';
 import UserAccountHistory from './pages/user_account_history';
@@ -38,6 +39,7 @@ import UserAccountTerms from './pages/user_account_terms';
 
 import UserScore from './pages/user_score';
 import UserScoreHistory from './pages/user_score_history';
+import UserScoreExplain from './pages/user_score_explain';
 import UserScoreWithdraw from './pages/user_score_withdraw';
 
 import UserSetting from './pages/user_setting';
@@ -56,36 +58,6 @@ export const fcConfig = {
     swipePanel: "left", //滑动打开侧栏
     swipePanelOnlyClose: true, //只允许滑动关闭，不允许滑动打开侧栏
     importJs: '@webcomponents/webcomponentsjs/webcomponents-lite',
-    publicFile: {
-        home_items: {
-            name: 'home_items',
-            path: `${adminBase}public/home_items.html`
-        },
-        favorite_items: {
-            name: 'favorite_items',
-            path: `${adminBase}public/favorite_items.html`
-        },
-        other_details_item: {
-            name: 'other_details_item',
-            path: `${adminBase}public/other_details_item.html`
-        },
-        bar_tabs: {
-            name: 'bar_tabs',
-            path: `${adminBase}public/bar_tabs.html`
-        },
-        live_preview: {
-            name: 'live_preview',
-            path: `${adminBase}public/live_preview.html`
-        },
-        client_rtc: {
-            name: 'client_rtc',
-            path: `${adminBase}public/client_rtc.html`
-        },
-        client_call: {
-            name: 'client_call',
-            path: `${adminBase}public/client_call.html`
-        }
-    },
     pagesFile: [{
         name: '404',
         path: `${adminBase}pages/404.html`,
@@ -133,13 +105,7 @@ export const fcConfig = {
         path: `${adminBase}pages/home.html`,
         component: Home,
         init: 1,
-        navTabs: 1,
-        children: [{
-            name: 'freevideo',
-            path: `${adminBase}pages/free_video.html`,
-            component: FreeVideo,
-            init: 1
-        }]
+        navTabs: 1
     }, {
         name: 'live',
         path: `${adminBase}pages/live.html`,
@@ -154,6 +120,17 @@ export const fcConfig = {
             name: 'liveList',
             path: `${adminBase}pages/live_list.html`,
             component: LiveList,
+            init: 1
+        }]
+    }, {
+        name: 'video',
+        path: `${adminBase}pages/video.html`,
+        component: Video,
+        init: 1,
+        children: [{
+            name: 'free',
+            path: `${adminBase}pages/video_free.html`,
+            component: VideoFree,
             init: 1
         }]
     }, {
@@ -214,6 +191,10 @@ export const fcConfig = {
                 path: `${adminBase}pages/user_score_history.html`,
                 component: UserScoreHistory
             }, {
+                name: 'explain',
+                path: `${adminBase}pages/user_score_explain.html`,
+                component: UserScoreExplain
+            }, {
                 name: 'withdraw',
                 path: `${adminBase}pages/user_score_withdraw.html`,
                 component: UserScoreWithdraw
@@ -230,6 +211,10 @@ export const fcConfig = {
             name: 'blacklist',
             path: adminBase + '../pages/user_blacklist.html',
             component: UserBlacklist
+        }, {
+            name: 'information',
+            path: adminBase + '../pages/user_information.html',
+            component: UserInformation
         }, {
             name: 'setting',
             path: `${adminBase}pages/user_setting.html`,
@@ -265,11 +250,7 @@ export const domainURL = location.pathname == '/' ? location.origin : location.o
 // export const baseURL = 'https://shinelive.me/live-app/open/gate.do';
 // export const chinaAppLogin = 'https://shinelive.me/live-app/login/appLogin.do';
 // export const chinaRegister = 'https://shinelive.me/live-app/register/updatePassword.do';
-// export const baseURL = 'https://13.57.137.240:8443/live-app/open/gate';
-// export const baseURL = 'https://52.53.136.48:8443/live-app/open/gate';
-// export const baseURL = 'http://52.53.136.48:8080/live-app/open/gate';
 // 本地地址
-// export const baseURL = 'http://192.168.1.36:8080/open/gate.do';
 export const baseURL = 'https://192.168.1.211:8443/live-app/open/gate.do';
 export const chinaAppLogin = 'https://192.168.1.211:8443/live-app/login/appLogin';
 export const chinaRegister = 'https://192.168.1.211:8443/live-app/register/updatePassword';
@@ -289,18 +270,6 @@ export const sendBirdConfig = {
     sendBirdAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
     sendBirdSandboxAppID: '739F5F33-F0B6-4AA5-B970-B20DD29599AA',
     sendBirdAppURL: 'https://api.sendbird.com',
-    customerUserId: 339,
-    customerIds: 'CS_01',
-    customerName: 'Customer service',
-    customerType: 'customer'
-};
-
-export const pubnubConfig = {
-    pubnub: true, // 默认使用pubnub DSK
-    publishKey: 'pub-c-d8599c43-cecf-42ba-a72f-aa3b24653c2b',
-    subscribeKey: 'sub-c-6c6c021c-c4e2-11e7-9628-f616d8b03518',
-    // publishKey: 'pub-c-d569fe13-e17f-48b5-b630-dd9312021dba',
-    // subscribeKey: 'sub-c-f4900850-dda0-11e8-94b4-42638ad66e25',
     customerUserId: 339,
     customerIds: 'CS_01',
     customerName: 'Customer service',

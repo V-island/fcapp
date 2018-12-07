@@ -12,62 +12,6 @@
             <div class="contents-wrapper">
                 <div class="user-contents" ref="listWrapper">
                     <div class="row box-cards" data-page="1" style="min-height: 100%;">
-                        <div class="col-50 card card-video video-add-card">
-                            <div class="card-content">
-                                <div class="icon-box">
-                                    <i class="icon user-add-video"></i>
-                                </div>
-                                <p class="add-title">{{USER_VIDEO.Add_Title}}</p>
-                                <p class="text">{{USER_VIDEO.Add_Text}}</p>
-                            </div>
-                        </div>
-
-                        {{if MyVideo}}
-                            {{each MyVideo}}
-                                {{if $value.status != 4}}
-                                <div class="col-50 card card-video" data-id="{{$value.id}}">
-                                    <div class="card-content" style="background-image: url({{$value.img_url}});">
-                                        <div class="cards-top">
-                                            <i class="icon user-close-video btn-close-video"></i>
-                                            {{if $value.status == 1}}
-                                                <span class="status-label review">{{PUBLIC.Review}}</span>
-                                            {{else if $value.status == 2}}
-                                                {{if $value.type == 1}}
-                                                    <span class="status-label free">{{PUBLIC.Free}}</span>
-                                                {{else if $value.type == 2}}
-                                                    <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
-                                                {{/if}}
-                                            {{else if $value.status == 3}}
-                                                <span class="status-label refuse">{{PUBLIC.Refuse}}</span>
-                                            {{/if}}
-                                        </div>
-                                        <div class="cards-bottom">
-                                            <p class="summary-txt">{{$value.video_description}}</p>
-                                            <div class="video-info">
-                                                <p class="video-time">{{$value.create_time | dateFormat 'YYYY-MM-DD'}}</p>
-                                                <div class="user-follow">
-                                                    <span class="tag-label praise">
-                                                        {{if $value.support > 999}}
-                                                            999+
-                                                        {{else}}
-                                                            {{$value.support}}
-                                                        {{/if}}
-                                                    </span>
-                                                    <span class="tag-label eye">
-                                                        {{if $value.watch_number > 999}}
-                                                            999+
-                                                        {{else}}
-                                                            {{$value.watch_number}}
-                                                        {{/if}}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {{/if}}
-                            {{/each}}
-                        {{/if}}
                     </div>
                     <!-- /.box-cards -->
                 </div>

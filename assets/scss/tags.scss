@@ -61,6 +61,29 @@ $tag-level-undone-border: 0.02rem solid #606066;
 		margin: auto -0.75rem;
 	    padding-left: 0.75rem;
 	}
+	&.tag-report {
+		>label.tag-label {
+	        padding: 0 1rem;
+	        margin: 0;
+		    border-width: 0;
+
+			background-color: transparent;
+	    	background-position: left;
+	        background-size: 0.5rem;
+	        background-repeat: no-repeat;
+	        background-image: url("#{$imgBaseUrl}/users/icon-checkbox.png");
+	        background-image: image-set(url("#{$imgBaseUrl}/users/icon-checkbox.png") 1x, url("#{$imgBaseUrl}/users/icon-checkbox@2x.png") 2x);
+
+	        &.active {
+	        	background-color: transparent;
+        		background-position: left;
+        	    background-size: 0.5rem;
+        	    background-repeat: no-repeat;
+	        	background-image: url("#{$imgBaseUrl}/users/icon-checkbox-active.png");
+	        	background-image: image-set(url("#{$imgBaseUrl}/users/icon-checkbox-active.png") 1x, url("#{$imgBaseUrl}/users/icon-checkbox-active@2x.png") 2x);
+	        }
+		}
+	}
 	label.tag-label {
 		background: $tag-bg-color;
 		border-radius: $tag-border-radius;
@@ -219,6 +242,20 @@ $tag-level-undone-border: 0.02rem solid #606066;
 		>img{
 			width: 100%;
 			height: 100%;
+		}
+	}
+	label.video-label {
+		@include flex-spindle-center(space-around, column);
+		margin: 0 2rem 0 0;
+
+		i.icon{
+			@include size(1rem);
+		}
+
+		span{
+			color: $color-text-gray-light;
+			font-size: 0.45rem;
+			margin-top: 0.2rem;
 		}
 	}
 	.user-info {

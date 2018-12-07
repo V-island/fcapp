@@ -36,6 +36,8 @@ import {
 } from './util';
 
 const LANG = getLangConfig();
+const WHITE_LIST_ID = 'WHITE_LIST';
+const COUNTRY_ID_NAME = 'COUNTRY_ID';
 const CODAPAY_CODAS = {
 	'7': 356, 		// India
 	'8': 764, 		// Thailand
@@ -295,6 +297,8 @@ export default class Pay extends EventEmitter {
 	}
 
 	_paypalServerEvent() {
+		let whiteListId = getLocalStorage(WHITE_LIST_ID);
+		let { currency_type } = getLocalStorage(COUNTRY_ID_NAME);
 		paypal.Button.render({
 
 			env: 'production', // sandbox | production
@@ -314,7 +318,7 @@ export default class Pay extends EventEmitter {
 			payment: (data, actions) => {
 				gtag('event', 'click', {
 				    'event_label': `${this.totalPrice} commodity`,
-				    'event_category': 'Pay',
+				    'event_category': 'Paypal',
 				    'non_interaction': true
 				});
 
@@ -323,8 +327,12 @@ export default class Pay extends EventEmitter {
 						keyword: 'pay',
 						order_id: order.order_id,
 						total: order.goods_price,
-						currency: this.currencyId
+						currency: currency_type
 					};
+
+					if (whiteListId) {
+						_data.white_list_id = whiteListId;
+					}
 					// Make a call to your server to set up the payment
 					return paypal.request.post(baseURL, _data)
 						.then((res) => {
@@ -347,6 +355,9 @@ export default class Pay extends EventEmitter {
 					payerId: data.payerID
 				};
 
+				if (whiteListId) {
+					_data.white_list_id = whiteListId;
+				}
 				// Make a call to your server to execute the payment
 				return paypal.request.post(baseURL, _data)
 					.then((res) => {
@@ -357,7 +368,7 @@ export default class Pay extends EventEmitter {
 
 								gtag('event', 'success', {
 								    'event_label': `${this.totalPrice} commodity`,
-								    'event_category': 'Pay',
+								    'event_category': 'Paypal',
 								    'non_interaction': true
 								});
 							}
@@ -369,7 +380,7 @@ export default class Pay extends EventEmitter {
 			onCancel: (data, actions) => {
 			    gtag('event', 'cancel', {
 				    'event_label': `${this.totalPrice} commodity`,
-				    'event_category': 'Pay',
+				    'event_category': 'Paypal',
 				    'non_interaction': true
 				});
 			},
@@ -378,7 +389,7 @@ export default class Pay extends EventEmitter {
 			onError: (err) => {
 			    gtag('event', 'error', {
 				    'event_label': `${this.totalPrice} commodity`,
-				    'event_category': 'Pay',
+				    'event_category': 'Paypal',
 				    'non_interaction': true
 				});
 			}

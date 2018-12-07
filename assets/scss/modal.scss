@@ -288,7 +288,9 @@ html.with-statusbar-overlay {
 // Picker
 .wheels-wrapper {
     @include flexbox;
-    padding: 0.75rem 0;
+    position: relative;
+    padding: 0.75rem 1.8rem;
+    margin: auto;
 
     .wheels {
         @include flex;
@@ -314,17 +316,30 @@ html.with-statusbar-overlay {
 
         &.active {
             color: $picker-text-color-active;
-            background: rgba(83,89,105,1);
+        }
+    }
+    .wheels-line {
+        color: $picker-text-color-active;
+        background: rgba(83,89,105,1);
+        height: 1.5rem;
+        position: absolute;
+        top: 1.8rem;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        text-align: right;
+        padding: 0 0.75rem;
+        line-height: 1.5rem;
+        font-size: 0.7rem;
 
-            &:after {
-                content: '';
-                width: 0.15rem;
-                position: absolute;
-                top: 0.35rem;
-                left: 0.75rem;
-                bottom: 0.35rem;
-                background: $color-primary;
-            }
+        &:after {
+            content: '';
+            width: 0.15rem;
+            position: absolute;
+            top: 0.35rem;
+            left: 0.75rem;
+            bottom: 0.35rem;
+            background: $color-primary;
         }
     }
 }

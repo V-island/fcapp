@@ -32,6 +32,7 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
+const VideoProfile = '480p_4';
 
 export default class LiveAnchor extends EventEmitter {
 	constructor(element, options) {
@@ -57,6 +58,7 @@ export default class LiveAnchor extends EventEmitter {
 		this.userId = userId;
 		this.liveRoomId = liveRoomId;
 		this.iMChannel = iMChannel;
+		this.memberCount = 0;
 
 		Promise.all([getIMChannel]).then((data) => {
 
@@ -83,7 +85,7 @@ export default class LiveAnchor extends EventEmitter {
 				this.stream = new AgoraStream(uid);
 				this.clientUid = uid;
 
-				this.stream.setVideoProfile('360p_4');
+				this.stream.setVideoProfile(VideoProfile);
 				this.stream.connect().then(() => {
 					this.stream.play(this.options.videoId);
 				});
@@ -128,14 +130,15 @@ export default class LiveAnchor extends EventEmitter {
 
 				this.listWrapperEl.parentNode.removeChild(livesAnchor.element);
 				this.client.publish(this.stream.stream);
+				checkLiveRoom(this.liveRoomId, 1);
 
 				SendBirdAction.getInstance()
 					.enter(this.iMChannel)
 					.then(openChannel => {
 						this.openChannel = openChannel;
 
-						const livesPrivate = this._livesPrivateEvent();
-						this.createHeartbeatHandler(livesPrivate);
+						this._livesPrivateEvent();
+						this.createHeartbeatHandler();
 						Spinner.remove();
 					})
 					.catch(error => {
@@ -175,13 +178,16 @@ export default class LiveAnchor extends EventEmitter {
 						    });
 						this.listWrapperEl.parentNode.removeChild(livesAnchor.element);
 						this.groupChannel = channel;
+
+						checkLiveRoom(this.liveRoomId, 2);
+
 						const livesPrivate = this._livesPartyEvent();
 
 						this.VideoEl.removeChild(this.VideoEl.firstChild);
 
 						this.stream = new AgoraStream(this.clientUid);
 
-						this.stream.setVideoProfile('360p_4');
+						this.stream.setVideoProfile(VideoProfile);
 						this.stream.connect().then(() => {
 							this.stream.play(this.options.localVideoId);
 
@@ -204,6 +210,7 @@ export default class LiveAnchor extends EventEmitter {
 							    this.client.unsubscribe(stream);
 							    this.client.unpublish(this.stream.stream);
 							    this.stream.close();
+							    livesPrivate.AnchorOfflineEl.innerText = `${LANG.LIVE_PREVIEW.Madal.AnchorOffline.Title}`;
 
 							    const callback = () => {
 							    	Spinner.start(body);
@@ -360,6 +367,11 @@ export default class LiveAnchor extends EventEmitter {
 			});
 		};
 
+		// 更新在线人数
+		livesPrivate.onOnline = (count) => {
+			this.memberCount = count;
+		};
+
 		this.listWrapperEl.appendChild(livesPrivate.element);
 
 		return livesPrivate;
@@ -490,10 +502,10 @@ export default class LiveAnchor extends EventEmitter {
 	}
 
 	// 心跳检测
-	createHeartbeatHandler(livesPrivate = false) {
+	createHeartbeatHandler() {
 		// 心跳检测服务器连接
 		this.heartbeatEvent = setInterval(() => {
-            checkLiveRoom(this.liveRoomId, livesPrivate ? livesPrivate.memberCount : 0);
+            checkLiveRoom(this.liveRoomId, this.memberCount);
         }, 60000);
 	}
 

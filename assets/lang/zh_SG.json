@@ -25,7 +25,7 @@
         "Madal": {
             "NotCoins": {
                 "Title": "没有足够的硬币",
-                "Text": "您的金币将被使用％S请及时充值",
+                "Text": "裸聊即将开始,<br/>金币不足将影响你的观看",
                 "Text_Coins": "余额不够，请先充值",
                 "ButtonsText": "立即购买"
             },
@@ -121,23 +121,25 @@
         "Detail": "详细信息",
         "Lists": {
             "My_Video": "我的小视频",
-            "Watch_History": "观看历史记录",
+            "Watch_History": "喜欢的视频",
             "Chatting_Price": "聊天价格",
             "Account": "账户",
             "Score": "积分",
             "Live_Certification": "直播认证",
             "Invite": "邀请",
             "Blacklist": "黑名单",
+            "ClientApp": "Androld APP下载",
             "Setting": "设置"
         }
     },
     "USER_VIDEO": {
         "Title": "你的剪辑视频",
         "Add_Title": "添加",
-        "Add_Text": "(赚钱)"
+        "Add_Text": "(赚钱)",
+        "Delete_Prompt": "您确定要删除此视频吗？"
     },
     "USER_WATCH": {
-        "Title": "观看历史"
+        "Title": "喜欢的视频"
     },
     "USER_PRICE": {
         "Title": "聊天价格",
@@ -171,6 +173,7 @@
         "Secondary_Title": "兑换现金",
         "Insufficient_points": "积分不足",
         "Score": "积分",
+        "Explain": "得分",
         "Withdraw": {
             "Title": "提现",
             "Paypal": {
@@ -183,19 +186,25 @@
             }
         },
         "Very_Sorry": {
-            "Title": "Very sorry",
-            "Text": "You did not pass review"
+            "Title": "很抱歉",
+            "Text": "你没有通过审查"
         },
         "Under_Review": {
             "Title": "非常抱歉",
             "Text": "你的提现消息没有审核通过"
-        }
+        },
+        "Content": [
+            "1) 成为主播并吸引更多用户进入您的直播间.",
+            "2) 上传您的视频，在审核之后，其他用户将会观看您的视频，并向您付费以获得分数."
+        ]
     },
     "USER_INVITE": {
         "Title": "邀请"
     },
     "USER_BLACKLIST": {
-        "Title": "黑名单"
+        "Title": "黑名单",
+        "Text": "没有拉黑过任何人〜",
+        "Buttons": "取消"
     },
     "USER_SETTING": {
         "Title": "设置",
@@ -221,7 +230,7 @@
         "Not_Text": "未绑定手机号码",
         "Binding": {
             "Mobile": {
-                "Title": "电话号码已注册",
+                "Title": "电话号码绑定成功",
                 "Text": "您下次可以使用电话号码和密码登录"
             },
             "Third_party": {
@@ -287,6 +296,7 @@
     "LOGIN": {
         "Title": "您好",
         "Text": "总能找到你想要的",
+        "Description": "(我们不会向平台发布任何内容)",
         "Buttons": {
             "Login": "登录",
             "Forget_password": "忘记密码?",
@@ -368,7 +378,9 @@
             "Title": "年龄",
             "Unit": "岁",
             "Madal": {
-                "Title": "修改生日"
+                "Title": "修改生日",
+                "Text": "确认您已经18岁",
+                "Buttons": "好的"
             }
         },
         "Height": {
@@ -439,6 +451,15 @@
                     }
                 ]
             }
+        }
+    },
+    "VIDEO": {
+        "Share": "分享",
+        "Gift": "送礼",
+        "Comment": "评论",
+        "NoComment": "还没有任何人评论〜",
+        "News": {
+            "Placeholder": "你想说什么？"
         }
     },
     "LIVE_INFORMATION": {
@@ -551,6 +572,7 @@
         "Live_Countdown": {
             "Title": "表演开始于",
             "Text": "表演时间",
+            "Prompt": "裸聊即将开始",
             "Explain": "这是表演时间！",
             "End_Explain": "节目时间结束了"
         },
@@ -632,7 +654,7 @@
             },
             "Blacklist": {
                 "Title": "黑名单",
-                "Text": "无法再添加到收藏列表"
+                "Text": "添加到黑名单后，无法添加到收藏夹中"
             },
             "PluginsShield": {
                 "Text": "你将不再看到对方的形象！"
@@ -695,7 +717,7 @@
         },
         "LIVE_MODE": {
             "Private": "私聊",
-            "Party": "免费秀",
+            "Party": "群聊",
             "Gold": "收费秀",
             "Sexy": "性感秀"
         },
@@ -747,6 +769,7 @@
         "modalPreloaderTitle": "等待中"
     },
     "SYSTEM_CODE": {
+        "0": "服务器繁忙,请稍后重试",
         "1000": "成功",
         "1001": "暂无数据",
         "1002": "服务器繁忙,请稍后重试",
@@ -790,7 +813,7 @@
         "2022": "操作失败",
         "2023": "生成token失败",
         "2024": "创建订单失败",
-        "2025": "结算失败",
+        "2025": "发送失败，请稍后再试。",
         "2026": "上播失败",
         "2027": "系统错误",
         "2028": "删除失败",

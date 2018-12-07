@@ -1,4 +1,5 @@
-import { LivesContent } from '../components/LivesContents';
+import { LivesContent, LivesContentIM } from '../components/LivesContents';
+import { MessageChat } from '../components/MessageChat';
 import { closeModal, alert } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import EventEmitter from '../eventEmitter';
@@ -25,6 +26,11 @@ import {
 	giveGift,
 	checkClient,
 	selAllGoods,
+	pullBlack,
+	reportUser,
+	addAnchorTag,
+	anchorTag,
+	reasonTag,
 	payWay
 } from '../api';
 import {
@@ -41,6 +47,7 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
+const VideoProfile = '480p_4';
 
 export default class Live extends EventEmitter {
 	constructor(element, options) {
@@ -84,13 +91,17 @@ export default class Live extends EventEmitter {
 		const getfindAllgifts = findAllgifts();
 		const getSelAllGoods = selAllGoods();
 		const getPayWay = payWay();
+		const getAnchorTag = anchorTag();
+		const getReasonTag = reasonTag();
 		const getIMChannel = this._createIMChannel(userId);
 
-		Promise.all([getAnchorInfo, getfindAllgifts, getSelAllGoods, getPayWay, getIMChannel]).then((data) => {
+		Promise.all([getAnchorInfo, getfindAllgifts, getSelAllGoods, getPayWay, getAnchorTag, getReasonTag, getIMChannel]).then((data) => {
 			this.data.AnchorInfo = data[0] ? data[0] : false;
 			this.data.AllGiftList = data[1] ? data[1] : false;
 			this.data.AllGoodsList = data[2] ? data[2] : false;
 			this.data.AllPayWayList = data[3] ? data[3] : false;
+			this.data.AllAnchorTag = data[4] ? data[4] : false;
+			this.data.AllReasonTag = data[5] ? data[5] : false;
 			this.data.livePrice = this.livePrice;
 			this.data.userId = this.userId;
 			this.liveRoomId = this.data.AnchorInfo.live_room_id;
@@ -99,6 +110,12 @@ export default class Live extends EventEmitter {
 			this.LiveEl = createDom(element);
 			this.trigger('pageLoadStart', this.LiveEl);
 			this._init();
+
+			gtag('event', 'click', {
+			    'event_label': `${this.liveRoomId}`,
+			    'event_category': 'Live',
+			    'non_interaction': true
+			});
 		});
 	}
 
@@ -124,6 +141,7 @@ export default class Live extends EventEmitter {
 	// 一对多事件
 	_bindPartyEvent() {
 		this.client = new AgoraClient();
+		let livesParty;
 
 		this.client.connect().then(() => {
 			this.client.join(`${this.liveRoomId}`, this.Tourist ? null : this.userId).then((uid) => {
@@ -149,6 +167,10 @@ export default class Live extends EventEmitter {
 				    this.VideoEl.removeChild(this.VideoEl.firstChild);
 
 				    this.anchorClose = true;
+
+				    if (livesParty) {
+				    	livesParty.AnchorOfflineEl.innerText = `${LANG.LIVE_PREVIEW.Madal.AnchorOffline.Title}`;
+				    }
 				});
 			});
 		});
@@ -166,7 +188,7 @@ export default class Live extends EventEmitter {
 						const { userPackage } = getUserInfo();
 						this.userPackage = userPackage;
 
-						this._livesPartyEvent();
+						livesParty = this._livesPartyEvent();
 						this.createHeartbeatHandler();
 					});
 				}
@@ -175,6 +197,7 @@ export default class Live extends EventEmitter {
 			})
 			.catch(error => {
 				errorAlert(error.message);
+				this._IMPreviewEvent();
 			});
 	}
 
@@ -185,8 +208,8 @@ export default class Live extends EventEmitter {
 		this.client.connect().then(() => {
 			this.client.join(`${this.liveRoomId}`, this.userId).then((uid) => {
 				this.stream = new AgoraStream(uid);
-				this.stream.setVideoProfile('360p_4');
-
+				this.stream.setVideoProfile(VideoProfile);
+				let livesPrivate;
 				SendBirdAction.getInstance()
 					.createChannelWithUserIds(this.anchorId)
 					.then(groupChannel => {
@@ -199,9 +222,9 @@ export default class Live extends EventEmitter {
 							const { userPackage } = getUserInfo();
 							this.userPackage = userPackage;
 							this.chargeLive = true;
-							// this.createHeartbeatHandler();
+							this.createHeartbeatHandler();
 
-							const livesPrivate =this._livesPrivateEvent();
+							livesPrivate = this._livesPrivateEvent();
 
 							this.stream.connect().then(() => {
 								this.stream.play(this.options.localVideoId);
@@ -237,6 +260,10 @@ export default class Live extends EventEmitter {
 
 				    addClass(this.listWrapperEl, this.options.funzzyShowClass);
 				    this.VideoEl.removeChild(this.VideoEl.firstChild);
+
+				    if (livesPrivate) {
+				    	livesPrivate.AnchorOfflineEl.innerText = `${LANG.LIVE_PREVIEW.Madal.AnchorOffline.Title}`;
+				    }
 
 				    const callback = () => {
 				    	Spinner.start(body);
@@ -310,18 +337,18 @@ export default class Live extends EventEmitter {
 		};
 
 		// 举报
-		livesPrivate.onReport = (id, value) => {
-
+		livesPrivate.onReport = (file, id, tagId, description) => {
+			reportUser(file, id, tagId, description);
 		};
 
 		// 拉黑
-		livesPrivate.onBlack = () => {
-
+		livesPrivate.onBlack = (id) => {
+			pullBlack(id, 3);
 		};
 
 		// 加标签
-		livesPrivate.onAddTag = (id, value) => {
-
+		livesPrivate.onAddTag = (id, tagId) => {
+			addAnchorTag(id, tagId.toString());
 		};
 
 		// 加好友
@@ -412,6 +439,8 @@ export default class Live extends EventEmitter {
 		};
 
 		this.listWrapperEl.appendChild(livesPrivate.element);
+
+		return livesPrivate;
 	}
 
 	// 一对一窗口
@@ -440,18 +469,18 @@ export default class Live extends EventEmitter {
 		};
 
 		// 举报
-		livesPrivate.onReport = (id, value) => {
-
+		livesPrivate.onReport = (file, id, tagId, description) => {
+			reportUser(file, id, tagId, description);
 		};
 
 		// 拉黑
-		livesPrivate.onBlack = () => {
-
+		livesPrivate.onBlack = (id) => {
+			pullBlack(id, 3);
 		};
 
 		// 加标签
-		livesPrivate.onAddTag = (id, value) => {
-
+		livesPrivate.onAddTag = (id, tagId) => {
+			addAnchorTag(id, tagId.toString());
 		};
 
 		// 加好友
@@ -544,8 +573,35 @@ export default class Live extends EventEmitter {
 			oneToMany: true
 		});
 
-		addEvent(livesPrivate.element, 'click', () => {
-		    return location.href = jumpURL('#/login/mobile');
+		// 关闭直播
+		livesPrivate.onClose = () => {
+			this.client.leave();
+			SendBirdAction.getInstance().exit(this.iMChannel);
+			SendBirdAction.getInstance().disconnect();
+
+			return location.href = jumpURL('#/home');
+		};
+
+		livesPrivate.onNotLogin = () => {
+			this.client.leave();
+			SendBirdAction.getInstance().exit(this.iMChannel);
+			SendBirdAction.getInstance().disconnect();
+
+			return location.href = jumpURL('#/login/mobile');
+		};
+
+		this.listWrapperEl.appendChild(livesPrivate.element);
+	}
+
+	// IM链接失败预览
+	_IMPreviewEvent() {
+		const close = () => {
+			this.client.leave();
+			return location.href = jumpURL('#/home');
+		};
+		const livesPrivate = new LivesContentIM({
+			close,
+			data: this.data
 		});
 
 		this.listWrapperEl.appendChild(livesPrivate.element);

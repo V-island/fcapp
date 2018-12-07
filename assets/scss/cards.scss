@@ -4,7 +4,7 @@ $cards-showdom-height: 3.5rem;
 $cards-font-size: 0.5rem;
 
 @mixin cards-showdom($path) {
-    background: linear-gradient(to $path, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+    background: linear-gradient(to $path, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)) !important;
 }
 
 /* === Cards === */

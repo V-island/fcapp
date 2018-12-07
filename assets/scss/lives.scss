@@ -12,6 +12,7 @@ $lives-button-border-radius: 3rem;
 $live-floating-duration: 800ms;
 
 $live-showtime-duration: 800ms;
+$live-prompt-duration: 6000ms;
 
 $lives-footer-bg-color: rgba(51, 51, 51, .8);
 $lives-footer-title-font: 0.6rem;
@@ -41,7 +42,7 @@ $waiting-arrivals-duration: 4000ms;
 .record-wrapper {
     width: 100%;
     height: 100%;
-    z-index: 10400;
+    z-index: 11000;
     color: $color-text;
     background-color: $color-bg;
     padding: $lives-content-frame;
@@ -367,7 +368,8 @@ p.lives-remark{
     right: 0;
     text-align: center;
     background: rgba(0,0,0,0.4);
-    font-size: 0.7rem;
+    overflow: hidden;
+    font-size: 1rem;
     padding: 0.7rem;
 
     @include animated($live-showtime-duration);
@@ -378,6 +380,28 @@ p.lives-remark{
     &.hide {
         @include zoomOut;
     }
+}
+// show Time提示
+.lives-prompt {
+	overflow: hidden;
+	position: absolute;
+	top: 2.8rem;
+	left: 5.5rem;
+	right: 0;
+	z-index: 2;
+	height: 1.5rem;
+
+	>.prompt-item {
+		@include animated-infinite($live-prompt-duration);
+		@include animated-timing(linear);
+		@include slideOutLeftBig;
+		background: linear-gradient(to right,rgba(242,122,90,1) ,rgba(250,61,203, 1));
+		color: $color-text;
+	    border-radius: 1.5rem;
+	    font-size: 0.6rem;
+	    line-height: 1.5rem;
+	    text-align: center;
+	}
 }
 // 新人进场
 .lives-arrivals {
@@ -1154,6 +1178,18 @@ p.lives-remark{
 			    margin: 0.35rem 0;
 				border-radius: 0.2rem;
 			}
+
+			>.tag{
+				label.tag-label{
+					min-width: 3.5rem;
+				}
+			}
+
+			textarea{
+				color: $color-text;
+				font-size: 0.6rem;
+			}
+
 			.across {
 				@include size(2.5rem);
 				border-radius: 0.2rem;

@@ -6,7 +6,7 @@ import {
 } from '../lang';
 
 import {
-    getFindPassword
+    findPassword
 } from '../api';
 
 import {
@@ -44,7 +44,7 @@ export default class FindPassWord extends EventEmitter {
 
 		// 表单提交
 		FormEvent.onsubmit = (params) => {
-			getFindPassword(params).then(() => {
+			findPassword(params).then(() => {
 				location.href = '#/login/set';
 			});
 		};

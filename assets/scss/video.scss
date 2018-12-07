@@ -1,0 +1,391 @@
+// video
+// ---------------------------------------------------
+$videos-text-color: $color-text;
+$videos-text-secondary-color: $color-text-secondary;
+$videos-icon-color: $color-text-gray-light;
+$videos-icon-active-color: $color-primary;
+
+$videos-content-frame: 0.65rem 1rem;
+$videos-content-bg-color: #27272D;
+
+$videos-header-height: 11rem;
+$videos-footer-height: 2.7rem;
+
+$videos-theme-color: $color-primary;
+$videos-theme-text-color: $color-text;
+$videos-theme-border-color: $color-text-gray;
+$videos-theme-modal-color: $color-more-gray;
+
+$vjs-color-bg: rgba(43, 51, 63, 0.7);
+$vjs-duration: 100ms;
+
+// videos-wrapper
+//--------------------------------
+.videos-wrapper{
+	height: calc(100% - #{$videos-footer-height});
+}
+.videos-header{
+	position: relative;
+
+	>i.icon{
+		width: 0.5rem;
+	    height: 1rem;
+		position: absolute;
+		top: 0.35rem;
+	    left: 0.7rem;
+	}
+
+}
+.videos-content{
+    height: calc(100% - #{$videos-header-height});
+    overflow: auto;
+}
+.videos-footer{
+	background: $videos-content-bg-color;
+	padding: $videos-content-frame;
+	color: $videos-text-color;
+    box-shadow: 0 0 0.4rem rgba(0,0,0,0.8);
+	position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.35rem;
+    line-height: 2rem;
+
+   	.news-input {
+	    border-color: $color-bg;
+        background: $color-bg;
+	    color: $videos-text-color;
+	    border-radius: 2rem;
+	    height: 1.5rem;
+	    margin: 0 0.35rem;
+	    padding: 0 0.7rem;
+   	}
+}
+
+// 视频窗口模块
+//--------------------------------
+.videos-window{
+	width: 100%;
+	height: $videos-header-height;
+    overflow: hidden;
+	>video{
+		width: 100%;
+		height: 100%;
+	}
+}
+
+// 模块
+//--------------------------------
+.videos-module{
+	background: $videos-content-bg-color;
+	padding: $videos-content-frame;
+	color: $videos-text-color;
+	margin-bottom: 0.35rem;
+
+	&:last-of-type{
+        margin-bottom: 0;
+    }
+
+	>.module-header{
+		@include spindle-center(space-between);
+
+
+		>p.title{
+			font-size: 0.6rem;
+			color: $videos-text-secondary-color;
+			line-height: normal;
+			text-align: left;
+		}
+		>.button{
+			min-width: 3rem;
+			margin: 0;
+			line-height: 1.5rem;
+			height: 1.5rem;
+			font-size: 0.5rem;
+		}
+	}
+	>.module-contenr{
+		min-height: 6rem;
+
+		.no-comment{
+			@include spindle-center(center);
+		    min-height: 6rem;
+
+			>p {
+				color: $videos-text-secondary-color;
+			    font-size: 0.5rem;
+			}
+		}
+	}
+	p.description{
+		@include multi-wrap-space(2);
+		height: 2.7rem;
+		padding: 0.35rem 0;
+		font-size: 0.7rem;
+		margin-bottom: 0.35rem;
+	}
+	.user-info{
+		>.user-img{
+			@include size(2rem);
+
+			+p.user-name{
+				line-height: 2rem;
+				padding-left: 0.35rem;
+			}
+		}
+	}
+}
+
+.comment-group{
+    min-height: calc(100% - 9rem);
+}
+
+// 弹框模块
+//--------------------------------
+.actions-modal.theme-video{
+    background: $videos-content-bg-color;
+
+    .tag{
+    	label.gift-label{
+    		.name{
+				color: $videos-theme-text-color;
+    		}
+    	}
+    }
+
+    .gift-group{
+    	@include hairline(top, $videos-theme-border-color);
+
+    	.recharge-box{
+    		color: $videos-theme-color;
+    	}
+    	.button.fill-recharge{
+    		border-color: $videos-theme-color;
+		    color: $videos-theme-color;
+		    &:hover{
+				background: $videos-theme-color;
+		    }
+    	}
+    }
+
+    .modal-title{
+    	color: $videos-theme-modal-color;
+    }
+
+    .actions-button-cancel{
+    	@include hairline(top, $videos-theme-border-color);
+    }
+}
+
+// 视频播放器模块
+//--------------------------------
+.video-js{
+	.vjs-tech{
+		background: $color-split;
+	}
+	// .vjs-big-play-button{
+	// 	top: 4rem !important;
+	// 	left: calc(50% - 1.5em) !important;
+	// }
+
+	.vjs-menu-button{
+		.vjs-resolution-button-label{
+			border: 0.03rem solid $videos-text-color;
+		    line-height: 2rem;
+			padding: 0.1rem 0.35rem;
+			border-radius: 1.6rem;
+		}
+	}
+
+	.vjs-menu{
+		li{
+		    line-height: 1.5rem !important;
+
+			&.vjs-selected{
+				&, &:focus, &:hover{
+					background-color: transparent !important;
+					color: $color-primary !important;
+				}
+			}
+			&.vjs-menu-item:focus{
+				background-color: transparent !important;
+			}
+		}
+	}
+
+	.vjs-menu-button-popup{
+		.vjs-menu{
+			margin-bottom: 0 !important;
+			width: 6rem !important;
+			left: -2.85rem !important;
+			height: 100vh !important;
+			background-color: $vjs-color-bg !important;
+
+			.vjs-menu-content{
+				bottom: 40vh !important;
+				max-height: $videos-header-height !important;
+				background-color: transparent !important;
+			}
+		}
+	}
+
+	.vjs-header-bar{
+		@include spindle-center(space-between);
+		@include cards-showdom(bottom);
+	    width: 100%;
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    height: 2rem;
+        padding: 0.35rem 0.7rem;
+        z-index: 10;
+
+	    >i.icon{
+	    	width: 0.5rem;
+	    	height: 1rem;
+	    }
+
+	    .vjs-header-groups{
+	    	@include spindle-center(space-between);
+	    	display: none;
+	    	width: 35%;
+
+	    	>i.icon{
+	    		@include size(0.8rem);
+	    	}
+	    }
+	}
+
+	.vjs-control-bar{
+		@include cards-showdom(top);
+	    height: 2rem !important;
+	}
+
+	.vjs-control{
+		&:before{
+		    line-height: 2rem !important;
+		}
+	}
+
+	.vjs-time-control{
+	    line-height: 2rem !important;
+	}
+
+	.vjs-modal-overlay{
+		position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    z-index: 10;
+        visibility: hidden;
+        opacity: 0;
+        &.modal-overlay-visible {
+            visibility: visible;
+            opacity: 1;
+        }
+	}
+	.vjs-modal{
+		background: rgba(0, 0, 0, 0.3);
+		display: none;
+	    position: absolute;
+	    bottom: 0;
+	    left: 0;
+	    right: 0;
+	    min-height: 6rem;
+        padding: 0.35rem 0.7rem;
+        z-index: 30;
+        @include animated($vjs-duration);
+
+        &.modal-in {
+            @include fadeInUp;
+        }
+        &.modal-out {
+            @include fadeOutDown;
+        }
+	}
+
+	&.vjs-has-started{
+		&.vjs-fullscreen{
+			.vjs-header-bar{
+				@include flexbox;
+				@include fadeInDown;
+				@include animated($vjs-duration);
+				visibility: visible;
+			}
+		}
+
+		.vjs-control-bar{
+			@include flexbox;
+			@include fadeInUp;
+			@include animated($vjs-duration);
+			visibility: visible;
+		}
+
+		.vjs-header-bar{
+			@include flexbox;
+			@include fadeInDown;
+			@include animated($vjs-duration);
+			visibility: visible;
+		}
+
+		&.vjs-user-inactive{
+			&.vjs-playing{
+				&.vjs-fullscreen{
+					.vjs-header-bar{
+						@include fadeOutUp;
+						@include animated($vjs-duration);
+					}
+				}
+				.vjs-control-bar{
+					@include fadeOutDown;
+					@include animated($vjs-duration);
+				}
+				.vjs-header-bar{
+					@include fadeOutUp;
+					@include animated($vjs-duration);
+				}
+			}
+		}
+	}
+	&.vjs-fullscreen{
+		.vjs-header-bar{
+			.vjs-header-groups{
+				display: flex;
+			}
+		}
+	}
+	&.vjs-paused{
+		.vjs-header-bar{
+			@include flexbox;
+			@include fadeInDown;
+			@include animated($vjs-duration);
+			visibility: visible;
+		}
+	}
+	&.vjs-playing{
+		.vjs-tech {
+		    pointer-events: auto !important;
+		}
+	}
+
+	*::-webkit-media-controls-panel {
+        display: none!important;
+        -webkit-appearance: none;
+    }
+    /* Old shadow dom for play button */
+
+    *::--webkit-media-controls-play-button {
+        display: none!important;
+        -webkit-appearance: none;
+    }
+    /* New shadow dom for play button */
+    /* This one works */
+
+    *::-webkit-media-controls-start-playback-button {
+        display: none!important;
+        -webkit-appearance: none;
+    }
+}

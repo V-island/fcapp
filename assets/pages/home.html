@@ -12,6 +12,11 @@
         <div class="content pages-video" ref="wrapper">
             <div class="pages-wrapper">
                 <div class="pages-contents" ref="listWrapper">
+                    <div class="billing-box">
+                        <a href="#/user/information" class="billing-item">
+                            <img src="https://shineliveapp.com/imges/backimges/information-bg@2x.png">
+                        </a>
+                    </div>
                     <div class="content-block bg-black section-live">
                         <div class="row box-cards box-lives">
                         </div>
@@ -29,88 +34,6 @@
                         {{/if}}
 
                         <div class="row box-cards box-videos" data-page="1">
-                            {{if FreeVideoList}}
-                                <div class="col-100 cards-header video-header">
-                                    <p>{{HOME.Video.Free.Title}}</p>
-                                    <a class="refresh" href="#/home/freevideo">{{HOME.Video.Free.More}}</a>
-                                </div>
-                                {{each FreeVideoList}}
-                                    <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                        <div class="card-content" style="background-image: url({{$value.img_url}});">
-                                            <div class="cards-top"></div>
-                                            <div class="cards-bottom">
-                                                <p class="summary-txt">{{$value.video_description}}</p>
-                                                <div class="video-info">
-                                                    <div class="user-info">
-                                                        <div class="user-img">
-                                                            <img src="{{$value.user_head}}">
-                                                        </div>
-                                                        <p class="user-name">{{$value.user_name}}</p>
-                                                    </div>
-                                                    <div class="user-follow">
-                                                        <span class="tag-label praise">
-                                                            {{if $value.support > 999}}
-                                                                999+
-                                                            {{else}}
-                                                                {{$value.support}}
-                                                            {{/if}}
-                                                        </span>
-                                                        <span class="tag-label eye">
-                                                            {{if $value.watch_number > 999}}
-                                                                999+
-                                                            {{else}}
-                                                                {{$value.watch_number}}
-                                                            {{/if}}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {{/each}}
-                            {{/if}}
-
-                            {{if VideoList}}
-                                <div class="col-100 cards-header video-header nth-child">
-                                    <p>{{HOME.Video.Exciting.Title}}</p>
-                                </div>
-                                {{each VideoList}}
-                                    <div class="col-50 card card-video" data-user-info="{{$value}}">
-                                        <div class="card-content" style="background-image: url({{$value.img_url}});">
-                                            <div class="cards-top">
-                                                <span class="tag-label">{{$value.price}} {{PUBLIC.Billing}}</span>
-                                            </div>
-                                            <div class="cards-bottom">
-                                                <p class="summary-txt">{{$value.video_description}}</p>
-                                                <div class="video-info">
-                                                    <div class="user-info">
-                                                        <div class="user-img avatar-female">
-                                                            <img src="{{$value.user_head}}">
-                                                        </div>
-                                                        <p class="user-name">{{$value.user_name}}</p>
-                                                    </div>
-                                                    <div class="user-follow">
-                                                        <span class="tag-label praise">
-                                                            {{if $value.support > 999}}
-                                                                999+
-                                                            {{else}}
-                                                                {{$value.support}}
-                                                            {{/if}}
-                                                        </span>
-                                                        <span class="tag-label eye">
-                                                            {{if $value.watch_number > 999}}
-                                                                999+
-                                                            {{else}}
-                                                                {{$value.watch_number}}
-                                                            {{/if}}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {{/each}}
-                            {{/if}}
                         </div>
                         <!-- /.box-cards -->
                     </div>

@@ -30,7 +30,7 @@ import {
     extend,
     getData,
     setData,
-    dataAges,
+    dataAgesSub,
     addEvent,
     createDom,
     createDivEl
@@ -38,6 +38,37 @@ import {
 
 const LANG = getLangConfig();
 const DETAIL = LANG.PERSONAL_DETAIL;
+const ListData = [{
+	value: 0,
+	text: `0`
+}, {
+	value: 1,
+	text: `1`
+}, {
+	value: 2,
+	text: `2`
+}, {
+	value: 3,
+	text: `3`
+}, {
+	value: 4,
+	text: `4`
+}, {
+	value: 5,
+	text: `5`
+}, {
+	value: 6,
+	text: `6`
+}, {
+	value: 7,
+	text: `7`
+}, {
+	value: 8,
+	text: `8`
+}, {
+	value: 9,
+	text: `9`
+}];
 
 export default class UserDetail extends EventEmitter {
 	constructor(element, options) {
@@ -156,7 +187,7 @@ export default class UserDetail extends EventEmitter {
 				data: [{
 					title: `${DETAIL.Gender.Madal.Male}`,
 					value: 1,
-					onClick: (text, value) => {
+					onClick: (value, text) => {
 						this.itemGenderTxtEl.innerText = text;
 						setData(this.itemGenderTxtEl, this.options.dataSexIndex, value);
 						updateUserInfo({
@@ -166,7 +197,7 @@ export default class UserDetail extends EventEmitter {
 				}, {
 					title: `${DETAIL.Gender.Madal.Female}`,
 					value: 2,
-					onClick: (text, value) => {
+					onClick: (value, text) => {
 						this.itemGenderTxtEl.innerText = text;
 						setData(this.itemGenderTxtEl, this.options.dataSexIndex, value);
 						updateUserInfo({
@@ -181,8 +212,12 @@ export default class UserDetail extends EventEmitter {
 		addEvent(this.itemAgeEl, 'click', () => {
 			timePicker({
 				title: `${DETAIL.Age.Madal.Title}`,
+				params: {
+					format: 'MM-DD-YYYY'
+				},
+				adultLimit: true,
 				callback: (value) => {
-					let ages = dataAges(value);
+					let ages = dataAgesSub(value);
 
 					this.itemAgeTxtEl.innerText = ages;
 					updateUserInfo({
@@ -194,14 +229,31 @@ export default class UserDetail extends EventEmitter {
 
 		// 身高
 		addEvent(this.itemHeightEl, 'click', () => {
-
-			prompt({
+			pickers({
 				title: `${DETAIL.Height.Madal.Title}`,
-				text: `${DETAIL.Height.Madal.Placeholder}`,
-				callback: (value) => {
-					this.itemHeightTxtEl.innerText = value + DETAIL.Height.Unit;
+				data: [
+					[{
+						value: 0,
+						text: `0`
+					}, {
+						value: 1,
+						text: `1`
+					}, {
+						value: 2,
+						text: `2`
+					}],
+					ListData,
+					ListData
+				],
+				unit: `${DETAIL.Height.Unit}`,
+				selectedIndex: [1, 5, 0],
+				callback: (value, text, index) => {
+					const _value = value.join('');
+					const _text = text.join('');
+
+					this.itemHeightTxtEl.innerText = _text + DETAIL.Height.Unit;
 					updateUserInfo({
-						height: value
+						height: _value
 					});
 				}
 			});
@@ -210,13 +262,21 @@ export default class UserDetail extends EventEmitter {
 		// 体重
 		addEvent(this.itemWeightEl, 'click', () => {
 
-			prompt({
+			pickers({
 				title: `${DETAIL.Body_Weight.Madal.Title}`,
-				text: `${DETAIL.Body_Weight.Madal.Placeholder}`,
-				callback: (value) => {
-					this.itemWeightTxtEl.innerText = value + DETAIL.Body_Weight.Unit;
+				data: [
+					ListData,
+					ListData
+				],
+				unit: `${DETAIL.Body_Weight.Unit}`,
+				selectedIndex: [5, 0],
+				callback: (value, text, index) => {
+					const _value = value.join('');
+					const _text = text.join('');
+
+					this.itemWeightTxtEl.innerText = _text + DETAIL.Body_Weight.Unit;
 					updateUserInfo({
-						weight: value
+						weight: _value
 					});
 				}
 			});
@@ -227,11 +287,11 @@ export default class UserDetail extends EventEmitter {
 
 			pickers({
 				title: `${DETAIL.Why_Make_Friends.Madal.Title}`,
-				data: DETAIL.Why_Make_Friends.Madal.Lists,
+				data: [DETAIL.Why_Make_Friends.Madal.Lists],
 				callback: (value, text, index) => {
-					this.itemFriendsTxtEl.innerText = text;
+					this.itemFriendsTxtEl.innerText = text[0];
 					updateUserInfo({
-						goal: value
+						goal: value[0]
 					});
 				}
 			});
@@ -252,6 +312,8 @@ export default class UserDetail extends EventEmitter {
 					selectData: data[1],
 					selected: 3,
 					callbackOk: (value, text) => {
+						if (value.length == 0 || text.length == 0) return false;
+
 						this.itemInterestTxtEl.innerText = '';
 
 						text.forEach((itemData, index) => {
@@ -283,6 +345,8 @@ export default class UserDetail extends EventEmitter {
 					selectData: data[1],
 					selected: 3,
 					callbackOk: (value, text) => {
+						if (value.length == 0 || text.length == 0) return false;
+
 						this.itemTypeTxtEl.innerText = '';
 
 						text.forEach((itemData, index) => {
@@ -314,6 +378,8 @@ export default class UserDetail extends EventEmitter {
 					selectData: data[1],
 					selected: 3,
 					callbackOk: (value, text) => {
+						if (value.length == 0 || text.length == 0) return false;
+
 						this.itemLoveTxtEl.innerText = '';
 
 						text.forEach((itemData, index) => {

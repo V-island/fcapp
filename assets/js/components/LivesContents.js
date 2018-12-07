@@ -52,6 +52,12 @@ const LANG = getLangConfig();
 
 let instanceAnchor = null;
 
+const defaultInfo = {
+    userName: `${LANG.MESSAGE.Anonymous}`,
+    userHead: acrossMaleImg,
+    userPackage: 0
+};
+
 // 直播功能/
 class LivesContent {
     constructor({data, channel, client, oneToMany}) {
@@ -63,6 +69,8 @@ class LivesContent {
             livesContentClass: 'lives-content',
             livesHeaderClass: 'lives-header',
             livesAttentionClass: 'lives-attention',
+            livesPromptClass: 'lives-prompt',
+            itemPromptClass: 'prompt-item',
             livesArrivalsClass: 'lives-arrivals',
             livesGiftsClass: 'lives-gifts',
             livesCommentsClass: 'lives-comments',
@@ -88,7 +96,7 @@ class LivesContent {
         this.ReceiveGiftList = [];
         this.secondTime = null;
         this.chargeTime = false;
-        this.memberCount = 0;
+        this.promptStart = true;
 
         this.notCoins = null;
 
@@ -107,6 +115,9 @@ class LivesContent {
         this.onLoves = null;
         this.onGift = null;
         this.onRecharge = null;
+
+        this.onNotLogin = null;
+        this.onOnline = null;
 
         // Shows
         this.onGetChargeShows = null;
@@ -143,6 +154,14 @@ class LivesContent {
         return this.data.AnchorInfo.follow_status == 1 ? true : false;
     }
 
+    set userFollow(value) {
+        return this.data.AnchorInfo.follow_status = value;
+    }
+
+    get userTagList() {
+        return this.data.AnchorInfo.list ? this.data.AnchorInfo.list : [];
+    }
+
     get price() {
         return this.data.livePrice ? this.data.livePrice : 0;
     }
@@ -166,6 +185,14 @@ class LivesContent {
         return this.data.AllPayWayList ? this.data.AllPayWayList : [];
     }
 
+    get AnchorTagList() {
+        return this.data.AllAnchorTag ? this.data.AllAnchorTag : [];
+    }
+
+    get ReasonTagList() {
+        return this.data.AllReasonTag ? this.data.AllReasonTag : [];
+    }
+
     get countdownTimes() {
         return timestampFromNow(this.data.times);
     }
@@ -175,7 +202,8 @@ class LivesContent {
     }
 
     _createElement() {
-        const { userName, userHead, userPackage } = getUserInfo();
+        const userInfo = getUserInfo(true);
+        const { userName, userHead, userPackage } = userInfo === null ? defaultInfo : userInfo;
         this.userPackage = userPackage;
         const livesContent = createDivEl({className: this.options.livesContentClass});
 
@@ -194,38 +222,27 @@ class LivesContent {
         headerAcrossBody.appendChild(headerAcrossBodyTxt);
         headerAcrossInfo.appendChild(headerAcrossImg);
         headerAcrossInfo.appendChild(headerAcrossBody);
+
+        let headerIconAttention,
+            Follow = this.userFollow ? 1 : 2;
         if (this.client) {
             addEvent(headerAcrossInfo, 'click', () => {
+                if (this.onNotLogin) return this.onNotLogin();
+
+                let modalsEl;
                 const report = () => {
-                    let modalsEl;
-                    const submit = (id, value) => {
-                        if (this.onReport) this.onReport(id, value);
+                    let modalsrReportEl;
+                    const submit = (file, tagId, description) => {
+                        closeModal(modalsrReportEl);
+                        if (this.onReport) this.onReport(file, this.anchorId, tagId, description);
                     };
                     const anchorReport = new LivesAnchorReport({
                         submit,
                         data: {
-                            id: 1,
-                            userHead: '',
-                            userSex: 1,
-                            reasonList: [{
-                                id: 0,
-                                title: "Minor's account"
-                            }, {
-                                id: 1,
-                                title: 'Advertising'
-                            }, {
-                                id: 2,
-                                title: 'Cheat'
-                            }, {
-                                id: 3,
-                                title: 'Political topic'
-                            }, {
-                                id: 4,
-                                title: 'Others'
-                            }]
+                            reasonList: this.ReasonTagList
                         }
                     });
-                    modalsEl = popup({
+                    modalsrReportEl = popup({
                         element: anchorReport.element,
                         title: `${LANG.LIVE_PREVIEW.Feedback.Title}`,
                         top: true
@@ -237,53 +254,40 @@ class LivesContent {
                         text: `${LANG.LIVE_PREVIEW.Madal.Blacklist.Text}`,
                         top: true,
                         callback: () => {
-                            if (this.onBlack) this.onBlack();
+                            if (this.onBlack) this.onBlack(this.anchorId);
                         }
                     });
                 }
                 const addTag = () => {
-                    let modalsEl;
-                    const save = (id, value) => {
-                        if (this.onAddTag) this.onAddTag(id, value);
+                    let modalsTagEl;
+                    const save = (tag) => {
+                        closeModal(modalsTagEl);
+                        if (this.onAddTag) this.onAddTag(this.anchorId, tag);
                     };
                     const anchorTag = new LivesAnchorTag({
                         save,
                         data: {
-                            userList: [{
-                                id: 0,
-                                title: 'Sexy'
-                            }, {
-                                id: 1,
-                                title: 'Humor'
-                            }, {
-                                id: 2,
-                                title: 'Cute'
-                            }],
-                            tagList: [{
-                                id: 0,
-                                title: 'Dance'
-                            }, {
-                                id: 1,
-                                title: 'Singing'
-                            }, {
-                                id: 2,
-                                title: 'Emotion'
-                            }, {
-                                id: 3,
-                                title: 'Art'
-                            }]
+                            userList: this.userTagList,
+                            tagList: this.AnchorTagList
                         }
                     });
-                    modalsEl = popup({
+                    modalsTagEl = popup({
                         element: anchorTag.element,
                         title: `${LANG.LIVE_PREVIEW.Impression.Title}`,
                         top: true
                     });
                 }
-                const favorite = () => {
-                    if (this.onFavorite) this.onFavorite();
+                const favorite = (status) => {
+                    const check = hasClass(headerIconAttention, this.options.attentionClass);
+
+                    removeClass(headerIconAttention, (check ? this.options.attentionClass : this.options.addAttentionClass));
+                    addClass(headerIconAttention, (check ? this.options.addAttentionClass : this.options.attentionClass));
+                    Follow = check ? 1 : 2;
+                    this.userFollow = check ? 1 : 2;
+                    if (this.onFavorite) this.onFavorite(status);
                 }
                 const message = () => {
+                    closeModal(modalsEl);
                     if (this.onMessage) this.onMessage();
                 }
                 const anchorInfo = new LivesAnchorInfo({
@@ -294,7 +298,7 @@ class LivesContent {
                     favorite,
                     data: this.AnchorInfo
                 });
-                const modalsEl = popupPart({
+                modalsEl = popupPart({
                     element: anchorInfo.element
                 });
             });
@@ -304,15 +308,17 @@ class LivesContent {
 
         // 加关注
         if (this.client) {
-            let Follow = this.userFollow ? 1 : 2;
-            const headerIconAttention = createDivEl({element: 'i', className: ['icon', (this.userFollow ? this.options.addAttentionClass : this.options.attentionClass)]});
+            headerIconAttention = createDivEl({element: 'i', className: ['icon', (this.userFollow ? this.options.addAttentionClass : this.options.attentionClass)]});
 
             addEvent(headerIconAttention, 'click', () => {
+                if (this.onNotLogin) return this.onNotLogin();
+
                 const check = hasClass(headerIconAttention, this.options.attentionClass);
 
                 removeClass(headerIconAttention, (check ? this.options.attentionClass : this.options.addAttentionClass));
                 addClass(headerIconAttention, (check ? this.options.addAttentionClass : this.options.attentionClass));
                 Follow = check ? 1 : 2;
+                this.userFollow = check ? 1 : 2;
                 if (this.onFavorite) this.onFavorite(Follow);
             });
             headerAttention.appendChild(headerIconAttention);
@@ -415,6 +421,8 @@ class LivesContent {
         // 评论
         const GroupsIconNews = createDivEl({element: 'i', className: ['icon', this.options.newsClass]});
         addEvent(GroupsIconNews, 'click', () => {
+            if (this.onNotLogin) return this.onNotLogin();
+
             let modalsEl;
             const send = (value) => {
                 closeModal(modalsEl);
@@ -532,13 +540,14 @@ class LivesContent {
             // 礼物
             const GroupsIconGift = createDivEl({element: 'i', className: ['icon', this.options.giftClass]});
             addEvent(GroupsIconGift, 'click', () => {
+                if (this.onNotLogin) return this.onNotLogin();
+
                 let modalsEl;
                 const send = (id, price, name, imgUrl, amount) => {
                     closeModal(modalsEl);
 
                     this._createGiftElement(livesGifts, userName, userHead, name, imgUrl, amount);
                     if (this.onGift) this.onGift(id, price, name, imgUrl, amount);
-
                 };
                 const recharge = () => {
                     closeModal(modalsEl);
@@ -585,6 +594,8 @@ class LivesContent {
             const GroupsIconLoves = createDivEl({element: 'i', className: 'icon', background: loveRedIcon});
             GroupsFloatLoves.appendChild(GroupsIconLoves);
             addEvent(GroupsFloatLoves, 'click', () => {
+                if (this.onNotLogin) return this.onNotLogin();
+
                 this._createLovesElement(GroupsFloatLoves);
                 if (this.onLoves) this.onLoves();
             });
@@ -751,7 +762,8 @@ class LivesContent {
                 }
 
                 if (this.oneToMany && user.userId != this.id) {
-                    this.memberCount = openChannel.participantCount;
+                    if (this.onOnline) this.onOnline(openChannel.participantCount);
+
                     headerAcrossBodyTxt.innerText = `${openChannel.participantCount + ' ' + LANG.PUBLIC.Online}`;
 
                     const arrivalsItem = new ArrivalsItem({
@@ -813,6 +825,11 @@ class LivesContent {
         itemBox.appendChild(itemTitle);
         itemBox.appendChild(itemTimes);
 
+        // 开始裸聊弹框
+        const livesPrompt = createDivEl({className: this.options.livesPromptClass});
+        const promptItem = createDivEl({className: this.options.itemPromptClass, content: `${LANG.LIVE_PREVIEW.Live_Countdown.Prompt}`});
+        livesPrompt.appendChild(promptItem);
+
         if (times == 0) {
             itemBox.innerText = '';
             itemBox.appendChild(itemText);
@@ -841,6 +858,10 @@ class LivesContent {
         }
 
         const Balance = (time) => {
+            if (this.client && this.promptStart && time <= 60) {
+                this.promptStart = false;
+                element.appendChild(livesPrompt);
+            }
             if (this.client && this.notCoins && (time == 180 || time == 60)) {
                 this._createNotCoinsElement(time);
             }
@@ -856,6 +877,7 @@ class LivesContent {
                 addClass(itemExplain, 'hide');
                 animationEnd(itemExplain, () => {
                     element.removeChild(itemExplain);
+                    element.removeChild(livesPrompt);
                 });
             }, 2000);
         }
@@ -886,7 +908,7 @@ class LivesContent {
             handler,
             data: {
                 time: `${setTimesFormat(time)}`,
-                text: `${LANG.HOME.Madal.NotCoins.Text}`,
+                text: `${LANG.HOME.Madal.NotCoins.Text.replace('%S', this.price)}`,
                 button: `${LANG.HOME.Madal.NotCoins.ButtonsText}`
             }
         });
@@ -967,18 +989,18 @@ class LivesContentAnchor {
         const livesPlugins = createDivEl({className: ['lives-button-groups', 'top-right', this.options.pluginsClass]});
 
         // plugins 美颜
-        const PluginsIconBeauty = createDivEl({element: 'i', className: ['icon', this.options.beautyClass]});
-        addEvent(PluginsIconBeauty, 'click', () => {
-            const beauty = (id) => {
-            }
-            const pluginsBeauty = new GluginBeauty({beauty});
-            const modalsEl = popupPart({
-                element: pluginsBeauty.element
-            });
-        });
-        livesPlugins.appendChild(PluginsIconBeauty);
-        livesContent.appendChild(livesPlugins);
-        livesWrapper.appendChild(livesContent);
+        // const PluginsIconBeauty = createDivEl({element: 'i', className: ['icon', this.options.beautyClass]});
+        // addEvent(PluginsIconBeauty, 'click', () => {
+        //     const beauty = (id) => {
+        //     }
+        //     const pluginsBeauty = new GluginBeauty({beauty});
+        //     const modalsEl = popupPart({
+        //         element: pluginsBeauty.element
+        //     });
+        // });
+        // livesPlugins.appendChild(PluginsIconBeauty);
+        // livesContent.appendChild(livesPlugins);
+        // livesWrapper.appendChild(livesContent);
 
         // footer
         const livesFooter = createDivEl({className: this.options.livesFooterClass});
@@ -1441,9 +1463,9 @@ class LivesAnchorCount {
         return this.data.user_sex == 1  ? iconMaleImg : iconFemaleImg;
     }
 
-    get today() {
-        return this.data.start_time && this.data.end_time ? `${countFromNow(this.data.start_time, this.data.end_time)}` : `0 ${LANG.LIVE_PREVIEW.End_Live_Anchor.Min}`;
-    }
+    // get today() {
+    //     return this.data.start_time && this.data.end_time ? `${countFromNow(this.data.start_time, this.data.end_time)}` : `0 ${LANG.LIVE_PREVIEW.End_Live_Anchor.Min}`;
+    // }
 
     get time() {
         return this.data.time ? `${this.data.time}` : `0`;
@@ -1477,12 +1499,12 @@ class LivesAnchorCount {
         acrossInfo.appendChild(acrossName);
         header.appendChild(acrossInfo);
 
-        const todayTitle = createDivEl({element: 'p', className: 'today-title'});
-        const todayTextSpan = createDivEl({element: 'span', content: `${LANG.LIVE_PREVIEW.End_Live_Anchor.Live_Time_Today}`});
-        const todayText = createDivEl({element: 'font', content: this.today});
-        todayTitle.appendChild(todayTextSpan);
-        todayTitle.appendChild(todayText);
-        header.appendChild(todayTitle);
+        // const todayTitle = createDivEl({element: 'p', className: 'today-title'});
+        // const todayTextSpan = createDivEl({element: 'span', content: `${LANG.LIVE_PREVIEW.End_Live_Anchor.Live_Time_Today}`});
+        // const todayText = createDivEl({element: 'font', content: this.today});
+        // todayTitle.appendChild(todayTextSpan);
+        // todayTitle.appendChild(todayText);
+        // header.appendChild(todayTitle);
 
         // Score
         const anchorScore = createDivEl({className: 'anchor-score'});
@@ -1528,7 +1550,7 @@ class LivesAnchorCount {
 
         if (handler) {
             handler().then((giftList) => {
-                todayText.innerText = `${countFromNow(giftList.start_time, giftList.end_time)}`;
+                // todayText.innerText = `${countFromNow(giftList.start_time, giftList.end_time)}`;
                 timeTitleFont.innerText = `${giftList.time}`;
                 scoreTitle.innerText = `${giftList.score}`;
 
@@ -1776,4 +1798,65 @@ class LivesFuzzyLayer {
         return livesWapper;
     }
 }
-export { LivesContent, LivesContentAnchor, LivesWaiting, LivesCallingAnchor, LivesCallingClient, LivesAnchorCount};
+
+// IM链接失败页
+class LivesContentIM {
+    constructor({data, close}) {
+        this.data = data;
+        this.options = {
+            livesContentClass: 'lives-content',
+            livesHeaderClass: 'lives-header',
+            livesAttentionClass: 'lives-attention',
+            // icon
+            closeClass: 'live-close'
+        };
+        this.element = this._createElement(close);
+
+        this.onClose = null;
+    }
+
+    get acrossUrl() {
+        return this.data.AnchorInfo.user_head ? protectFromXSS(this.data.AnchorInfo.user_head) : acrossFemaleImg;
+    }
+
+    get userName() {
+        return this.data.AnchorInfo.user_name ? `${this.data.AnchorInfo.user_name}` : `${LANG.MESSAGE.Anonymous}`;
+    }
+
+    get userHeat() {
+        return this.data.AnchorInfo.fans_number ? `${this.data.AnchorInfo.fans_number+ ' ' + LANG.PUBLIC.Heat}` : `0 ${LANG.PUBLIC.Heat}`;
+    }
+
+    _createElement(close) {
+        const livesContent = createDivEl({className: this.options.livesContentClass});
+
+        // header
+        const livesHeader = createDivEl({className: this.options.livesHeaderClass});
+        const headerAttention = createDivEl({className: this.options.livesAttentionClass});
+
+        // 直播详情
+        const headerAcrossInfo = createDivEl({className: ['user-info', 'across']});
+        const headerAcrossImg = createDivEl({element: 'img', className: 'user-img'});
+        headerAcrossImg.src = this.acrossUrl;
+        const headerAcrossBody = createDivEl({className: 'across-body'});
+        const headerAcrossBodyName = createDivEl({element: 'p', className: 'user-name', content: this.userName});
+        const headerAcrossBodyTxt = createDivEl({element: 'p', className: 'user-txt', content: this.userHeat});
+        headerAcrossBody.appendChild(headerAcrossBodyName);
+        headerAcrossBody.appendChild(headerAcrossBodyTxt);
+        headerAcrossInfo.appendChild(headerAcrossImg);
+        headerAcrossInfo.appendChild(headerAcrossBody);
+        headerAttention.appendChild(headerAcrossInfo);
+        livesHeader.appendChild(headerAttention);
+
+        // 关闭直播
+        const headerIconClose = createDivEl({element: 'i', className: ['icon', this.options.closeClass]});
+        addEvent(headerIconClose, 'click', () => {
+            if (close) close();
+        });
+        livesHeader.appendChild(headerIconClose);
+        livesContent.appendChild(livesHeader);
+
+        return livesWrapper;
+    }
+}
+export { LivesContent, LivesContentAnchor, LivesWaiting, LivesCallingAnchor, LivesCallingClient, LivesAnchorCount, LivesContentIM};

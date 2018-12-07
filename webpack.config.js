@@ -25,8 +25,7 @@ module.exports = {
 			'./assets/js/navigator'
 		],
 		slComponents: [
-			'jquery-ripple',
-			'video.js'
+			'jquery-ripple'
 		],
 		slStyle: './assets/scss/sl.scss',
 
@@ -188,7 +187,7 @@ module.exports = {
 			title: 'SHINE LIVE- live video stream and chat',
 			filename: 'redirect.html',
 			template: './assets/admin.html',
-			chunks: ['redirect'],
+			chunks: ['redirect', 'slStyle'],
 			favicon: './assets/img/favicon.ico',
 			meta: {
 				viewport: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no,user-scalable=no',
@@ -231,9 +230,6 @@ module.exports = {
 		new CopyWebpackPlugin([{
 			from: path.resolve(__dirname, 'assets/pages'),
 			to: './pages'
-		}, {
-			from: path.resolve(__dirname, 'assets/public'),
-			to: './public'
 		}, {
 			from: path.resolve(__dirname, 'assets/lang'),
 			to: './assets/lang'

@@ -517,11 +517,8 @@ class PayItem {
     }
 
     _createElement() {
-        const label = createDivEl({element: 'li', className: this.options.itemClass, data: {
-            name: 'id',
-            value: this.id
-        }});
-
+        const label = createDivEl({element: 'li', className: this.options.itemClass});
+        setData(label, 'id', this.id);
         const img = createDivEl({element: 'span', className: ['icon', this.options.graphicClass], background: this.imgUrl});
         const text = createDivEl({element: 'span', className: this.options.textClass, content: this.name});
         const meta = createDivEl({element: 'span', className: ['icon', 'modals-confirm', this.options.metaClass]});

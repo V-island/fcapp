@@ -25,7 +25,7 @@
         "Madal": {
             "NotCoins": {
                 "Title": "Not enough coins",
-                "Text": "Your gold coins will be used %S please recharge in time",
+                "Text": "naked performance will be started,<br/>Insufficient gold coins will affect your viewing",
                 "Text_Coins": "The balance is not enough, please recharge first",
                 "ButtonsText": "Buy now"
             },
@@ -121,23 +121,25 @@
         "Detail": "Detail",
         "Lists": {
             "My_Video": "My video",
-            "Watch_History": "Watch history",
+            "Watch_History": "Favorite video",
             "Chatting_Price": "Chatting price",
             "Account": "Account",
             "Score": "Score",
             "Live_Certification": "Live certification",
             "Invite": "Invite",
             "Blacklist": "Blacklist",
+            "ClientApp": "Androld download",
             "Setting": "Setting"
         }
     },
     "USER_VIDEO": {
         "Title": "Your video clips",
         "Add_Title": "Add",
-        "Add_Text": "(To earn money)"
+        "Add_Text": "(To earn money)",
+        "Delete_Prompt": "Are you sure you want to delete this video?"
     },
     "USER_WATCH": {
-        "Title": "Watch history"
+        "Title": "Favorite video"
     },
     "USER_PRICE": {
         "Title": "Chatting price",
@@ -171,6 +173,7 @@
         "Secondary_Title": "Exchange cash",
         "Insufficient_points": "Insufficient points",
         "Score": "score",
+        "Explain": "get score",
         "Withdraw": {
             "Title": "Withdraw",
             "Paypal": {
@@ -189,13 +192,19 @@
         "Under_Review": {
             "Title": "Under review",
             "Text": "We will giving the results in a working day"
-        }
+        },
+        "Content": [
+            "1) Become an anchor and attract more users into your live room.",
+            "2) Upload your video,After reviewing,other users will watch your video and pay you afee to get the score."
+        ]
     },
     "USER_INVITE": {
         "Title": "Invite"
     },
     "USER_BLACKLIST": {
-        "Title": "Blacklist"
+        "Title": "Blacklist",
+        "Text": "You haven't pulled anyone black~",
+        "Buttons": "Move out"
     },
     "USER_SETTING": {
         "Title": "Setting",
@@ -301,6 +310,7 @@
         "Third_party": {
             "Title": "or login",
             "Text": "coming soon",
+            "Description": "(we won't post anything to platform)",
             "Mobile": "Mobile",
             "QuickLogin": "Fast registration",
             "Facebook": "Facebook",
@@ -368,7 +378,9 @@
             "Title": "Age",
             "Unit": "years old",
             "Madal": {
-                "Title": "Modify birthday"
+                "Title": "Modify birthday",
+                "Text": "Confirm that you are already 18 years old",
+                "Buttons": "OK"
             }
         },
         "Height": {
@@ -439,6 +451,15 @@
                     }
                 ]
             }
+        }
+    },
+    "VIDEO": {
+        "Share": "Share",
+        "Gift": "Gift",
+        "Comment": "Comment",
+        "NoComment": "No one has commented yet~",
+        "News": {
+            "Placeholder": "What do you want to say?"
         }
     },
     "LIVE_INFORMATION": {
@@ -551,6 +572,7 @@
         "Live_Countdown": {
             "Title": "Show start at",
             "Text": "Show time",
+            "Prompt": "naked performance will be started",
             "Explain": "It's show time!",
             "End_Explain": "show time finished"
         },
@@ -632,7 +654,7 @@
             },
             "Blacklist": {
                 "Title": "Blacklist",
-                "Text": "No longer be able to add to favorite list"
+                "Text": "After adding to the blacklist，cannot be added to favorite"
             },
             "PluginsShield": {
                 "Text": "You will no longer see the other party's image!"
@@ -647,6 +669,7 @@
                 "Text": "Do you want to end this live？"
             },
             "AnchorOffline": {
+                "Title": "The anchor has left ~",
                 "Text": "Trying to connect with each other, please wait. . ."
             },
             "SendSuccess": {
@@ -747,6 +770,7 @@
         "modalPreloaderTitle": "Loading"
     },
     "SYSTEM_CODE": {
+        "0": "The server is busy, please try again later",
         "1000": "Success",
         "1001": "No data yet",
         "1002": "The server is busy, please try again later",
@@ -790,7 +814,7 @@
         "2022": "Operation failed",
         "2023": "Generate token failed",
         "2024": "Create order failed",
-        "2025": "Settlement failed",
+        "2025": "send failed,please try again later.",
         "2026": "Upcast failed",
         "2027": "System error",
         "2028": "Delete failed",

@@ -23,8 +23,7 @@ module.exports = {
 			'./assets/js/navigator'
 		],
 		slComponents: [
-			'jquery-ripple',
-			'video.js'
+			'jquery-ripple'
 		],
 		slStyle: './assets/scss/sl.scss',
 
@@ -219,9 +218,6 @@ module.exports = {
 		new CopyWebpackPlugin([{
 			from: path.resolve(__dirname, 'assets/pages'),
 			to: './pages'
-		}, {
-			from: path.resolve(__dirname, 'assets/public'),
-			to: './public'
 		}, {
 			from: path.resolve(__dirname, 'assets/lang'),
 			to: './assets/lang'

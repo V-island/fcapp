@@ -1,4 +1,3 @@
-import Picker from './picker';
 import EventEmitter from './eventEmitter';
 import DateTimePicker from 'pickerjs';
 import {
@@ -534,45 +533,6 @@ export default class Modal extends EventEmitter {
 
         self.openModal(modal);
         return modal[0];
-    }
-
-    /**
-     * 弹框滑动选择
-     * @param  {[array]} data           为二位数组，如[lists1, lists2, lists3]
-     * @param  {[string]} title          标题文字
-     * @param  {[function]} callbackOk     通过事件
-     * @return {[type]}                [description]
-     */
-    pickerModal(data, title, callbackOk) {
-        const self = this;
-
-        if (typeof title === 'function') {
-            callbackOk = arguments[1];
-            title = false;
-        }
-        let picker = new Picker({
-            data: [data],
-            title: title,
-            valueEqualText: true,
-            buttons: [{
-                text: self.defaults.confirmButtonCancel,
-                fill: true,
-            }, {
-                text: self.defaults.confirmButtonOk
-            }]
-        });
-
-        picker.show();
-        picker.on('picker.valuechange', function(selectedVal, selectedText, selectedIndex) {
-            self.closeModal(picker.modalEl);
-            callbackOk(selectedVal[0], selectedText[0], selectedIndex[0]);
-        });
-        picker.on('picker.cancel', function() {
-            self.closeModal(picker.modalEl);
-        });
-
-        self.openModal(picker.modalEl);
-        return picker.modalEl;
     }
 
     /**

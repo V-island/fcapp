@@ -6,7 +6,7 @@ import {
 } from '../lang';
 
 import {
-    getUpdatePassword
+    updatePassword
 } from '../api';
 
 import {
@@ -43,7 +43,7 @@ export default class SetPassWord extends EventEmitter {
 
 		// 表单提交
 		FormEvent.onsubmit = (params) => {
-			getUpdatePassword(params).then(() => {
+			updatePassword(params).then(() => {
 				location.href = '#/login';
 			});
 		};

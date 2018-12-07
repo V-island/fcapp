@@ -125,7 +125,7 @@ function getPost(_url, param, callback, callbackCancel, onProgress, _type, _head
 			response = JSON.parse(response);
 			// console.log(response);
 		}
-		if (response.code === 1000 || response.code === 1001 || response.code === 1002 || response.code === 1011) {
+		if (response.code === 1000 || response.code === 1001 || response.code === 1002 || response.code === 1011 || response.code === 2034) {
 			return callback(response);
 		}
 		if (response.code === 2012) {
@@ -573,7 +573,7 @@ export const QuickLogin = (_userId) => {
 			Spinner.start(body);
 			checkIMChannel(user_id, null, null, null).then(({praiseURL, commentURL, giftURL}) => {
 				SendBirdAction.getInstance().disconnect();
-				CreateIMChannel(userId, praiseURL, commentURL, giftURL).then((data) => {
+				CreateIMChannel(user_id, praiseURL, commentURL, giftURL).then((data) => {
 					if (!data) QuickLogin(_params);
 
 					personCenter({
@@ -612,6 +612,7 @@ export const bindAccount = (params) => {
 	_params.loginMode = userLoginMode;
 	_params.mac_type = MacType;
 	_params.mac = getMac();
+	_params.token = getLocalStorage(TOKEN_NAME);
 
 	return new Promise((resolve, reject) => {
 
@@ -1778,6 +1779,7 @@ export const createOrder = (goodsId, type) => {
 	let _params = {
 		goods_id: goodsId,
 		pay_type: type,
+		goods_type: 1,
 		userId: userId,
 		token: getLocalStorage(TOKEN_NAME),
 		loginMode: userLoginMode,
@@ -1983,7 +1985,8 @@ export const myCodaPay = (_country, _currency, _goodId, _title, _price, _payTota
 		price: _price,
 		pay_total: _payTotal,
 		user_id: userId,
-		pay_type: 2
+		pay_type: 2,
+		goods_type: 1
 	}
 
 	if (DistGreen) {
@@ -2027,10 +2030,17 @@ export const selAllGoods = () => {
  * 显示主播列表接口
  * @return {[type]} [description]
  */
-export const showLiveList = () => {
+export const showLiveList = (_page = 1, _number = 10, type) => {
+	let _params = {
+		page: _page,
+		number: _number
+	};
 
+	if (type) {
+		_params.live_room_type = type;
+	}
 	return new Promise((resolve) => {
-		getPost('/showLiveList', {}, (response) => {
+		getPost('/showLiveList', _params, (response) => {
 			resolve(response.data);
 		}, (response) => {
 			resolve(false);
@@ -2318,6 +2328,214 @@ export const getLivePrice = () => {
 	return new Promise((resolve) => {
 		getPost('/getLivePrice', {}, (response) => {
 			resolve(response.data ? response.data : []);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+//------------------------------------------------------------------------------------------------------
+//-----功能叠加新增接口
+//------------------------------------------------------------------------------------------------------
+/**
+ * 收藏视频或取消收藏
+ * @param  {[type]} id     [视频ID]
+ * @param  {[type]} status [状态 1.收藏 2.取消收藏]
+ * @return {[type]}        [description]
+ */
+export const collectionVideo = (id, status) => {
+	let {userId} = getUserInfo();
+	let _params = {
+		user_id: userId,
+		video_id: id,
+		status: status
+	};
+
+	return new Promise((resolve) => {
+		getPost('/collectionVideo', _params, (response) => {
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 收藏的视频列表
+ * @param  {Number} _page   [当前页]
+ * @param  {Number} _number [每页显示条数]
+ * @return {[type]}         [description]
+ */
+export const collectionList = (_page = 1, _number = 10) => {
+	let {userId} = getUserInfo();
+	let _params = {
+		user_id: userId,
+		page: _page,
+		number: _number
+	};
+	return new Promise((resolve) => {
+		getPost('/collectionList', _params, (response) => {
+			resolve(response.data ? response.data : false);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 根据国家获取VIP商品
+ * @return {[type]} [description]
+ */
+export const vipGoods = () => {
+	let { id } = getLocalStorage(COUNTRY_ID_NAME);
+	let _params = {
+		country_id: id
+	};
+	return new Promise((resolve) => {
+		getPost('/vipGoods', _params, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 拉黑和取消拉黑
+ * @param  {[type]} id     [拉黑的用户ID]
+ * @param  {[type]} status [状态：3.拉黑 4.取消拉黑]
+ * @return {[type]}        [description]
+ */
+export const pullBlack = (id, status) => {
+	let {userId} = getUserInfo();
+	let _params = {
+		user_id: userId,
+		black_user_id: id,
+		status: status
+	};
+
+	return new Promise((resolve) => {
+		getPost('/pullBlack', _params, (response) => {
+			toast({text: LANG.SYSTEM_CODE[response.code]});
+			resolve(true);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 拉黑列表
+ * @param  {Number} _page   [当前页]
+ * @param  {Number} _number [每页显示条数]
+ * @return {[type]}         [description]
+ */
+export const blackList = (_page = 1, _number = 10) => {
+	let {userId} = getUserInfo();
+	let _params = {
+		user_id: userId,
+		page: _page,
+		number: _number
+	};
+	return new Promise((resolve) => {
+		getPost('/blackList', _params, (response) => {
+			resolve(response.data ? response.data : []);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 举报页面返回举报类型标签
+ * @return {[type]} [description]
+ */
+export const reasonTag = () => {
+	return new Promise((resolve) => {
+		getPost('/reasonTag', {}, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 举报
+ * @param  {[type]} _file       [上传文件]
+ * @param  {[type]} id          [被举报的用户ID]
+ * @param  {[type]} reason      [举报理由标签ID]
+ * @param  {[type]} description [举报描述]
+ * @param  {[type]} onProgress  [description]
+ * @return {[type]}             [description]
+ */
+export const reportUser = (_file, id, reason, description, onProgress) => {
+	let {userId} = getUserInfo();
+	let whiteListId = getLocalStorage(WHITE_LIST_ID);
+	let formData = new FormData();
+
+	if (whiteListId) {
+		formData.append("white_list_id", whiteListId);
+	}
+
+	formData.append("keyword", 'reportUser');
+	formData.append("user_id", userId);
+	formData.append("report_user_id", id);
+	formData.append("report_reason_id", reason);
+	formData.append("report_description", description);
+
+	console.log(_file);
+	if (Array.isArray(_file)) {
+		for (let i = 0; i < _file.length; i++) {
+			formData.append("file", _file[i]);
+		}
+	}else {
+		formData.append("file", _file);
+	}
+
+	return new Promise((resolve) => {
+		getPost(formData, (response) => {
+			toast({text: LANG.SYSTEM_CODE[response.code]});
+			resolve(response.data ? response.data : false);
+		}, (progress) => {
+			if (typeof onProgress === 'function') {
+			  onProgress(progress);
+			}
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 获取主播标签
+ * @return {[type]} [description]
+ */
+export const anchorTag = () => {
+	return new Promise((resolve) => {
+		getPost('/anchorTag', {}, (response) => {
+			resolve(response.data);
+		}, (response) => {
+			resolve(false);
+		});
+	});
+};
+
+/**
+ * 添加标签
+ * @param  {[type]} id  [用户ID]
+ * @param  {[type]} tag [标签ID数组]
+ * @return {[type]}     [description]
+ */
+export const addAnchorTag = (id, tag) => {
+	let _params = {
+		anchor_user_id: id,
+		array_anchor_tag_id: tag
+	};
+	return new Promise((resolve) => {
+		getPost('/addAnchorTag', _params, (response) => {
+			toast({text: LANG.SYSTEM_CODE[response.code]});
+			resolve(response.data ? response.data : false);
 		}, (response) => {
 			resolve(false);
 		});

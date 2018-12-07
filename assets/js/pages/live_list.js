@@ -53,7 +53,7 @@ export default class LiveList extends EventEmitter {
 		this._page = 1;
 		this._number = 10;
 
-		let getShowLiveList = showLiveList();
+		let getShowLiveList = showLiveList(this._page, this._number);
 		let createIMChannel = this._createIMChannel();
 
 		Promise.all([getShowLiveList, createIMChannel]).then((data) => {

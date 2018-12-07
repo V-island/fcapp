@@ -125,16 +125,20 @@
 }
 
 .login-footer{
-	text-align: center;
+	@include spindle-vertical(column);
     margin-top: 0.35rem;
+    text-align: center;
 
-	>p {
+    >p,
+    >h5{
 		font-size: 0.6rem;
 		color: $color-text-gray-light;
-	    margin-bottom: 1.75rem;
+	}
+
+    >h5{
 	    min-width: 7.5rem;
-	    display: inline-block;
 	    position: relative;
+	    margin: 0;
 
 	    $starts: after, before;
 	    @each $start in $starts {
@@ -157,6 +161,11 @@
 		    }
 
 		}
+    }
+
+	>.tag{
+		width: 100%;
+		margin-top: 1.75rem;
 	}
 }
 
@@ -439,11 +448,20 @@
 	// score
 	>.score-header{
 		@include spindle-center(center);
+		position: relative;
 		height: 6.55rem;
 		padding: 0;
 
 		.score-amount{
 			font-size: 1.25rem;
+			color: $color-text;
+		}
+
+		.score-explain{
+			position: absolute;
+			bottom: 0.35rem;
+			right: 0.35rem;
+			font-size: 0.6rem;
 			color: $color-text;
 		}
 	}
@@ -857,5 +875,18 @@
 		font-size: 0.6rem;
 		padding-left: 0.7rem;
 		margin-bottom: 0.35rem;
+	}
+}
+
+// advertisement-box
+//--------------------------------
+.billing-box {
+	>.billing-item{
+		width: 100%;
+		height: 4rem;
+		display: block;
+		img{
+			@include size(100%);
+		}
 	}
 }

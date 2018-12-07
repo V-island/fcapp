@@ -1,4 +1,5 @@
 import Template from 'art-template/lib/template-web';
+import { FavoriteItem } from '../components/CardsItem';
 import { PullLoad } from '../components/PullLoad';
 import EventEmitter from '../eventEmitter';
 import {
@@ -44,7 +45,6 @@ export default class Favorite extends EventEmitter {
 	    extend(this.options, options);
 	    extend(this.data, LANG);
 
-	    this.favoriteFile = fcConfig.publicFile.favorite_items;
 	    this.init(element);
 
 	}
@@ -56,17 +56,11 @@ export default class Favorite extends EventEmitter {
 		let getFollowList = followList(this._page, this._number, this._type);
 
 		Promise.all([getFollowList]).then((data) => {
-			this.data.FollowList = data[0] ? data[0] : false;
+			this.FollowList = data[0] ? data[0] : [];
 
 			this.FavoriteEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.FavoriteEl);
 			this._init();
-		});
-
-		this.tpl = {};
-
-		importTemplate(this.favoriteFile, (id, _template) => {
-		    this.tpl[id] = _template;
 		});
 	}
 
@@ -74,36 +68,26 @@ export default class Favorite extends EventEmitter {
 		this.pagesFavoriteEl = this.FavoriteEl.querySelector(this.options.favoriteWrapper);
 		this.listFavoriteEl = this.pagesFavoriteEl.getElementsByClassName(this.options.listFavoriteClass)[0];
 
+		if (this.FollowList.length > 0) {
+			// content
+			this.FollowList.forEach((itemData, index) => {
+				const follow = (id, status) => {
+					follow(id, status);
+				};
+				const favoriteItem = new FavoriteItem({
+					follow,
+					data: itemData
+				});
+				this.listFavoriteEl.append(favoriteItem.element);
+			});
+		}else {
+			const empty = createDivEl({element: 'li', className: 'favorite-empty'});
+			const emptyTxt = createDivEl({element: 'p', content: `You haven't Followed at anyone yet~`});
+			empty.append(emptyTxt);
+			this.listFavoriteEl.append(empty);
+		}
+
 		this._FollwPullLoad();
-		this._bindEvent();
-	}
-
-	_bindEvent() {
-		this.btnFollwEl = this.FavoriteEl.getElementsByClassName(this.options.btnFollwClass);
-
-		Array.prototype.slice.call(this.btnFollwEl).forEach(follwEl => {
-			this._cardFollwEvent(follwEl);
-		});
-	}
-
-	_cardFollwEvent(follwEl) {
-		addEvent(follwEl, 'click', () => {
-            let _id = getData(follwEl, this.options.dataItemId),
-                status;
-
-            if (hasClass(follwEl, this.options.showClass)) {
-                status = 1;
-            }else {
-                status = 2;
-            }
-
-            follow(_id, status).then((data) => {
-            	if (!data) return;
-
-            	follwEl.innerHTML = status === 1 ? LANG.FAVORITE.Followed : LANG.FAVORITE.Follow;
-            	toggleClass(follwEl, this.options.showClass);
-            });
-        });
 	}
 
 	// Video 模块
@@ -128,19 +112,31 @@ export default class Favorite extends EventEmitter {
 		// 下拉刷新
 		FollwPullLoad.onPullingDown = () => {
 			return new Promise((resolve) => {
-				followList(this._page, this._number, this._type).then((data) => {
-					if (!data) return;
+				followList(this._page, this._number, this._type).then((followList) => {
+					if (!followList) return;
 
 					this.listFavoriteEl.innerHTML = '';
 
-					data.forEach((itemData, index) => {
-						this.data.FollowList = itemData;
-						this.data.HeaderVideos = true;
-						this.listFavoriteEl.append(createDom(Template.render(this.tpl.list_favorite_items, this.data)));
-					});
+					if (followList) {
+						// content
+						followList.forEach((itemData, index) => {
+							const follow = (id, status) => {
+								follow(id, status);
+							};
+							const favoriteItem = new FavoriteItem({
+								follow,
+								data: itemData
+							});
+							this.listFavoriteEl.append(favoriteItem.element);
+						});
+					}else {
+						const empty = createDivEl({element: 'li', className: 'favorite-empty'});
+						const emptyTxt = createDivEl({element: 'p', content: `You haven't Followed at anyone yet~`});
+						empty.append(emptyTxt);
+						this.listFavoriteEl.append(empty);
+					}
 
-					setData(this.listFavoriteEl, this.options.listsPageIndex, 1);
-					this._bindEvent();
+					setData(this.listFavoriteEl, this.options.listsPageIndex, this._page);
 					resolve(true);
 				});
 			});
@@ -152,17 +148,19 @@ export default class Favorite extends EventEmitter {
 			_page = parseInt(_page) + 1;
 
 			return new Promise((resolve) => {
-				followList(_page, this._number, this._type).then((data) => {
-					if (data) {
-						data.forEach((itemData, index) => {
-							this.data.FollowList = itemData;
-							this.data.HeaderVideos = true;
-
-							let element = createDom(Template.render(this.tpl.list_favorite_items, this.data));
-							this._cardFollwEvent(element);
-							this.listFavoriteEl.append(element);
+				followList(_page, this._number, this._type).then((followList) => {
+					if (followList) {
+						// content
+						followList.forEach((itemData, index) => {
+							const follow = (id, status) => {
+								follow(id, status);
+							};
+							const favoriteItem = new FavoriteItem({
+								follow,
+								data: itemData
+							});
+							this.listFavoriteEl.append(favoriteItem.element);
 						});
-
 						setData(this.listFavoriteEl, this.options.listsPageIndex, _page);
 					}
 					resolve(true);

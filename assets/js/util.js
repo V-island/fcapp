@@ -104,8 +104,22 @@ export const removeLocalStorage = name => {
 };
 
 // 删除全部
-export const clearLocalStorage = name => {
-    return localStorage.clear();
+export const clearLocalStorage = () => {
+    const TOKEN_NAME = 'TOKEN';
+    const WHITE_LIST_ID = 'WHITE_LIST';
+    const UER_NAME = 'USE_INFO';
+    const UER_BINDING_STATUS = 'UER_BINDING_STATUS';
+    const UUID = 'UUID';
+    const SHARE_NAME = 'SHARE';
+
+    localStorage.removeItem(TOKEN_NAME);
+    localStorage.removeItem(WHITE_LIST_ID);
+    localStorage.removeItem(UER_NAME);
+    localStorage.removeItem(UER_BINDING_STATUS);
+    localStorage.removeItem(UUID);
+    localStorage.removeItem(SHARE_NAME);
+    return true;
+    // return localStorage.clear();
 };
 
 export const getVariableFromUrl = () => {
@@ -280,6 +294,24 @@ export const dataAges = str => {
 };
 
 /**
+ * 通过出生年月计算年龄
+ * @param  {[type]} str 日期 01-01-2001
+ * @return {[type]}     [description]
+ */
+export const dataAgesSub = str => {
+    let r = str.match(/^(\d{1,2})(-|\/)(\d{1,2})(-|\/)(\d{1,4})$/);
+    if (r == null) return false;
+
+    let d = new Date(r[5], r[1] - 1, r[3]);
+
+    if (d.getFullYear() == r[5] && (d.getMonth() + 1) == r[1] && d.getDate() == r[3]) {
+        let Y = new Date().getFullYear();
+        return (Y - r[5]);
+    }
+    return false;
+};
+
+/**
  * 时间截取
  * @param  {[type]} str       日期 2001-01-01
  * @param  {[type]} format    格式 YYYY-MM-DD
@@ -321,6 +353,12 @@ export const countFromNow = (start, end) => {
     const _end   = moment(end);
 
     return _end.from(_start, true);
+};
+
+export const diffFromNow = (timestamp) => {
+    const _start = moment();
+    const _end   = moment(timestamp);
+    return _start.diff(_end, 'years');
 };
 
 export const secToTime = (timestamp) => {
@@ -679,16 +717,15 @@ const __dealCssEvent = (element, eventNameArr, callback) =>{
     });
 }
 export const animationEnd = (element, callback) => {
-    let events = ['webkitAnimationEnd', 'animationend'];
+    let events = ['webkitAnimationEnd', 'mozAnimationEnd', 'oAnimationEnd', 'animationend'];
 
     return __dealCssEvent(element, events, callback);
 };
 export const transitionEnd = (element, callback) => {
-    let events = ['webkitTransitionEnd', 'transitionend'];
+    let events = ['webkitTransitionEnd', 'mozTransitionEnd', 'oTransitionEnd', 'transitionend'];
 
     return __dealCssEvent(element, events, callback);
 };
-
 
 // datetime-picker
 export const getDaysInMonth = (year, month) => {

@@ -49,7 +49,7 @@ export default class AgoraClient {
         this.detection();
         this.client = AgoraRTC.createClient({
             mode: 'live',
-            codec: 'vp8'
+            codec: 'h264'
         });
 
         this.clientEmitter = new EventEmitter();

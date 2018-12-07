@@ -1,11 +1,10 @@
 import Template from 'art-template/lib/template-web';
 import { LivesCallingClient } from '../components/LivesContents';
-import { CardLiveItem, CardLiveMore } from '../components/CardsItem';
+import { CardLiveItem, CardLiveMore, CardVideoItem, CardVideoMore } from '../components/CardsItem';
 import { closeModal, alert, popup } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import { PullLoad } from '../components/PullLoad';
 import EventEmitter from '../eventEmitter';
-import VideoPreview from '../videoPreview';
 import SendBirdAction from '../SendBirdAction';
 import {
 	body,
@@ -36,8 +35,7 @@ import {
     addClass,
     toggleClass,
     removeClass,
-    errorAlert,
-    importTemplate
+    errorAlert
 } from '../util';
 
 const LANG = getLangConfig();
@@ -83,7 +81,6 @@ export default class Home extends EventEmitter {
             tagsClass: '.tag',
             tagsLabelClass: 'tag-label',
 
-            dataUserPackage: 'userPackage',
             cardsPageIndex: 'page',
             tagsIndex: 'id',
             showClass: 'active'
@@ -92,7 +89,6 @@ export default class Home extends EventEmitter {
 	    extend(this.options, options);
 	    extend(this.data, LANG);
 
-	    this.homeFile = fcConfig.publicFile.home_items;
 	    this.init(element);
 	}
 
@@ -101,27 +97,20 @@ export default class Home extends EventEmitter {
 		this._number = 10;
 		this.tagId = 0;
 
+		let getvideoType = videoType();
 		let getFreeVideoClips = videoClips(this._page, this._number, this.tagId, 1);
 		let getVideoClips = videoClips(this._page, this._number, this.tagId, 2);
-		let getvideoType = videoType();
 		let getShowLiveList = showLiveList();
 
-		Promise.all([getFreeVideoClips, getVideoClips, getvideoType, getShowLiveList]).then((data) => {
-			// this.data.FreeVideoList = data[0] ? (data[0].length > 2 ? data[0].slice(0, 2) : data[0]) : false;
-			this.data.FreeVideoList = data[0] ? data[0] : false;
-			this.data.VideoList = data[1] ? data[1] : false;
-			this.data.VideoType = data[2] ? data[2] : false;
+		Promise.all([getvideoType, getVideoClips, getFreeVideoClips, getShowLiveList]).then((data) => {
+			this.data.VideoType = data[0] ? data[0] : false;
+			this.VideoList = data[1] ? data[1] : [];
+			this.FreeVideoList = data[2] ? (data[2].length > 2 ? data[2].slice(0, 2) : data[2]) : [];
 			this.LivesList = data[3] ? (data[3].length > 2 ? data[3].slice(0, 2) : data[3]) : [];
 
 			this.HomeEl = createDom(Template.render(element, this.data));
 			this.trigger('pageLoadStart', this.HomeEl);
 			this._init();
-		});
-
-		this.tpl = {};
-
-		importTemplate(this.homeFile, (id, _template) => {
-		    this.tpl[id] = _template;
 		});
 
 		if (!checkLogin()) {
@@ -156,9 +145,40 @@ export default class Home extends EventEmitter {
 
 		this.tagsEl = this.HomeEl.querySelector(this.options.tagsClass);
 
+		if (this.FreeVideoList.length > 0) {
+			// header
+			const videoMoreItem = new CardVideoMore({
+				free: true
+			});
+			this.boxVideoEl.append(videoMoreItem.element);
+
+			// content
+			this.FreeVideoList.forEach((itemData, index) => {
+				const videoItem = new CardVideoItem({
+					data: itemData
+				});
+				this.boxVideoEl.append(videoItem.element);
+			});
+		}
+
+		if (this.VideoList.length > 0) {
+			// header
+			const videoMoreItem = new CardVideoMore({
+				free: false
+			});
+			this.boxVideoEl.append(videoMoreItem.element);
+
+			// content
+			this.VideoList.forEach((itemData, index) => {
+				const videoItem = new CardVideoItem({
+					data: itemData
+				});
+				this.boxVideoEl.append(videoItem.element);
+			});
+		}
+
 		this._VideoPullLoad();
 		this._bindEvent();
-		this._listEvent();
 
 		gtag('event', 'look', {
 		    'event_label': 'HOME',
@@ -188,34 +208,46 @@ export default class Home extends EventEmitter {
 						toggleClass(tagsLabelEl, this.options.showClass);
 					}
 					Spinner.start(body);
-					videoClips(1, 10, this.tagId, 1).then((data) => {
-						videoClips(1, 10, this.tagId, 2).then((_data) => {
-							if (!data && !_data) return Spinner.remove();
+					videoClips(1, 10, this.tagId, 1).then((freeVideoList) => {
+						videoClips(1, 10, this.tagId, 2).then((videoList) => {
+							if (!freeVideoList && !videoList) return Spinner.remove();
 
 							this.boxVideoEl.innerHTML = '';
 
-							// free
-							if (data) {
-								this.boxVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-								// data = data.length > 2 ? data.slice(0, 2) : data;
-								data.forEach((itemData, index) => {
-									this.data.VideosList = itemData;
-									this.data.NotFreeVideos = false;
-									this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+							if (freeVideoList) {
+								// header
+								const videoMoreItem = new CardVideoMore({
+									free: true
+								});
+								this.boxVideoEl.append(videoMoreItem.element);
+
+								// content
+								freeVideoList.forEach((itemData, index) => {
+									const videoItem = new CardVideoItem({
+										data: itemData
+									});
+									this.boxVideoEl.append(videoItem.element);
+
+									if (index > 2) return false;
 								});
 							}
 
-							if (_data) {
-								this.boxVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+							if (videoList) {
+								// header
+								const videoMoreItem = new CardVideoMore({
+									free: false
+								});
+								this.boxVideoEl.append(videoMoreItem.element);
 
-								_data.forEach((itemData, index) => {
-									this.data.VideosList = itemData;
-									this.data.NotFreeVideos = true;
-									this.boxVideoEl.append(createDom(Template.render(this.tpl.list_videos, this.data)));
+								// content
+								videoList.forEach((itemData, index) => {
+									const videoItem = new CardVideoItem({
+										data: itemData
+									});
+									this.boxVideoEl.append(videoItem.element);
 								});
 							}
 							setData(this.boxVideoEl, this.options.cardsPageIndex, 1);
-							this._listEvent();
 							Spinner.remove();
 						});
 					});
@@ -324,43 +356,6 @@ export default class Home extends EventEmitter {
 			});
 	}
 
-	_listEvent() {
-		this.cardVideoEl = this.HomeEl.querySelectorAll('.card-video');
-
-		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
-			this._cardVideoEvent(cardVideoItemEl);
-		});
-	}
-
-	_cardVideoEvent(ItemEl) {
-		addEvent(ItemEl, 'tap', () => {
-			let info = JSON.parse(getData(ItemEl, 'userInfo'));
-			let { userPackage } = getUserInfo(this.options.dataUserPackage);
-
-			if (parseInt(userPackage / info.price) < 1) {
-			    return alert({
-			    	title: `${LANG.HOME.Madal.NotCoins.Title}`,
-			    	text: `${LANG.HOME.Madal.NotCoins.Text}`,
-			    	button: `${LANG.HOME.Madal.NotCoins.ButtonsText}`,
-			    	callback: () => {
-			    		return location.href = jumpURL('#/user');
-			    	}
-			    });
-			}
-
-			Spinner.start(body);
-			playVideo(info.id).then((data) => {
-				if (!data) return Spinner.remove();
-				extend(info, data);
-				setUserInfo(this.options.dataUserPackage, userPackage - info.price);
-				let _videoPreview = new VideoPreview(ItemEl, info);
-				_videoPreview.on('videoPreview.start', () => {
-                    Spinner.remove();
-                });
-			});
-		});
-	}
-
 	// Video 模块
 	_VideoPullLoad() {
 		const VideoPullLoad = new PullLoad(this.pagesVideoEl, {
@@ -388,41 +383,46 @@ export default class Home extends EventEmitter {
 				let getShowLiveList = showLiveList();
 
 				Promise.all([getFreeVideo, getVideoClips, getShowLiveList]).then((data) => {
-					const freeVideo = data[0] ? data[0] : false;
-					const videoLIst = data[1] ? data[1] : false;
+					const freeVideo = data[0] ? (data[0].length > 2 ? data[0].slice(0, 2) : data[0]) : [];
+					const videoLIst = data[1] ? data[1] : [];
 					const liveLIst = data[2] ? (data[2].length > 2 ? data[2].slice(0, 2) : data[2]) : [];
 
 					this.boxLivesEl.innerText = '';
 					this.boxVideoEl.innerText = '';
 
-					// free
-					if (freeVideo) {
-						this.boxVideoEl.append(createDom(Template.render(this.tpl.free_videos_header, this.data)));
-						// data = data.length > 2 ? data.slice(0, 2) : data;
+					if (freeVideo.length > 0) {
+						// header
+						const videoMoreItem = new CardVideoMore({
+							free: true
+						});
+						this.boxVideoEl.append(videoMoreItem.element);
+
+						// content
 						freeVideo.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
-							this.data.NotFreeVideos = false;
-
-							let element = createDom(Template.render(this.tpl.list_videos, this.data));
-							this._cardVideoEvent(element);
-							this.boxVideoEl.append(element);
+							const videoItem = new CardVideoItem({
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
 						});
 					}
 
-					if (videoLIst) {
-						this.boxVideoEl.append(createDom(Template.render(this.tpl.videos_header, this.data)));
+					if (videoLIst.length > 0) {
+						// header
+						const videoMoreItem = new CardVideoMore({
+							free: false
+						});
+						this.boxVideoEl.append(videoMoreItem.element);
 
+						// content
 						videoLIst.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
-							this.data.NotFreeVideos = true;
-
-							let element = createDom(Template.render(this.tpl.list_videos, this.data));
-							this._cardVideoEvent(element);
-							this.boxVideoEl.append(element);
+							const videoItem = new CardVideoItem({
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
 						});
 					}
 
-					if (liveLIst) {
+					if (liveLIst.length > 0) {
 						liveLIst.forEach((itemData, index) => {
 							const blurry = liveLIst.length > 1 ? false : true;
 							const handler = ({clientName, clientHead, anchorId, roomId, roomType, price}) => {
@@ -442,7 +442,6 @@ export default class Home extends EventEmitter {
 						}
 					}
 
-
 					setData(this.boxVideoEl, this.options.cardsPageIndex, 1);
 					resolve(true);
 
@@ -456,33 +455,28 @@ export default class Home extends EventEmitter {
 			_page = parseInt(_page) + 1;
 
 			return new Promise((resolve) => {
-				videoClips(_page, this._number, this.tagId, 1).then((data) => {
-					if (data) {
-						data.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
-							this.data.NotFreeVideos = false;
-							let element = createDom(Template.render(this.tpl.list_videos, this.data));
-							this._cardVideoEvent(element);
-							this.boxVideoEl.append(element);
+				videoClips(_page, this._number, this.tagId, 2).then((videoList) => {
+					if (videoList) {
+						// header
+						if (_page == 1) {
+							const videoMoreItem = new CardVideoMore({
+								free: false
+							});
+							this.boxVideoEl.append(videoMoreItem.element);
+						}
+
+						// content
+						videoList.forEach((itemData, index) => {
+							const videoItem = new CardVideoItem({
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
 						});
+
 						setData(this.boxVideoEl, this.options.cardsPageIndex, _page);
 					}
 					resolve(true);
 				});
-				// videoClips(_page, this._number, this.tagId, 2).then((data) => {
-				// 	if (data) {
-				// 		data.forEach((itemData, index) => {
-				// 			this.data.VideosList = itemData;
-							// this.data.NotFreeVideos = true;
-				// 			let element = createDom(Template.render(this.tpl.list_videos, this.data));
-				// 			this._cardVideoEvent(element);
-				// 			this.boxVideoEl.append(element);
-				// 		});
-				// 		setData(this.boxVideoEl, this.options.cardsPageIndex, _page);
-				// 	}
-				// 	this.pagesVideoSwiper.finishPullUp();
-				// 	this.pagesVideoSwiper.refresh();
-				// });
 			});
 		};
 	}

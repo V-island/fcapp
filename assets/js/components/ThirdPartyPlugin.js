@@ -1,6 +1,6 @@
 import hello from 'hellojs/dist/hello.all.js';
 import EventEmitter from '../eventEmitter';
-import Modal from '../modal';
+import { alert, toast } from './Modal';
 import {
 	domainURL,
 	facebookConfig,
@@ -31,7 +31,6 @@ import {
 } from '../util';
 
 const LANG = getLangConfig();
-const modal = new Modal();
 // let hello = require('hellojs/dist/hello.all.js');s
 
 
@@ -132,9 +131,11 @@ class FacebookPlugin extends EventEmitter {
 				}
 			});
 		} else {
-			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
-				modal.closeModal(_modal);
-				this.trigger('FacebookLogin.cancel');
+			alert({
+				text: `${LANG.LOGIN.Madal.Cancel}`,
+				callback: () =>{
+					this.trigger('FacebookLogin.cancel');
+				}
 			});
 
 			if (this.onCancelEvent) {
@@ -145,7 +146,10 @@ class FacebookPlugin extends EventEmitter {
 
 	Login() {
 		if (typeof(FB) == 'undefined') {
-			return modal.toast(LANG.LOGIN.Madal.Error);
+
+			return toast({
+				text: `${LANG.LOGIN.Madal.Error}`
+			});
 		}
 
 		FB.login((response) => {
@@ -161,7 +165,10 @@ class FacebookPlugin extends EventEmitter {
 
 	Share(URL) {
 		if (typeof(FB) == 'undefined') {
-			return modal.toast(LANG.LOGIN.Madal.Error);
+
+			return toast({
+				text: `${LANG.LOGIN.Madal.Error}`
+			});
 		}
 
 		return new Promise((resolve) => {
@@ -175,15 +182,19 @@ class FacebookPlugin extends EventEmitter {
 						shareInfo(thirdPartyType.facebook).then((data) => {
 							let title = data ? LANG.LIVE_PREVIEW.Share.Prompt.Completed_Once : LANG.LIVE_PREVIEW.Share.Prompt.Completed;
 
-							modal.alert(title, (_modal) => {
-								modal.closeModal(_modal);
-								resolve();
+							alert({
+								text: `${title}`,
+								callback: () =>{
+									resolve();
+								}
 							});
 						});
 					} else {
-						modal.alert(LANG.LIVE_PREVIEW.Share.Prompt.Error, (_modal) => {
-							modal.closeModal(_modal);
-							resolve();
+						alert({
+							text: `${LANG.LIVE_PREVIEW.Share.Prompt.Error}`,
+							callback: () =>{
+								resolve();
+							}
 						});
 					}
 				}
@@ -193,7 +204,9 @@ class FacebookPlugin extends EventEmitter {
 
 	Logout() {
 		if (typeof(FB) == 'undefined') {
-			return modal.toast(LANG.LOGIN.Madal.Error);
+			return toast({
+				text: `${LANG.LOGIN.Madal.Error}`
+			});
 		}
 		FB.logout((response) => {
 			this.trigger('FacebookLogin.logout');
@@ -300,9 +313,12 @@ class TwitterPlugin extends EventEmitter {
 				}
 			});
 		}, (e) => {
-			modal.alert(LANG.LOGIN.Madal.Cancel, (_modal) => {
-				modal.closeModal(_modal);
-				this.trigger('twitterLogin.cancel');
+
+			alert({
+				text: `${LANG.LOGIN.Madal.Cancel}`,
+				callback: () =>{
+					this.trigger('twitterLogin.cancel');
+				}
 			});
 
 			if (this.onCancelEvent) {
@@ -327,9 +343,11 @@ class TwitterPlugin extends EventEmitter {
 				var loop = setInterval(() => {
 					if(winObj.closed) {
 						clearInterval(loop);
-						modal.alert(title, (_modal) => {
-						 	modal.closeModal(_modal);
-						 	resolve();
+						alert({
+							text: `${title}`,
+							callback: () =>{
+								resolve();
+							}
 						});
 					}
 				}, 1000);

@@ -208,8 +208,23 @@
 
         .list-item-secondary{
             font-size: 0.6rem;
-            color: $color-text-gray;
+            color: $color-text-secondary;
             white-space: normal;
+        }
+
+        &.theme-video{
+            .list-item{
+                position: relative;
+                padding: 0.4rem 0;
+
+                &:after {
+                    background: $color-text-gray;
+                }
+            }
+            .list-item-secondary{
+                font-size: 0.6rem;
+                color: $color-text;
+            }
         }
     }
 
@@ -366,6 +381,21 @@
                 background: $color-primary;
                 color: $color-text-gray;
             }
+        }
+
+        .btn-blacklist{
+            width: auto;
+            min-width: 2.8rem;
+            height: 1.4rem;
+            line-height: 1.4rem;
+            margin: 0;
+            font-size: 0.5rem;
+            text-align: center;
+            border-radius: 0.1rem;
+            padding: 0 0.35rem;
+            position: absolute;
+            right: 0.8rem;
+            top: 0.9rem;
         }
     }
 

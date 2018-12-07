@@ -12,29 +12,30 @@ import {
 
 const LANG = getLangConfig();
 
-export default class Favorite extends EventEmitter {
+export default class UserInformation extends EventEmitter {
 	constructor(element, options) {
 	    super();
 
+	    this.data = {};
 	    this.options = {
-    		data: []
         };
 
 	    extend(this.options, options);
+	    extend(this.data, LANG);
 
 	    this.init(element);
 
 	}
 
 	init(element) {
-		this.FavoriteEl = createDom(Template.render(element, LANG));
+		this.UserInformationEl = createDom(Template.render(element, this.data));
 
 		setTimeout(() => {
-			this.trigger('pageLoadStart', this.FavoriteEl);
+			this.trigger('pageLoadStart', this.UserInformationEl);
 		}, 0);
 	}
 
 	static attachTo(element, options) {
-	    return new Favorite(element, options);
+	    return new UserInformation(element, options);
 	}
 }

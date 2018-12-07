@@ -1,4 +1,4 @@
-import Picker from '../picker';
+import Picker from './Picker';
 import DateTimePicker from 'pickerjs';
 import {
     body
@@ -18,6 +18,7 @@ import {
     removeClass,
     showHideDom,
     createDivEl,
+    diffFromNow,
     animationEnd,
     getLocalStorage,
     setLocalStorage
@@ -82,14 +83,14 @@ const openModal = ({modal, top, callback}) => {
         if (popupOverlayEl.length > 0) {
             _popupOverlayEl = popupOverlayEl[0];
         }
-        if (modalOverlayEl.length === 0 && !isPopup  && !top) {
+        if (modalOverlayEl.length === 0 && !isPopup) {
             _modalOverlayEl = createDivEl({className: Options.modalOverlayClass});
             addEvent(_modalOverlayEl, 'click', () => {
                 closeModal();
             });
             body.appendChild(_modalOverlayEl);
         }
-        if (popupOverlayEl.length === 0 && isPopup && !top) {
+        if (popupOverlayEl.length === 0 && isPopup) {
             _popupOverlayEl = createDivEl({className: Options.popupOverlayClass});
 
             body.appendChild(_popupOverlayEl);
@@ -119,11 +120,10 @@ const openModal = ({modal, top, callback}) => {
 }
 
 export const closeModal = (modal) => {
-    const modalGroup = body.querySelectorAll(`.modal`);
+    const modalGroup = body.querySelectorAll(`.modal-in`);
     if (typeof modal == 'undefined') {
         modal = body.querySelector(`.${Options.modalInClass}`);
     }
-
     let modalOverlayEl = body.getElementsByClassName(Options.modalOverlayClass)[0];
     let popupOverlayEl = body.getElementsByClassName(Options.popupOverlayClass)[0];
     let isModal = hasClass(modal, 'modal'),
@@ -441,35 +441,36 @@ export const popup = ({element, top, title, extraclass, notBack, notPadding, can
 }
 
 // 弹框滑动选择 为二位数组，如[lists1, lists2, lists3]
-export const pickers = ({title, data, callback}) => {
+export const pickers = ({title, data, unit, selectedIndex, callback}) => {
     let picker = new Picker({
-        data: [data],
+        data: data,
         title: title,
+        unit: unit,
+        selectedIndex: selectedIndex ? selectedIndex : null,
         valueEqualText: true,
-        buttons: [{
-            text: Defaults.confirmButtonCancel,
-            fill: true,
-        }, {
-            text: Defaults.confirmButtonOk
-        }]
-    });
-    picker.show();
-    picker.on('picker.valuechange', (selectedVal, selectedText, selectedIndex) => {
-        closeModal(picker.modalEl);
-        if (callback) callback(selectedVal[0], selectedText[0], selectedIndex[0]);
-    });
-    picker.on('picker.cancel', () => {
-        closeModal(picker.modalEl);
+        buttonCancel: Defaults.confirmButtonCancel,
+        buttonOk: Defaults.confirmButtonOk
     });
 
+    picker.onClose = () =>{
+        closeModal(picker.element);
+    }
+
+    picker.onConfirm = (selectedVal, selectedText, selectedIndex) =>{
+        closeModal(picker.element);
+        if (callback) callback(selectedVal, selectedText, selectedIndex);
+    }
+
+    body.appendChild(picker.element);
     openModal({
-        modal: picker.modalEl
+        modal: picker.element
     });
-    return picker.modalEl;
+    return picker.element;
 }
 
+
 // 日期时间选择器
-export const timePicker = ({title, params, button, callback, callbackCancel}) => {
+export const timePicker = ({title, params, adultLimit, button, callback, callbackCancel}) => {
     const modal = createDivEl({className: 'modal'});
     title = title ? title : Defaults.modalTitle;
 
@@ -515,6 +516,14 @@ export const timePicker = ({title, params, button, callback, callbackCancel}) =>
 
     const buttonYes = createDivEl({className: ['button', 'button-primary'], content: button ? Defaults.modalButtonOk : Defaults.confirmButtonOk});
     addEvent(buttonYes, 'click', () => {
+        if (adultLimit) {
+            if (diffFromNow(picker.getDate()) < 18) {
+                return alert({
+                    text: `${LANG.PERSONAL_DETAIL.Age.Madal.Text}`,
+                    button: `${LANG.PERSONAL_DETAIL.Age.Madal.Buttons}`
+                });
+            }
+        }
         closeModal(modal);
         if (callback) callback(picker.getDate(options.format));
     });

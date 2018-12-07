@@ -32,6 +32,8 @@ import acrossFemaleImg from '../../img/users/avatar-female@2x.png';
 import acrossMaleImg from '../../img/users/avatar-male@2x.png';
 import giftImg from '../../img/gifts/gift-lollipop@2x.png';
 
+import uploadPhotosImg from '../../img/users/icon-upload-photos@2x.png';
+
 const LANG = getLangConfig();
 
 // 信息详情
@@ -125,7 +127,7 @@ class LivesAnchorInfo {
         const content = createDivEl({className: this.options.contentClass});
         const contentTags = createDivEl({className: ['tag', 'tags-label']});
         this.tags.forEach((data, index) => {
-            let label = createDivEl({element: 'label', className: 'tag-label', content: data.type_name});
+            let label = createDivEl({element: 'label', className: 'tag-label', content: data.anchor_tag_title});
             switch(random(5)) {
                 case 1:
                     addClass(label, 'bg-success');
@@ -166,7 +168,7 @@ class LivesAnchorInfo {
             if (hasClass(btnFavorite, this.options.disabledClass)) return false;
 
             addClass(btnFavorite, this.options.disabledClass)
-            if (favorite) favorite();
+            if (favorite) favorite(this.follow ? 2 : 1);
         });
         buttons.appendChild(btnFavorite);
 
@@ -546,17 +548,10 @@ class LivesAnchorReport {
         this.options = {
             wrapperClass: 'popup-wrapper',
             groupClass: 'popup-group',
-            contentClass: 'anchor-content'
+            contentClass: 'anchor-content',
+            showCalss: 'active'
         };
         this.element = this._createElement(submit);
-    }
-
-    get id() {
-        return this.data.id ? `${this.data.id}` : `0`;
-    }
-
-    get acrossUrl() {
-        return this.data.userHead ? protectFromXSS(this.data.userHead) : (this.data.userSex == 1  ? acrossMaleImg : acrossFemaleImg);
     }
 
     get reasonlist() {
@@ -564,6 +559,9 @@ class LivesAnchorReport {
     }
 
     _createElement(submit) {
+        let File = null,
+            activeEL = null,
+            tagID = null;
         const wrapper = createDivEl({className: this.options.wrapperClass});
 
         const groupTag = createDivEl({className: this.options.groupClass});
@@ -572,10 +570,20 @@ class LivesAnchorReport {
 
         // tags
         const tagContent = createDivEl({className: this.options.contentClass});
-        const tags = createDivEl({className: ['tag', 'tags-video']});
+        const tags = createDivEl({className: ['tag', 'tag-report']});
         this.reasonlist.forEach((data, index) => {
-            let label = createDivEl({element: 'label', className: 'tag-label', content: data.title});
-
+            let label = createDivEl({element: 'label', className: 'tag-label', content: data.reason});
+            addEvent(label, 'click', () => {
+                if (activeEL) {
+                    removeClass(activeEL, this.options.showCalss);
+                }
+                activeEL = label;
+                tagID = data.id;
+                addClass(label, this.options.showCalss);
+            });
+            if (index == 0) {
+                addClass(label, this.options.showCalss);
+            }
             tags.appendChild(label);
         });
         tagContent.appendChild(tags);
@@ -593,14 +601,40 @@ class LivesAnchorReport {
         inputContent.appendChild(textarea);
 
         const acrossImg = createDivEl({element: 'img', className: 'across'});
-        acrossImg.src = this.acrossUrl;
+        acrossImg.src = uploadPhotosImg;
         inputContent.appendChild(acrossImg);
+        addEvent(acrossImg, 'click', () => {
+            const inputEl = createDivEl({element: 'input'});
+            // let userAgent = navigator.userAgent.toLowerCase();
+            //判断是否是苹果手机，是则是true
+            // if ((userAgent.indexOf('iphone') != -1) || (userAgent.indexOf('ipad') != -1)) {
+            //     inputEl.setAttribute("capture", "camera");
+            // };
+
+            inputEl.setAttribute("type", "file");
+            inputEl.setAttribute("accept", "image/*");
+            inputEl.click();
+
+            addEvent(inputEl, 'change', () => {
+                File = inputEl.files[0];
+                let reader = new FileReader();
+
+                reader.onload = () => {
+                    let fileURL = reader.result;
+                    acrossImg.src = fileURL;
+                };
+
+                reader.readAsDataURL(File);
+            });
+        });
         groupInput.appendChild(inputContent);
         wrapper.appendChild(groupInput);
 
         const btnSubmit = createDivEl({className: ['button', 'button-primary'], content: `${LANG.LIVE_PREVIEW.Feedback.Buttons}`});
         addEvent(btnSubmit, 'click', () => {
-            if (submit) submit();
+            let description = replaceNote(textarea.value);
+
+            if (submit) submit([File], tagID, description);
         });
         wrapper.appendChild(btnSubmit);
 
@@ -629,9 +663,11 @@ class LivesAnchorTag {
         return this.data.tagList ? this.data.tagList : [];
     }
 
+    get selected() {
+        return this.data.selected ? this.data.selected : 3;
+    }
+
     _createElement(save) {
-        let activeEL = null,
-            tagID = null;
         const wrapper = createDivEl({className: this.options.wrapperClass});
 
         const groupUser = createDivEl({className: this.options.groupClass});
@@ -642,7 +678,24 @@ class LivesAnchorTag {
         const userContent = createDivEl({className: this.options.contentClass});
         const users = createDivEl({className: ['tag', 'tags-video']});
         this.userlist.forEach((data, index) => {
-            let label = createDivEl({element: 'label', className: 'tag-label', content: data.title});
+            let label = createDivEl({element: 'label', className: 'tag-label', content: data.anchor_tag_title});
+            switch(random(5)) {
+                case 1:
+                    addClass(label, 'label-success');
+                    break;
+                case 2:
+                    addClass(label, 'label-primary');
+                    break;
+                case 3:
+                    addClass(label, 'label-danger');
+                    break;
+                case 4:
+                    addClass(label, 'label-blue');
+                    break;
+                case 5:
+                    addClass(label, 'label-purple');
+                    break;
+            };
             users.appendChild(label);
         });
         userContent.appendChild(users);
@@ -658,13 +711,14 @@ class LivesAnchorTag {
         const tagContent = createDivEl({className: this.options.contentClass});
         const tags = createDivEl({className: ['tag', 'tags-video']});
         this.taglist.forEach((data, index) => {
-            let label = createDivEl({element: 'label', className: 'tag-label', content: data.title});
+            let label = createDivEl({element: 'label', className: 'tag-label', content: data.anchor_tag_title});
+            setData(label, 'id', data.id);
+
             addEvent(label, 'click', () => {
-                if (activeEL) {
-                    removeClass(activeEL, this.options.showCalss);
-                }
-                activeEL = label;
-                tagID = data.id;
+                const activeEl = tags.querySelectorAll(`.${this.options.showCalss}`);
+                if (hasClass(label, this.options.showCalss)) return removeClass(label, this.options.showCalss);
+                if (activeEl.length >= this.selected) return false;
+
                 addClass(label, this.options.showCalss);
             });
             tags.appendChild(label);
@@ -675,6 +729,12 @@ class LivesAnchorTag {
 
         const btnpass = createDivEl({className: ['button', 'button-primary'], content: `${LANG.LIVE_PREVIEW.Impression.Buttons}`});
         addEvent(btnpass, 'click', () => {
+            const activeEl = tags.querySelectorAll(`.${this.options.showCalss}`);
+            let tagID = [];
+
+            Array.prototype.slice.call(activeEl).forEach(itemEl => {
+                tagID.push(getData(itemEl, 'id'));
+            });
             if (save) save(tagID);
         });
         wrapper.appendChild(btnpass);

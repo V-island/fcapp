@@ -1,10 +1,10 @@
 import Template from 'art-template/lib/template-web';
 import EventEmitter from '../eventEmitter';
 import { LivesCallingClient } from '../components/LivesContents';
+import { CardVideoItem } from '../components/CardsItem';
 import { closeModal, alert, popup } from '../components/Modal';
 import { Spinner } from '../components/Spinner';
 import { PullLoad } from '../components/PullLoad';
-import VideoPreview from '../videoPreview';
 import SendBirdAction from '../SendBirdAction';
 import SendBirdConnection from '../SendBirdConnection';
 
@@ -34,7 +34,6 @@ import {
     toggleClass,
     errorAlert,
     dateFormat,
-    importTemplate,
     getVariableFromUrl
 } from '../util';
 
@@ -68,7 +67,6 @@ export default class OtherDetails extends EventEmitter {
 	    extend(this.options, options);
 	    extend(this.data, LANG);
 
-	    this.otherDetailsFile = fcConfig.publicFile.other_details_item;
 	    this.init(element);
 
 	}
@@ -86,8 +84,8 @@ export default class OtherDetails extends EventEmitter {
 
 		Promise.all([getUserDetail, getVideo, getIMChannel]).then((data) => {
 			this.data.UserDetail = data[0] ? data[0] : false;
-			this.data.VideoList = data[1] ? data[1] : false;
 
+			this.VideoList = data[1] ? data[1] : [];
 			this.anchorInfo = data[0] ? data[0].anchor : {};
 
 			this.OtherDetailsEl = createDom(Template.render(element, this.data));
@@ -96,26 +94,33 @@ export default class OtherDetails extends EventEmitter {
 
 			this.info = data[0] ? data[0] : false;
 		});
-
-		this.tpl = {};
-
-		importTemplate(this.otherDetailsFile, (id, _template) => {
-		    this.tpl[id] = _template;
-		});
 	}
 
 	_init() {
 		this.btnAddAttentionEl = this.OtherDetailsEl.getElementsByClassName(this.options.btnAddAttentionClass)[0];
 		this.pagesVideoEl = this.OtherDetailsEl.querySelector(this.options.pagesVideoClass);
-		this.cardsVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
+		this.boxVideoEl = this.pagesVideoEl.querySelector(this.options.boxCardsClass);
 
 		this.btnPrivateEl = this.pagesVideoEl.querySelector(this.options.btnPrivateLetterClass);
 		this.btnVideoChatEl = this.pagesVideoEl.querySelector(this.options.btnVideoChatClass);
 
+
+		if (this.VideoList.length > 0) {
+			// content
+			this.VideoList.forEach((itemData, index) => {
+				const videoItem = new CardVideoItem({
+					data: itemData
+				});
+				this.boxVideoEl.append(videoItem.element);
+			});
+		}else {
+			const moreTxt = createDivEl({element: 'p', className: 'no-more', content: `${LANG.USER_WATCH.No_More}`});
+			this.boxVideoEl.append(moreTxt);
+		}
+
 		this._SlidePullLoad();
 		this._VideoPullLoad();
 		this._bindEvent();
-		this._listEvent();
 	}
 
 	// 链接直播服务
@@ -294,29 +299,6 @@ export default class OtherDetails extends EventEmitter {
 			});
 	}
 
-	_listEvent() {
-		this.cardVideoEl = this.OtherDetailsEl.querySelectorAll(this.options.cardVideoClass);
-		// video list
-		Array.prototype.slice.call(this.cardVideoEl).forEach(cardVideoItemEl => {
-			this._cardVideoEvent(cardVideoItemEl);
-		});
-	}
-
-	_cardVideoEvent(ItemEl) {
-		addEvent(ItemEl, 'tap', () => {
-			let info = JSON.parse(getData(ItemEl, 'userInfo'));
-			Spinner.start(body);
-			playVideo(info.id).then((data) => {
-				if (!data) return Spinner.remove();
-				extend(info, data);
-				let _videoPreview = new VideoPreview(ItemEl, info);
-				_videoPreview.on('videoPreview.start', () => {
-                    Spinner.remove();
-                });
-			});
-		});
-	}
-
 	// Slide 滑块
 	_SlidePullLoad() {
 		const slideWrapperEl = this.OtherDetailsEl.querySelector(this.options.slideWrapper);
@@ -383,19 +365,25 @@ export default class OtherDetails extends EventEmitter {
 		// 下拉刷新
 		VideoPullLoad.onPullingDown = () => {
 			return new Promise((resolve) => {
-				selVideoByUserId(this.info.user_id, this._page, this._number).then((data) => {
-					if (!data) return;
+				selVideoByUserId(this.info.user_id, this._page, this._number).then((videoList) => {
+					if (!videoList) return;
 
-					this.cardsVideoEl.innerHTML = '';
+					this.boxVideoEl.innerHTML = '';
 
-					data.forEach((itemData, index) => {
-						this.data.VideosList = itemData;
-						this.data.HeaderVideos = true;
-						this.cardsVideoEl.append(createDom(Template.render(this.tpl.list_videos_item, this.data)));
-					});
+					if (videoList) {
+						// content
+						videoList.forEach((itemData, index) => {
+							const videoItem = new CardVideoItem({
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
+						});
+					}else {
+						const moreTxt = createDivEl({element: 'p', className: 'no-more', content: `${LANG.USER_WATCH.No_More}`});
+						this.boxVideoEl.append(moreTxt);
+					}
 
-					setData(this.cardsVideoEl, this.options.cardsPageIndex, 1);
-					this._listEvent();
+					setData(this.boxVideoEl, this.options.cardsPageIndex, this._page);
 					resolve(true);
 				});
 			});
@@ -403,21 +391,20 @@ export default class OtherDetails extends EventEmitter {
 
 		// 上拉加载
 		VideoPullLoad.onPullingUp = () => {
-			let _page = getData(this.cardsVideoEl, this.options.cardsPageIndex);
+			let _page = getData(this.boxVideoEl, this.options.cardsPageIndex);
 			_page = parseInt(_page) + 1;
 
 			return new Promise((resolve) => {
-				selVideoByUserId(this.info.user_id, _page, this._number).then((data) => {
-					if (data) {
-						data.forEach((itemData, index) => {
-							this.data.VideosList = itemData;
-							this.data.HeaderVideos = true;
-
-							let element = createDom(Template.render(this.tpl.list_videos_item, this.data));
-							this._cardVideoEvent(element);
-							this.cardsVideoEl.append(element);
+				selVideoByUserId(this.info.user_id, _page, this._number).then((videoList) => {
+					if (videoList) {
+						// content
+						videoList.forEach((itemData, index) => {
+							const videoItem = new CardVideoItem({
+								data: itemData
+							});
+							this.boxVideoEl.append(videoItem.element);
 						});
-						setData(this.cardsVideoEl, this.options.cardsPageIndex, _page);
+						setData(this.boxVideoEl, this.options.cardsPageIndex, _page);
 					}
 					resolve(true);
 				});
