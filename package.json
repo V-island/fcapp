@@ -48,7 +48,7 @@
   "dependencies": {
     "@webcomponents/webcomponentsjs": "^1.1.0",
     "art-template": "^4.12.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "better-scroll": "^1.12.4",
     "chat-engine": "^0.9.19",
     "cropperjs": "^1.4.1",
