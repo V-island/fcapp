@@ -33,7 +33,7 @@
     "file-loader": "^1.1.11",
     "holderjs": "^2.9.4",
     "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "^5.5.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "script-loader": "^0.7.2",
@@ -64,7 +64,7 @@
     "sendbird": "^3.0.69",
     "video.js": "^5.8",
     "videojs-resolution-switcher": "^0.4.2",
-    "webpack-encoding-plugin": "^0.2.1",
+    "webpack-encoding-plugin": "^0.3.1",
     "wolfy87-eventemitter": "^5.2.5"
   }
 }
